@@ -1,0 +1,5 @@
+decorating MeshDesc with Mesh makes const-correctness problematic.
+
+Mesh: handle "empty" MeshDesc
+
+glDepthMask() affects glClear(GL_DEPTH_BUFFER_BIT). Spend half a day debugging ... sigh

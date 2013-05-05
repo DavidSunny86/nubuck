@@ -1,0 +1,11 @@
+#!/bin/bash
+# mocname MOCGEN_DIR FILE0 ... FILEn
+
+MOCGEN_DIR=$1
+shift
+
+while [ $# -gt 0 ]
+do
+    echo $1 | sed -e s%.%./$MOCGEN_DIR% -e s%\.h$%_moc.cpp%
+    shift
+done

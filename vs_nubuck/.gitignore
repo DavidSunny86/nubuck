@@ -1,0 +1,10 @@
+Win32/
+*.sdf
+*.opensdf
+Debug/
+Release/
+GeneratedFiles/
+*.vcxproj.user
+ipch/
+*.suo
+logfile.txt

@@ -1,0 +1,3 @@
+#!/bin/bash
+# uiheadername GENFILESDIR FORMSNAME
+echo "./$1/ui_"$(basename $2 .ui)".h"

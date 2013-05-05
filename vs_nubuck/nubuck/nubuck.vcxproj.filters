@@ -1,0 +1,519 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Public">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Private">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="Private\renderer">
+      <UniqueIdentifier>{151e343b-87de-4e47-864a-b4bbbc62857d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\glew">
+      <UniqueIdentifier>{690cb762-88fa-4f65-ae23-5819d5d13f68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\UI">
+      <UniqueIdentifier>{7614b199-a3c9-4071-9455-8f56505238c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\UI\mainwindow">
+      <UniqueIdentifier>{30f02b77-8f09-4abe-be2d-7ccb0c5c297c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\UI\renderview">
+      <UniqueIdentifier>{fe7dcee8-8160-4e02-bde6-15ad16e0845a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\generic">
+      <UniqueIdentifier>{02fd699d-1a32-4c74-a58b-703c5192a5ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\effects">
+      <UniqueIdentifier>{086e3747-c671-415c-8dc2-1ed97aea6a42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\common">
+      <UniqueIdentifier>{3c05911a-04b5-45c7-9e68-6c515759e248}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\program">
+      <UniqueIdentifier>{44f3ce80-44f1-49a2-a3b2-9db6d515353d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\shader">
+      <UniqueIdentifier>{9b6c3aac-3e11-4ed9-aec8-da3fd0fb0269}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\color">
+      <UniqueIdentifier>{7fb5ce12-07b5-413e-92f3-5215542687ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\math">
+      <UniqueIdentifier>{3c07f34d-2e2a-43d4-8ebf-4eea32704bf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\mesh">
+      <UniqueIdentifier>{5559252f-6c7b-48c3-bc81-d03b8ee4c099}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\mesh\quad">
+      <UniqueIdentifier>{fe6a8f41-699f-43c1-96ce-ade8e91367ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\world">
+      <UniqueIdentifier>{8ac41f66-c4a2-41c1-a5bd-632cae1ae4e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\system">
+      <UniqueIdentifier>{eeb790c1-2d4b-4a66-9c07-4bf52d3dde1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\system\opengl">
+      <UniqueIdentifier>{53753027-11e4-4504-ae1e-23e6a182ae97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\system\timer">
+      <UniqueIdentifier>{321c52af-aace-438b-87f1-f185f28c7836}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\system\window">
+      <UniqueIdentifier>{54b89710-f726-4839-b67d-2c28d809061b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\system\opengl\glwindow">
+      <UniqueIdentifier>{10a182e9-25a9-4b3d-a6e1-072f89764598}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\mesh\polyhedron">
+      <UniqueIdentifier>{7e8cc913-8676-43d5-8c11-42cfcd37db88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\UI\randompoints">
+      <UniqueIdentifier>{68b15fd8-3765-4698-82b6-dcdf986944f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{7830a7c0-b491-46b7-b027-790784e54110}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{7797bb4e-85d5-425a-aed6-1f8c1c0f0ebb}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Private\world\entities">
+      <UniqueIdentifier>{80e705f5-6367-4b12-baa3-3a7e4280a3a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\world\entities\ent_polyhedron">
+      <UniqueIdentifier>{d0d4eda9-af5e-479b-8a48-e75043dabe06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\camera">
+      <UniqueIdentifier>{b6528ad0-dcb5-43b5-ab7b-f070bdda70d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\light">
+      <UniqueIdentifier>{aa1872b8-242c-4661-8009-d3855a79d80c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\world\entities\ent_node">
+      <UniqueIdentifier>{be5c4589-a8b3-41a5-8584-688a0e775644}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\material">
+      <UniqueIdentifier>{d4fef104-4ebd-44a0-be59-d17ac18acad1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\UI\algorithmwidget">
+      <UniqueIdentifier>{3f6dbbd9-6d3e-43ac-adf0-553b99407542}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\algdriver">
+      <UniqueIdentifier>{8ce06f9d-99e8-45b1-aaee-019d1cf47783}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\system\locks">
+      <UniqueIdentifier>{e8634b6a-8aa4-4a56-a587-aa307570c037}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\system\thread">
+      <UniqueIdentifier>{98c6cb0d-31e3-4176-adb8-86a6c5d20bfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\UI\logwidget">
+      <UniqueIdentifier>{17cdd0db-4c76-4c7f-bfe1-a66deb0f3fe5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
+      <Filter>Private\renderer\glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\glew\glxew.h">
+      <Filter>Private\renderer\glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\glew\wglew.h">
+      <Filter>Private\renderer\glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\nubuck.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_mainwindow.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\generic\pointer.h">
+      <Filter>Private\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\generic\singleton.h">
+      <Filter>Private\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\generic\uncopyable.h">
+      <Filter>Private\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\common\common.h">
+      <Filter>Private\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader.h">
+      <Filter>Private\renderer\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\program\program.h">
+      <Filter>Private\renderer\program</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\color\color.h">
+      <Filter>Private\renderer\color</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\color\color_inl.h">
+      <Filter>Private\renderer\color</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\line.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\line_mem_inl.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\math.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\math_inl.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\matrix3.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\matrix4.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\quaternion.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\quaternion_mem_inl.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\quaternion_op_inl.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\transform.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\vector2.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\vector2_mem_inl.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\vector2_op_inl.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\vector3.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\vector3_mem_inl.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\vector3_op_inl.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\pass.h">
+      <Filter>Private\renderer\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\glcall.h">
+      <Filter>Private\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\renderer.h">
+      <Filter>Private\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\mesh.h">
+      <Filter>Private\renderer\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.h">
+      <Filter>Private\renderer\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\quad\quad.h">
+      <Filter>Private\renderer\mesh\quad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\world.h">
+      <Filter>Private\world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\opengl\glwindow\glwindow.h">
+      <Filter>Private\system\opengl\glwindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\opengl\opengl.h">
+      <Filter>Private\system\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\timer\timer.h">
+      <Filter>Private\system\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\window\loop.h">
+      <Filter>Private\system\window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\window\window.h">
+      <Filter>Private\system\window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\winerror.h">
+      <Filter>Private\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\renderworld.h">
+      <Filter>Private\world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polyhedron\polyhedron.h">
+      <Filter>Private\renderer\mesh\polyhedron</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_randompoints.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\common\types.h">
+      <Filter>Private\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.h">
+      <Filter>Private\world\entities\ent_polyhedron</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\camera\arcball_camera.h">
+      <Filter>Private\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\light\light.h">
+      <Filter>Private\renderer\light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\effect.h">
+      <Filter>Private\renderer\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\entity.h">
+      <Filter>Private\world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\events.h">
+      <Filter>Private\world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_node\ent_node.h">
+      <Filter>Private\world\entities\ent_node</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\material\material.h">
+      <Filter>Private\renderer\material</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_algorithm.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\nubuck_private.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\algdriver\algdriver.h">
+      <Filter>Private\algdriver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\locks\spinlock.h">
+      <Filter>Private\system\locks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\thread\thread.h">
+      <Filter>Private\system\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\UI\logwidget\logwidget_inl.h">
+      <Filter>Private\UI\logwidget</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_logwidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\polyhedron.h">
+      <Filter>Private\world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\world_inl.h">
+      <Filter>Private\world</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
+      <Filter>Private\renderer\glew</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\nubuck.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.cpp">
+      <Filter>Private\UI\mainwindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\renderview\renderview.cpp">
+      <Filter>Private\UI\renderview</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\common\common.cpp">
+      <Filter>Private\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader.cpp">
+      <Filter>Private\renderer\shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\program\program.cpp">
+      <Filter>Private\renderer\program</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\color\color.cpp">
+      <Filter>Private\renderer\color</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\line.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\math.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\matrix3_mem.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\matrix3_op.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\matrix4_mem.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\matrix4_op.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\quaternion_mem.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\vector3_mem.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\vector3_op.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\pass.cpp">
+      <Filter>Private\renderer\effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\renderer.cpp">
+      <Filter>Private\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\mesh.cpp">
+      <Filter>Private\renderer\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.cpp">
+      <Filter>Private\renderer\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\quad\quad.cpp">
+      <Filter>Private\renderer\mesh\quad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\world.cpp">
+      <Filter>Private\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\system\opengl\glwindow\glwindow.cpp">
+      <Filter>Private\system\opengl\glwindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\system\opengl\opengl.cpp">
+      <Filter>Private\system\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\system\timer\timer.cpp">
+      <Filter>Private\system\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\system\window\window.cpp">
+      <Filter>Private\system\window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\system\winerror.cpp">
+      <Filter>Private\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\polyhedron\polyhedron.cpp">
+      <Filter>Private\renderer\mesh\polyhedron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\randompoints\randompoints.cpp">
+      <Filter>Private\UI\randompoints</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_randompoints.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_randompoints.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_mainwindow.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_mainwindow.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.cpp">
+      <Filter>Private\world\entities\ent_polyhedron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\camera\arcball_camera.cpp">
+      <Filter>Private\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\effect.cpp">
+      <Filter>Private\renderer\effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\default_effects.cpp">
+      <Filter>Private\renderer\effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\entity.cpp">
+      <Filter>Private\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_node\ent_node.cpp">
+      <Filter>Private\world\entities\ent_node</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_renderview.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_renderview.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\algorithmwidget\algorithmwidget.cpp">
+      <Filter>Private\UI\algorithmwidget</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_algorithmwidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_algorithmwidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\algdriver\algdriver.cpp">
+      <Filter>Private\algdriver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\system\locks\spinlock.cpp">
+      <Filter>Private\system\locks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\system\thread\thread.cpp">
+      <Filter>Private\system\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\logwidget\logwidget.cpp">
+      <Filter>Private\UI\logwidget</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_logwidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_logwidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\_polyhedron.cpp">
+      <Filter>Private\world</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
+      <Filter>Private\UI\mainwindow</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\mainwindow.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\randompoints\randompoints.h">
+      <Filter>Private\UI\randompoints</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\randompoints.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\renderview\renderview.h">
+      <Filter>Private\UI\renderview</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\algorithm.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\algorithmwidget\algorithmwidget.h">
+      <Filter>Private\UI\algorithmwidget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\logwidget\logwidget.h">
+      <Filter>Private\UI\logwidget</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\logwidget.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\Nubuck\renderer\renderer_notes.txt">
+      <Filter>Private\renderer</Filter>
+    </None>
+  </ItemGroup>
+</Project>

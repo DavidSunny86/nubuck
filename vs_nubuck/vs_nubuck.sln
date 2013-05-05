@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nubuck", "nubuck\nubuck.vcxproj", "{41FA7EED-25F5-4CD7-8656-42AB6FD66983}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nubuck_client", "nubuck_client\nubuck_client.vcxproj", "{B0B72E6A-6454-4434-9BC6-BA284F170F7D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{41FA7EED-25F5-4CD7-8656-42AB6FD66983} = {41FA7EED-25F5-4CD7-8656-42AB6FD66983}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{41FA7EED-25F5-4CD7-8656-42AB6FD66983}.Debug|Win32.ActiveCfg = Debug|Win32
+		{41FA7EED-25F5-4CD7-8656-42AB6FD66983}.Debug|Win32.Build.0 = Debug|Win32
+		{41FA7EED-25F5-4CD7-8656-42AB6FD66983}.Release|Win32.ActiveCfg = Release|Win32
+		{41FA7EED-25F5-4CD7-8656-42AB6FD66983}.Release|Win32.Build.0 = Release|Win32
+		{B0B72E6A-6454-4434-9BC6-BA284F170F7D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B0B72E6A-6454-4434-9BC6-BA284F170F7D}.Debug|Win32.Build.0 = Debug|Win32
+		{B0B72E6A-6454-4434-9BC6-BA284F170F7D}.Release|Win32.ActiveCfg = Release|Win32
+		{B0B72E6A-6454-4434-9BC6-BA284F170F7D}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

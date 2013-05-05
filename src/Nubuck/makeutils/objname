@@ -1,0 +1,11 @@
+#!/bin/bash
+# objname BUILD_DIR FILE0 ... FILEn
+
+BUILD_DIR=$1
+shift
+
+while [ $# -gt 0 ]
+do
+    echo $1 | sed -e s%.%./$BUILD_DIR% -e s%.cpp$%.obj% -e s%.c$%.obj% -e s%.h$%.obj%
+    shift
+done

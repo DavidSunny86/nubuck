@@ -1,0 +1,10 @@
+Make.src
+core
+geo
+graph
+graphics
+numbers
+
+# ignore only leda's files, not Nubuck's
+/Makefile
+/system
