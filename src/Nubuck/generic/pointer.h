@@ -6,147 +6,167 @@
 
 namespace GEN {
 
-    template<class T>
-	class Pointer {
-		template<class U> friend class Pointer;
-	private:
-		T*			_raw;
-		unsigned*	_cnt;
+    namespace PointerImpl {
 
-		void Drop(void);
-		template<class U> void Copy(const Pointer<U>& other);
-	public:
-		Pointer(void);
-		Pointer(const Pointer& other);
-		Pointer(T* const raw);
-		template<class U> Pointer(const Pointer<U>& other);
-		~Pointer(void);
+        struct RefCount {
+            unsigned val;
 
-		Pointer& operator=(const Pointer& other);
-		template<class U> Pointer& operator=(const Pointer<U>& other);
+            void Inc(void) { val++; }
+            unsigned Dec(void) { return --val; }
+        };
 
-		const T*	Raw(void) const;
-		T*			Raw(void);
-		unsigned	Count(void) const;
-	
-		bool		IsValid(void) const;
+        template<typename LOCK>
+        struct LockedRefCount {
+            unsigned    val;
+            LOCK        lck;
 
-		const T*	operator->(void) const;
-		const T&	operator*(void) const;
-		T*			operator->(void);
-		T&			operator*(void);
-	};
+            void Inc(void) {
+                lck.Lock();
+                val++;
+                lck.Unlock();
+            }
 
-	template<class T>
-	void Pointer<T>::Drop(void) {
-		if(NULL != _raw /* ie. pointer is valid */) {
-			if(0 >= --(*_cnt)) {
-				delete _raw;
-				_raw = NULL;
+            unsigned Dec(void) {
+                lck.Lock();
+                unsigned ret = --val;
+                lck.Unlock();
+                return ret;
+            }
+        };
 
-				delete _cnt;
-				_cnt = NULL;
-			}
-		}
-	}
+    } // namespace PointerImpl
 
-	template<class T>
-	template<class U>
-	void Pointer<T>::Copy(const Pointer<U>& other) {
-		Drop();
+    template<
+        typename TYPE, 
+        typename REFCNT = PointerImpl::RefCount
+    >
+    class Pointer {
+        template<typename, typename> friend class Pointer;
+    private:
+        TYPE*   _raw;
+        REFCNT* _cnt;
+    public:
+        Pointer(void);
+        Pointer(const Pointer& other);
+        template<typename IMPLICIT> 
+        Pointer(const Pointer<IMPLICIT, REFCNT>& other);
+        Pointer(TYPE* const raw);
+        ~Pointer(void);
 
-		_raw = other._raw;
-		_cnt = other._cnt;
+        Pointer& operator=(const Pointer& other);
+        template<typename IMPLICIT>
+        Pointer& operator=(const Pointer<IMPLICIT, REFCNT>& other);
 
-		if(NULL != _raw /* ie. pointer is valid */) {
-			(*_cnt)++;
-		}
-	}
+        void Drop(void);
 
-	template<class T>
-	inline Pointer<T>::Pointer(void) : _raw(NULL), _cnt(NULL) {
-	}
+        const TYPE*	Raw(void) const;
+        TYPE*		Raw(void);
+        unsigned	Count(void) const;
+    
+        bool		IsValid(void) const;
 
-	template<class T>
-	inline Pointer<T>::Pointer(const Pointer& other) : _raw(other._raw), _cnt(other._cnt) {
-		if(NULL != _raw /* ie. pointer is valid */) {
-			(*_cnt)++;
-		}
-	}
+        const TYPE*	operator->(void) const;
+        const TYPE&	operator*(void) const;
+        TYPE*		operator->(void);
+        TYPE&		operator*(void);
+    };
 
-	template<class T>
-	inline Pointer<T>::Pointer(T* const raw) : _raw(NULL), _cnt(NULL) {
-		if(NULL != raw) {
-			unsigned* cnt = new unsigned(1);
-			_raw = raw;
-			_cnt = cnt;
-		}
-	}
+    template<typename TYPE, typename REFCNT>
+    inline Pointer<TYPE, REFCNT>::Pointer(void) : _raw(NULL), _cnt(NULL) { }
 
-	template<class T>
-	template<class U>
-	inline Pointer<T>::Pointer(const Pointer<U>& other) : _raw(other._raw), _cnt(other._cnt) {
-		if(NULL != _raw) {
-			(*_cnt)++;
-		}
-	}
+    template<typename TYPE, typename REFCNT>
+    inline Pointer<TYPE, REFCNT>::Pointer(const Pointer& other) : _raw(other._raw), _cnt(other._cnt) {
+        if(_raw) _cnt->Inc();
+    }
 
-	template<class T>
-	inline Pointer<T>::~Pointer(void) {
-		Drop();
-	}
+    template<typename TYPE, typename REFCNT>
+    template<typename IMPLICIT>
+    inline Pointer<TYPE, REFCNT>::Pointer(const Pointer<IMPLICIT, REFCNT>& other) : _raw(other._raw), _cnt(other._cnt) {
+        if(_raw) _cnt->Inc();
+    }
 
-	template<class T>
-	inline Pointer<T>& Pointer<T>::operator=(const Pointer& other) {
-		if(&other != this) Copy(other);
-		return *this;
-	}
+    template<typename TYPE, typename REFCNT>
+    inline Pointer<TYPE, REFCNT>::Pointer(TYPE* const raw) : _raw(NULL), _cnt(NULL) {
+        if(NULL != raw) {
+            REFCNT* cnt = new REFCNT();
+            cnt->val = 1;
+            _raw = raw;
+            _cnt = cnt;
+        }
+    }
 
-	template<class T>
-	template<class U>
-	inline Pointer<T>& Pointer<T>::operator=(const Pointer<U>& other) {
-		Copy(other);
-		return *this;
-	}
+    template<typename TYPE, typename REFCNT>
+    inline Pointer<TYPE, REFCNT>::~Pointer(void) {
+        Drop();
+    }
 
-	template<class T>
-	inline const T* Pointer<T>::Raw(void) const {
-		return _raw;
-	}
+    template<typename TYPE, typename REFCNT>
+    inline Pointer<TYPE, REFCNT>& Pointer<TYPE, REFCNT>::operator=(const Pointer& other) {
+        if(this != &other) {
+            Drop();
+            if((_raw = other._raw) && (_cnt = other._cnt)) _cnt->Inc();
+        }
+        return *this;
+    }
 
-	template<class T>
-	inline T* Pointer<T>::Raw(void){
-		return _raw;
-	}
+    template<typename TYPE, typename REFCNT>
+    template<typename IMPLICIT>
+    inline Pointer<TYPE, REFCNT>& Pointer<TYPE, REFCNT>::operator=(const Pointer<IMPLICIT, REFCNT>& other) {
+        if(this != &other) {
+            Drop();
+            if((_raw = other._raw) && (_cnt = other._cnt)) _cnt->Inc();
+        }
+        return *this;
+    }
 
-	template<class T>
-	inline unsigned Pointer<T>::Count(void) const {
-		return *_cnt;
-	}
+    template<typename TYPE, typename REFCNT>
+    inline void Pointer<TYPE, REFCNT>::Drop(void) {
+        if(_raw && !_cnt->Dec()) {
+            delete _raw;
+            delete _cnt;
+        }
+        _raw = NULL;
+        _cnt = NULL;
+    }
 
-	template<class T>
-	inline bool Pointer<T>::IsValid(void) const {
-		return NULL != _raw;
-	}
+    template<typename TYPE, typename REFCNT>
+    inline const TYPE* Pointer<TYPE, REFCNT>::Raw(void) const {
+        return _raw;
+    }
 
-	template<class T> 
-	const T* Pointer<T>::operator->(void) const {
-		return _raw;
-	}
+    template<typename TYPE, typename REFCNT>
+    inline TYPE* Pointer<TYPE, REFCNT>::Raw(void){
+        return _raw;
+    }
 
-	template<class T>
-	const T& Pointer<T>::operator*(void) const {
-		return *_raw;
-	}
+    template<typename TYPE, typename REFCNT>
+    inline unsigned Pointer<TYPE, REFCNT>::Count(void) const {
+        return *_cnt;
+    }
 
-	template<class T>
-	T* Pointer<T>::operator->(void) {
-		return _raw;
-	}
+    template<typename TYPE, typename REFCNT>
+    inline bool Pointer<TYPE, REFCNT>::IsValid(void) const {
+        return NULL != _raw;
+    }
 
-	template<class T>
-	T& Pointer<T>::operator*(void) {
-		return *_raw;
-	}
+    template<typename TYPE, typename REFCNT> 
+    const TYPE* Pointer<TYPE, REFCNT>::operator->(void) const {
+        return _raw;
+    }
+
+    template<typename TYPE, typename REFCNT>
+    const TYPE& Pointer<TYPE, REFCNT>::operator*(void) const {
+        return *_raw;
+    }
+
+    template<typename TYPE, typename REFCNT>
+    TYPE* Pointer<TYPE, REFCNT>::operator->(void) {
+        return _raw;
+    }
+
+    template<typename TYPE, typename REFCNT>
+    TYPE& Pointer<TYPE, REFCNT>::operator*(void) {
+        return *_raw;
+    }
 
 } // namespace GEN
