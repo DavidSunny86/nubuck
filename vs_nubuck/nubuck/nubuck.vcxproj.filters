@@ -323,9 +323,6 @@
     <ClInclude Include="..\..\src\Nubuck\world\world_inl.h">
       <Filter>Private\world</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\generic\res_pointer.h">
-      <Filter>Private\generic</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
