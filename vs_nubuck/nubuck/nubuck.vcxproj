@@ -17,6 +17,7 @@
     <ClInclude Include="..\..\src\Nubuck\common\common.h" />
     <ClInclude Include="..\..\src\Nubuck\common\types.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\pointer.h" />
+    <ClInclude Include="..\..\src\Nubuck\generic\res_pointer.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\singleton.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\uncopyable.h" />
     <ClInclude Include="..\..\src\Nubuck\math\line.h" />
