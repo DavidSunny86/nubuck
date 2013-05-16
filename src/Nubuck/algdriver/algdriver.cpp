@@ -30,7 +30,7 @@ namespace ALG {
     void Driver::Step(void) {
         if(_phase.IsValid()) {
             if(IPhase::DONE == _phase->Step()) {
-                SetPhase(_phase->NextPhase());
+                SetPhase(GEN::Pointer<IPhase>(_phase->NextPhase()));
             }
         }
     }

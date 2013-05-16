@@ -50,7 +50,7 @@ namespace GEN {
         Pointer(const Pointer& other);
         template<typename IMPLICIT> 
         Pointer(const Pointer<IMPLICIT, REFCNT>& other);
-        Pointer(TYPE* const raw);
+        explicit Pointer(TYPE* const raw);
         ~Pointer(void);
 
         Pointer& operator=(const Pointer& other);
