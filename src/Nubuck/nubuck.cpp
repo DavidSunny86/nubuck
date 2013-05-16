@@ -34,7 +34,9 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
 
     W::world.RegisterEntity<W::ENT_Node>(W::ENT_NODE);
     W::world.RegisterEntity<W::ENT_Polyhedron>(W::ENT_POLYHEDRON);
+#ifdef NUBUCK_MT
     W::world.Start();
+#endif
 
     nubuck.common   = &common;
     nubuck.world    = &W::world;

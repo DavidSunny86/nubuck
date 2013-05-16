@@ -78,6 +78,9 @@ namespace UI {
 
     void RenderView::Update(void) {
         updateGL();
+#ifndef NUBUCK_MT
+        W::world.Update();
+#endif
     }
 
 } // namespace UI
