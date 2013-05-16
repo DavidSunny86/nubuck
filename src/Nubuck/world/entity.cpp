@@ -12,7 +12,7 @@ namespace W {
     }
 
     void Entity::SetMeshDesc(const R::MeshDesc& meshDesc) {
-        _mesh = GEN::Pointer<R::Mesh>(new R::Mesh(meshDesc));
+        _mesh = R::meshPtr_t(new R::Mesh(meshDesc));
     }
 
     void Entity::InvalidateMesh(void) {
@@ -65,7 +65,7 @@ namespace W {
     }
 
     void Entity::FreeResources(void) {
-        _mesh   = GEN::Pointer<R::Mesh>();
+        _mesh   = R::meshPtr_t();
         _effect = GEN::Pointer<R::Effect>();
     }
 
@@ -76,7 +76,7 @@ namespace W {
     R::RenderJob Entity::GetRenderJob(void) {
         R::RenderJob renderJob;
         renderJob.fx        = _effect.Raw();
-        renderJob.mesh      = _mesh.Raw();
+        renderJob.mesh      = _mesh;
         renderJob.material  = &_material;
         renderJob.transform = M::Mat4::Translate(_position);
         return renderJob;

@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <generic\pointer.h>
+#include <system\locks\spinlock.h>
 #include <math\matrix4.h>
 #include "light\light.h"
 
@@ -12,9 +13,11 @@ namespace R {
     class   Mesh;
     struct  Material;
 
+    typedef GEN::Pointer<Mesh, GEN::PointerImpl::LockedRefCount<SYS::SpinLock> > meshPtr_t;
+
     struct RenderJob {
         Effect*     fx;
-        Mesh*       mesh;
+        meshPtr_t   mesh;
         Material*   material;
         M::Matrix4  transform;
 

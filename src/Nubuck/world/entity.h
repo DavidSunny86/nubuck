@@ -5,6 +5,8 @@
 #include <renderer\material\material.h>
 #include <renderer\renderer.h>
 
+#include <system\locks\spinlock.h>
+
 namespace W {
 
     struct Event;
@@ -14,7 +16,7 @@ namespace W {
         int         _id;
         M::Vector3  _position;
  
-        GEN::Pointer<R::Mesh>       _mesh;
+        R::meshPtr_t                _mesh;
         GEN::Pointer<R::Effect>     _effect;
         R::Material                 _material;
 

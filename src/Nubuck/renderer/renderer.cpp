@@ -143,7 +143,7 @@ namespace R {
     }
 
     void Renderer::Add(const RenderJob& renderJob) {
-        if(!renderJob.fx || !renderJob.mesh) return;
+        if(!renderJob.fx || !renderJob.mesh.IsValid()) return;
         _renderJobs.push_back(renderJob);
         _renderJobs.back().next = NULL;
     }
