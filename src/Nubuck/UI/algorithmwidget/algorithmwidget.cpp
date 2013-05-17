@@ -9,9 +9,11 @@ namespace UI {
     }
 
     void AlgorithmWidget::OnNext(void) {
+        ALG::Driver::Instance().Next();
     }
 
     void AlgorithmWidget::OnRun(void) {
+        ALG::Driver::Instance().Run();
     }
 
     void AlgorithmWidget::OnReset(void) {

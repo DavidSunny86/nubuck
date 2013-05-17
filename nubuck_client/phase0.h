@@ -22,7 +22,7 @@ struct Phase0 : IPhase {
     void Leave(void) override;
 
     bool IsWall(void) const override { return true; }
-    bool IsDone(void) const override { return true; }
+    bool IsDone(void) const override { return false; }
 
     StepRet Step(void) override;
     IPhase* NextPhase(void) override;

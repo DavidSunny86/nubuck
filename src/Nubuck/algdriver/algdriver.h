@@ -26,6 +26,8 @@ namespace ALG {
 
         void Reset(void);
         void Step(void);
+        void Next(void);
+        void Run(void);
     };
 
 } // namespace ALG

@@ -35,4 +35,15 @@ namespace ALG {
         }
     }
 
+    void Driver::Next(void) {
+        if(_phase.IsValid()) {
+            while(IPhase::DONE != _phase->Step());
+            SetPhase(GEN::Pointer<IPhase>(_phase->NextPhase()));
+        }
+    }
+
+    void Driver::Run(void) {
+        while(_phase.IsValid() && !_phase->IsDone()) Next();
+    }
+
 } // namespace ALG
