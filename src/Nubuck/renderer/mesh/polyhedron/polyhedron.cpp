@@ -96,6 +96,14 @@ namespace R {
         Rebuild();
     }
 
+    unsigned PolyhedronMesh::NumFaces(void) const {
+        return _faces.size();
+    }
+
+    unsigned PolyhedronMesh::FaceOf(leda::edge e) const {
+        return _edges[e].faceIndex;
+    }
+
     const PolyhedronMesh::graph_t& PolyhedronMesh::GetGraph(void) const {
         return _G;
     }

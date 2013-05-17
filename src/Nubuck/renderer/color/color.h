@@ -20,6 +20,8 @@ namespace R {
 	Color operator+(const Color& lhp, const Color& rhp);
 	Color operator*(float f, const Color& color);
 
+    Color Lerp(const Color& source, const Color& target, float l);
+
 } // namespace R
 
 #include "color_inl.h"

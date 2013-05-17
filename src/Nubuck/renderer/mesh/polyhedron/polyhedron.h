@@ -41,6 +41,9 @@ namespace R {
     public:
         PolyhedronMesh(const graph_t& G);
 
+        unsigned NumFaces(void) const;
+        unsigned FaceOf(leda::edge e) const;
+
         const graph_t&  GetGraph(void) const;
         Desc            GetDesc(void) const override;
 

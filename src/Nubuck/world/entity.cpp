@@ -51,18 +51,10 @@ namespace W {
         R::MeshMgr::Instance().Release(_meshHandle);
     }
 
-    R::Color Lerp(const R::Color& source, const R::Color& target, float l) {
-        return R::Color(
-            (1.0f - l) * source.r + l * target.r,
-            (1.0f - l) * source.g + l * target.g,
-            (1.0f - l) * source.b + l * target.b,
-            (1.0f - l) * source.a + l * target.a);
-    }
-
     void Entity::Update(float secsPassed) {
         if(CHANGE_COLOR == _state) {
             const float l = M::Min(1.0f, _changeColorState.t / _changeColorState.dur);
-            _material.diffuseColor = Lerp(_changeColorState.sourceColor, _changeColorState.targetColor, _changeColorState.func(l));
+            _material.diffuseColor = R::Lerp(_changeColorState.sourceColor, _changeColorState.targetColor, _changeColorState.func(l));
             _changeColorState.t += secsPassed;
 
             if(_changeColorState.t >= _changeColorState.dur)
