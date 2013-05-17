@@ -54,6 +54,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\program\program.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\renderer.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader.h" />
+    <ClInclude Include="..\..\src\Nubuck\system\locks\semaphore.h" />
     <ClInclude Include="..\..\src\Nubuck\system\locks\spinlock.h" />
     <ClInclude Include="..\..\src\Nubuck\system\opengl\glwindow\glwindow.h" />
     <ClInclude Include="..\..\src\Nubuck\system\opengl\opengl.h" />
@@ -153,6 +154,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\program\program.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\renderer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\system\locks\semaphore.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\locks\spinlock.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\opengl\glwindow\glwindow.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\opengl\opengl.cpp" />

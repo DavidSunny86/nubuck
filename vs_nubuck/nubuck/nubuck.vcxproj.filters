@@ -326,6 +326,9 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr.h">
       <Filter>Private\renderer\mesh</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\locks\semaphore.h">
+      <Filter>Private\system\locks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -486,6 +489,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\meshmgr.cpp">
       <Filter>Private\renderer\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\system\locks\semaphore.cpp">
+      <Filter>Private\system\locks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
