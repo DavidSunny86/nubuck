@@ -11,12 +11,12 @@ namespace W {
         _position = position;
     }
 
-    void Entity::SetMeshDesc(const R::MeshDesc& meshDesc) {
-        _mesh = R::meshPtr_t(new R::Mesh(meshDesc));
+    void Entity::SetMeshHandle(R::MeshMgr::meshHandle_t meshHandle) {
+        R::MeshMgr::Instance().Release(_meshHandle);
+        _meshHandle = meshHandle;
     }
 
     void Entity::InvalidateMesh(void) {
-        _mesh->Invalidate();
     }
 
     void Entity::SetID(int id) { _id = id; }
@@ -41,8 +41,13 @@ namespace W {
 
     Entity::Entity(void) : _id(0), _position(M::Vector3::Zero) {
         _state = IDLE;
+        _meshHandle = NULL;
         _effect = R::EffectManager::Instance().GetEffect("Lit");
         _material.diffuseColor = R::Color::White;
+    }
+
+    Entity::~Entity(void) {
+        R::MeshMgr::Instance().Release(_meshHandle);
     }
 
     R::Color Lerp(const R::Color& source, const R::Color& target, float l) {
@@ -65,7 +70,6 @@ namespace W {
     }
 
     void Entity::FreeResources(void) {
-        _mesh   = R::meshPtr_t();
         _effect = GEN::Pointer<R::Effect>();
     }
 
@@ -76,7 +80,7 @@ namespace W {
     R::RenderJob Entity::GetRenderJob(void) {
         R::RenderJob renderJob;
         renderJob.fx        = _effect.Raw();
-        renderJob.mesh      = _mesh;
+        renderJob.mesh      = _meshHandle;
         renderJob.material  = &_material;
         renderJob.transform = M::Mat4::Translate(_position);
         return renderJob;

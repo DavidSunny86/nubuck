@@ -1,3 +1,4 @@
+#include <renderer\mesh\meshmgr.h>
 #include <renderer\mesh\quad\quad.h>
 #include <world\events.h>
 #include "ent_node.h"
@@ -12,6 +13,14 @@ namespace {
 } // unnamed namespace
 
 namespace W {
+
+    void ENT_Node::InitResources(void) {
+        static bool init = false;
+        if(!init) {
+            R::MeshMgr::Instance().RegisterMesh(R::CreateQuad(), "quad");
+        }
+        init = true;
+    }
 
     void ENT_Node::HandleEvent(const Event& event) {
         if(EVENT_CHANGE_COLOR == event.id) {
@@ -31,7 +40,9 @@ namespace W {
         _node = spawnArgs->node;
 
         SetPosition(ToVector((*spawnArgs->G)[_node]));
-        SetMeshDesc(R::CreateQuad());
+
+        InitResources();
+        SetMeshHandle(R::MeshMgr::Instance().FindMesh("quad"));
     }
 
 } // namespace W

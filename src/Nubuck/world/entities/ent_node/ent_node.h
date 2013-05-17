@@ -8,6 +8,8 @@ namespace W {
     class ENT_Node : public Entity {
     private:
         leda::node _node;
+
+        static void InitResources(void);
     public:
         struct SpawnArgs {
             const graph_t*  G;

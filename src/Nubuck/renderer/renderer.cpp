@@ -67,17 +67,20 @@ namespace R {
     }
 
     RenderJob* DrawMeshList(Program& prog, int passType, const M::Matrix4& worldMat, RenderJob* first) {
-        RenderJob* mesh = first;
-        while(mesh && mesh->fx == first->fx) {
+        RenderJob* meshJob = first;
+        while(meshJob && meshJob->fx == first->fx) {
             if(FIRST_LIGHT_PASS == passType || LIGHT_PASS == passType)
-                SetMaterialUniforms(prog, *mesh->material);
+                SetMaterialUniforms(prog, *meshJob->material);
 
-            prog.SetUniform("uTransform", worldMat * mesh->transform);
-            mesh->mesh->Bind();
-            mesh->mesh->Draw();
-            mesh = mesh->next;
+            prog.SetUniform("uTransform", worldMat * meshJob->transform);
+
+            Mesh& mesh = MeshMgr::Instance().GetMesh(meshJob->mesh);
+            mesh.Bind();
+            mesh.Draw();
+
+            meshJob = meshJob->next;
         }
-        return mesh;
+        return meshJob;
     }
 
     void Renderer::DrawFrame(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
@@ -143,7 +146,7 @@ namespace R {
     }
 
     void Renderer::Add(const RenderJob& renderJob) {
-        if(!renderJob.fx || !renderJob.mesh.IsValid()) return;
+        if(!renderJob.fx || !renderJob.mesh) return;
         _renderJobs.push_back(renderJob);
         _renderJobs.back().next = NULL;
     }
@@ -160,10 +163,12 @@ namespace R {
             RenderJob& rjob = _renderJobs[i];
             if(i < numJobs - 1) rjob.next = &_renderJobs[i + 1];
             rjob.fx->Compile();
-            rjob.mesh->Compile();
+            MeshMgr::Instance().GetMesh(rjob.mesh).Compile();
         }
 
         DrawFrame(worldMat, projectionMat);
+
+        R::MeshMgr::Instance().Update();
     }
 
 

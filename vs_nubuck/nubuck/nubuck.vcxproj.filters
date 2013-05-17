@@ -323,6 +323,9 @@
     <ClInclude Include="..\..\src\Nubuck\world\world_inl.h">
       <Filter>Private\world</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr.h">
+      <Filter>Private\renderer\mesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -480,6 +483,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\world\_polyhedron.cpp">
       <Filter>Private\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\meshmgr.cpp">
+      <Filter>Private\renderer\mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

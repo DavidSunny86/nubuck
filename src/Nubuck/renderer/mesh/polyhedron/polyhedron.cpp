@@ -102,10 +102,19 @@ namespace R {
 
     MeshDesc PolyhedronMesh::GetDesc(void) const {
         MeshDesc desc;
-        desc.vertices       = &_vertices[0];
-        desc.numVertices    = _vertices.size();
-        desc.indices        = &_indices[0];
-        desc.numIndices     = _indices.size();
+
+        Vertex* vertCpy = new Vertex[_vertices.size()];
+        for(unsigned i = 0; i < _vertices.size(); ++i)
+            vertCpy[i] = _vertices[i];
+        desc.vertices = vertCpy;
+        desc.numVertices = _vertices.size();
+
+        Index* indCpy = new Index[_indices.size()];
+        for(unsigned i = 0; i < _indices.size(); ++i)
+            indCpy[i] = _indices[i];
+        desc.indices = indCpy;
+        desc.numIndices = _indices.size();
+
         desc.primType       = GL_TRIANGLE_FAN;
         return desc;
     }

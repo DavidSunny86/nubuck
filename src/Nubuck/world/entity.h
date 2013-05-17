@@ -1,6 +1,7 @@
 #pragma once
 
 #include <renderer\effects\effect.h>
+#include <renderer\mesh\meshmgr.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\material\material.h>
 #include <renderer\renderer.h>
@@ -16,7 +17,7 @@ namespace W {
         int         _id;
         M::Vector3  _position;
  
-        R::meshPtr_t                _mesh;
+        R::MeshMgr::meshHandle_t    _meshHandle;
         GEN::Pointer<R::Effect>     _effect;
         R::Material                 _material;
 
@@ -39,13 +40,14 @@ namespace W {
         void ChangeColor(ChangeColorState::func_t func, const R::Color& targetColor, float dur);
     protected:
         void SetPosition(const M::Vector3& position);
-        void SetMeshDesc(const R::MeshDesc& meshDesc);
+        void SetMeshHandle(const R::MeshMgr::meshHandle_t meshHandle);
         void InvalidateMesh(void);
 
         void PulseColor(const R::Color& targetColor, float dur);
         void LerpColor(const R::Color& targetColor, float dur);
     public:
         Entity(void);
+        virtual ~Entity(void);
 
         int GetID(void) const { return _id; }
 
