@@ -42,6 +42,23 @@ void Polyhedron::SetNodeColor(leda::node node, float r, float g, float b) {
     W::world.Send(event);
 }
 
+void Polyhedron::SetFaceColor(leda::edge edge, float r, float g, float b) {
+    W::Event event;
+
+    event.id        = W::EVENT_CHANGE_COLOR;
+    event.entityId  = _hullID;
+    event.sem       = NULL;
+
+    W::ChangeColorArgs* args = (W::ChangeColorArgs*)event.args;
+    args->mode = W::ChangeColorArgs::MODE_LERP;
+    args->r     = r;
+    args->g     = g;
+    args->b     = b;
+    args->edge  = edge;
+
+    W::world.Send(event);
+}
+
 void Polyhedron::Update(void) {
     W::Event event;
 

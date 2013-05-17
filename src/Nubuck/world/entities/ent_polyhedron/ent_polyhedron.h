@@ -9,7 +9,7 @@ namespace W {
 
     class ENT_Polyhedron : public Entity {
     private:
-        GEN::Pointer<R::PolyhedronMesh> _mesh;
+        GEN::Pointer<R::PolyhedronMesh> _polyDesc;
         const graph_t* _G;
     public:
         struct SpawnArgs {

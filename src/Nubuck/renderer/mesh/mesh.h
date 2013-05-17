@@ -50,6 +50,9 @@ namespace R {
 
     class Mesh {
     private:
+        // NOTE: a normal pointer should be fine here,
+        // since a mesh is only ever deleted by the mgr
+        // if there are no external references to it
         GEN::Pointer<MeshDesc> _meshDesc;
 
         GEN::Pointer<StaticBuffer> _vertexBuffer;

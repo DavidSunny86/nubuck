@@ -17,6 +17,7 @@ namespace W {
     }
 
     void Entity::InvalidateMesh(void) {
+        R::MeshMgr::Instance().GetMesh(_meshHandle).Invalidate();
     }
 
     void Entity::SetID(int id) { _id = id; }

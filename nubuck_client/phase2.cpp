@@ -79,9 +79,11 @@ IPhase::StepRet Phase2::Step(void) {
 
         if(IsVisible(curNode, e)) {
             g.nb.log->printf("visible   (red)\n");
+            g.polyhedron->SetFaceColor(e, 1.0f, 0.0f, 0.0f);
             MarkFace(e, VISIBLE);
         } else {
             g.nb.log->printf("invisible (blue)\n");
+            g.polyhedron->SetFaceColor(e, 0.0f, 0.0f, 1.0f);
             MarkFace(e, INVISIBLE);
         }
     } else {

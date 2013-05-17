@@ -17,6 +17,7 @@ namespace W {
             MODE_LERP
         } mode;
         float       r, g, b;
+        leda::edge  edge;
     };
 
     struct Event {

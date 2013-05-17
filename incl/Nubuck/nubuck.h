@@ -19,6 +19,7 @@ struct IPolyhedron {
     virtual ~IPolyhedron(void) { }
 
     virtual void SetNodeColor(leda::node node, float r, float g, float b) = 0;
+    virtual void SetFaceColor(leda::edge edge, float r, float g, float b) = 0;
 
     virtual void Update(void) = 0;
 };

@@ -11,14 +11,23 @@ namespace W {
         const SpawnArgs* spawnArgs = (const SpawnArgs*)event.args;
         _G = spawnArgs->G;
 
+        /*
+        NOTE: ignore this for now...
         if(!spawnArgs->G->empty())
-            _mesh = GEN::Pointer<R::PolyhedronMesh>(new R::PolyhedronMesh(*_G));
+            _polyDesc = GEN::Pointer<R::PolyhedronMesh>(new R::PolyhedronMesh(*_G));
+        */
     }
 
     void ENT_Polyhedron::HandleEvent(const Event& event) {
         if(EVENT_REBUILD == event.id) {
-            GEN::Pointer<R::PolyhedronMesh> polyMesh = GEN::Pointer<R::PolyhedronMesh>(new R::PolyhedronMesh(*_G));
-            SetMeshHandle(R::MeshMgr::Instance().CreateMesh(polyMesh));
+            _polyDesc = GEN::Pointer<R::PolyhedronMesh>(new R::PolyhedronMesh(*_G));
+            SetMeshHandle(R::MeshMgr::Instance().CreateMesh(_polyDesc));
+        }
+        if(EVENT_CHANGE_COLOR == event.id) {
+            ChangeColorArgs* args = (ChangeColorArgs*)event.args;
+            R::Color color(args->r, args->g, args->b);
+            _polyDesc->Set(args->edge, color);
+            InvalidateMesh();
         }
     }
 
