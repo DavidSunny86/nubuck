@@ -32,7 +32,10 @@ namespace W {
         _eventsLock.Lock();
         _events.push(event);
         _eventsLock.Unlock();
+#ifdef NUBUCK_MT
+        // TODO: why does the deadlock only occur in release mode?
         if(event.sem) event.sem->Wait();
+#endif
     }
 
     int World::Spawn(Event event) {
@@ -72,7 +75,9 @@ namespace W {
                     (*entIt)->HandleEvent(event);
             }
 
+#ifdef NUBUCK_MT
             if(event.sem) event.sem->Signal();
+#endif
         }
 
         for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
