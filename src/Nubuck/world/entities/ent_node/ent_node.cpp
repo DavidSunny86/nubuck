@@ -17,7 +17,7 @@ namespace W {
     void ENT_Node::InitResources(void) {
         static bool init = false;
         if(!init) {
-            R::MeshMgr::Instance().RegisterMesh(R::CreateQuad(), "quad");
+            R::MeshMgr::Instance().RegisterMesh(R::CreateQuadDesc(), "quad");
         }
         init = true;
     }

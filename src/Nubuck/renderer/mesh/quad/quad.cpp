@@ -2,8 +2,8 @@
 
 namespace R {
 
-    MeshDesc CreateQuad(float edgeLength) {
-        MeshDesc desc;
+    GEN::Pointer<MeshDesc> CreateQuadDesc(float edgeLength) {
+        MeshDesc::Desc desc;
 
         Vertex* v = new Vertex[4];
         for(int j = 0; j < 4; ++j) {
@@ -26,7 +26,7 @@ namespace R {
 
         desc.primType = GL_TRIANGLES;
         
-        return desc;
+        return GEN::Pointer<MeshDesc>(new SimpleMeshDesc(desc));
     }
 
 } // namespace R

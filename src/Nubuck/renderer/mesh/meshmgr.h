@@ -15,13 +15,13 @@ namespace R {
             const char* name;
             Mesh mesh;
 
-            Node(const MeshDesc& desc);
+            Node(const GEN::Pointer<MeshDesc>& desc);
         };
 
         Node* _meshes;
         SYS::SpinLock _meshesLck;
 
-        Node* _CreateMesh(const MeshDesc& desc);
+        Node* _CreateMesh(const GEN::Pointer<MeshDesc>& desc);
         Node* _FindMesh(const char* name);
 
         MeshMgr(void);
@@ -30,9 +30,9 @@ namespace R {
 
         ~MeshMgr(void);
 
-        void RegisterMesh(const MeshDesc& desc, const char* name);
+        void RegisterMesh(const GEN::Pointer<MeshDesc>& desc, const char* name);
         meshHandle_t FindMesh(const char* name);
-        meshHandle_t CreateMesh(const MeshDesc& desc);
+        meshHandle_t CreateMesh(const GEN::Pointer<MeshDesc>& desc);
 
         Mesh& GetMesh(meshHandle_t meshHandle);
         void Release(meshHandle_t meshHandle);

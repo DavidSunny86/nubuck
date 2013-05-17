@@ -45,25 +45,24 @@ namespace R {
     void Mesh::Compile(void) {
         if(_compiled) return;
 
+        MeshDesc::Desc desc = _meshDesc->GetDesc();
+
         _vertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(
                     GL_ARRAY_BUFFER,
-                    _desc.vertices,
-                    _desc.numVertices * sizeof(Vertex)));
+                    desc.vertices,
+                    desc.numVertices * sizeof(Vertex)));
         _indexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(
                     GL_ELEMENT_ARRAY_BUFFER,
-                    _desc.indices,
-                    _desc.numIndices * sizeof(Index)));
+                    desc.indices,
+                    desc.numIndices * sizeof(Index)));
 
         _compiled = true;
     }
 
-    Mesh::Mesh(const MeshDesc& desc) : _desc(desc), _compiled(false) { 
+    Mesh::Mesh(const GEN::Pointer<MeshDesc>& meshDesc) : _meshDesc(meshDesc), _compiled(false) { 
     }
 
-    Mesh::~Mesh(void) {
-        if(_desc.vertices)  delete[] _desc.vertices;
-        if(_desc.indices)   delete[] _desc.indices;
-    }
+    Mesh::~Mesh(void) { }
 
     void Mesh::Bind(void) const {
         _vertexBuffer->Bind();
@@ -77,8 +76,8 @@ namespace R {
         assert(GL_UNSIGNED_INT == ToGLEnum<unsigned>::ENUM);
         assert(GL_INT == ToGLEnum<int>::ENUM);
 #endif
-
-        GL_CALL(glDrawElements(_desc.primType, _desc.numIndices, ToGLEnum<Index>::ENUM, NULL));
+        MeshDesc::Desc desc = _meshDesc->GetDesc();
+        GL_CALL(glDrawElements(desc.primType, desc.numIndices, ToGLEnum<Index>::ENUM, NULL));
     }
 
 } // namespace R

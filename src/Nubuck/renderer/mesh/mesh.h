@@ -21,13 +21,27 @@ namespace R {
 #define RESTART_INDEX (unsigned)0xFFFFFFFF
 
     struct MeshDesc {
-        const Vertex*   vertices;
-        int             numVertices;
+        struct Desc {
+            const Vertex*   vertices;
+            int             numVertices;
 
-        const Index*    indices;
-        int             numIndices;
+            const Index*    indices;
+            int             numIndices;
 
-        GLenum          primType;
+            GLenum          primType;
+        };
+        virtual ~MeshDesc(void) { }
+        virtual Desc GetDesc(void) const = 0;
+    };
+
+    struct SimpleMeshDesc : MeshDesc {
+        Desc desc;
+        explicit SimpleMeshDesc(const Desc& desc) : desc(desc) { }
+        ~SimpleMeshDesc(void) {
+            if(desc.vertices) delete[] desc.vertices;
+            if(desc.indices) delete[] desc.indices;
+        }
+        Desc GetDesc(void) const override { return desc; }
     };
 
     struct Instance {
@@ -36,13 +50,13 @@ namespace R {
 
     class Mesh {
     private:
-        MeshDesc _desc;
+        GEN::Pointer<MeshDesc> _meshDesc;
 
         GEN::Pointer<StaticBuffer> _vertexBuffer;
         GEN::Pointer<StaticBuffer> _indexBuffer;
         bool _compiled;
     public:
-        explicit Mesh(const MeshDesc& desc);
+        explicit Mesh(const GEN::Pointer<MeshDesc>& meshDesc);
         ~Mesh(void);
 
         void Bind(void) const;

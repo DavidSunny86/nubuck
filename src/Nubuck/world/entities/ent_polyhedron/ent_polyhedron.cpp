@@ -17,8 +17,8 @@ namespace W {
 
     void ENT_Polyhedron::HandleEvent(const Event& event) {
         if(EVENT_REBUILD == event.id) {
-            R::PolyhedronMesh polyMesh = R::PolyhedronMesh(*_G);
-            SetMeshHandle(R::MeshMgr::Instance().CreateMesh(polyMesh.GetDesc()));
+            GEN::Pointer<R::PolyhedronMesh> polyMesh = GEN::Pointer<R::PolyhedronMesh>(new R::PolyhedronMesh(*_G));
+            SetMeshHandle(R::MeshMgr::Instance().CreateMesh(polyMesh));
         }
     }
 

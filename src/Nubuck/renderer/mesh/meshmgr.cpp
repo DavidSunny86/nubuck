@@ -4,7 +4,7 @@
 
 namespace R {
 
-    MeshMgr::Node* MeshMgr::_CreateMesh(const MeshDesc& desc) {
+    MeshMgr::Node* MeshMgr::_CreateMesh(const GEN::Pointer<MeshDesc>& desc) {
         Node* node = new Node(desc);
         node->prev = NULL;
         node->next = _meshes;
@@ -19,14 +19,14 @@ namespace R {
         return node;
     }
 
-    MeshMgr::Node::Node(const MeshDesc& desc) 
+    MeshMgr::Node::Node(const GEN::Pointer<MeshDesc>& desc) 
         : prev(NULL), next(NULL), refCnt(0), name(NULL), mesh(desc) { }
 
     MeshMgr::MeshMgr(void) : _meshes(NULL) { }
 
     MeshMgr::~MeshMgr(void) { Clear(); }
 
-    void MeshMgr::RegisterMesh(const MeshDesc& desc, const char* name) {
+    void MeshMgr::RegisterMesh(const GEN::Pointer<MeshDesc>& desc, const char* name) {
         _meshesLck.Lock();
         if(!_FindMesh(name)) {
             Node* node = _CreateMesh(desc);
@@ -36,7 +36,7 @@ namespace R {
         _meshesLck.Unlock();
     }
 
-    MeshMgr::meshHandle_t MeshMgr::CreateMesh(const MeshDesc& desc) {
+    MeshMgr::meshHandle_t MeshMgr::CreateMesh(const GEN::Pointer<MeshDesc>& desc) {
         _meshesLck.Lock();
         Node* node = _CreateMesh(desc);
         node->refCnt = 1;

@@ -100,22 +100,15 @@ namespace R {
         return _G;
     }
 
-    MeshDesc PolyhedronMesh::GetDesc(void) const {
-        MeshDesc desc;
+    MeshDesc::Desc PolyhedronMesh::GetDesc(void) const {
+        Desc desc;
 
-        Vertex* vertCpy = new Vertex[_vertices.size()];
-        for(unsigned i = 0; i < _vertices.size(); ++i)
-            vertCpy[i] = _vertices[i];
-        desc.vertices = vertCpy;
+        desc.vertices = &_vertices[0];
         desc.numVertices = _vertices.size();
-
-        Index* indCpy = new Index[_indices.size()];
-        for(unsigned i = 0; i < _indices.size(); ++i)
-            indCpy[i] = _indices[i];
-        desc.indices = indCpy;
+        desc.indices = &_indices[0];
         desc.numIndices = _indices.size();
+        desc.primType = GL_TRIANGLE_FAN;
 
-        desc.primType       = GL_TRIANGLE_FAN;
         return desc;
     }
 
