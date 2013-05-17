@@ -4,6 +4,7 @@
 
 #include <Nubuck\nubuck.h>
 #include <common\types.h>
+#include <system\locks\semaphore.h>
 
 class Polyhedron : public IPolyhedron {
 private:
@@ -11,6 +12,8 @@ private:
 
     leda::node_map<int> _nodeEntIDs;
     int                 _hullID;
+
+    SYS::Semaphore _rebuildSem;
 public:
     Polyhedron(const graph_t& G);
 

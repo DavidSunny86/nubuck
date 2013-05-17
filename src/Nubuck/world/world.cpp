@@ -32,6 +32,7 @@ namespace W {
         _eventsLock.Lock();
         _events.push(event);
         _eventsLock.Unlock();
+        if(event.sem) event.sem->Wait();
     }
 
     int World::Spawn(Event event) {
@@ -70,6 +71,8 @@ namespace W {
                 for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt)
                     (*entIt)->HandleEvent(event);
             }
+
+            if(event.sem) event.sem->Signal();
         }
 
         for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {

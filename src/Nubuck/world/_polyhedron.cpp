@@ -3,11 +3,12 @@
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include "polyhedron.h"
 
-Polyhedron::Polyhedron(const graph_t& G) : _G(G) {
+Polyhedron::Polyhedron(const graph_t& G) : _G(G), _rebuildSem(0) {
     _nodeEntIDs.init(_G);
 
     W::World& world = W::world;
     W::Event event;
+    event.sem = NULL;
 
     event.type = W::ENT_NODE;
     leda::node n = NULL;
@@ -30,6 +31,7 @@ void Polyhedron::SetNodeColor(leda::node node, float r, float g, float b) {
 
     event.id        = W::EVENT_CHANGE_COLOR;
     event.entityId  = _nodeEntIDs[node];
+    event.sem       = NULL;
 
     W::ChangeColorArgs* args = (W::ChangeColorArgs*)event.args;
     args->mode = W::ChangeColorArgs::MODE_LERP;
@@ -45,6 +47,7 @@ void Polyhedron::Update(void) {
 
     event.id = W::EVENT_REBUILD;
     event.entityId = _hullID;
+    event.sem = &_rebuildSem;
 
     W::world.Send(event);
 }

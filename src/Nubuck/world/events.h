@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <common\types.h>
+#include <system\locks\semaphore.h>
 
 namespace W {
 
@@ -25,6 +26,8 @@ namespace W {
         // when EVENT_SPAWN_ENTITY == id, then entityId contains the id of
         // the new entity
         int entityId;
+
+        SYS::Semaphore* sem;
 
         int type; // in EntityTypes, used by EVENT_SPAWN_ENTITY
         char args[512];
