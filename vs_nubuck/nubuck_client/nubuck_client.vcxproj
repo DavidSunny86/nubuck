@@ -14,11 +14,13 @@
     <ClCompile Include="..\..\nubuck_client\main.cpp" />
     <ClCompile Include="..\..\nubuck_client\phase0.cpp" />
     <ClCompile Include="..\..\nubuck_client\phase1.cpp" />
+    <ClCompile Include="..\..\nubuck_client\phase2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\nubuck_client\globals.h" />
     <ClInclude Include="..\..\nubuck_client\phase0.h" />
     <ClInclude Include="..\..\nubuck_client\phase1.h" />
+    <ClInclude Include="..\..\nubuck_client\phase2.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B0B72E6A-6454-4434-9BC6-BA284F170F7D}</ProjectGuid>

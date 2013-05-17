@@ -40,6 +40,9 @@
     <ClCompile Include="..\..\nubuck_client\phase1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\nubuck_client\phase2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\nubuck_client\globals.h">
@@ -49,6 +52,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\nubuck_client\phase1.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\nubuck_client\phase2.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

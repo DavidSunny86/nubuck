@@ -1,3 +1,4 @@
+#include "phase2.h"
 #include "phase1.h"
 
 namespace {
@@ -44,6 +45,8 @@ void Phase1::Leave(void) {
 }
 
 IPhase::StepRet Phase1::Step(void) {
+    g.nb.log->printf("constructing initial tetrahedron.\n");
+
     BuildTetrahedron(g.G, g.tVerts[0], g.tVerts[1], g.tVerts[2], g.tVerts[3]);
     g.polyhedron->Update();
 
@@ -53,9 +56,9 @@ IPhase::StepRet Phase1::Step(void) {
         g.polyhedron->SetNodeColor(n, 1.0f, 1.0f, 1.0f);
     }
 
-    return CONTINUE;
+    return DONE;
 }
 
 IPhase* Phase1::NextPhase(void) {
-    return NULL;
+    return new Phase2(g);
 }
