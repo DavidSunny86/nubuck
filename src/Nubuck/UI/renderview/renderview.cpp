@@ -62,6 +62,8 @@ namespace UI {
     }
 
     RenderView::RenderView(QWidget* parent) : QGLWidget(parent), _fpsLabel(NULL), _arcballCamera(DEFAULT_WIDTH, DEFAULT_HEIGHT) {
+        common.printf("INFO - depthbuffer size = %d\n", format().depthBufferSize());
+        
         connect(&_timer, SIGNAL(timeout()), this, SLOT(Update()));
         _timer.start();
 
