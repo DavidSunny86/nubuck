@@ -19,6 +19,16 @@ namespace UI {
     }
 
     void RenderView::paintGL(void) {
+        if(1.0f <= (_time += _rtimer.Stop())) {
+            float fps = _numFrames / _time;
+            _numFrames = 0;
+            _time = 0.0f;
+
+            if(_fpsLabel) _fpsLabel->setText(QString("fps = %1").arg(fps));
+        }
+        _numFrames++;
+        _rtimer.Start();
+
         RenderWorld renderWorld(_renderer);
 
         _renderer.BeginFrame();
@@ -51,7 +61,7 @@ namespace UI {
         Update();
     }
 
-    RenderView::RenderView(QWidget* parent) : QGLWidget(parent), _arcballCamera(DEFAULT_WIDTH, DEFAULT_HEIGHT) {
+    RenderView::RenderView(QWidget* parent) : QGLWidget(parent), _fpsLabel(NULL), _arcballCamera(DEFAULT_WIDTH, DEFAULT_HEIGHT) {
         connect(&_timer, SIGNAL(timeout()), this, SLOT(Update()));
         _timer.start();
 
@@ -81,6 +91,11 @@ namespace UI {
 #ifndef NUBUCK_MT
         W::world.Update();
 #endif
+    }
+
+    QLabel* RenderView::FpsLabel(void) {
+        if(!_fpsLabel) _fpsLabel = new QLabel("fps = ?");
+        return _fpsLabel;
     }
 
 } // namespace UI

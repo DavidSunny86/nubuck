@@ -45,6 +45,7 @@ namespace UI {
         _ui.setupUi(this);
 
         RenderView* renderView = new RenderView();
+        statusBar()->addWidget(renderView->FpsLabel());
         setCentralWidget(renderView);
 
         AlgorithmWidget* algorithmWidget = new AlgorithmWidget();
