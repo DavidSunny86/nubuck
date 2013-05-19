@@ -30,6 +30,7 @@ namespace W {
         std::map<EntityType, entAlloc_t> _entityAllocs;
 
         std::vector<entPtr_t>   _entities;
+        SYS::SpinLock           _entitiesLock;
         int                     _entIdCnt;
 
         std::queue<Event> _events;
@@ -38,6 +39,9 @@ namespace W {
         SYS::Timer  _timer;
         float       _secsPassed;
         float       _timePassed;
+
+        int             _numVisitors;
+        SYS::SpinLock   _numVisitorsLock;
 
         entPtr_t GetEntityById(int id);
     public:

@@ -8,7 +8,7 @@ namespace W {
 
     World world;
 
-    World::World(void) : _entIdCnt(0), _secsPassed(0.0f), _timePassed(0.0f) { }
+    World::World(void) : _entIdCnt(0), _secsPassed(0.0f), _timePassed(0.0f), _numVisitors(0) { }
 
     World::entPtr_t World::GetEntityById(int id) {
         for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
@@ -18,10 +18,18 @@ namespace W {
     }
 
     void World::Accept(const Visitor& visitor) {
+        _numVisitorsLock.Lock();
+        if(1 == ++_numVisitors) _entitiesLock.Lock();
+        _numVisitorsLock.Unlock();
+
         for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
             entPtr_t& entPtr = *entIt;
             visitor.Visit(*entPtr);
         }
+
+        _numVisitorsLock.Lock();
+        if(0 == --_numVisitors) _entitiesLock.Unlock();
+        _numVisitorsLock.Unlock();
     }
 
     void World::Add(const entPtr_t& entity) {
@@ -59,16 +67,20 @@ namespace W {
             _events.pop();
             _eventsLock.Unlock();
 
-			if(EVENT_APOCALYPSE == event.id) {
-				_entities.clear();
-				continue;
-			}
+            if(EVENT_APOCALYPSE == event.id) {
+                _entitiesLock.Lock();
+                _entities.clear();
+                _entitiesLock.Unlock();
+                continue;
+            }
 
             if(EVENT_SPAWN_ENTITY == event.id) {
                 entAlloc_t alloc = _entityAllocs[EntityType(event.type)];
                 GEN::Pointer<Entity> entity(alloc());
                 entity->Spawn(event);
+                _entitiesLock.Lock();
                 _entities.push_back(entity);
+                _entitiesLock.Unlock();
             }
 
             if(0 < event.entityId) {
