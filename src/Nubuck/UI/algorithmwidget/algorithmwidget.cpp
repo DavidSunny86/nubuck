@@ -1,4 +1,5 @@
 #include <algdriver\algdriver.h>
+#include <world\events.h>
 #include <world\world.h>
 #include "algorithmwidget.h"
 
@@ -17,7 +18,11 @@ namespace UI {
     }
 
     void AlgorithmWidget::OnReset(void) {
-        W::world.Apocalypse();
+		W::Event event;
+		event.id = W::EVENT_APOCALYPSE;
+		event.sem = NULL;
+		W::world.Send(event);
+
         ALG::Driver::Instance().Reset();
     }
 

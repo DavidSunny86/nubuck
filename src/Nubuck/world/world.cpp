@@ -59,6 +59,11 @@ namespace W {
             _events.pop();
             _eventsLock.Unlock();
 
+			if(EVENT_APOCALYPSE == event.id) {
+				_entities.clear();
+				continue;
+			}
+
             if(EVENT_SPAWN_ENTITY == event.id) {
                 entAlloc_t alloc = _entityAllocs[EntityType(event.type)];
                 GEN::Pointer<Entity> entity(alloc());
@@ -83,14 +88,6 @@ namespace W {
         for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
             (*entIt)->Update(_secsPassed);
         }
-    }
-
-    void World::FreeResources(void) {
-    }
-
-    void World::Apocalypse(void) {
-        FreeResources();
-        _entities.clear();
     }
 
     IPolyhedron* World::CreatePolyhedron(const graph_t& G) {

@@ -62,8 +62,6 @@ namespace W {
         int Spawn(Event event);
 
         void Update(void);
-        void FreeResources(void);
-        void Apocalypse(void);
 
         // exported to client
         IPolyhedron* CreatePolyhedron(const graph_t& G) override;
