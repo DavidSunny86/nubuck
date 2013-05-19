@@ -72,7 +72,7 @@ namespace W {
         R::RenderJob renderJob;
         renderJob.fx        = "Lit";
         renderJob.mesh      = _meshHandle;
-        renderJob.material  = &_material;
+        renderJob.material  = _material;
         renderJob.transform = M::Mat4::Translate(_position);
         return renderJob;
     }

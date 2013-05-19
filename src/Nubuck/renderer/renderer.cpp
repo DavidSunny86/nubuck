@@ -71,7 +71,7 @@ namespace R {
         RenderJob* meshJob = first;
         while(meshJob && meshJob->fx == first->fx) {
             if(FIRST_LIGHT_PASS == passType || LIGHT_PASS == passType)
-                SetMaterialUniforms(prog, *meshJob->material);
+                SetMaterialUniforms(prog, meshJob->material);
 
             prog.SetUniform("uTransform", worldMat * meshJob->transform);
 
