@@ -86,9 +86,6 @@ namespace W {
     }
 
     void World::FreeResources(void) {
-        for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
-            (*entIt)->FreeResources();
-        }
     }
 
     void World::Apocalypse(void) {

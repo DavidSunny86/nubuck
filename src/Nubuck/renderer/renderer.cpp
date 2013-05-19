@@ -6,6 +6,7 @@
 #include <renderer\glew\glew.h>
 #include <renderer\glcall.h>
 #include <renderer\effects\effect.h>
+#include <renderer\effects\effectmgr.h>
 #include <renderer\effects\pass.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\material\material.h>
@@ -90,10 +91,12 @@ namespace R {
         RenderJob* next = NULL;
         while(cur) {
             next = NULL;
-            if(cur->fx) {
-                int numPasses = cur->fx->NumPasses();
+            if(true) {
+				GEN::Pointer<Effect> fx = effectMgr.GetEffect(cur->fx);
+
+                int numPasses = fx->NumPasses();
                 for(int i = 0; i < numPasses; ++i) {
-                    Pass* pass = cur->fx->GetPass(i);
+                    Pass* pass = fx->GetPass(i);
                     pass->Use();
                     
                     Program&        prog = pass->GetProgram();
@@ -146,7 +149,7 @@ namespace R {
     }
 
     void Renderer::Add(const RenderJob& renderJob) {
-        if(!renderJob.fx || !renderJob.mesh) return;
+		if(renderJob.fx.empty() || !renderJob.mesh) return;
         _renderJobs.push_back(renderJob);
         _renderJobs.back().next = NULL;
     }
@@ -162,7 +165,8 @@ namespace R {
         for(unsigned i = 0; i < numJobs; ++i) {
             RenderJob& rjob = _renderJobs[i];
             if(i < numJobs - 1) rjob.next = &_renderJobs[i + 1];
-            rjob.fx->Compile();
+            
+			effectMgr.GetEffect(rjob.fx)->Compile();
             MeshMgr::Instance().GetMesh(rjob.mesh).Compile();
         }
 

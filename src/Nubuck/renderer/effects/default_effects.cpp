@@ -1,3 +1,4 @@
+#include "effectmgr.h"
 #include "effect.h"
 
 namespace R {
@@ -18,7 +19,7 @@ namespace R {
 
         fx.name = "Default";
         fx.passes.push_back(pass0);
-        EffectManager::Instance().Add(fx);
+		effectMgr.Register(fx);
         fx.passes.clear();
 
         // DefaultLit Effect
@@ -63,7 +64,7 @@ namespace R {
         fx.passes.push_back(pass0);
         fx.passes.push_back(pass1);
         fx.passes.push_back(pass2);
-        EffectManager::Instance().Add(fx);
+        effectMgr.Register(fx);
         fx.passes.clear();
     }
 

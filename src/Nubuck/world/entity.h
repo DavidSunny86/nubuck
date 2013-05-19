@@ -1,6 +1,5 @@
 #pragma once
 
-#include <renderer\effects\effect.h>
 #include <renderer\mesh\meshmgr.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\material\material.h>
@@ -18,7 +17,6 @@ namespace W {
         M::Vector3  _position;
  
         R::MeshMgr::meshHandle_t    _meshHandle;
-        GEN::Pointer<R::Effect>     _effect;
         R::Material                 _material;
 
         enum State {

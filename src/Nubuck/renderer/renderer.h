@@ -9,13 +9,13 @@
 #include "light\light.h"
 
 namespace R {
-
+	
     class   Effect;
     class   Mesh;
     struct  Material;
 
     struct RenderJob {
-        Effect*                 fx;
+        std::string             fx;
         MeshMgr::meshHandle_t   mesh;
         Material*               material;
         M::Matrix4              transform;

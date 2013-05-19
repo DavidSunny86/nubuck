@@ -329,6 +329,9 @@
     <ClInclude Include="..\..\src\Nubuck\system\locks\semaphore.h">
       <Filter>Private\system\locks</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\effectmgr.h">
+      <Filter>Private\renderer\effects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -492,6 +495,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\system\locks\semaphore.cpp">
       <Filter>Private\system\locks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\effectmgr.cpp">
+      <Filter>Private\renderer\effects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

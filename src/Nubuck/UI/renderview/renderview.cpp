@@ -2,6 +2,7 @@
 
 #include <common\common.h>
 #include <world\world.h>
+#include <renderer\effects\effectmgr.h>
 #include <world\renderworld.h>
 #include "renderview.h"
 
@@ -72,8 +73,7 @@ namespace UI {
     }
 
     RenderView::~RenderView(void) {
-        W::world.FreeResources();
-        R::EffectManager::Instance().FreeResources();
+		R::effectMgr.FreeResources();
     }
 
     void RenderView::Update(void) {

@@ -27,17 +27,6 @@ namespace R {
         Pass*   GetPass(int id);
     };
 
-    class EffectManager : public GEN::Singleton<EffectManager> {
-        friend class GEN::Singleton<EffectManager>;
-    private:
-        std::map<std::string, GEN::Pointer<Effect> > _effects;
-    public:
-        void Add(const EffectDesc& desc);
-        GEN::Pointer<Effect> GetEffect(const std::string& name);
-
-        void FreeResources(void);
-    };
-
     void CreateDefaultEffects(void);
 
 } // namespace R

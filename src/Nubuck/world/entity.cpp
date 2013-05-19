@@ -43,7 +43,6 @@ namespace W {
     Entity::Entity(void) : _id(0), _position(M::Vector3::Zero) {
         _state = IDLE;
         _meshHandle = NULL;
-        _effect = R::EffectManager::Instance().GetEffect("Lit");
         _material.diffuseColor = R::Color::White;
     }
 
@@ -63,7 +62,6 @@ namespace W {
     }
 
     void Entity::FreeResources(void) {
-        _effect = GEN::Pointer<R::Effect>();
     }
 
     void Entity::Spawn(const Event& event) {
@@ -72,7 +70,7 @@ namespace W {
 
     R::RenderJob Entity::GetRenderJob(void) {
         R::RenderJob renderJob;
-        renderJob.fx        = _effect.Raw();
+        renderJob.fx        = "Lit";
         renderJob.mesh      = _meshHandle;
         renderJob.material  = &_material;
         renderJob.transform = M::Mat4::Translate(_position);
