@@ -34,6 +34,7 @@ namespace SYS {
 		bool _initialized;
 
 		static bool _extensionsInitialized;
+        static int _major, _minor;
 		static void InitExtensions(void);
 
         void Init(void);

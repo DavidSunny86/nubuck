@@ -25,6 +25,8 @@ namespace SYS {
     }
 
     bool RenderingContext::_extensionsInitialized = false;
+    int RenderingContext::_major = -1;
+    int RenderingContext::_minor = -1;
 
     void RenderingContext::InitExtensions(void) {
         if(_extensionsInitialized) return;
@@ -57,6 +59,8 @@ namespace SYS {
 
         const GLubyte* glVersion = glGetString(GL_VERSION);
         common.printf("INFO - supported GL version: '%s'.\n", glVersion);
+        glGetIntegerv(GL_MAJOR_VERSION, &_major);
+        glGetIntegerv(GL_MINOR_VERSION, &_minor);
 
         wglMakeCurrent(NULL, NULL);
         wglDeleteContext(dummyGLRC);
@@ -100,8 +104,8 @@ namespace SYS {
         }
 
         GLint attribs[] = {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+            WGL_CONTEXT_MAJOR_VERSION_ARB, _major,
+            WGL_CONTEXT_MINOR_VERSION_ARB, _minor,
             WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
             WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
             0
