@@ -81,7 +81,7 @@ namespace R {
             if(FIRST_LIGHT_PASS == passType || LIGHT_PASS == passType)
                 SetMaterialUniforms(prog, meshJob->material);
 
-            prog.SetUniform("uTransform", worldMat * meshJob->transform);
+            prog.SetUniform("uTransform", meshJob->transform);
 
             Mesh& mesh = MeshMgr::Instance().GetMesh(meshJob->mesh);
             mesh.Bind();
@@ -176,6 +176,8 @@ namespace R {
             
 			effectMgr.GetEffect(rjob.fx)->Compile();
             MeshMgr::Instance().GetMesh(rjob.mesh).Compile();
+
+            rjob.transform = worldMat * rjob.transform;
         }
 
         DrawFrame(worldMat, projectionMat);
