@@ -508,6 +508,9 @@
     <ClCompile Include="..\..\src\Nubuck\UI\glwidget\glwidget.cpp">
       <Filter>Private\UI\glwidget</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\debugoutput.cpp">
+      <Filter>Private\renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">

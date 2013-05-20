@@ -14,6 +14,8 @@
 
 namespace R {
 
+    void InitDebugOutput(void);
+
     void SetEnabled(GLenum state, GLboolean enabled) {
         if(enabled) GL_CALL(glEnable(state));
         else        GL_CALL(glDisable(state));
@@ -42,6 +44,8 @@ namespace R {
 
     void Renderer::Init(void) {
         GL_CHECK_ERROR;
+
+        InitDebugOutput();
 
         /*
         uncomment this when using QGLWidget

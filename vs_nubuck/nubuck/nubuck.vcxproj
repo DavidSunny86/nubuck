@@ -156,6 +156,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\program\program.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\renderer.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\debugoutput.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\locks\semaphore.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\locks\spinlock.cpp" />
