@@ -72,11 +72,12 @@ namespace SYS {
             WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
             WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
             WGL_ACCELERATION_ARB,	WGL_FULL_ACCELERATION_ARB,
-            WGL_COLOR_BITS_ARB,		24,
-            WGL_DEPTH_BITS_ARB,		16,
+            WGL_COLOR_BITS_ARB,		32,
+            WGL_DEPTH_BITS_ARB,		24,
+            WGL_STENCIL_BITS_ARB,   0,
             WGL_DOUBLE_BUFFER_ARB,	GL_TRUE,
-            WGL_SAMPLE_BUFFERS_ARB,	GL_TRUE,
-            WGL_SAMPLES_ARB,		8,
+            //WGL_SAMPLE_BUFFERS_ARB,	GL_TRUE,
+            //WGL_SAMPLES_ARB,		2,
             WGL_PIXEL_TYPE_ARB,		WGL_TYPE_RGBA_ARB,
             0
         };
@@ -100,7 +101,7 @@ namespace SYS {
 
         GLint attribs[] = {
             WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 1,
             WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
             0
         };
