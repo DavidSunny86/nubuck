@@ -41,6 +41,10 @@ namespace R {
     }
 
     void Renderer::Init(void) {
+        GL_CHECK_ERROR;
+
+        /*
+        uncomment this when using QGLWidget
         GLenum ret;
         if(GLEW_OK != (ret = glewInit())) {
             common.printf("ERROR - glewInit() failed with code %d, \"%s\"\n",
@@ -51,7 +55,7 @@ namespace R {
 
         const GLubyte* glVersion = glGetString(GL_VERSION);
         common.printf("INFO - supported GL version: '%s'.\n", glVersion);
-
+        */
         GL_CALL(glEnable(GL_PRIMITIVE_RESTART));
         GL_CALL(glPrimitiveRestartIndex(RESTART_INDEX));
 
@@ -59,8 +63,8 @@ namespace R {
         glClearDepth(1.0f);
         glEnable(GL_DEPTH_TEST);
         
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(1.0f, 1.0f);
+        /*glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.0f, 1.0f);*/
     }
 
     void Renderer::Resize(int width, int height) {

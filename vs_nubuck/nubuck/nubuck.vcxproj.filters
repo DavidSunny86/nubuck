@@ -132,6 +132,9 @@
     <Filter Include="Private\UI\logwidget">
       <UniqueIdentifier>{17cdd0db-4c76-4c7f-bfe1-a66deb0f3fe5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\UI\glwidget">
+      <UniqueIdentifier>{3bf3127d-3379-4864-b0ce-80a5094e90ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -332,6 +335,9 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\effectmgr.h">
       <Filter>Private\renderer\effects</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\UI\glwidget\glwidget.h">
+      <Filter>Private\UI\glwidget</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -498,6 +504,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\effectmgr.cpp">
       <Filter>Private\renderer\effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\glwidget\glwidget.cpp">
+      <Filter>Private\UI\glwidget</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

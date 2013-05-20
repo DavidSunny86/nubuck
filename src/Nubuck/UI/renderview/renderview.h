@@ -9,10 +9,11 @@
 #include <world\world.h>
 #include <renderer\renderer.h>
 #include <camera\arcball_camera.h>
+#include <UI\glwidget\glwidget.h>
 
 namespace UI {
 
-    class RenderView : public QGLWidget {
+    class RenderView : public GLWidget {
         Q_OBJECT
     private:
         QLabel* _fpsLabel;
@@ -38,6 +39,8 @@ namespace UI {
     public slots:
         void Update(void);
     public:
+        typedef GLWidget glWidget_t;
+
         enum {
             DEFAULT_WIDTH  = 800,
             DEFAULT_HEIGHT = 400
