@@ -191,9 +191,9 @@ namespace R {
     }
 
     void Renderer::Add(const RenderJob& renderJob) {
-        /*if(renderJob.fx.empty() || !renderJob.vertices.IsValid() || !renderJob.indices.IsValid()) return;
+        if(renderJob.fx.empty() || !renderJob.vertices.IsValid() || !renderJob.indices.IsValid()) return;
         _renderJobs.push_back(renderJob);
-        _renderJobs.back().next = NULL;*/
+        _renderJobs.back().next = NULL;
     }
 
     void Renderer::EndFrame(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
@@ -203,7 +203,6 @@ namespace R {
 
         // TODO: sort
 
-        /*
         unsigned numJobs = _renderJobs.size();
         for(unsigned i = 0; i < numJobs; ++i) {
             RenderJob& rjob = _renderJobs[i];
@@ -217,9 +216,8 @@ namespace R {
         }
 
         DrawFrame(worldMat, projectionMat);
-        */
 
-        //meshMgr.R_FrameUpdate();
+        meshMgr.R_FrameUpdate();
     }
 
 
