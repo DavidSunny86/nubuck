@@ -59,14 +59,7 @@ namespace W {
         }
     }
 
-    void Entity::FreeResources(void) {
-    }
-
-    void Entity::Spawn(const Event& event) {
-        SetID(event.entityId);
-    }
-
-    R::RenderJob Entity::GetRenderJob(void) {
+    void Entity::Render(std::vector<R::RenderJob>& renderList) {
         R::RenderJob renderJob;
         renderJob.fx        = "Lit";
         renderJob.vertices  = _mesh.vertices;
@@ -74,7 +67,14 @@ namespace W {
         renderJob.primType  = _mesh.primType;
         renderJob.material  = _material;
         renderJob.transform = M::Mat4::Translate(_position);
-        return renderJob;
+        renderList.push_back(renderJob);
+    }
+
+    void Entity::FreeResources(void) {
+    }
+
+    void Entity::Spawn(const Event& event) {
+        SetID(event.entityId);
     }
 
 } // namespace W

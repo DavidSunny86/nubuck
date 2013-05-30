@@ -266,9 +266,6 @@
     <ClInclude Include="..\..\src\Nubuck\system\winerror.h">
       <Filter>Private\system</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\renderworld.h">
-      <Filter>Private\world</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polyhedron\polyhedron.h">
       <Filter>Private\renderer\mesh\polyhedron</Filter>
     </ClInclude>

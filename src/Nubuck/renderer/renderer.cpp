@@ -183,21 +183,30 @@ namespace R {
         _lights.push_back(light);
     }
 
-    void Renderer::BeginFrame(void) {
-        _renderJobs.clear();
+    void Renderer::SetRenderList(const std::vector<RenderJob>& renderList) {
+        _renderListLock.Lock();
+        _renderList.clear();
+        for(std::vector<RenderJob>::const_iterator rlistIt(renderList.cbegin());
+            renderList.cend() != rlistIt; ++rlistIt)
+        {
+            const RenderJob& renderJob = *rlistIt;
+            if(renderJob.fx.empty() || !renderJob.vertices.IsValid() || !renderJob.indices.IsValid()) return;
+            _renderList.push_back(renderJob);
+            _renderList.back().next = NULL;
+        }
+        _renderListLock.Unlock();
+    }
+
+    void Renderer::Render(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
+        typedef std::vector<RenderJob>::iterator rjobIt_t;
 
         GL_CALL(glDepthMask(GL_TRUE));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-    }
 
-    void Renderer::Add(const RenderJob& renderJob) {
-        if(renderJob.fx.empty() || !renderJob.vertices.IsValid() || !renderJob.indices.IsValid()) return;
-        _renderJobs.push_back(renderJob);
-        _renderJobs.back().next = NULL;
-    }
-
-    void Renderer::EndFrame(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
-        typedef std::vector<RenderJob>::iterator rjobIt_t;
+        _renderJobs.clear();
+        _renderListLock.Lock();
+        _renderJobs = _renderList;
+        _renderListLock.Unlock();
 
         if(_renderJobs.empty()) return;
 

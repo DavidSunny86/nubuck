@@ -100,6 +100,19 @@ namespace W {
         for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
             (*entIt)->Update(_secsPassed);
         }
+
+        _renderListLock.Lock();
+        _renderList.clear();
+        for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
+            (*entIt)->Render(_renderList);
+        }
+        _renderListLock.Unlock();
+    }
+
+    void World::CopyRenderList(std::vector<R::RenderJob>& renderList) {
+        _renderListLock.Lock();
+        renderList = _renderList;
+        _renderListLock.Unlock();
     }
 
     IPolyhedron* World::CreatePolyhedron(const graph_t& G) {

@@ -28,6 +28,9 @@ namespace R {
 
 	class Renderer {
     private:
+        std::vector<RenderJob>  _renderList;
+        SYS::SpinLock           _renderListLock;
+
         std::vector<RenderJob>  _renderJobs;
         std::vector<Light>      _lights;
 
@@ -39,9 +42,8 @@ namespace R {
 
         void Add(const Light& light);
 
-        void BeginFrame(void);
-        void Add(const RenderJob& renderJob);
-        void EndFrame(const M::Matrix4& worldMat, const M::Matrix4& projectionMat);
+        void SetRenderList(const std::vector<RenderJob>& renderList);
+        void Render(const M::Matrix4& worldMat, const M::Matrix4& projectionMat);
 	};
 
 } // namespace R

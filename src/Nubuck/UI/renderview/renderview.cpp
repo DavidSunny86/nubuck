@@ -3,7 +3,6 @@
 #include <common\common.h>
 #include <world\world.h>
 #include <renderer\effects\effectmgr.h>
-#include <world\renderworld.h>
 #include "renderview.h"
 
 namespace UI {
@@ -29,11 +28,9 @@ namespace UI {
         _numFrames++;
         _rtimer.Start();
 
-        RenderWorld renderWorld(_renderer);
-
-        _renderer.BeginFrame();
-        W::world.Accept(renderWorld);
-        _renderer.EndFrame(_arcballCamera.GetWorldMatrix(), _arcballCamera.GetProjectionMatrix());
+        W::world.CopyRenderList(_renderList);
+        _renderer.SetRenderList(_renderList);
+        _renderer.Render(_arcballCamera.GetWorldMatrix(), _arcballCamera.GetProjectionMatrix());
     }
 
     void RenderView::mousePressEvent(QMouseEvent* event) {

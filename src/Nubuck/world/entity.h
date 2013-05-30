@@ -56,11 +56,11 @@ namespace W {
         int GetID(void) const { return _id; }
 
         virtual void Update(float secsPassed);
+        virtual void Render(std::vector<R::RenderJob>& renderList);
         void FreeResources(void);
         
         virtual void Spawn(const Event& event);
         virtual void HandleEvent(const Event& event) { }
-        virtual R::RenderJob GetRenderJob(void);
     };
 
 } // namespace W

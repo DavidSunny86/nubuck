@@ -10,6 +10,7 @@
 #include <system\thread\thread.h>
 #include <system\locks\spinlock.h>
 #include <common\types.h>
+#include <renderer\renderer.h>
 #include "events.h"
 
 namespace W {
@@ -43,6 +44,9 @@ namespace W {
         int             _numVisitors;
         SYS::SpinLock   _numVisitorsLock;
 
+        std::vector<R::RenderJob>   _renderList;
+        SYS::SpinLock               _renderListLock;
+
         entPtr_t GetEntityById(int id);
     public:
         struct Visitor {
@@ -66,6 +70,8 @@ namespace W {
         int Spawn(Event event);
 
         void Update(void);
+
+        void CopyRenderList(std::vector<R::RenderJob>& renderList);
 
         // exported to client
         IPolyhedron* CreatePolyhedron(const graph_t& G) override;
