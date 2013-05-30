@@ -66,4 +66,6 @@ namespace W {
         virtual void HandleEvent(const Event& event) { }
     };
 
+    Entity::Mesh MeshFromDesc(const R::MeshDesc& desc);
+
 } // namespace W

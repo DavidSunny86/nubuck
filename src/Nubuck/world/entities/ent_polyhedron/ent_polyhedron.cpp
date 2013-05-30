@@ -8,14 +8,6 @@ static float IP_Ident(float l) { return l; }
 
 namespace W {
 
-    Entity::Mesh MeshFromDesc(const R::MeshDesc& desc) {
-        Entity::Mesh mesh;
-        mesh.vertices   = R::meshMgr.Create(desc.vertices, desc.numVertices);
-        mesh.indices    = R::meshMgr.Create(desc.indices, desc.numIndices);
-        mesh.primType   = desc.primType;
-        return mesh;
-    }
-
     void ENT_Polyhedron::Rebuild(void) {
         _polyDesc = GEN::Pointer<R::PolyhedronMesh>(new R::PolyhedronMesh(*_G));
         

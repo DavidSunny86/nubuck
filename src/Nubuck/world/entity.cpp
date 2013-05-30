@@ -85,4 +85,12 @@ namespace W {
         SetID(event.entityId);
     }
 
+    Entity::Mesh MeshFromDesc(const R::MeshDesc& desc) {
+        Entity::Mesh mesh;
+        mesh.vertices   = R::meshMgr.Create(desc.vertices, desc.numVertices);
+        mesh.indices    = R::meshMgr.Create(desc.indices, desc.numIndices);
+        mesh.primType   = desc.primType;
+        return mesh;
+    }
+
 } // namespace W

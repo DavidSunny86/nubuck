@@ -138,6 +138,12 @@
     <Filter Include="Private\renderer\resource">
       <UniqueIdentifier>{b89b9d71-ffea-4c87-b00d-2a894bfb5bec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\world\entities\ent_face">
+      <UniqueIdentifier>{62deeed7-09d4-4c8c-bbfa-c8bc56451df7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\mesh\polygon">
+      <UniqueIdentifier>{ed66ed19-3299-4159-b075-c15b2eb4ad3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -344,6 +350,12 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\resource\resource.h">
       <Filter>Private\renderer\resource</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_face\ent_face.h">
+      <Filter>Private\world\entities\ent_face</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.h">
+      <Filter>Private\renderer\mesh\polygon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -519,6 +531,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\resource\resource.cpp">
       <Filter>Private\renderer\resource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_face\ent_face.cpp">
+      <Filter>Private\world\entities\ent_face</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.cpp">
+      <Filter>Private\renderer\mesh\polygon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

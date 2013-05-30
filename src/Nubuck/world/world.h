@@ -17,7 +17,8 @@ namespace W {
 
     enum EntityType {
         ENT_NODE = 0,
-        ENT_POLYHEDRON
+        ENT_POLYHEDRON,
+        ENT_FACE
     };
 
     class Entity;

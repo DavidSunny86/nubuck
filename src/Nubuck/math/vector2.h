@@ -27,6 +27,8 @@ namespace M {
 	Vector2 operator*(const Vector2& vector, float scalar);
 	Vector2 operator/(const Vector2& vector, float scalar);
 
+    Vector2 Normalize(const Vector2& vector);
+
 } // namespace M
 
 #include "vector2_mem_inl.h"

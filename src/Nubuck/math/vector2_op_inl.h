@@ -29,4 +29,9 @@ namespace M {
 		return Vector2(vector.x / scalar, vector.y / scalar);
 	}
 
+    M_INLINE Vector2 Normalize(const Vector2& vector) {
+        float length = sqrt(vector.x * vector.x + vector.y * vector.y);
+		return vector / length;
+    }
+
 } // namespace M

@@ -8,6 +8,7 @@
 #include <world\world.h>
 #include <world\entities\ent_node\ent_node.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
+#include <world\entities\ent_face\ent_face.h>
 #include <renderer\effects\effect.h>
 #include <algdriver\algdriver.h>
 #include <UI\mainwindow\mainwindow.h>
@@ -34,6 +35,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
 
     W::world.RegisterEntity<W::ENT_Node>(W::ENT_NODE);
     W::world.RegisterEntity<W::ENT_Polyhedron>(W::ENT_POLYHEDRON);
+    W::world.RegisterEntity<W::ENT_Face>(W::ENT_FACE);
 #ifdef NUBUCK_MT
     W::world.Start();
 #endif

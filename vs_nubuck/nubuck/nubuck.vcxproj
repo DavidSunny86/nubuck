@@ -50,6 +50,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\mesh.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr_inl.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polyhedron\polyhedron.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\quad\quad.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.h" />
@@ -88,6 +89,7 @@
     </CustomBuild>
     <ClInclude Include="..\..\src\Nubuck\UI\glwidget\glwidget.h" />
     <ClInclude Include="..\..\src\Nubuck\UI\logwidget\logwidget_inl.h" />
+    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_face\ent_face.h" />
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_node\ent_node.h" />
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.h" />
     <ClInclude Include="..\..\src\Nubuck\world\entity.h" />
@@ -152,6 +154,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\mesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\meshmgr.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\polyhedron\polyhedron.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\quad\quad.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.cpp" />
@@ -174,6 +177,7 @@
     <ClCompile Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\randompoints\randompoints.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\renderview\renderview.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_face\ent_face.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_node\ent_node.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entity.cpp" />
