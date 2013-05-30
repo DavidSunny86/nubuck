@@ -28,6 +28,8 @@ namespace W {
 
         const graph_t* _G;
 
+        std::vector<Event> _evBuffer;
+
         void Rebuild(void);
         void ChangeFaceColor(ColorState::func_t func, leda::edge edge, const R::Color& targetColor, float dur);
     public:

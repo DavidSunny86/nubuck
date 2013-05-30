@@ -41,6 +41,22 @@ namespace W {
     void ENT_Polyhedron::Update(float secsPassed) {
         Entity::Update(secsPassed);
 
+        while(!_evBuffer.empty()) {
+            Event event = _evBuffer.back();
+            _evBuffer.pop_back();
+
+            if(EVENT_CHANGE_COLOR == event.id) {
+                ChangeColorArgs* args = (ChangeColorArgs*)event.args;
+                R::Color targetColor(args->r, args->g, args->b);
+                ColorState::func_t func = NULL;
+                if(ChangeColorArgs::MODE_PULSE == args->mode) func = IP_Pulse;
+                if(ChangeColorArgs::MODE_LERP == args->mode) func = IP_Ident;
+                ChangeFaceColor(func, args->edge, targetColor, 1.0f);
+                _numAnimFaces++;
+            }
+        }
+        _evBuffer.clear();
+
         if(_numAnimFaces) {
             for(unsigned i = 0; i < _polyDesc->NumFaces(); ++i) {
                 ColorState& state = _faceColorStates[i];
@@ -77,15 +93,12 @@ namespace W {
     void ENT_Polyhedron::HandleEvent(const Event& event) {
         if(EVENT_REBUILD == event.id) {
             Rebuild();
+
+            // drop events that refer to former states of the graph
+            _evBuffer.clear();
         }
         if(EVENT_CHANGE_COLOR == event.id) {
-            ChangeColorArgs* args = (ChangeColorArgs*)event.args;
-            R::Color targetColor(args->r, args->g, args->b);
-            ColorState::func_t func = NULL;
-            if(ChangeColorArgs::MODE_PULSE == args->mode) func = IP_Pulse;
-            if(ChangeColorArgs::MODE_LERP == args->mode) func = IP_Ident;
-            ChangeFaceColor(func, args->edge, targetColor, 1.0f);
-            _numAnimFaces++;
+            _evBuffer.push_back(event);
         }
     }
 
