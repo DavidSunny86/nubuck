@@ -1,44 +1,83 @@
 #pragma once
 
-#include <generic\singleton.h>
+#include <generic\pointer.h>
 #include <system\locks\spinlock.h>
 #include "mesh.h"
 
 namespace R {
 
-    class MeshMgr : public GEN::Singleton<MeshMgr> {
-        friend class GEN::Singleton<MeshMgr>;
-    private:
-        struct Node {
-            Node *prev, *next;
-            int refCnt;
-            const char* name;
-            Mesh mesh;
+    class StaticBuffer;
 
-            Node(const GEN::Pointer<MeshDesc>& desc);
+    class MeshMgr {
+    private:
+        template<typename TYPE> // TYPE in {Vertex, Index}
+        struct MeshData {
+            MeshData *prev, *next;
+
+            int             refCount;
+            SYS::SpinLock   refCountLock;
+
+            TYPE*       data;
+            int         num;
+
+            GEN::Pointer<StaticBuffer> buffer;
+
+            void IncRef(void);
+            void DecRef(void);
         };
 
-        Node* _meshes;
-        SYS::SpinLock _meshesLck;
+        typedef MeshData<Vertex>    vrtData_t;
+        typedef MeshData<Index>     idxData_t;
 
-        Node* _CreateMesh(const GEN::Pointer<MeshDesc>& desc);
-        Node* _FindMesh(const char* name);
+        // synchronizes access to both vertex and index data
+        SYS::SpinLock   _dataLock;
+
+        vrtData_t*  _vertices;
+        idxData_t*  _indices;
+
+        void Link(vrtData_t* vrtData);
+        void Link(idxData_t* idxData);
+
+        void FreeUnused(vrtData_t* vrtData);
+        void FreeUnused(idxData_t* idxData);
+    public:
+        template<typename TYPE>
+        class Handle {
+            friend class MeshMgr;
+        private:
+            MeshData<TYPE>* _res;
+            MeshData<TYPE>* Res(void);
+            Handle(MeshData<TYPE>* const res);
+        public:
+            Handle(void);
+            ~Handle(void);
+            Handle(const Handle& other);
+            Handle& operator=(const Handle& other);
+            bool IsValid(void) const;
+        };
+
+        typedef Handle<Vertex> vertexHandle_t;
+        typedef Handle<Index> indexHandle_t;
 
         MeshMgr(void);
-    public:
-        typedef Node* meshHandle_t;
 
-        ~MeshMgr(void);
+        template<typename TYPE> // TYPE in {Vertex, Index}
+        Handle<TYPE> Create(const TYPE* const data, int num);
 
-        void RegisterMesh(const GEN::Pointer<MeshDesc>& desc, const char* name);
-        meshHandle_t FindMesh(const char* name);
-        meshHandle_t CreateMesh(const GEN::Pointer<MeshDesc>& desc);
+        template<typename TYPE> // TYPE in {Vertex, Index}
+        void R_Compile(Handle<TYPE>& handle);
 
-        Mesh& GetMesh(meshHandle_t meshHandle);
-        void Release(meshHandle_t meshHandle);
+        template<typename TYPE> // TYPE in {Vertex, Index}
+        void R_Bind(Handle<TYPE>& handle);
 
-        void Update(void);
-        void Clear(void);
+        template<typename TYPE> // TYPE in {Vertex, Index}
+        int R_Size(Handle<TYPE>& handle);
+
+        void R_FrameUpdate(void);
     };
 
+    extern MeshMgr meshMgr;
+
 } // namespace R
+
+#include "meshmgr_inl.h"

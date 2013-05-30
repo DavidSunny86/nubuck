@@ -12,12 +12,18 @@ namespace W {
     struct Event;
 
     class Entity {
+    public:
+        struct Mesh {
+            R::MeshMgr::vertexHandle_t  vertices;
+            R::MeshMgr::indexHandle_t   indices;
+            GLenum                      primType;
+        };
     private:
         int         _id;
         M::Vector3  _position;
  
-        R::MeshMgr::meshHandle_t    _meshHandle;
-        R::Material                 _material;
+        Mesh        _mesh;
+        R::Material _material;
 
         enum State {
             IDLE = 0,
@@ -38,7 +44,7 @@ namespace W {
         void ChangeColor(ChangeColorState::func_t func, const R::Color& targetColor, float dur);
     protected:
         void SetPosition(const M::Vector3& position);
-        void SetMeshHandle(const R::MeshMgr::meshHandle_t meshHandle);
+        void SetMesh(const Mesh& mesh);
         void InvalidateMesh(void);
 
         void PulseColor(const R::Color& targetColor, float dur);

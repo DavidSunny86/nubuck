@@ -11,13 +11,12 @@ namespace W {
         _position = position;
     }
 
-    void Entity::SetMeshHandle(R::MeshMgr::meshHandle_t meshHandle) {
-        R::MeshMgr::Instance().Release(_meshHandle);
-        _meshHandle = meshHandle;
+    void Entity::SetMesh(const Mesh& mesh) {
+        _mesh = mesh;
     }
 
     void Entity::InvalidateMesh(void) {
-        R::MeshMgr::Instance().GetMesh(_meshHandle).Invalidate();
+        //R::MeshMgr::Instance().GetMesh(_meshHandle).Invalidate();
     }
 
     void Entity::SetID(int id) { _id = id; }
@@ -42,12 +41,11 @@ namespace W {
 
     Entity::Entity(void) : _id(0), _position(M::Vector3::Zero) {
         _state = IDLE;
-        _meshHandle = NULL;
         _material.diffuseColor = R::Color::White;
     }
 
     Entity::~Entity(void) {
-        R::MeshMgr::Instance().Release(_meshHandle);
+        //R::MeshMgr::Instance().Release(_meshHandle);
     }
 
     void Entity::Update(float secsPassed) {
@@ -71,7 +69,9 @@ namespace W {
     R::RenderJob Entity::GetRenderJob(void) {
         R::RenderJob renderJob;
         renderJob.fx        = "Lit";
-        renderJob.mesh      = _meshHandle;
+        renderJob.vertices  = _mesh.vertices;
+        renderJob.indices   = _mesh.indices;
+        renderJob.primType  = _mesh.primType;
         renderJob.material  = _material;
         renderJob.transform = M::Mat4::Translate(_position);
         return renderJob;

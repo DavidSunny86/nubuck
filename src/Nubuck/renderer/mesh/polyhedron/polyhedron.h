@@ -9,7 +9,7 @@
 
 namespace R {
 
-    class PolyhedronMesh : public MeshDesc {
+    class PolyhedronMesh {
     public:
         typedef leda::rational              scalar_t;
         typedef leda::d3_rat_point          point_t;
@@ -45,7 +45,7 @@ namespace R {
         unsigned FaceOf(leda::edge e) const;
 
         const graph_t&  GetGraph(void) const;
-        Desc            GetDesc(void) const override;
+        MeshDesc        GetSolidDesc(void);
 
         void Set(leda::edge edge, const Color& color);
     };

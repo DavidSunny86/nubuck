@@ -4,6 +4,6 @@
 
 namespace R {
 
-    GEN::Pointer<MeshDesc> CreateQuadDesc(float edgeLength = 1.0f);
+    MeshDesc CreateQuadDesc(float edgeLength = 1.0f);
 
 } // namespace R

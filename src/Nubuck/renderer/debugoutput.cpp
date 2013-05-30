@@ -1,3 +1,4 @@
+#include <renderer\glew\glew.h>
 #include <common\common.h>
 #include "renderer.h"
 

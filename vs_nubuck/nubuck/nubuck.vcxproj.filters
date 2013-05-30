@@ -135,6 +135,9 @@
     <Filter Include="Private\UI\glwidget">
       <UniqueIdentifier>{3bf3127d-3379-4864-b0ce-80a5094e90ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\resource">
+      <UniqueIdentifier>{b89b9d71-ffea-4c87-b00d-2a894bfb5bec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -338,6 +341,12 @@
     <ClInclude Include="..\..\src\Nubuck\UI\glwidget\glwidget.h">
       <Filter>Private\UI\glwidget</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr_inl.h">
+      <Filter>Private\renderer\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\resource\resource.h">
+      <Filter>Private\renderer\resource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -510,6 +519,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\debugoutput.cpp">
       <Filter>Private\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\resource\resource.cpp">
+      <Filter>Private\renderer\resource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

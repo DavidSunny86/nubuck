@@ -108,8 +108,8 @@ namespace R {
         return _G;
     }
 
-    MeshDesc::Desc PolyhedronMesh::GetDesc(void) const {
-        Desc desc;
+    MeshDesc PolyhedronMesh::GetSolidDesc(void) {
+        MeshDesc desc;
 
         desc.vertices = &_vertices[0];
         desc.numVertices = _vertices.size();

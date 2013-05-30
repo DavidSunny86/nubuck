@@ -22,10 +22,10 @@ namespace W {
         if(1 == ++_numVisitors) _entitiesLock.Lock();
         _numVisitorsLock.Unlock();
 
-        for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
+        /*for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
             entPtr_t& entPtr = *entIt;
             visitor.Visit(*entPtr);
-        }
+        }*/
 
         _numVisitorsLock.Lock();
         if(0 == --_numVisitors) _entitiesLock.Unlock();

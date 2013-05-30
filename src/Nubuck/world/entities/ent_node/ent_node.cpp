@@ -14,10 +14,15 @@ namespace {
 
 namespace W {
 
+    R::MeshMgr::vertexHandle_t ENT_Node::s_meshVertices;
+    R::MeshMgr::indexHandle_t ENT_Node::s_meshIndices;
+
     void ENT_Node::InitResources(void) {
         static bool init = false;
         if(!init) {
-            R::MeshMgr::Instance().RegisterMesh(R::CreateQuadDesc(), "quad");
+            R::MeshDesc desc = R::CreateQuadDesc();
+            s_meshVertices = R::meshMgr.Create(desc.vertices, desc.numVertices);
+            s_meshIndices = R::meshMgr.Create(desc.indices, desc.numIndices);
         }
         init = true;
     }
@@ -42,7 +47,12 @@ namespace W {
         SetPosition(ToVector((*spawnArgs->G)[_node]));
 
         InitResources();
-        SetMeshHandle(R::MeshMgr::Instance().FindMesh("quad"));
+        
+        Mesh mesh;
+        mesh.vertices   = s_meshVertices;
+        mesh.indices    = s_meshIndices;
+        mesh.primType   = GL_TRIANGLES;
+        SetMesh(mesh);
     }
 
 } // namespace W

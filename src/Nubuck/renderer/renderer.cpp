@@ -12,6 +12,37 @@
 #include <renderer\material\material.h>
 #include "renderer.h"
 
+namespace {
+
+    enum {
+        IN_POSITION     = 0,
+        IN_NORMAL       = 1,
+        IN_COLOR        = 2
+    };
+
+    void BindVertices(void) {
+        GL_CALL(glVertexAttribPointer(IN_POSITION,
+            3, GL_FLOAT, GL_FALSE, sizeof(R::Vertex),
+            (void*)offsetof(R::Vertex, position)));
+        GL_CALL(glEnableVertexAttribArray(IN_POSITION));
+
+        GL_CALL(glVertexAttribPointer(IN_NORMAL,
+            3, GL_FLOAT, GL_FALSE, sizeof(R::Vertex),
+            (void*)offsetof(R::Vertex, normal)));
+        GL_CALL(glEnableVertexAttribArray(IN_NORMAL));
+
+        GL_CALL(glVertexAttribPointer(IN_COLOR,
+            4, GL_FLOAT, GL_FALSE, sizeof(R::Vertex),
+            (void*)offsetof(R::Vertex, color)));
+        GL_CALL(glEnableVertexAttribArray(IN_COLOR));
+    }
+
+    template<typename T> struct ToGLEnum { };
+    template<> struct ToGLEnum<unsigned>    { enum { ENUM = GL_UNSIGNED_INT }; };
+    template<> struct ToGLEnum<int>         { enum { ENUM = GL_INT }; };
+
+} // unnamed namespace
+
 namespace R {
 
     void InitDebugOutput(void);
@@ -83,9 +114,12 @@ namespace R {
 
             prog.SetUniform("uTransform", meshJob->transform);
 
-            Mesh& mesh = MeshMgr::Instance().GetMesh(meshJob->mesh);
-            mesh.Bind();
-            mesh.Draw();
+            meshMgr.R_Bind(meshJob->vertices);
+            BindVertices();
+            meshMgr.R_Bind(meshJob->indices);
+            int numIndices = meshMgr.R_Size(meshJob->indices);
+
+            GL_CALL(glDrawElements(meshJob->primType, numIndices, ToGLEnum<Index>::ENUM, NULL));
 
             meshJob = meshJob->next;
         }
@@ -100,7 +134,7 @@ namespace R {
         while(cur) {
             next = NULL;
             if(true) {
-				GEN::Pointer<Effect> fx = effectMgr.GetEffect(cur->fx);
+                GEN::Pointer<Effect> fx = effectMgr.GetEffect(cur->fx);
 
                 int numPasses = fx->NumPasses();
                 for(int i = 0; i < numPasses; ++i) {
@@ -157,9 +191,9 @@ namespace R {
     }
 
     void Renderer::Add(const RenderJob& renderJob) {
-		if(renderJob.fx.empty() || !renderJob.mesh) return;
+        /*if(renderJob.fx.empty() || !renderJob.vertices.IsValid() || !renderJob.indices.IsValid()) return;
         _renderJobs.push_back(renderJob);
-        _renderJobs.back().next = NULL;
+        _renderJobs.back().next = NULL;*/
     }
 
     void Renderer::EndFrame(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
@@ -169,20 +203,23 @@ namespace R {
 
         // TODO: sort
 
+        /*
         unsigned numJobs = _renderJobs.size();
         for(unsigned i = 0; i < numJobs; ++i) {
             RenderJob& rjob = _renderJobs[i];
             if(i < numJobs - 1) rjob.next = &_renderJobs[i + 1];
             
-			effectMgr.GetEffect(rjob.fx)->Compile();
-            MeshMgr::Instance().GetMesh(rjob.mesh).Compile();
+            effectMgr.GetEffect(rjob.fx)->Compile();
+            meshMgr.R_Compile(rjob.vertices);
+            meshMgr.R_Compile(rjob.indices);
 
             rjob.transform = worldMat * rjob.transform;
         }
 
         DrawFrame(worldMat, projectionMat);
+        */
 
-        R::MeshMgr::Instance().Update();
+        //meshMgr.R_FrameUpdate();
     }
 
 

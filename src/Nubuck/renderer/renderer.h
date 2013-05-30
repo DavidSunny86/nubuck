@@ -16,7 +16,9 @@ namespace R {
 
     struct RenderJob {
         std::string             fx;
-        MeshMgr::meshHandle_t   mesh;
+        MeshMgr::vertexHandle_t vertices;
+        MeshMgr::indexHandle_t  indices;
+        GLenum                  primType;
         Material	            material;
         M::Matrix4              transform;
 

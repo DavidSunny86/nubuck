@@ -10,7 +10,14 @@ namespace W {
 
     void ENT_Polyhedron::Rebuild(void) {
         _polyDesc = GEN::Pointer<R::PolyhedronMesh>(new R::PolyhedronMesh(*_G));
-        SetMeshHandle(R::MeshMgr::Instance().CreateMesh(_polyDesc));
+        
+        R::MeshDesc desc = _polyDesc->GetSolidDesc();
+
+        Mesh mesh;
+        mesh.vertices   = R::meshMgr.Create(desc.vertices, desc.numVertices);
+        mesh.indices    = R::meshMgr.Create(desc.indices, desc.numIndices);
+        mesh.primType   = desc.primType;
+        SetMesh(mesh);
 
         _faceColorStates.resize(_polyDesc->NumFaces());
         for(unsigned i = 0; i < _polyDesc->NumFaces(); ++i) {
