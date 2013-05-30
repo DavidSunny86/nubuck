@@ -8,6 +8,8 @@ namespace W {
         P.push_back(M::Vector2(-1.0f, -1.0f));
         P.push_back(M::Vector2( 1.0f, -1.0f));
         P.push_back(M::Vector2( 0.0f,  1.0f));
+        for(int i = 0; i < 5; ++i)
+            P = R::ChaikinSubdiv(P);
 
         R::PolygonMesh polyDesc(P);
         Mesh mesh = MeshFromDesc(polyDesc.GetSolidDesc());

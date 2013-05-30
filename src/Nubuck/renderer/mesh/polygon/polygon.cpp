@@ -6,6 +6,22 @@ namespace R {
         return M::Normalize(M::Vector2(-v.y, v.x));
     }
 
+    leda::list<M::Vector2> ChaikinSubdiv(const leda::list<M::Vector2>& polygon) {
+        leda::list<M::Vector2> refined;
+        leda::list_item it = polygon.first();
+        while(NULL != it) {
+            const M::Vector2& v0 = polygon[polygon.cyclic_pred(it)];
+            const M::Vector2& v1 = polygon[it];
+
+            refined.push_back(0.75 * v0 + 0.25 * v1);
+            refined.push_back(0.25 * v0 + 0.75 * v1);
+
+            it = polygon.succ(it);
+        }
+
+        return refined;
+    }
+
     PolygonMesh::PolygonMesh(const leda::list<M::Vector2>& polygon) {
         const float size = 0.2f;
         bool loop = true;
