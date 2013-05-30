@@ -22,6 +22,21 @@ namespace R {
 		effectMgr.Register(fx);
         fx.passes.clear();
 
+        // Default Wireframe Effect
+
+        pass0.name = "Wireframe";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\default.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\default.frag";
+        pass0.state.SetDefault();
+        pass0.state.raster.lineWidth = 5.0f;
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "Wireframe";
+        fx.passes.push_back(pass0);
+        effectMgr.Register(fx);
+        fx.passes.clear();
+
         // DefaultLit Effect
         // lit
 

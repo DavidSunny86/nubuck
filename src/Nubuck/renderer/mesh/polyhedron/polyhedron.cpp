@@ -120,6 +120,18 @@ namespace R {
         return desc;
     }
 
+    MeshDesc PolyhedronMesh::GetWireframeDesc(void) {
+        MeshDesc desc;
+
+        desc.vertices = &_vertices[0];
+        desc.numVertices = _vertices.size();
+        desc.indices = &_indices[0];
+        desc.numIndices = _indices.size();
+        desc.primType = GL_LINE_LOOP;
+
+        return desc;
+    }
+
     void PolyhedronMesh::Set(leda::edge edge, const Color& color) {
         Set(_faces[_edges[edge].faceIndex], color);
     }

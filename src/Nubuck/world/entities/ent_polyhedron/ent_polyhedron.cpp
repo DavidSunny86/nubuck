@@ -8,16 +8,19 @@ static float IP_Ident(float l) { return l; }
 
 namespace W {
 
-    void ENT_Polyhedron::Rebuild(void) {
-        _polyDesc = GEN::Pointer<R::PolyhedronMesh>(new R::PolyhedronMesh(*_G));
-        
-        R::MeshDesc desc = _polyDesc->GetSolidDesc();
-
-        Mesh mesh;
+    Entity::Mesh MeshFromDesc(const R::MeshDesc& desc) {
+        Entity::Mesh mesh;
         mesh.vertices   = R::meshMgr.Create(desc.vertices, desc.numVertices);
         mesh.indices    = R::meshMgr.Create(desc.indices, desc.numIndices);
         mesh.primType   = desc.primType;
-        SetMesh(mesh);
+        return mesh;
+    }
+
+    void ENT_Polyhedron::Rebuild(void) {
+        _polyDesc = GEN::Pointer<R::PolyhedronMesh>(new R::PolyhedronMesh(*_G));
+        
+        _solidMesh = MeshFromDesc(_polyDesc->GetSolidDesc());
+        _wireMesh = MeshFromDesc(_polyDesc->GetWireframeDesc());
 
         _faceColorStates.resize(_polyDesc->NumFaces());
         for(unsigned i = 0; i < _polyDesc->NumFaces(); ++i) {
@@ -75,6 +78,28 @@ namespace W {
 
             InvalidateMesh();
         } // if _numAnimFaces
+    }
+
+    void ENT_Polyhedron::Render(std::vector<R::RenderJob>& renderList) {
+        R::RenderJob renderJob;
+
+        // solid hull
+        renderJob.fx = "Lit";
+        renderJob.vertices  = _solidMesh.vertices;
+        renderJob.indices   = _solidMesh.indices;
+        renderJob.primType  = _solidMesh.primType;
+        renderJob.transform = M::Mat4::Translate(GetPosition());
+        renderJob.material  = GetMaterial();
+        renderList.push_back(renderJob);
+
+        // wireframe hull
+        renderJob.fx = "Wireframe";
+        renderJob.vertices  = _wireMesh.vertices;
+        renderJob.indices   = _wireMesh.indices;
+        renderJob.primType  = _wireMesh.primType;
+        renderJob.transform = M::Mat4::Translate(GetPosition());
+        renderJob.material  = GetMaterial();
+        renderList.push_back(renderJob);
     }
 
     void ENT_Polyhedron::Spawn(const Event& event) {

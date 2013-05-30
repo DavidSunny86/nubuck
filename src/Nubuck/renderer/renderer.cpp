@@ -59,6 +59,8 @@ namespace R {
         // SetEnabled(GL_DEPTH_TEST, state.depth.enabled);
         GL_CALL(glDepthMask(state.depth.maskEnabled));
         GL_CALL(glDepthFunc(state.depth.func));
+
+        GL_CALL(glLineWidth(state.raster.lineWidth));
     }
 
     void SetLightUniforms(Program& prog, const Light& light) {

@@ -43,6 +43,9 @@ namespace W {
         void SetID(int id);
         void ChangeColor(ChangeColorState::func_t func, const R::Color& targetColor, float dur);
     protected:
+        const M::Vector3& GetPosition(void) const;
+        const R::Material& GetMaterial(void) const;
+
         void SetPosition(const M::Vector3& position);
         void SetMesh(const Mesh& mesh);
         void InvalidateMesh(void);

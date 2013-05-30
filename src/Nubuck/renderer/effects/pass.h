@@ -23,6 +23,10 @@ namespace R {
             GLenum      func;
         } depth;
 
+        struct {
+            float       lineWidth;
+        } raster;
+
         Color color;
 
         void SetDefault(void) {
@@ -33,6 +37,8 @@ namespace R {
             depth.enabled       = GL_TRUE;
             depth.maskEnabled   = GL_TRUE;
             depth.func          = GL_LESS;
+
+            raster.lineWidth    = 1.0f;
 
             color               = Color::White;
         }

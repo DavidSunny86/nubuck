@@ -46,6 +46,7 @@ namespace R {
 
         const graph_t&  GetGraph(void) const;
         MeshDesc        GetSolidDesc(void);
+        MeshDesc        GetWireframeDesc(void);
 
         void Set(leda::edge edge, const Color& color);
     };

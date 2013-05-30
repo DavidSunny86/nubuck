@@ -7,6 +7,14 @@ static float IP_Ident(float l) { return l; }
 
 namespace W {
 
+    const M::Vector3& Entity::GetPosition(void) const {
+        return _position;
+    }
+
+    const R::Material& Entity::GetMaterial(void) const {
+        return _material;
+    }
+
     void Entity::SetPosition(const M::Vector3& position) {
         _position = position;
     }

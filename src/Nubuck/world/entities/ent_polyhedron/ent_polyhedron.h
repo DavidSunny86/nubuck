@@ -30,6 +30,9 @@ namespace W {
 
         std::vector<Event> _evBuffer;
 
+        Mesh _solidMesh;
+        Mesh _wireMesh;
+
         void Rebuild(void);
         void ChangeFaceColor(ColorState::func_t func, leda::edge edge, const R::Color& targetColor, float dur);
     public:
@@ -40,6 +43,7 @@ namespace W {
         ENT_Polyhedron(void);
 
         void Update(float secsPassed) override;
+        void Render(std::vector<R::RenderJob>& renderList) override;
 
         void Spawn(const Event& event);
 
