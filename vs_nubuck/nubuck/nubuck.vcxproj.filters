@@ -185,9 +185,6 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\color\color_inl.h">
       <Filter>Private\renderer\color</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\line.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\math\line_mem_inl.h">
       <Filter>Private\math</Filter>
     </ClInclude>
@@ -356,6 +353,12 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.h">
       <Filter>Private\renderer\mesh\polygon</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\line3.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\line2.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -381,9 +384,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\color\color.cpp">
       <Filter>Private\renderer\color</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\line.cpp">
-      <Filter>Private\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\math\math.cpp">
       <Filter>Private\math</Filter>
@@ -537,6 +537,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.cpp">
       <Filter>Private\renderer\mesh\polygon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\line3.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\line2.cpp">
+      <Filter>Private\math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

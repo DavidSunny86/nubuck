@@ -1,3 +1,5 @@
+#include <assert.h> 
+#include <math\line2.h>
 #include "polygon.h"
 
 namespace R {
@@ -38,11 +40,17 @@ namespace R {
             const M::Vector2& n = polygon[polygon.cyclic_succ(it)];
             const M::Vector2& p = polygon[polygon.cyclic_pred(it)];
 
-            M::Vector2 d = M::Normalize(0.5f * (Normal(n - v) + Normal(v - p)));
-            M::Vector2 v0 = v - size * d;
-            M::Vector2 v1 = v + size * d;
+            M::Vector2 n0 = size * Normal(v - p);
+            M::Vector2 n1 = size * Normal(n - v);
 
-            vert.position = M::Vector3(v0.x, v0.y, 0.0f);
+            M::Vector2 v1;
+            bool is = M::Intersect(
+                M::Line2::FromPoints(v + n0, p + n0),
+                M::Line2::FromPoints(v + n1, n + n1),
+                &v1);
+            assert(is);
+
+            vert.position = M::Vector3(v.x, v.y, 0.0f);
             _vertices.push_back(vert);
             _indices.push_back(indexCnt++);
 

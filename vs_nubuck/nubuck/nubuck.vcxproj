@@ -19,7 +19,8 @@
     <ClInclude Include="..\..\src\Nubuck\generic\pointer.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\singleton.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\uncopyable.h" />
-    <ClInclude Include="..\..\src\Nubuck\math\line.h" />
+    <ClInclude Include="..\..\src\Nubuck\math\line2.h" />
+    <ClInclude Include="..\..\src\Nubuck\math\line3.h" />
     <ClInclude Include="..\..\src\Nubuck\math\line_mem_inl.h" />
     <ClInclude Include="..\..\src\Nubuck\math\math.h" />
     <ClInclude Include="..\..\src\Nubuck\math\math_inl.h" />
@@ -136,7 +137,8 @@
     <ClCompile Include="..\..\src\Nubuck\algdriver\algdriver.cpp" />
     <ClCompile Include="..\..\src\Nubuck\camera\arcball_camera.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\common.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\math\line.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\math\line2.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\math\line3.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\math.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\matrix3_mem.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\matrix3_op.cpp" />
