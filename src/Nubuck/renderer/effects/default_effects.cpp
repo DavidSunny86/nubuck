@@ -13,6 +13,7 @@ namespace R {
         pass0.name = "Pass0";
         pass0.filenames[R::Shader::VERTEX]      = "Shaders\\default.vert";
         pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\default.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
         pass0.state.SetDefault();
         pass0.type = DEFAULT;
         pass0.flags = 0;
@@ -27,12 +28,31 @@ namespace R {
         pass0.name = "Wireframe";
         pass0.filenames[R::Shader::VERTEX]      = "Shaders\\default.vert";
         pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\default.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
         pass0.state.SetDefault();
+        pass0.state.depth.func = GL_LEQUAL;
         pass0.state.raster.lineWidth = 5.0f;
         pass0.type = DEFAULT;
         pass0.flags = 0;
 
         fx.name = "Wireframe";
+        fx.passes.push_back(pass0);
+        effectMgr.Register(fx);
+        fx.passes.clear();
+
+        // Create Generic Wireframe
+
+        pass0.name = "Wireframe";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\wireframe.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\wireframe.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "Shaders\\wireframe.geom";
+        pass0.state.SetDefault();
+        pass0.state.depth.func = GL_LEQUAL;
+        pass0.state.raster.lineWidth = 2.0f;
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "GenericWireframe";
         fx.passes.push_back(pass0);
         effectMgr.Register(fx);
         fx.passes.clear();
@@ -43,6 +63,7 @@ namespace R {
         pass0.name = "Ambient";
         pass0.filenames[R::Shader::VERTEX]      = "Shaders\\lit_pass0.vert";
         pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\lit_pass0.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
         pass0.state.SetDefault();
         pass0.state.blend.enabled = GL_TRUE;
         pass0.state.blend.srcFactor = GL_SRC_ALPHA;
@@ -54,6 +75,7 @@ namespace R {
         pass1.name = "Light0";
         pass1.filenames[R::Shader::VERTEX]      = "Shaders\\lit_pass1.vert";
         pass1.filenames[R::Shader::FRAGMENT]    = "Shaders\\lit_pass1.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
         pass1.state.SetDefault();
         pass1.state.blend.enabled = GL_TRUE;
         pass1.state.blend.srcFactor = GL_SRC_ALPHA;
@@ -66,6 +88,7 @@ namespace R {
         pass2.name = "LightN";
         pass2.filenames[R::Shader::VERTEX]      = "Shaders\\lit_pass1.vert";
         pass2.filenames[R::Shader::FRAGMENT]    = "Shaders\\lit_pass1.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
         pass2.state.SetDefault();
         pass2.state.blend.enabled = GL_TRUE;
         pass2.state.blend.srcFactor = GL_SRC_ALPHA;
