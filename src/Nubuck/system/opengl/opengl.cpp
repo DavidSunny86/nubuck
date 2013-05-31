@@ -135,8 +135,11 @@ namespace SYS {
 
     RenderingContext::~RenderingContext(void) {
         if(NULL != _contextHandle) {
+            /*
+            TODO: crashes on nvidia 540m
             wglMakeCurrent(NULL, NULL);
             wglDeleteContext(_contextHandle);
+            */
         }
     }
 

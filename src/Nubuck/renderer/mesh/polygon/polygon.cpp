@@ -1,4 +1,5 @@
-#include <assert.h> 
+#include <assert.h>
+#include <algorithm>
 #include <math\line2.h>
 #include "polygon.h"
 
@@ -24,12 +25,12 @@ namespace R {
         return refined;
     }
 
-    PolygonMesh::PolygonMesh(const leda::list<M::Vector2>& polygon) {
+    PolygonMesh::PolygonMesh(const leda::list<M::Vector2>& polygon, const M::Vector3& normal) {
         const float size = 0.2f;
         bool loop = true;
         
         Vertex vert;
-        vert.normal = M::Vector3(0.0f, 0.0f, 1.0f);
+        vert.normal = normal;
         vert.color = Color::White;
         
         unsigned indexCnt = 0;
@@ -65,6 +66,25 @@ namespace R {
             _indices.push_back(0);
             _indices.push_back(1);
         }
+    }
+
+    template<typename TYPE> // TYPE in {Matrix3, Matrix4}
+    struct TransformFunc {
+        const TYPE& mat;
+        
+        TransformFunc(const TYPE& mat) : mat(mat) { }
+
+        void operator()(Vertex& vert) {
+            vert.position = M::Transform(mat, vert.position);
+        }
+    };
+
+    void PolygonMesh::Transform(const M::Matrix3& mat) {
+        std::for_each(_vertices.begin(), _vertices.end(), TransformFunc<M::Matrix3>(mat));
+    }
+
+    void PolygonMesh::Transform(const M::Matrix4& mat) {
+        std::for_each(_vertices.begin(), _vertices.end(), TransformFunc<M::Matrix4>(mat));
     }
 
     MeshDesc PolygonMesh::GetSolidDesc(void) {

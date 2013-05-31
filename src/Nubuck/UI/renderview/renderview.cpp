@@ -77,12 +77,6 @@ namespace UI {
         light.position          = M::Vector3( dist, -dist, dist);
         light.diffuseColor      = R::Color::White;
         _renderer.Add(light);
-
-        // REMOVEME
-        W::Event event;
-        event.sem = NULL;
-        event.type = W::ENT_FACE;
-        W::world.Spawn(event);
     }
 
     RenderView::~RenderView(void) {

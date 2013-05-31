@@ -1,6 +1,8 @@
 #include <common\common.h>
 #include <world\events.h>
 #include <renderer\mesh\quad\quad.h>
+#include <world\world.h> // REMOVEME
+#include <world\entities\ent_face\ent_face.h> // REMOVEME
 #include "ent_polyhedron.h"
 
 static float IP_Pulse(float l) { return sinf(M::PI * l); }
@@ -17,6 +19,27 @@ namespace W {
         _faceColorStates.resize(_polyDesc->NumFaces());
         for(unsigned i = 0; i < _polyDesc->NumFaces(); ++i) {
             _faceColorStates[i].changing = false;
+        }
+
+        // REMOVEME
+        leda::edge_array<bool> visited(*_G, false);
+        leda::edge e;
+        forall_edges(e, *_G) {
+            if(!visited[e]) {
+                leda::list<M::Vector3> points;
+                leda::edge it = e;
+                do {
+                    visited[it] = true;
+                } while(e != (it = _G->face_cycle_succ(it)));
+
+                W::Event fevent;
+                fevent.sem = NULL;
+                fevent.type = W::ENT_FACE;
+                ENT_Face::SpawnArgs* fspawnArgs = (ENT_Face::SpawnArgs*)fevent.args;
+                fspawnArgs->G = _G;
+                fspawnArgs->edge = e;
+                W::world.Spawn(fevent);
+            }
         }
     }
 
