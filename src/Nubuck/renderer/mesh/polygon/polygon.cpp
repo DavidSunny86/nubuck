@@ -54,21 +54,16 @@ namespace R {
             const M::Vector2& n = polygon[polygon.cyclic_succ(it)];
             const M::Vector2& p = polygon[polygon.cyclic_pred(it)];
 
-            M::Vector2 n0 = size * Normal(v - p);
-            M::Vector2 n1 = size * Normal(n - v);
-
-            M::Vector2 v1;
-            bool is = M::Intersect(
-                M::Line2::FromPoints(v + n0, p + n0),
-                M::Line2::FromPoints(v + n1, n + n1),
-                &v1);
-            if(!is) v1 = v + n0;
+            M::Vector2 n0 = Normal(v - p);
+            M::Vector2 n1 = Normal(n - v);
+            M::Vector2 d = M::Normalize(0.5f * (n0 + n1));
 
             vert.position = M::Vector3(v.x, v.y, 0.0f);
             vert.texCoords = M::Vector2(texCoord, 0.0f);
             _vertices.push_back(vert);
             _indices.push_back(indexCnt++);
 
+            M::Vector2 v1 = v - size * d;
             vert.position = M::Vector3(v1.x, v1.y, 0.0f);
             vert.texCoords = M::Vector2(texCoord, 1.0f);
             _vertices.push_back(vert);
