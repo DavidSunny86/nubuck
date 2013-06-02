@@ -12,6 +12,33 @@ namespace {
         return M::Vector3(fp.xcoord(), fp.ycoord(), fp.zcoord());
     }
 
+    void MakeObtuse(leda::list<M::Vector3>& polygon) {
+        leda::list_item it;
+
+        M::Vector3 center = M::Vector3::Zero;
+        forall_items(it, polygon) center += polygon[it];
+        center /= polygon.size();
+
+        forall_items(it, polygon) {
+            M::Vector3& v = polygon[it];
+            v = 0.8f * (v - center) + center;
+        }
+
+        forall_items(it, polygon) {
+            M::Vector3& v = polygon[it];
+            M::Vector3 e0 = M::Normalize(polygon[polygon.cyclic_succ(it)] - v);
+            M::Vector3 e1 = M::Normalize(polygon[polygon.cyclic_pred(it)] - v);
+            const M::Vector3 d = M::Normalize(0.5f * (e0 + e1));
+            int i = 0;
+            while(M::Dot(e0, e1) > 0.8f && i < 200) {
+                v += 0.2f * d;
+                e0 = M::Normalize(polygon[polygon.cyclic_succ(it)] - v);
+                e1 = M::Normalize(polygon[polygon.cyclic_pred(it)] - v);
+                i++;
+            }
+        }
+    }
+
 } // unnamed namespace
 
 namespace W {
@@ -29,6 +56,8 @@ namespace W {
             points.push_back(ToVector(G[source(it)]));
         } while(edge != (it = G.face_cycle_succ(it)));
         assert(3 <= points.size());
+
+        MakeObtuse(points);
 
         const M::Vector3& p0 = points[points.get_item(0)];
         const M::Vector3& p1 = points[points.get_item(1)];

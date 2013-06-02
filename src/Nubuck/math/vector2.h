@@ -29,7 +29,9 @@ namespace M {
 	Vector2 operator*(const Vector2& vector, float scalar);
 	Vector2 operator/(const Vector2& vector, float scalar);
 
+    float   Dot(const Vector2& lhp, const Vector2& rhp);
     float   Length(const Vector2& vector);
+    float   Distance(const Vector2& lhp, const Vector2& rhp);
     Vector2 Normalize(const Vector2& vector);
 
 } // namespace M

@@ -37,7 +37,7 @@ namespace R {
     }
 
     PolygonMesh::PolygonMesh(const leda::list<M::Vector2>& polygon, const M::Vector3& normal) {
-        const float size = 0.2f;
+        const float size = 0.5f;
         bool loop = true;
         
         Vertex vert;
