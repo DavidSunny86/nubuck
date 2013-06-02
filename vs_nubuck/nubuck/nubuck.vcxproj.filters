@@ -144,6 +144,9 @@
     <Filter Include="Private\renderer\mesh\polygon">
       <UniqueIdentifier>{ed66ed19-3299-4159-b075-c15b2eb4ad3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\skin">
+      <UniqueIdentifier>{4b53a1f5-d4bf-4a0e-9a37-fdd87fdd1335}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -359,6 +362,12 @@
     <ClInclude Include="..\..\src\Nubuck\math\line2.h">
       <Filter>Private\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\skin\skin.h">
+      <Filter>Private\renderer\skin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\skin\skinmgr.h">
+      <Filter>Private\renderer\skin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -543,6 +552,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\math\line2.cpp">
       <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\skin\skinmgr.cpp">
+      <Filter>Private\renderer\skin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
