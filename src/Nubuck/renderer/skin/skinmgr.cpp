@@ -51,11 +51,41 @@ namespace R {
     // SkinMgr Impl
     // ==================================================
 
-    SkinMgr::SkinMgr(void) : _skins(NULL) { }
-
-    SkinMgr::handle_t SkinMgr::Create(const Skin& skin) {
-        return handle_t();
+    void SkinMgr::Link(SkinData* skinData) {
+        _dataLock.Lock();
+        skinData->prev = NULL;
+        if(skinData->next = _skins)
+            skinData->next->prev = skinData;
+        _skins = skinData;
+        _dataLock.Unlock();
     }
 
+    SkinMgr::SkinMgr(void) : _skins(NULL) { }
+
+    SkinMgr::handle_t SkinMgr::Create(const SkinDesc& skin) {
+        SkinData* skinData = new SkinData();
+        skinData->refCount = 0;
+        skinData->skinDesc = skin;
+        skinData->compiled = false;
+
+        Link(skinData);
+
+        return handle_t(skinData);
+    }
+
+    void SkinMgr::R_Compile(handle_t& handle) {
+        if(!handle.Res()->compiled) {
+            SkinDesc& skinDesc = handle.Res()->skinDesc;
+            Skin& skin = handle.Res()->skin;
+
+            skin.SetTexture(Skin::TL_DIFFUSE, TextureManager::Instance().Get(skinDesc.diffuseTexture));
+
+            handle.Res()->compiled = true;
+        }
+    }
+
+    void SkinMgr::R_Bind(Program& program, handle_t& handle) {
+        handle.Res()->skin.Bind(BF_TEX_DIFFUSE, program);
+    }
 
 } // namespace R

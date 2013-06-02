@@ -51,7 +51,8 @@ namespace R {
     };
 
     enum PassFlags {
-        USE_COLOR   = (1 << 0)
+        USE_COLOR       = (1 << 0),
+        USE_TEX_DIFFUSE = (1 << 1)
     };
 
     struct PassDesc {

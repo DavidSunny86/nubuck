@@ -17,7 +17,8 @@ namespace {
     enum {
         IN_POSITION     = 0,
         IN_NORMAL       = 1,
-        IN_COLOR        = 2
+        IN_COLOR        = 2,
+        IN_TEXCOORDS    = 3
     };
 
     void BindVertices(void) {
@@ -35,6 +36,11 @@ namespace {
             4, GL_FLOAT, GL_FALSE, sizeof(R::Vertex),
             (void*)offsetof(R::Vertex, color)));
         GL_CALL(glEnableVertexAttribArray(IN_COLOR));
+
+        GL_CALL(glVertexAttribPointer(IN_TEXCOORDS,
+            2, GL_FLOAT, GL_FALSE, sizeof(R::Vertex),
+            (void*)offsetof(R::Vertex, texCoords)));
+        GL_CALL(glEnableVertexAttribArray(IN_TEXCOORDS));
     }
 
     template<typename T> struct ToGLEnum { };
@@ -108,13 +114,17 @@ namespace R {
         glViewport(0, 0, width, height);
     }
 
-    RenderJob* DrawMeshList(Program& prog, int passType, const M::Matrix4& worldMat, RenderJob* first) {
+    RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const M::Matrix4& worldMat, RenderJob* first) {
         RenderJob* meshJob = first;
         while(meshJob && meshJob->fx == first->fx) {
             if(FIRST_LIGHT_PASS == passType || LIGHT_PASS == passType)
                 SetMaterialUniforms(prog, meshJob->material);
 
             prog.SetUniform("uTransform", meshJob->transform);
+
+            if(USE_TEX_DIFFUSE & passFlags) {
+                skinMgr.R_Bind(prog, meshJob->skin);
+            }
 
             meshMgr.R_Bind(meshJob->vertices);
             BindVertices();
@@ -164,13 +174,13 @@ namespace R {
                         if(FIRST_LIGHT_PASS == desc.type && !_lights.empty())
                             SetLightUniforms(prog, _lights[0]);
 
-                        next = DrawMeshList(prog, desc.type, worldMat, cur);
+                        next = DrawMeshList(prog, desc.type, desc.flags, worldMat, cur);
                     }
 
                     if(LIGHT_PASS == desc.type) {
                         for(int j = 1; j < _lights.size(); ++j) {
                             SetLightUniforms(prog, _lights[j]);
-                            next = DrawMeshList(prog, desc.type, worldMat, cur);
+                            next = DrawMeshList(prog, desc.type, desc.flags, worldMat, cur);
                         }
                     } // LIGHT_PASS == type
                 }
@@ -222,6 +232,7 @@ namespace R {
             effectMgr.GetEffect(rjob.fx)->Compile();
             meshMgr.R_Compile(rjob.vertices);
             meshMgr.R_Compile(rjob.indices);
+            if(rjob.skin.IsValid()) skinMgr.R_Compile(rjob.skin);
 
             rjob.transform = worldMat * rjob.transform;
         }

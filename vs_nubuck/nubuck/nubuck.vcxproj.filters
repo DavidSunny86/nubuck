@@ -589,6 +589,9 @@
     <ClCompile Include="..\..\src\Nubuck\common\filesystem\filesystem.cpp">
       <Filter>Private\common\filesystem</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\skin\skin.cpp">
+      <Filter>Private\renderer\skin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">

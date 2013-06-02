@@ -173,6 +173,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\debugoutput.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\resource\resource.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\skin\skin.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\skin\skinmgr.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\textures\texture.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\textures\tga_texalloc.cpp" />

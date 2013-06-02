@@ -15,6 +15,10 @@ namespace R {
         v[1].position = M::Vector3( size, -size, 0.0f);
         v[2].position = M::Vector3( size,  size, 0.0f);
         v[3].position = M::Vector3(-size,  size, 0.0f);
+        v[0].texCoords = M::Vector2(0.0f, 0.0f);
+        v[1].texCoords = M::Vector2(1.0f, 0.0f);
+        v[2].texCoords = M::Vector2(1.0f, 1.0f);
+        v[3].texCoords = M::Vector2(0.0f, 1.0f);
         desc.vertices       = v;
         desc.numVertices    = 4;
 

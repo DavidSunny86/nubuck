@@ -52,7 +52,26 @@ namespace W {
         mesh.vertices   = s_meshVertices;
         mesh.indices    = s_meshIndices;
         mesh.primType   = GL_TRIANGLES;
-        SetMesh(mesh);
+        _mesh = mesh;
+
+        // REMOVEME
+        R::SkinDesc skinDesc;
+        skinDesc.diffuseTexture = "C:\\Users\\cj\\Projects\\cg_ex8\\bin\\Textures\\uni_a1.tga";
+
+        _skin = R::skinMgr.Create(skinDesc);
+    }
+
+    void ENT_Node::Render(std::vector<R::RenderJob>& renderList) {
+        R::RenderJob renderJob;
+
+        renderJob.fx = "TexDiffuse";
+        renderJob.vertices  = _mesh.vertices;
+        renderJob.indices   = _mesh.indices;
+        renderJob.primType  = _mesh.primType;
+        renderJob.skin      = _skin;
+        renderJob.transform = M::Mat4::Translate(GetPosition());
+        renderJob.material  = GetMaterial();
+        renderList.push_back(renderJob);
     }
 
 } // namespace W

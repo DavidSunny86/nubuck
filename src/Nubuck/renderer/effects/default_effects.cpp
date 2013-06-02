@@ -57,6 +57,21 @@ namespace R {
         effectMgr.Register(fx);
         fx.passes.clear();
 
+        // Diffuse Texture only
+
+        pass0.name = "TexDiffuse";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\textured.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\textured.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.type = DEFAULT;
+        pass0.flags = USE_TEX_DIFFUSE;
+
+        fx.name = "TexDiffuse";
+        fx.passes.push_back(pass0);
+        effectMgr.Register(fx);
+        fx.passes.clear();
+
         // DefaultLit Effect
         // lit
 

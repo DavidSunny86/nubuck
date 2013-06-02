@@ -13,6 +13,10 @@ namespace R {
 
             int             refCount;
             SYS::SpinLock   refCountLock;
+
+            SkinDesc    skinDesc;
+            Skin        skin;
+            bool        compiled;
         
             void IncRef(void);
             void DecRef(void);
@@ -21,6 +25,8 @@ namespace R {
         SYS::SpinLock _dataLock;
 
         SkinData* _skins;
+
+        void Link(SkinData* skinData);
     public:
         class Handle {
             friend class SkinMgr;
@@ -40,7 +46,10 @@ namespace R {
 
         SkinMgr(void);
 
-        handle_t Create(const Skin& skin);
+        handle_t Create(const SkinDesc& skin);
+
+        void R_Compile(handle_t& handle);
+        void R_Bind(Program& program, handle_t& handle);
     };
 
     extern SkinMgr skinMgr;

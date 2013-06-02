@@ -7,6 +7,7 @@
 #include <math\matrix4.h>
 #include "material\material.h"
 #include "mesh\meshmgr.h"
+#include "skin\skinmgr.h"
 #include "light\light.h"
 
 namespace R {
@@ -20,6 +21,7 @@ namespace R {
         MeshMgr::indexHandle_t  indices;
         GLenum                  primType;
         Material	            material;
+        SkinMgr::handle_t       skin;
         M::Matrix4              transform;
 
         // handled by renderer

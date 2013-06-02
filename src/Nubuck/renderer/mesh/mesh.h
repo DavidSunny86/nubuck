@@ -2,6 +2,7 @@
 
 #include <renderer\glew\glew.h>
 #include <math\vector3.h>
+#include <math\vector2.h>
 #include <renderer\color\color.h>
 
 namespace R {
@@ -10,6 +11,7 @@ namespace R {
         M::Vector3  position;
         M::Vector3  normal;
         Color       color;
+        M::Vector2  texCoords;
     };
 
     typedef unsigned Index;

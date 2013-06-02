@@ -61,12 +61,6 @@ namespace W {
         polyMesh.Transform(M::Mat4::Translate(p0));
 
         _mesh = MeshFromDesc(polyMesh.GetSolidDesc());
-
-        // REMOVEME
-        R::Skin skinDesc;
-        skinDesc.diffuseTexture = "test";
-
-        R::SkinMgr::handle_t skin = R::skinMgr.Create(skinDesc);
     }
 
     void ENT_Face::Render(std::vector<R::RenderJob>& renderList) {
