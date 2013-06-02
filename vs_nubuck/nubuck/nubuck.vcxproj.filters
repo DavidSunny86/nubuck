@@ -592,6 +592,12 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\skin\skin.cpp">
       <Filter>Private\renderer\skin</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\vector2_mem.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\vector2_op.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">

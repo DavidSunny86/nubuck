@@ -153,6 +153,8 @@
     <ClCompile Include="..\..\src\Nubuck\math\matrix4_mem.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\matrix4_op.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\quaternion_mem.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\math\vector2_mem.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\math\vector2_op.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\vector3_mem.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\vector3_op.cpp" />
     <ClCompile Include="..\..\src\Nubuck\nubuck.cpp" />

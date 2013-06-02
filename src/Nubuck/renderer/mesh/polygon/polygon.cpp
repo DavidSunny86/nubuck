@@ -33,6 +33,8 @@ namespace R {
         vert.normal = normal;
         vert.color = Color::White;
         
+        float texCoord = 0.0f; // x-coord
+
         unsigned indexCnt = 0;
 
         leda::list_item it = polygon.first();
@@ -52,12 +54,16 @@ namespace R {
             assert(is);
 
             vert.position = M::Vector3(v.x, v.y, 0.0f);
+            vert.texCoords = M::Vector2(texCoord, 0.0f);
             _vertices.push_back(vert);
             _indices.push_back(indexCnt++);
 
             vert.position = M::Vector3(v1.x, v1.y, 0.0f);
+            vert.texCoords = M::Vector2(texCoord, 1.0f);
             _vertices.push_back(vert);
             _indices.push_back(indexCnt++);
+
+            texCoord += 2.0f * M::Length(n - v);
 
             it = polygon.succ(it);
         }

@@ -105,7 +105,7 @@ namespace W {
         renderJob.primType  = _solidMesh.primType;
         renderJob.transform = M::Mat4::Translate(GetPosition());
         renderJob.material  = GetMaterial();
-        renderList.push_back(renderJob);
+        // renderList.push_back(renderJob);
 
         // wireframe hull
         renderJob.fx = "Wireframe";

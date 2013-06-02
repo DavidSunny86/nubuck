@@ -7,6 +7,7 @@ namespace W {
     class ENT_Face : public Entity {
     private:
         Mesh _mesh;
+        R::SkinMgr::handle_t _skin;
     public:
         struct SpawnArgs {
             const graph_t*  G;
