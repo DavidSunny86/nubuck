@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <common\common.h> // TODO: removeme
 #include <algorithm>
 #include <math\line2.h>
 #include "polygon.h"
@@ -34,7 +33,7 @@ namespace R {
         vert.normal = normal;
         vert.color = Color::White;
         
-        float len = 0.0f;
+        float texCoord = 0.0f; // x-coord
 
         unsigned indexCnt = 0;
 
@@ -55,33 +54,23 @@ namespace R {
             assert(is);
 
             vert.position = M::Vector3(v.x, v.y, 0.0f);
+            vert.texCoords = M::Vector2(texCoord, 0.0f);
             _vertices.push_back(vert);
             _indices.push_back(indexCnt++);
 
             vert.position = M::Vector3(v1.x, v1.y, 0.0f);
+            vert.texCoords = M::Vector2(texCoord, 1.0f);
             _vertices.push_back(vert);
             _indices.push_back(indexCnt++);
 
-            it = polygon.succ(it);
+            texCoord += 2.0f * M::Length(n - v);
 
-            if(it) len += M::Length(n - v);
+            it = polygon.succ(it);
         }
 
         if(loop) {
-            vert = _vertices[0];
-            _vertices.push_back(vert);
-            _indices.push_back(indexCnt++);
-
-            vert = _vertices[1];
-            _vertices.push_back(vert);
-            _indices.push_back(indexCnt++);
-        }
-
-        float ds = (float)((int)len) / ((_vertices.size() - 2) >> 1);
-        for(unsigned i = 0, j = 0; i < _vertices.size(); i += 2, j++) {
-            float texCoord = j * ds;
-            _vertices[i].texCoords = M::Vector2(texCoord, 0.0f);
-            _vertices[i + 1].texCoords = M::Vector2(texCoord, 1.0f);
+            _indices.push_back(0);
+            _indices.push_back(1);
         }
     }
 
