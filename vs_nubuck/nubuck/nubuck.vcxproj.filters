@@ -144,6 +144,15 @@
     <Filter Include="Private\renderer\mesh\polygon">
       <UniqueIdentifier>{ed66ed19-3299-4159-b075-c15b2eb4ad3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\textures">
+      <UniqueIdentifier>{43306ecc-f379-42c3-b680-062b4ca35432}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\common\filesystem">
+      <UniqueIdentifier>{468c2add-405a-4346-a2a0-1cde6556b267}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\common\config">
+      <UniqueIdentifier>{d19103ff-80d8-4b5d-91be-8209b002bd39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -359,6 +368,18 @@
     <ClInclude Include="..\..\src\Nubuck\math\line2.h">
       <Filter>Private\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\textures\texallocs.h">
+      <Filter>Private\renderer\textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\textures\texture.h">
+      <Filter>Private\renderer\textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\common\config\config.h">
+      <Filter>Private\common\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\common\filesystem\filesystem.h">
+      <Filter>Private\common\filesystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -543,6 +564,18 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\math\line2.cpp">
       <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\textures\texture.cpp">
+      <Filter>Private\renderer\textures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\textures\tga_texalloc.cpp">
+      <Filter>Private\renderer\textures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\common\config\config.cpp">
+      <Filter>Private\common\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\common\filesystem\filesystem.cpp">
+      <Filter>Private\common\filesystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
