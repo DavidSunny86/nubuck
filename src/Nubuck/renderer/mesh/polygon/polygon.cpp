@@ -43,10 +43,11 @@ namespace R {
         Vertex vert;
         vert.normal = normal;
         vert.color = Color::White;
-        
-        float texCoord = 0.0f; // x-coord
 
         unsigned indexCnt = 0;
+
+        float texCoord = 0.0f;
+        M::Vector2 lastVec = polygon.front();
 
         leda::list_item it = polygon.first();
         while(NULL != it) {
@@ -54,23 +55,32 @@ namespace R {
             const M::Vector2& n = polygon[polygon.cyclic_succ(it)];
             const M::Vector2& p = polygon[polygon.cyclic_pred(it)];
 
-            M::Vector2 n0 = Normal(v - p);
-            M::Vector2 n1 = Normal(n - v);
-            M::Vector2 d = M::Normalize(0.5f * (n0 + n1));
+            M::Vector2 v1 = v - size * Normal(v - p);
+            M::Vector2 v2 = v - size * Normal(n - v);
+            
+            texCoord += M::Distance(lastVec, v);
 
             vert.position = M::Vector3(v.x, v.y, 0.0f);
             vert.texCoords = M::Vector2(texCoord, 0.0f);
             _vertices.push_back(vert);
             _indices.push_back(indexCnt++);
 
-            M::Vector2 v1 = v - size * d;
             vert.position = M::Vector3(v1.x, v1.y, 0.0f);
             vert.texCoords = M::Vector2(texCoord, 1.0f);
             _vertices.push_back(vert);
             _indices.push_back(indexCnt++);
 
-            texCoord += 2.0f * M::Length(n - v);
+            vert.position = M::Vector3(v.x, v.y, 0.0f);
+            vert.texCoords = M::Vector2(texCoord, 0.0f);
+            _vertices.push_back(vert);
+            _indices.push_back(indexCnt++);
 
+            vert.position = M::Vector3(v2.x, v2.y, 0.0f);
+            vert.texCoords = M::Vector2(texCoord, 1.0f);
+            _vertices.push_back(vert);
+            _indices.push_back(indexCnt++);
+
+            lastVec = v;
             it = polygon.succ(it);
         }
 

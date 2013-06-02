@@ -24,6 +24,7 @@ namespace {
             v = 0.8f * (v - center) + center;
         }
 
+        /*
         forall_items(it, polygon) {
             M::Vector3& v = polygon[it];
             M::Vector3 e0 = M::Normalize(polygon[polygon.cyclic_succ(it)] - v);
@@ -37,6 +38,7 @@ namespace {
                 i++;
             }
         }
+        */
     }
 
 } // unnamed namespace
@@ -110,6 +112,11 @@ namespace W {
 
         // solid
         renderJob.fx = "TexDiffuse";
+        renderList.push_back(renderJob);
+
+        // wireframe
+        renderJob.fx = "GenericWireframe";
+        renderJob.skin = R::SkinMgr::handle_t();
         renderList.push_back(renderJob);
     }
 
