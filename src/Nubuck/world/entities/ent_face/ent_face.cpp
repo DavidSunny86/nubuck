@@ -53,8 +53,8 @@ namespace W {
             assert(M::AlmostEqual(0.0f, l.z));
             lpoly.push_back(M::Vector2(l.x, l.y));
         }
-        for(int i = 0; i < 4; ++i)
-            lpoly = R::ChaikinSubdiv(lpoly);
+        for(int i = 0; i < 1; ++i) R::Subdiv(lpoly);
+        for(int i = 0; i < 4; ++i) lpoly = R::ChaikinSubdiv(lpoly);
 
         R::PolygonMesh polyMesh(lpoly, v2);
         polyMesh.Transform(M);

@@ -16,7 +16,8 @@ namespace M {
     // cnf. http://community.topcoder.com/tc?module=Static&d1=tutorials&d2=geometry2#line_line_intersection
     bool Intersect(const Line2& lhp, const Line2& rhp, M::Vector2* where) {
         float det = lhp.a * rhp.b - rhp.a * lhp.b;
-        if(0.0f == det) return false;
+        //if(0.0f == det) return false;
+        if(M::AlmostEqual(0.0f, det)) return false;
         if(where) {
             where->x = (rhp.b * lhp.c - lhp.b * rhp.c) / det;
             where->y = (lhp.a * rhp.c - rhp.a * lhp.c) / det;

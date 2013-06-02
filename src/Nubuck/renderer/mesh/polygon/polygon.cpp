@@ -9,6 +9,17 @@ namespace R {
         return M::Normalize(M::Vector2(-v.y, v.x));
     }
 
+    void Subdiv(leda::list<M::Vector2>& polygon) {
+        leda::list_item next, it = polygon.first();
+        while(NULL != it) {
+            next = polygon.succ(it);
+            const M::Vector2& v0 = polygon[polygon.cyclic_succ(it)];
+            const M::Vector2& v1 = polygon[it];
+            polygon.insert(0.5f * (v0 + v1), it, leda::behind);
+            it = next;
+        }
+    }
+
     leda::list<M::Vector2> ChaikinSubdiv(const leda::list<M::Vector2>& polygon) {
         leda::list<M::Vector2> refined;
         leda::list_item it = polygon.first();
@@ -51,7 +62,7 @@ namespace R {
                 M::Line2::FromPoints(v + n0, p + n0),
                 M::Line2::FromPoints(v + n1, n + n1),
                 &v1);
-            assert(is);
+            if(!is) v1 = v + n0;
 
             vert.position = M::Vector3(v.x, v.y, 0.0f);
             vert.texCoords = M::Vector2(texCoord, 0.0f);

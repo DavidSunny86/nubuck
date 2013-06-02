@@ -12,6 +12,7 @@
 
 namespace R {
 
+    void Subdiv(leda::list<M::Vector2>& polygon);
     leda::list<M::Vector2> ChaikinSubdiv(const leda::list<M::Vector2>& polygon);
 
     class PolygonMesh {
