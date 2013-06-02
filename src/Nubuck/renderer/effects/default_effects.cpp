@@ -64,6 +64,9 @@ namespace R {
         pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\textured.frag";
         pass0.filenames[R::Shader::GEOMETRY]    = "";
         pass0.state.SetDefault();
+        pass0.state.blend.enabled = true;
+        pass0.state.blend.srcFactor = GL_SRC_ALPHA;
+        pass0.state.blend.dstFactor = GL_ONE_MINUS_SRC_ALPHA;
         pass0.type = DEFAULT;
         pass0.flags = USE_TEX_DIFFUSE;
 

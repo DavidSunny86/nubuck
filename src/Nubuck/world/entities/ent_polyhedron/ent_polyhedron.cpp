@@ -114,7 +114,7 @@ namespace W {
         renderJob.primType  = _wireMesh.primType;
         renderJob.transform = M::Mat4::Translate(GetPosition());
         renderJob.material  = GetMaterial();
-        renderList.push_back(renderJob);
+        // renderList.push_back(renderJob);
     }
 
     void ENT_Polyhedron::Spawn(const Event& event) {
