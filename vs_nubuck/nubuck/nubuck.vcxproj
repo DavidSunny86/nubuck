@@ -15,6 +15,8 @@
     <ClInclude Include="..\..\src\Nubuck\algdriver\algdriver.h" />
     <ClInclude Include="..\..\src\Nubuck\camera\arcball_camera.h" />
     <ClInclude Include="..\..\src\Nubuck\common\common.h" />
+    <ClInclude Include="..\..\src\Nubuck\common\config\config.h" />
+    <ClInclude Include="..\..\src\Nubuck\common\filesystem\filesystem.h" />
     <ClInclude Include="..\..\src\Nubuck\common\types.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\pointer.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\singleton.h" />
@@ -61,6 +63,8 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\skin\skin.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\skin\skinmgr.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\textures\texallocs.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\textures\texture.h" />
     <ClInclude Include="..\..\src\Nubuck\system\locks\semaphore.h" />
     <ClInclude Include="..\..\src\Nubuck\system\locks\spinlock.h" />
     <ClInclude Include="..\..\src\Nubuck\system\opengl\glwindow\glwindow.h" />
@@ -139,6 +143,8 @@
     <ClCompile Include="..\..\src\Nubuck\algdriver\algdriver.cpp" />
     <ClCompile Include="..\..\src\Nubuck\camera\arcball_camera.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\common.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\common\config\config.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\common\filesystem\filesystem.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\line2.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\line3.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\math.cpp" />
@@ -168,6 +174,8 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\resource\resource.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\skin\skinmgr.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\textures\texture.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\textures\tga_texalloc.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\locks\semaphore.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\locks\spinlock.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\opengl\glwindow\glwindow.cpp" />
