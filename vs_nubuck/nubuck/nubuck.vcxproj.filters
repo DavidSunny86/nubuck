@@ -389,6 +389,9 @@
     <ClInclude Include="..\..\src\Nubuck\common\filesystem\filesystem.h">
       <Filter>Private\common\filesystem</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon_inl.h">
+      <Filter>Private\renderer\mesh\polygon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">

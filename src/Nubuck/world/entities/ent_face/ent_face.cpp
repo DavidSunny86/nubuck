@@ -21,10 +21,9 @@ namespace {
 
         forall_items(it, polygon) {
             M::Vector3& v = polygon[it];
-            v = 0.8f * (v - center) + center;
+            v = 0.7f * (v - center) + center;
         }
 
-        /*
         forall_items(it, polygon) {
             M::Vector3& v = polygon[it];
             M::Vector3 e0 = M::Normalize(polygon[polygon.cyclic_succ(it)] - v);
@@ -38,7 +37,6 @@ namespace {
                 i++;
             }
         }
-        */
     }
 
 } // unnamed namespace
@@ -58,7 +56,6 @@ namespace W {
             points.push_back(ToVector(G[source(it)]));
         } while(edge != (it = G.face_cycle_succ(it)));
         assert(3 <= points.size());
-
         MakeObtuse(points);
 
         const M::Vector3& p0 = points[points.get_item(0)];
@@ -69,29 +66,13 @@ namespace W {
         M::Vector3 v1 = M::Normalize(p2 - p0);
         M::Vector3 v2 = M::Normalize(M::Cross(v0, v1));
 
-        M::Matrix3 M(M::Mat3::FromColumns(v0, v1, v2));
-        if(M::AlmostEqual(0.0f, M::Det(M))) {
-            common.printf("ERROR - ENT_Face: non-invertable matrix M.\n");
-        }
+        for(int i = 0; i < 1; ++i) R::Subdiv(points);
+        for(int i = 0; i < 4; ++i) points = R::ChaikinSubdiv(points);
 
-        // M does not need to be orthogonal
-        M::Matrix3 invM(M::Inverse(M));
-
-        leda::list<M::Vector2> lpoly;
-        M::Vector3 p;
-        forall(p, points) {
-            M::Vector3 l = M::Transform(invM, p - p0);
-            assert(M::AlmostEqual(0.0f, l.z));
-            lpoly.push_back(M::Vector2(l.x, l.y));
-        }
-        for(int i = 0; i < 1; ++i) R::Subdiv(lpoly);
-        for(int i = 0; i < 4; ++i) lpoly = R::ChaikinSubdiv(lpoly);
-
-        R::PolygonMesh polyMesh(lpoly, v2);
-        polyMesh.Transform(M);
+        R::PolygonMesh polyMesh(points, v2);
 
         const float eps = 0.001f; // resolves z-fighting of faces and hull
-        polyMesh.Transform(M::Mat4::Translate(p0 + eps * v2));
+        polyMesh.Transform(M::Mat4::Translate(eps * v2));
 
         _mesh = MeshFromDesc(polyMesh.GetSolidDesc());
 
@@ -117,7 +98,7 @@ namespace W {
         // wireframe
         renderJob.fx = "GenericWireframe";
         renderJob.skin = R::SkinMgr::handle_t();
-        renderList.push_back(renderJob);
+        // renderList.push_back(renderJob);
     }
 
 } // namespace W

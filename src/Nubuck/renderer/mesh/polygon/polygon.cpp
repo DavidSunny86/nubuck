@@ -9,33 +9,6 @@ namespace R {
         return M::Normalize(M::Vector2(-v.y, v.x));
     }
 
-    void Subdiv(leda::list<M::Vector2>& polygon) {
-        leda::list_item next, it = polygon.first();
-        while(NULL != it) {
-            next = polygon.succ(it);
-            const M::Vector2& v0 = polygon[polygon.cyclic_succ(it)];
-            const M::Vector2& v1 = polygon[it];
-            polygon.insert(0.5f * (v0 + v1), it, leda::behind);
-            it = next;
-        }
-    }
-
-    leda::list<M::Vector2> ChaikinSubdiv(const leda::list<M::Vector2>& polygon) {
-        leda::list<M::Vector2> refined;
-        leda::list_item it = polygon.first();
-        while(NULL != it) {
-            const M::Vector2& v0 = polygon[polygon.cyclic_pred(it)];
-            const M::Vector2& v1 = polygon[it];
-
-            refined.push_back(0.75 * v0 + 0.25 * v1);
-            refined.push_back(0.25 * v0 + 0.75 * v1);
-
-            it = polygon.succ(it);
-        }
-
-        return refined;
-    }
-
     PolygonMesh::PolygonMesh(const leda::list<M::Vector2>& polygon, const M::Vector3& normal) {
         const float size = 0.5f;
         bool loop = true;
@@ -87,6 +60,61 @@ namespace R {
         if(loop) {
             _indices.push_back(0);
             _indices.push_back(1);
+        }
+    }
+
+    PolygonMesh::PolygonMesh(leda::list<M::Vector3>& polygon, const M::Vector3& normal) {
+        const float size = 0.2f;
+        bool loop = true;
+        
+        Vertex vert;
+        vert.normal = normal;
+        vert.color = Color::White;
+
+        unsigned indexCnt = 0;
+
+        float texCoord = 0.0f;
+        M::Vector3 lastVec = polygon.front();
+
+        leda::list_item it = polygon.first();
+        while(NULL != it) {
+            const M::Vector3& v = polygon[it];
+            const M::Vector3& n = polygon[polygon.cyclic_succ(it)];
+            const M::Vector3& p = polygon[polygon.cyclic_pred(it)];
+
+            M::Vector3 n0 = M::Normalize(M::Cross(v - p, normal));
+            M::Vector3 n1 = M::Normalize(M::Cross(n - v, normal));
+            M::Vector3 v1 = v + size * M::Normalize(0.5 * (n0 + n1));
+            
+            texCoord += M::Distance(lastVec, v);
+
+            vert.position = v;
+            vert.texCoords = M::Vector2(texCoord, 0.0f);
+            _vertices.push_back(vert);
+            _indices.push_back(indexCnt++);
+
+            vert.position = v1;
+            vert.texCoords = M::Vector2(texCoord, 1.0f);
+            _vertices.push_back(vert);
+            _indices.push_back(indexCnt++);
+
+            lastVec = v;
+            it = polygon.succ(it);
+        }
+
+        if(loop) {
+            texCoord += M::Distance(lastVec, _vertices[0].position);
+            texCoord = (int)texCoord;
+
+            vert = _vertices[0];
+            vert.texCoords.s = texCoord;
+            _vertices.push_back(vert);
+            _indices.push_back(indexCnt++);
+
+            vert = _vertices[1];
+            vert.texCoords.s = texCoord;
+            _vertices.push_back(vert);
+            _indices.push_back(indexCnt++);
         }
     }
 

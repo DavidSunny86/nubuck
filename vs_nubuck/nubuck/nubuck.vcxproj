@@ -54,6 +54,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr_inl.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon_inl.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polyhedron\polyhedron.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\quad\quad.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.h" />

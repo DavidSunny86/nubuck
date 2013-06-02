@@ -12,8 +12,11 @@
 
 namespace R {
 
-    void Subdiv(leda::list<M::Vector2>& polygon);
-    leda::list<M::Vector2> ChaikinSubdiv(const leda::list<M::Vector2>& polygon);
+    template<typename TYPE> // TYPE in {Vector2, Vector3}
+    void Subdiv(leda::list<TYPE>& polygon);
+
+    template<typename TYPE> // TYPE in {Vector2, Vector3}
+    leda::list<TYPE> ChaikinSubdiv(const leda::list<TYPE>& polygon);
 
     class PolygonMesh {
     private:
@@ -21,6 +24,7 @@ namespace R {
         std::vector<Index>  _indices;
     public:
         PolygonMesh(const leda::list<M::Vector2>& polygon, const M::Vector3& normal);
+        PolygonMesh(leda::list<M::Vector3>& polygon, const M::Vector3& normal);
 
         void Transform(const M::Matrix3& mat);
         void Transform(const M::Matrix4& mat);
@@ -29,3 +33,5 @@ namespace R {
     };
 
 } // namespace R
+
+#include "polygon_inl.h"
