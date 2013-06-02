@@ -58,7 +58,9 @@ namespace W {
 
         R::PolygonMesh polyMesh(lpoly, v2);
         polyMesh.Transform(M);
-        polyMesh.Transform(M::Mat4::Translate(p0));
+
+        const float eps = 0.001f; // resolves z-fighting of faces and hull
+        polyMesh.Transform(M::Mat4::Translate(p0 + eps * v2));
 
         _mesh = MeshFromDesc(polyMesh.GetSolidDesc());
 
