@@ -71,7 +71,8 @@ namespace W {
                 }
             } // forall faces
 
-            InvalidateMesh();
+            R::MeshDesc desc = _polyDesc->GetSolidDesc();
+            R::meshMgr.Update(_vertices, desc.vertices, desc.numVertices);
         } // if _numAnimFaces
     }
 

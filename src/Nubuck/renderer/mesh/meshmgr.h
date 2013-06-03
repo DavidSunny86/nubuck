@@ -23,6 +23,8 @@ namespace R {
             GEN::Pointer<StaticBuffer>  buffer;
             bool                        compiled;
 
+            SYS::SpinLock dataLock;
+
             void IncRef(void);
             void DecRef(void);
         };
@@ -64,6 +66,9 @@ namespace R {
 
         template<typename TYPE> // TYPE in {Vertex, Index}
         Handle<TYPE> Create(const TYPE* const data, int num);
+
+        template<typename TYPE> // TYPE in {Vertex, Index}
+        void Update(Handle<TYPE>& handle, const TYPE* const data, int num);
 
         template<typename TYPE> // TYPE in {Vertex, Index}
         void R_Compile(Handle<TYPE>& handle);

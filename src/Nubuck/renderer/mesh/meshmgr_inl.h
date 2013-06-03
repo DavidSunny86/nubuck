@@ -77,6 +77,17 @@ namespace R {
         return Handle<TYPE>(meshData);
     }
 
+    template<typename TYPE>
+    void MeshMgr::Update(Handle<TYPE>& handle, const TYPE* const data, int num) {
+        MeshData<TYPE>* meshData = handle.Res();
+        meshData->dataLock.Lock();
+        for(int i = 0; i < num; ++i) {
+            handle.Res()->data[i] =  data[i];
+        }
+        handle.Res()->compiled = false;
+        meshData->dataLock.Unlock();
+    }
+
     template<typename TYPE> struct BufferType;
     template<> struct BufferType<Vertex> { enum { VALUE = GL_ARRAY_BUFFER }; };
     template<> struct BufferType<Index> { enum { VALUE = GL_ELEMENT_ARRAY_BUFFER }; };
@@ -84,11 +95,13 @@ namespace R {
     template<typename TYPE>
     void MeshMgr::R_Compile(Handle<TYPE>& handle) {
         MeshData<TYPE>* meshData = handle.Res();
+        meshData->dataLock.Lock();
         if(!meshData->compiled) {
             meshData->buffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(
                 BufferType<TYPE>::VALUE, meshData->data, meshData->num * sizeof(TYPE)));
             meshData->compiled = true;
         }
+        meshData->dataLock.Unlock();
     }
 
     template<typename TYPE>
