@@ -79,6 +79,8 @@ namespace W {
         R::SkinDesc skinDesc;
         skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\dot.tga";
         _skin = R::skinMgr.Create(skinDesc);
+
+        _material.diffuseColor = R::Color(spawnArgs->r, spawnArgs->g, spawnArgs->b);
     }
 
     void ENT_Face::Render(std::vector<R::RenderJob>& renderList) {
@@ -89,7 +91,7 @@ namespace W {
         renderJob.primType  = _mesh.primType;
         renderJob.skin      = _skin;
         renderJob.transform = M::Mat4::Translate(GetPosition());
-        renderJob.material  = GetMaterial();
+        renderJob.material  = _material;
 
         // solid
         renderJob.fx = "FaceRing";

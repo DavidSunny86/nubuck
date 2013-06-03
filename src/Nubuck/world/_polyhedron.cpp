@@ -1,10 +1,12 @@
 #include <world\world.h>
 #include <world\entities\ent_node\ent_node.h>
+#include <world\entities\ent_face\ent_face.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include "polyhedron.h"
 
 Polyhedron::Polyhedron(const graph_t& G) : _G(G), _rebuildSem(0) {
     _nodeEntIDs.init(_G);
+    _faceEntIDs.init(_G, 0);
 
     W::World& world = W::world;
     W::Event event;
@@ -42,7 +44,7 @@ void Polyhedron::SetNodeColor(leda::node node, float r, float g, float b) {
     W::world.Send(event);
 }
 
-void Polyhedron::SetFaceColor(leda::edge edge, float r, float g, float b) {
+void Polyhedron::SetFaceColorSolid(leda::edge edge, float r, float g, float b) {
     W::Event event;
 
     event.id        = W::EVENT_CHANGE_COLOR;
@@ -57,6 +59,34 @@ void Polyhedron::SetFaceColor(leda::edge edge, float r, float g, float b) {
     args->edge  = edge;
 
     W::world.Send(event);
+}
+
+void Polyhedron::SetFaceColorRing(leda::edge edge, float r, float g, float b) {
+    // if(0 < _faceEntIDs[edge]) return;
+
+    W::Event event;
+
+    event.id    = W::EVENT_SPAWN_ENTITY;
+    event.type  = W::ENT_FACE;
+    event.sem   = &_rebuildSem;
+
+    W::ENT_Face::SpawnArgs* args = (W::ENT_Face::SpawnArgs*)event.args;
+    args->G     = &_G;
+    args->edge  = edge;
+    args->r     = r;
+    args->g     = g;
+    args->b     = b;
+
+    int id = W::world.Spawn(event);
+
+    leda::edge it = edge;
+    do {
+        _faceEntIDs[it] = id;
+    } while(edge != (it = _G.face_cycle_succ(it)));
+}
+
+void Polyhedron::SetFaceColor(leda::edge edge, float r, float g, float b) {
+    SetFaceColorRing(edge, r, g, b);
 }
 
 void Polyhedron::Update(void) {

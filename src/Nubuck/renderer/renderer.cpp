@@ -121,7 +121,7 @@ namespace R {
     RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const M::Matrix4& worldMat, RenderJob* first) {
         RenderJob* meshJob = first;
         while(meshJob && meshJob->fx == first->fx) {
-            if(FIRST_LIGHT_PASS == passType || LIGHT_PASS == passType)
+            if(FIRST_LIGHT_PASS == passType || LIGHT_PASS == passType || USE_MATERIAL & passFlags)
                 SetMaterialUniforms(prog, meshJob->material);
 
             prog.SetUniform("uTransform", meshJob->transform);
