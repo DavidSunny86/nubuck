@@ -66,14 +66,15 @@ namespace R {
         TYPE* copy = new TYPE[num];
         for(int i = 0; i < num; ++i) copy[i] = data[i];
 
-        MeshData<TYPE>* vrtData = new MeshData<TYPE>;
-        vrtData->refCount = 0;
-        vrtData->data = copy;
-        vrtData->num = num;
+        MeshData<TYPE>* meshData = new MeshData<TYPE>;
+        meshData->refCount = 0;
+        meshData->data = copy;
+        meshData->num = num;
+        meshData->compiled = false;
 
-        Link(vrtData);
+        Link(meshData);
 
-        return Handle<TYPE>(vrtData);
+        return Handle<TYPE>(meshData);
     }
 
     template<typename TYPE> struct BufferType;
@@ -83,8 +84,11 @@ namespace R {
     template<typename TYPE>
     void MeshMgr::R_Compile(Handle<TYPE>& handle) {
         MeshData<TYPE>* meshData = handle.Res();
-        meshData->buffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(
-            BufferType<TYPE>::VALUE, meshData->data, meshData->num * sizeof(TYPE)));
+        if(!meshData->compiled) {
+            meshData->buffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(
+                BufferType<TYPE>::VALUE, meshData->data, meshData->num * sizeof(TYPE)));
+            meshData->compiled = true;
+        }
     }
 
     template<typename TYPE>

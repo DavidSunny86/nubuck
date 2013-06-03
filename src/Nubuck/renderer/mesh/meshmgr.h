@@ -20,7 +20,8 @@ namespace R {
             TYPE*       data;
             int         num;
 
-            GEN::Pointer<StaticBuffer> buffer;
+            GEN::Pointer<StaticBuffer>  buffer;
+            bool                        compiled;
 
             void IncRef(void);
             void DecRef(void);
