@@ -12,6 +12,8 @@ namespace UI {
         Q_OBJECT
 	private:
 		Ui::MainWindow _ui;
+    protected:
+        void closeEvent(QCloseEvent*) override;
     public slots:
 	    void OnRandomPoints(void);
         void OnShowRenderMetrics(void);

@@ -29,6 +29,10 @@ namespace {
 
 namespace UI {
 
+    void MainWindow::closeEvent(QCloseEvent*) {
+        qApp->exit();
+    }
+
     void MainWindow::OnRandomPoints(void) {
         RandomPoints randomPoints;
         if(QDialog::Accepted == randomPoints.exec()) {
