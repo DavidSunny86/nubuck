@@ -81,6 +81,8 @@ namespace R {
         prog.SetUniform("uMatDiffuseColor", mat.diffuseColor);
     }
 
+    Renderer::Renderer(void) : _time(0.0f) { }
+
     void Renderer::Init(void) {
         GL_CHECK_ERROR;
 
@@ -108,6 +110,8 @@ namespace R {
         
         /*glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0f, 1.0f);*/
+
+        _timer.Start();
     }
 
     void Renderer::Resize(int width, int height) {
@@ -161,9 +165,8 @@ namespace R {
                     prog.SetUniform("uProjection", projectionMat);
                     // prog.SetUniform("uTransform", worldMat);
 
-                    if(USE_COLOR & desc.flags) {
-                        prog.SetUniform("uColor", desc.state.color);
-                    }
+                    if(USE_TIME & desc.flags) prog.SetUniform("uTime", _time);
+                    if(USE_COLOR & desc.flags) prog.SetUniform("uColor", desc.state.color);
 
                     if(FIRST_LIGHT_PASS == desc.type || LIGHT_PASS == desc.type) {
                         M::Matrix3 normalMat = M::Transpose(M::Inverse(M::RotationOf(worldMat)));
@@ -211,6 +214,10 @@ namespace R {
 
     void Renderer::Render(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
         typedef std::vector<RenderJob>::iterator rjobIt_t;
+
+        float secsPassed = _timer.Stop();
+        _time += secsPassed;
+        _timer.Start();
 
         GL_CALL(glDepthMask(GL_TRUE));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));

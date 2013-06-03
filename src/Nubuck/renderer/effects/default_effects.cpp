@@ -75,6 +75,24 @@ namespace R {
         effectMgr.Register(fx);
         fx.passes.clear();
 
+        // Face Ring, move diffuse texture
+
+        pass0.name = "FaceRing";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\facering.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\facering.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.state.blend.enabled = true;
+        pass0.state.blend.srcFactor = GL_SRC_ALPHA;
+        pass0.state.blend.dstFactor = GL_ONE_MINUS_SRC_ALPHA;
+        pass0.type = DEFAULT;
+        pass0.flags = USE_TEX_DIFFUSE | USE_TIME;
+
+        fx.name = "FaceRing";
+        fx.passes.push_back(pass0);
+        effectMgr.Register(fx);
+        fx.passes.clear();
+
         // DefaultLit Effect
         // lit
 

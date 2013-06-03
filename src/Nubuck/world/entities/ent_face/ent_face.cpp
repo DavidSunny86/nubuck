@@ -92,7 +92,7 @@ namespace W {
         renderJob.material  = GetMaterial();
 
         // solid
-        renderJob.fx = "TexDiffuse";
+        renderJob.fx = "FaceRing";
         renderList.push_back(renderJob);
 
         // wireframe
