@@ -1,3 +1,4 @@
+#include <renderer\metrics\metrics.h>
 #include "../glcall.h"
 #include "staticbuffer.h"
 
@@ -8,6 +9,8 @@ namespace R {
         GL_CALL(glBindBuffer(type, _id));
         GL_CALL(glBufferData(type, size, data, GL_DYNAMIC_DRAW )); // TODO
         GL_CALL(glBindBuffer(type, 0)); // TODO: bind previously bound buffer
+
+        metrics.resources.totalVertexBufferSize += size;
     }
 
     StaticBuffer::~StaticBuffer(void) {

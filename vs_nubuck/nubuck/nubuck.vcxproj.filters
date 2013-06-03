@@ -156,6 +156,12 @@
     <Filter Include="Private\common\config">
       <UniqueIdentifier>{d19103ff-80d8-4b5d-91be-8209b002bd39}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\metrics">
+      <UniqueIdentifier>{fcb87847-f4a1-4c2d-8a2b-03a977b6b962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\UI\rendermetrics">
+      <UniqueIdentifier>{c1d33feb-ce90-4fd2-9ea9-b35b32f3f6c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -392,6 +398,12 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon_inl.h">
       <Filter>Private\renderer\mesh\polygon</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\metrics\metrics.h">
+      <Filter>Private\renderer\metrics</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_rendermetrics.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -601,6 +613,18 @@
     <ClCompile Include="..\..\src\Nubuck\math\vector2_op.cpp">
       <Filter>Private\math</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\metrics\metrics.cpp">
+      <Filter>Private\renderer\metrics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\rendermetrics\rendermetrics.cpp">
+      <Filter>Private\UI\rendermetrics</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_rendermetrics.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_rendermetrics.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -629,6 +653,12 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\forms\logwidget.ui">
       <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\rendermetrics.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\rendermetrics\rendermetrics.h">
+      <Filter>Private\UI\rendermetrics</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

@@ -29,12 +29,24 @@
     </property>
     <addaction name="actRandomPoints"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actShowRenderMetrics"/>
+   </widget>
    <addaction name="menuScene"/>
+   <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actRandomPoints">
    <property name="text">
     <string>Random Points</string>
+   </property>
+  </action>
+  <action name="actShowRenderMetrics">
+   <property name="text">
+    <string>Render Metrics</string>
    </property>
   </action>
  </widget>
@@ -56,8 +68,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actShowRenderMetrics</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OnShowRenderMetrics()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>OnRandomPoints()</slot>
+  <slot>OnShowRenderMetrics()</slot>
  </slots>
 </ui>

@@ -14,6 +14,7 @@ namespace UI {
 		Ui::MainWindow _ui;
     public slots:
 	    void OnRandomPoints(void);
+        void OnShowRenderMetrics(void);
     public:
 		MainWindow(void);
 	};

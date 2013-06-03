@@ -6,6 +6,7 @@
 #include <world\entities\ent_node\ent_node.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include <UI\renderview\renderview.h>
+#include <UI\rendermetrics\rendermetrics.h>
 #include <UI\randompoints\randompoints.h>
 #include <UI\algorithmwidget\algorithmwidget.h>
 #include <UI\logwidget\logwidget.h>
@@ -39,6 +40,10 @@ namespace UI {
             ALG::Driver& algDrv = ALG::Driver::Instance();
             algDrv.Init(randomPoints.AsGraph());
         }
+    }
+
+    void MainWindow::OnShowRenderMetrics(void) {
+        RenderMetrics::Instance()->show();
     }
 
     MainWindow::MainWindow(void) {

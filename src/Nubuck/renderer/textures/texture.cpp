@@ -1,8 +1,18 @@
 #include <common\common.h>
+#include <renderer\metrics\metrics.h>
 #include "..\glcall.h"
 #include "texture.h"
 
 namespace R {
+
+    inline int NumComponents(GLenum format) {
+        switch(format) {
+        case GL_RGB: return 3;
+        case GL_RGBA: return 4;
+        }
+        Crash();
+        return 0;
+    }
 
 	/* Texture Impl */
 
@@ -15,6 +25,8 @@ namespace R {
 		
 		GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, _width, _height, 0, _format,
 			GL_UNSIGNED_BYTE, pixelData));
+
+        metrics.resources.totalTextureBufferSize += sizeof(char) * NumComponents(_internalFormat) * _width * _height;
 
 		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR));
 		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR));
