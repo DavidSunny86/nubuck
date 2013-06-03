@@ -13,33 +13,13 @@ namespace W {
     void ENT_Polyhedron::Rebuild(void) {
         _polyDesc = GEN::Pointer<R::PolyhedronMesh>(new R::PolyhedronMesh(*_G));
         
-        _solidMesh = MeshFromDesc(_polyDesc->GetSolidDesc());
-        _wireMesh = MeshFromDesc(_polyDesc->GetWireframeDesc());
+        R::MeshDesc desc = _polyDesc->GetSolidDesc();
+        _vertices = R::meshMgr.Create(desc.vertices, desc.numVertices);
+        _indices = R::meshMgr.Create(desc.indices, desc.numIndices);
 
         _faceColorStates.resize(_polyDesc->NumFaces());
         for(unsigned i = 0; i < _polyDesc->NumFaces(); ++i) {
             _faceColorStates[i].changing = false;
-        }
-
-        // REMOVEME
-        leda::edge_array<bool> visited(*_G, false);
-        leda::edge e;
-        forall_edges(e, *_G) {
-            if(!visited[e]) {
-                leda::list<M::Vector3> points;
-                leda::edge it = e;
-                do {
-                    visited[it] = true;
-                } while(e != (it = _G->face_cycle_succ(it)));
-
-                W::Event fevent;
-                fevent.sem = NULL;
-                fevent.type = W::ENT_FACE;
-                ENT_Face::SpawnArgs* fspawnArgs = (ENT_Face::SpawnArgs*)fevent.args;
-                fspawnArgs->G = _G;
-                fspawnArgs->edge = e;
-                W::world.Spawn(fevent);
-            }
         }
     }
 
@@ -100,18 +80,18 @@ namespace W {
 
         // solid hull
         renderJob.fx = "Lit";
-        renderJob.vertices  = _solidMesh.vertices;
-        renderJob.indices   = _solidMesh.indices;
-        renderJob.primType  = _solidMesh.primType;
+        renderJob.vertices  = _vertices;
+        renderJob.indices   = _indices;
+        renderJob.primType  = GL_TRIANGLE_FAN;
         renderJob.transform = M::Mat4::Translate(GetPosition());
         renderJob.material  = GetMaterial();
         renderList.push_back(renderJob);
 
         // wireframe hull
         renderJob.fx = "Wireframe";
-        renderJob.vertices  = _wireMesh.vertices;
-        renderJob.indices   = _wireMesh.indices;
-        renderJob.primType  = _wireMesh.primType;
+        renderJob.vertices  = _vertices;
+        renderJob.indices   = _indices;
+        renderJob.primType  = GL_LINE_LOOP;
         renderJob.transform = M::Mat4::Translate(GetPosition());
         renderJob.material  = GetMaterial();
         // renderList.push_back(renderJob);

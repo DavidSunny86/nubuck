@@ -30,8 +30,8 @@ namespace W {
 
         std::vector<Event> _evBuffer;
 
-        Mesh _solidMesh;
-        Mesh _wireMesh;
+        R::MeshMgr::vertexHandle_t  _vertices;
+        R::MeshMgr::indexHandle_t   _indices;
 
         void Rebuild(void);
         void ChangeFaceColor(ColorState::func_t func, leda::edge edge, const R::Color& targetColor, float dur);
