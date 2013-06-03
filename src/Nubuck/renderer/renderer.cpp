@@ -104,12 +104,12 @@ namespace R {
         GL_CALL(glEnable(GL_PRIMITIVE_RESTART));
         GL_CALL(glPrimitiveRestartIndex(RESTART_INDEX));
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClearDepth(1.0f);
         glEnable(GL_DEPTH_TEST);
         
-        /*glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(1.0f, 1.0f);*/
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.0f, 1.0f);
 
         _timer.Start();
     }

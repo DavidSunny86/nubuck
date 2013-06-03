@@ -34,7 +34,10 @@ namespace W {
         state.rep           = edge;
     }
 
-    ENT_Polyhedron::ENT_Polyhedron(void) : _numAnimFaces(0) { }
+    ENT_Polyhedron::ENT_Polyhedron(void) : _numAnimFaces(0) { 
+        _solidMat.diffuseColor = R::Color::White;
+        _wireMat.diffuseColor = R::Color::Black;
+    }
 
     void ENT_Polyhedron::Update(float secsPassed) {
         Entity::Update(secsPassed);
@@ -85,7 +88,7 @@ namespace W {
         renderJob.indices   = _indices;
         renderJob.primType  = GL_TRIANGLE_FAN;
         renderJob.transform = M::Mat4::Translate(GetPosition());
-        renderJob.material  = GetMaterial();
+        renderJob.material  = _solidMat;
         renderList.push_back(renderJob);
 
         // wireframe hull
@@ -94,8 +97,8 @@ namespace W {
         renderJob.indices   = _indices;
         renderJob.primType  = GL_LINE_LOOP;
         renderJob.transform = M::Mat4::Translate(GetPosition());
-        renderJob.material  = GetMaterial();
-        // renderList.push_back(renderJob);
+        renderJob.material  = _wireMat;
+        renderList.push_back(renderJob);
     }
 
     void ENT_Polyhedron::Spawn(const Event& event) {

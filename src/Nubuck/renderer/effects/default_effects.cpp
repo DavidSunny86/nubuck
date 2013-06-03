@@ -31,9 +31,9 @@ namespace R {
         pass0.filenames[R::Shader::GEOMETRY]    = "";
         pass0.state.SetDefault();
         pass0.state.depth.func = GL_LEQUAL;
-        pass0.state.raster.lineWidth = 5.0f;
+        pass0.state.raster.lineWidth = 3.0f;
         pass0.type = DEFAULT;
-        pass0.flags = 0;
+        pass0.flags = USE_MATERIAL;
 
         fx.name = "Wireframe";
         fx.passes.push_back(pass0);

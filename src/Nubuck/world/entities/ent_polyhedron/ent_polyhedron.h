@@ -33,6 +33,9 @@ namespace W {
         R::MeshMgr::vertexHandle_t  _vertices;
         R::MeshMgr::indexHandle_t   _indices;
 
+        R::Material _solidMat;
+        R::Material _wireMat;
+
         void Rebuild(void);
         void ChangeFaceColor(ColorState::func_t func, leda::edge edge, const R::Color& targetColor, float dur);
     public:
