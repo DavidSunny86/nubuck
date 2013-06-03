@@ -10,7 +10,6 @@ namespace W {
         leda::node _node;
 
         Mesh _mesh;
-        R::SkinMgr::handle_t _skin;
 
         static R::MeshMgr::vertexHandle_t   s_meshVertices;
         static R::MeshMgr::indexHandle_t    s_meshIndices;
