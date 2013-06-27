@@ -6,81 +6,48 @@
 
 namespace R {
 
-    class StaticBuffer;
-
     class MeshMgr {
     private:
-        template<typename TYPE> // TYPE in {Vertex, Index}
-        struct MeshData {
-            MeshData *prev, *next;
+        Mesh* _meshes;
 
-            int             refCount;
-            SYS::SpinLock   refCountLock;
-
-            TYPE*       data;
-            int         num;
-
-            GEN::Pointer<StaticBuffer>  buffer;
-            bool                        compiled;
-
-            SYS::SpinLock dataLock;
+        SYS::SpinLock _mtx; // locks mesh list
+    public:
+        class MeshPtr {
+        private:
+            Mesh* _mesh;
 
             void IncRef(void);
             void DecRef(void);
-        };
-
-        typedef MeshData<Vertex>    vrtData_t;
-        typedef MeshData<Index>     idxData_t;
-
-        // synchronizes access to both vertex and index data
-        SYS::SpinLock   _dataLock;
-
-        vrtData_t*  _vertices;
-        idxData_t*  _indices;
-
-        void Link(vrtData_t* vrtData);
-        void Link(idxData_t* idxData);
-
-        void FreeUnused(vrtData_t* vrtData);
-        void FreeUnused(idxData_t* idxData);
-    public:
-        template<typename TYPE>
-        class Handle {
-            friend class MeshMgr;
-        private:
-            MeshData<TYPE>* _res;
-            MeshData<TYPE>* Res(void);
-            Handle(MeshData<TYPE>* const res);
         public:
-            Handle(void);
-            ~Handle(void);
-            Handle(const Handle& other);
-            Handle& operator=(const Handle& other);
-            bool IsValid(void) const;
-        };
+            MeshPtr(void) : _mesh(NULL) { }
+            MeshPtr(Mesh* const mesh) : _mesh(mesh) { IncRef(); }
+            MeshPtr(const MeshPtr& other) : _mesh(other._mesh) { IncRef(); }
+            ~MeshPtr(void) { DecRef(); }
 
-        typedef Handle<Vertex> vertexHandle_t;
-        typedef Handle<Index> indexHandle_t;
+            MeshPtr& operator=(const MeshPtr& other) {
+                if(&other != this) {
+                    DecRef();
+                    _mesh = other._mesh;
+                    IncRef();
+                }
+                return *this;
+            }
 
-        MeshMgr(void);
+            bool IsValid(void) const { return _mesh; }
 
-        template<typename TYPE> // TYPE in {Vertex, Index}
-        Handle<TYPE> Create(const TYPE* const data, int num);
+            Mesh*       operator->(void) { return _mesh; }
+            const Mesh* operator->(void) const { return _mesh; }
 
-        template<typename TYPE> // TYPE in {Vertex, Index}
-        void Update(Handle<TYPE>& handle, const TYPE* const data, int num);
+        }; // class MeshPtr
 
-        template<typename TYPE> // TYPE in {Vertex, Index}
-        void R_Compile(Handle<TYPE>& handle);
+        MeshMgr(void) : _meshes(NULL) { }
 
-        template<typename TYPE> // TYPE in {Vertex, Index}
-        void R_Bind(Handle<TYPE>& handle);
+        MeshPtr Create(const Mesh::Desc& desc); // deep copy
 
-        template<typename TYPE> // TYPE in {Vertex, Index}
-        int R_Size(Handle<TYPE>& handle);
-
-        void R_FrameUpdate(void);
+        void R_Update(void);
     };
+
+    typedef MeshMgr::MeshPtr meshPtr_t;
 
     extern MeshMgr meshMgr;
 

@@ -74,7 +74,7 @@ namespace W {
         const float eps = 0.001f; // resolves z-fighting of faces and hull
         polyMesh.Transform(M::Mat4::Translate(eps * v2));
 
-        _mesh = MeshFromDesc(polyMesh.GetSolidDesc());
+        _mesh = R::meshMgr.Create(polyMesh.GetDesc());
 
         R::SkinDesc skinDesc;
         skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\dot.tga";
@@ -86,9 +86,8 @@ namespace W {
     void ENT_Face::Render(std::vector<R::RenderJob>& renderList) {
         R::RenderJob renderJob;
 
-        renderJob.vertices  = _mesh.vertices;
-        renderJob.indices   = _mesh.indices;
-        renderJob.primType  = _mesh.primType;
+        renderJob.mesh      = _mesh;
+        renderJob.primType  = 0;
         renderJob.skin      = _skin;
         renderJob.transform = M::Mat4::Translate(GetPosition());
         renderJob.material  = _material;

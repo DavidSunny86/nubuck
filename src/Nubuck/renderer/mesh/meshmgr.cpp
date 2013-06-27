@@ -5,71 +5,36 @@ namespace R {
 
     MeshMgr meshMgr;
 
-    void MeshMgr::Link(vrtData_t* vrtData) {
-        _dataLock.Lock();
-        vrtData->prev = NULL;
-        if(vrtData->next = _vertices)
-            vrtData->next->prev = vrtData;
-        _vertices = vrtData;
-        _dataLock.Unlock();
+    MeshMgr::MeshPtr MeshMgr::Create(const Mesh::Desc& desc) {
+        Mesh* mesh = new Mesh(desc);
+        Mesh::MgrLink& link = mesh->mgrLink;
+        link.refCount = 0;
+
+        _mtx.Lock();
+        link.next = _meshes;
+        link.prev = NULL;
+        if(link.next) link.next->mgrLink.prev = mesh;
+        _meshes = mesh;
+        _mtx.Unlock();
+
+        return MeshPtr(mesh);
     }
 
-    void MeshMgr::Link(idxData_t* idxData) {
-        _dataLock.Lock();
-        idxData->prev = NULL;
-        if(idxData->next = _indices)
-            idxData->next->prev = idxData;
-        _indices = idxData;
-        _dataLock.Unlock();
-    }
-
-    void MeshMgr::FreeUnused(vrtData_t* vrtData) {
-        vrtData_t *prev, *next;
-        int numFreed = 0;
-        while(vrtData) {
-            prev = vrtData->prev;
-            next = vrtData->next;
-            if(0 >= vrtData->refCount) {
-                if(next) next->prev = prev;
-                if(prev) prev->next = next;
-                else _vertices = next;
-
-                delete vrtData;
-                numFreed++;
+    void MeshMgr::R_Update(void) {
+        _mtx.Lock();
+        Mesh *next, *it = _meshes;
+        while(it) {
+            Mesh::MgrLink& link = it->mgrLink;
+            next = link.next;
+            if(0 >= link.refCount) {
+                if(link.next) link.next->mgrLink.prev = link.prev;
+                if(link.prev) link.prev->mgrLink.next = link.next;
+                if(_meshes == it) _meshes = next;
+                delete it;
             }
-            vrtData = next;
+            it = next;
         }
-
-        if(numFreed) common.printf("INFO - freed %d vertex data objects.\n", numFreed);
-    }
-
-    void MeshMgr::FreeUnused(idxData_t* idxData) {
-        idxData_t *prev, *next;
-        int numFreed = 0;
-        while(idxData) {
-            prev = idxData->prev;
-            next = idxData->next;
-            if(0 >= idxData->refCount) {
-                if(next) next->prev = prev;
-                if(prev) prev->next = next;
-                else _indices = next;
-
-                delete idxData;
-                numFreed++;
-            }
-            idxData = next;
-        }
-
-        if(numFreed) common.printf("INFO - freed %d index data objects.\n", numFreed);
-    }
-
-    MeshMgr::MeshMgr(void) : _vertices(NULL), _indices(NULL) { }
-
-    void MeshMgr::R_FrameUpdate(void) {
-        _dataLock.Lock();
-        FreeUnused(_vertices);
-        FreeUnused(_indices);
-        _dataLock.Unlock();
+        _mtx.Unlock();
     }
 
 } // namespace R

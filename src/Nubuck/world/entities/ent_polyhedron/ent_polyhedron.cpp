@@ -13,9 +13,8 @@ namespace W {
     void ENT_Polyhedron::Rebuild(void) {
         _polyDesc = GEN::Pointer<R::PolyhedronMesh>(new R::PolyhedronMesh(*_G));
         
-        R::MeshDesc desc = _polyDesc->GetSolidDesc();
-        _vertices = R::meshMgr.Create(desc.vertices, desc.numVertices);
-        _indices = R::meshMgr.Create(desc.indices, desc.numIndices);
+        R::Mesh::Desc desc = _polyDesc->GetDesc();
+        _mesh = R::meshMgr.Create(desc);
 
         _faceColorStates.resize(_polyDesc->NumFaces());
         for(unsigned i = 0; i < _polyDesc->NumFaces(); ++i) {
@@ -74,8 +73,10 @@ namespace W {
                 }
             } // forall faces
 
+            /*
             R::MeshDesc desc = _polyDesc->GetSolidDesc();
             R::meshMgr.Update(_vertices, desc.vertices, desc.numVertices);
+            */
         } // if _numAnimFaces
     }
 
@@ -84,8 +85,7 @@ namespace W {
 
         // solid hull
         renderJob.fx = "Lit";
-        renderJob.vertices  = _vertices;
-        renderJob.indices   = _indices;
+        renderJob.mesh = _mesh;
         renderJob.primType  = GL_TRIANGLE_FAN;
         renderJob.transform = M::Mat4::Translate(GetPosition());
         renderJob.material  = _solidMat;
@@ -93,8 +93,7 @@ namespace W {
 
         // wireframe hull
         renderJob.fx = "Wireframe";
-        renderJob.vertices  = _vertices;
-        renderJob.indices   = _indices;
+        renderJob.mesh = _mesh;
         renderJob.primType  = GL_LINE_LOOP;
         renderJob.transform = M::Mat4::Translate(GetPosition());
         renderJob.material  = _wireMat;

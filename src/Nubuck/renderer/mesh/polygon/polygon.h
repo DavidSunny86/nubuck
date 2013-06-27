@@ -20,8 +20,8 @@ namespace R {
 
     class PolygonMesh {
     private:
-        std::vector<Vertex> _vertices;
-        std::vector<Index>  _indices;
+        std::vector<Mesh::Vertex> _vertices;
+        std::vector<Mesh::Index>  _indices;
     public:
         PolygonMesh(const leda::list<M::Vector2>& polygon, const M::Vector3& normal);
         PolygonMesh(leda::list<M::Vector3>& polygon, const M::Vector3& normal);
@@ -29,7 +29,7 @@ namespace R {
         void Transform(const M::Matrix3& mat);
         void Transform(const M::Matrix4& mat);
 
-        MeshDesc GetSolidDesc(void);
+        Mesh::Desc GetDesc(void);
     };
 
 } // namespace R

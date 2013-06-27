@@ -4,6 +4,6 @@
 
 namespace R {
 
-    MeshDesc CreateQuadDesc(float edgeLength = 1.0f);
+    Mesh::Desc CreateQuadDesc(float edgeLength = 1.0f);
 
 } // namespace R

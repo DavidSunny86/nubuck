@@ -19,10 +19,6 @@ namespace W {
         _position = position;
     }
 
-    void Entity::SetMesh(const Mesh& mesh) {
-        _mesh = mesh;
-    }
-
     void Entity::InvalidateMesh(void) {
         //R::MeshMgr::Instance().GetMesh(_meshHandle).Invalidate();
     }
@@ -68,14 +64,6 @@ namespace W {
     }
 
     void Entity::Render(std::vector<R::RenderJob>& renderList) {
-        R::RenderJob renderJob;
-        renderJob.fx        = "Lit";
-        renderJob.vertices  = _mesh.vertices;
-        renderJob.indices   = _mesh.indices;
-        renderJob.primType  = _mesh.primType;
-        renderJob.material  = _material;
-        renderJob.transform = M::Mat4::Translate(_position);
-        renderList.push_back(renderJob);
     }
 
     void Entity::FreeResources(void) {
@@ -83,14 +71,6 @@ namespace W {
 
     void Entity::Spawn(const Event& event) {
         SetID(event.entityId);
-    }
-
-    Entity::Mesh MeshFromDesc(const R::MeshDesc& desc) {
-        Entity::Mesh mesh;
-        mesh.vertices   = R::meshMgr.Create(desc.vertices, desc.numVertices);
-        mesh.indices    = R::meshMgr.Create(desc.indices, desc.numIndices);
-        mesh.primType   = desc.primType;
-        return mesh;
     }
 
 } // namespace W

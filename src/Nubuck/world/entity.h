@@ -12,17 +12,10 @@ namespace W {
     struct Event;
 
     class Entity {
-    public:
-        struct Mesh {
-            R::MeshMgr::vertexHandle_t  vertices;
-            R::MeshMgr::indexHandle_t   indices;
-            GLenum                      primType;
-        };
     private:
         int         _id;
         M::Vector3  _position;
- 
-        Mesh        _mesh;
+
         R::Material _material;
 
         enum State {
@@ -47,7 +40,6 @@ namespace W {
         const R::Material& GetMaterial(void) const;
 
         void SetPosition(const M::Vector3& position);
-        void SetMesh(const Mesh& mesh);
         void InvalidateMesh(void);
 
         void PulseColor(const R::Color& targetColor, float dur);
@@ -65,7 +57,5 @@ namespace W {
         virtual void Spawn(const Event& event);
         virtual void HandleEvent(const Event& event) { }
     };
-
-    Entity::Mesh MeshFromDesc(const R::MeshDesc& desc);
 
 } // namespace W

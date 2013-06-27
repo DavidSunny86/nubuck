@@ -17,13 +17,12 @@ namespace R {
     class   Mesh;
 
     struct RenderJob {
-        std::string             fx;
-        MeshMgr::vertexHandle_t vertices;
-        MeshMgr::indexHandle_t  indices;
-        GLenum                  primType;
-        Material	            material;
-        SkinMgr::handle_t       skin;
-        M::Matrix4              transform;
+        std::string         fx;
+        meshPtr_t           mesh;
+        GLenum              primType;
+        Material	        material;
+        SkinMgr::handle_t   skin;
+        M::Matrix4          transform;
 
         // handled by renderer
         RenderJob* next;

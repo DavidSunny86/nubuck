@@ -53,7 +53,7 @@ namespace R {
                 unsigned faceIndex = _faces.size() - 1;
                 Face& faceRef = _faces.back();
 
-                Vertex vert;
+                Mesh::Vertex vert;
                 vert.normal = normal;
                 vert.color  = Color::White;
 
@@ -80,7 +80,7 @@ namespace R {
                     faceRef.size += 1;
                 }
 
-                _indices.push_back(RESTART_INDEX);
+                _indices.push_back(Mesh::RESTART_INDEX);
             }
         } // forall_edges
 
@@ -108,26 +108,14 @@ namespace R {
         return _G;
     }
 
-    MeshDesc PolyhedronMesh::GetSolidDesc(void) {
-        MeshDesc desc;
+    Mesh::Desc PolyhedronMesh::GetDesc(void) {
+        Mesh::Desc desc;
 
         desc.vertices = &_vertices[0];
         desc.numVertices = _vertices.size();
         desc.indices = &_indices[0];
         desc.numIndices = _indices.size();
-        desc.primType = GL_TRIANGLE_FAN;
-
-        return desc;
-    }
-
-    MeshDesc PolyhedronMesh::GetWireframeDesc(void) {
-        MeshDesc desc;
-
-        desc.vertices = &_vertices[0];
-        desc.numVertices = _vertices.size();
-        desc.indices = &_indices[0];
-        desc.numIndices = _indices.size();
-        desc.primType = GL_LINE_LOOP;
+        desc.primType = 0;
 
         return desc;
     }

@@ -29,8 +29,8 @@ namespace R {
 
         const graph_t& _G;
 
-        std::vector<Vertex> _vertices;
-        std::vector<Index>  _indices;
+        std::vector<Mesh::Vertex> _vertices;
+        std::vector<Mesh::Index>  _indices;
 
         std::vector<Face>       _faces;
         leda::edge_array<Edge>  _edges;
@@ -45,8 +45,12 @@ namespace R {
         unsigned FaceOf(leda::edge e) const;
 
         const graph_t&  GetGraph(void) const;
-        MeshDesc        GetSolidDesc(void);
-        MeshDesc        GetWireframeDesc(void);
+
+        // leaves primitive type undefined!
+        // use:
+        // GL_TRIANGLE_FAN for solid polyhedron and
+        // GL_LINE_LOOP for wireframe polyhedron
+        Mesh::Desc      GetDesc(void);
 
         void Set(leda::edge edge, const Color& color);
     };

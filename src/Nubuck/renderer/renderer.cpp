@@ -23,23 +23,23 @@ namespace {
 
     void BindVertices(void) {
         GL_CALL(glVertexAttribPointer(IN_POSITION,
-            3, GL_FLOAT, GL_FALSE, sizeof(R::Vertex),
-            (void*)offsetof(R::Vertex, position)));
+            3, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
+            (void*)offsetof(R::Mesh::Vertex, position)));
         GL_CALL(glEnableVertexAttribArray(IN_POSITION));
 
         GL_CALL(glVertexAttribPointer(IN_NORMAL,
-            3, GL_FLOAT, GL_FALSE, sizeof(R::Vertex),
-            (void*)offsetof(R::Vertex, normal)));
+            3, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
+            (void*)offsetof(R::Mesh::Vertex, normal)));
         GL_CALL(glEnableVertexAttribArray(IN_NORMAL));
 
         GL_CALL(glVertexAttribPointer(IN_COLOR,
-            4, GL_FLOAT, GL_FALSE, sizeof(R::Vertex),
-            (void*)offsetof(R::Vertex, color)));
+            4, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
+            (void*)offsetof(R::Mesh::Vertex, color)));
         GL_CALL(glEnableVertexAttribArray(IN_COLOR));
 
         GL_CALL(glVertexAttribPointer(IN_TEXCOORDS,
-            2, GL_FLOAT, GL_FALSE, sizeof(R::Vertex),
-            (void*)offsetof(R::Vertex, texCoords)));
+            2, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
+            (void*)offsetof(R::Mesh::Vertex, texCoords)));
         GL_CALL(glEnableVertexAttribArray(IN_TEXCOORDS));
     }
 
@@ -102,7 +102,7 @@ namespace R {
         common.printf("INFO - supported GL version: '%s'.\n", glVersion);
         */
         GL_CALL(glEnable(GL_PRIMITIVE_RESTART));
-        GL_CALL(glPrimitiveRestartIndex(RESTART_INDEX));
+        GL_CALL(glPrimitiveRestartIndex(Mesh::RESTART_INDEX));
 
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClearDepth(1.0f);
@@ -130,12 +130,14 @@ namespace R {
                 skinMgr.R_Bind(prog, meshJob->skin);
             }
 
-            meshMgr.R_Bind(meshJob->vertices);
+            meshJob->mesh->R_Bind();
             BindVertices();
-            meshMgr.R_Bind(meshJob->indices);
-            int numIndices = meshMgr.R_Size(meshJob->indices);
+            unsigned numIndices = meshJob->mesh->NumIndices();
 
-            GL_CALL(glDrawElements(meshJob->primType, numIndices, ToGLEnum<Index>::ENUM, NULL));
+            GLenum primType = meshJob->primType;
+            if(!primType) primType = meshJob->mesh->PrimitiveType();
+
+            GL_CALL(glDrawElements(primType, numIndices, ToGLEnum<Mesh::Index>::ENUM, NULL));
 
             meshJob = meshJob->next;
         }
@@ -205,7 +207,7 @@ namespace R {
             renderList.cend() != rlistIt; ++rlistIt)
         {
             const RenderJob& renderJob = *rlistIt;
-            if(renderJob.fx.empty() || !renderJob.vertices.IsValid() || !renderJob.indices.IsValid()) return;
+            if(renderJob.fx.empty() || !renderJob.mesh.IsValid()) return;
             _renderList.push_back(renderJob);
             _renderList.back().next = NULL;
         }
@@ -237,8 +239,7 @@ namespace R {
             if(i < numJobs - 1) rjob.next = &_renderJobs[i + 1];
             
             effectMgr.GetEffect(rjob.fx)->Compile();
-            meshMgr.R_Compile(rjob.vertices);
-            meshMgr.R_Compile(rjob.indices);
+            rjob.mesh->R_Compile();
             if(rjob.skin.IsValid()) skinMgr.R_Compile(rjob.skin);
 
             rjob.transform = worldMat * rjob.transform;
@@ -246,7 +247,7 @@ namespace R {
 
         DrawFrame(worldMat, projectionMat);
 
-        meshMgr.R_FrameUpdate();
+        meshMgr.R_Update();
     }
 
 

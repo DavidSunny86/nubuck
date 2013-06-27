@@ -6,7 +6,7 @@ namespace W {
 
     class ENT_Face : public Entity {
     private:
-        Mesh _mesh;
+        R::meshPtr_t _mesh;
         R::SkinMgr::handle_t _skin;
         R::Material _material;
     public:

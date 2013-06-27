@@ -9,10 +9,7 @@ namespace W {
     private:
         leda::node _node;
 
-        Mesh _mesh;
-
-        static R::MeshMgr::vertexHandle_t   s_meshVertices;
-        static R::MeshMgr::indexHandle_t    s_meshIndices;
+        static R::meshPtr_t s_mesh;
         static void InitResources(void);
     public:
         struct SpawnArgs {

@@ -30,8 +30,7 @@ namespace W {
 
         std::vector<Event> _evBuffer;
 
-        R::MeshMgr::vertexHandle_t  _vertices;
-        R::MeshMgr::indexHandle_t   _indices;
+        R::meshPtr_t _mesh;
 
         R::Material _solidMat;
         R::Material _wireMat;

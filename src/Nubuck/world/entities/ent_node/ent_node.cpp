@@ -14,15 +14,13 @@ namespace {
 
 namespace W {
 
-    R::MeshMgr::vertexHandle_t ENT_Node::s_meshVertices;
-    R::MeshMgr::indexHandle_t ENT_Node::s_meshIndices;
+    R::meshPtr_t ENT_Node::s_mesh;
 
     void ENT_Node::InitResources(void) {
         static bool init = false;
         if(!init) {
-            R::MeshDesc desc = R::CreateQuadDesc();
-            s_meshVertices = R::meshMgr.Create(desc.vertices, desc.numVertices);
-            s_meshIndices = R::meshMgr.Create(desc.indices, desc.numIndices);
+            R::Mesh::Desc desc = R::CreateQuadDesc();
+            s_mesh = R::meshMgr.Create(desc);
         }
         init = true;
     }
@@ -47,21 +45,14 @@ namespace W {
         SetPosition(ToVector((*spawnArgs->G)[_node]));
 
         InitResources();
-        
-        Mesh mesh;
-        mesh.vertices   = s_meshVertices;
-        mesh.indices    = s_meshIndices;
-        mesh.primType   = GL_TRIANGLES;
-        _mesh = mesh;
     }
 
     void ENT_Node::Render(std::vector<R::RenderJob>& renderList) {
         R::RenderJob renderJob;
 
         renderJob.fx = "Lit";
-        renderJob.vertices  = _mesh.vertices;
-        renderJob.indices   = _mesh.indices;
-        renderJob.primType  = _mesh.primType;
+        renderJob.mesh = s_mesh;
+        renderJob.primType  = 0;
         renderJob.transform = M::Mat4::Translate(GetPosition());
         renderJob.material  = GetMaterial();
         renderList.push_back(renderJob);

@@ -13,7 +13,7 @@ namespace R {
         const float size = 0.5f;
         bool loop = true;
         
-        Vertex vert;
+        Mesh::Vertex vert;
         vert.normal = normal;
         vert.color = Color::White;
 
@@ -67,7 +67,7 @@ namespace R {
         const float size = 0.2f;
         bool loop = true;
         
-        Vertex vert;
+        Mesh::Vertex vert;
         vert.normal = normal;
         vert.color = Color::White;
 
@@ -124,7 +124,7 @@ namespace R {
         
         TransformFunc(const TYPE& mat) : mat(mat) { }
 
-        void operator()(Vertex& vert) {
+        void operator()(Mesh::Vertex& vert) {
             vert.position = M::Transform(mat, vert.position);
         }
     };
@@ -137,8 +137,8 @@ namespace R {
         std::for_each(_vertices.begin(), _vertices.end(), TransformFunc<M::Matrix4>(mat));
     }
 
-    MeshDesc PolygonMesh::GetSolidDesc(void) {
-        MeshDesc desc;
+    Mesh::Desc PolygonMesh::GetDesc(void) {
+        Mesh::Desc desc;
 
         desc.vertices = &_vertices[0];
         desc.numVertices = _vertices.size();
