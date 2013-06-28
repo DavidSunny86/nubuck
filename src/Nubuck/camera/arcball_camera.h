@@ -22,8 +22,6 @@ private:
     M::Vector3 VectorOnSphereFromMousePos(int mouseX, int mouseY);
     M::Vector3 VectorInPlaneFromMousePos(int mouseX, int mouseY);
     M::Vector3 VectorInXYPlaneFromMousePos(int mouseX, int mouseY);
-
-    M::Matrix4 _projection;
 public:
     ArcballCamera(int width, int height);
 
@@ -47,7 +45,6 @@ public:
     const M::TransformTRS& GetTransform(void) const;
     M::Quaternion GetRotation(void) const;
 
-    M::Matrix4 GetProjectionMatrix(void) const;
     M::Matrix4 GetWorldMatrix(void) const;
 
     void Render(void);

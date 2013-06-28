@@ -116,6 +116,7 @@ namespace R {
 
     void Renderer::Resize(int width, int height) {
         glViewport(0, 0, width, height);
+        _aspect = (float)width / height;
     }
 
     RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const M::Matrix4& worldMat, RenderJob* first) {
@@ -214,7 +215,7 @@ namespace R {
         _renderListLock.Unlock();
     }
 
-    void Renderer::Render(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
+    void Renderer::Render(const M::Matrix4& worldMat) {
         typedef std::vector<RenderJob>::iterator rjobIt_t;
 
         float secsPassed = _timer.Stop();
@@ -233,6 +234,7 @@ namespace R {
 
         // TODO: sort
 
+        float zMin = 10000.0f, zMax = -10000.0f;
         unsigned numJobs = _renderJobs.size();
         for(unsigned i = 0; i < numJobs; ++i) {
             RenderJob& rjob = _renderJobs[i];
@@ -243,7 +245,14 @@ namespace R {
             if(rjob.skin.IsValid()) skinMgr.R_Compile(rjob.skin);
 
             rjob.transform = worldMat * rjob.transform;
+
+            M::Vector3 v = M::Transform(rjob.transform, M::Vector3::Zero);
+            float r = rjob.mesh->Radius();
+            if(0 > v.z - r) zMin = M::Min(zMin, v.z - r);
+            if(0 > v.z + r) zMax = M::Max(zMax, v.z + r);
         }
+
+        M::Matrix4 projectionMat = M::Mat4::Perspective(45.0f, _aspect, -zMax, -zMin);
 
         DrawFrame(worldMat, projectionMat);
 

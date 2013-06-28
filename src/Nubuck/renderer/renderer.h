@@ -19,7 +19,7 @@ namespace R {
     struct RenderJob {
         std::string         fx;
         meshPtr_t           mesh;
-        GLenum              primType;
+        GLenum              primType; // value != 0 overrides prim type of mesh
         Material	        material;
         SkinMgr::handle_t   skin;
         M::Matrix4          transform;
@@ -39,6 +39,8 @@ namespace R {
         SYS::Timer  _timer;
         float       _time;
 
+        float _aspect;
+
         void DrawFrame(const M::Matrix4& worldMat, const M::Matrix4& projectionMat);
 	public:
         Renderer(void);
@@ -50,7 +52,7 @@ namespace R {
         void Add(const Light& light);
 
         void SetRenderList(const std::vector<RenderJob>& renderList);
-        void Render(const M::Matrix4& worldMat, const M::Matrix4& projectionMat);
+        void Render(const M::Matrix4& worldMat);
 	};
 
 } // namespace R

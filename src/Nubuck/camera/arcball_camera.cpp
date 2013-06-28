@@ -97,9 +97,6 @@ void ArcballCamera::SetScreenSize(int width, int height) {
     _halfWidth = width / 2.0f;
     _halfHeight = height / 2.0f;
     _radius = M::Min(_halfWidth, _halfHeight);
-
-    float aspect = (float)width / height;
-    _projection = M::Mat4::Perspective(45.0f, aspect, 1.0f, 100.0f);
 }
 
 void ArcballCamera::StartDragging(int mouseX, int mouseY) {
@@ -155,10 +152,6 @@ const M::TransformTRS& ArcballCamera::GetTransform(void) const {
 M::Quaternion ArcballCamera::GetRotation(void) const {
     if(_dragging) return _dragRot * _transform.rot;
     return _transform.rot;
-}
-
-M::Matrix4 ArcballCamera::GetProjectionMatrix(void) const {
-    return _projection;
 }
 
 M::Matrix4 ArcballCamera::GetWorldMatrix(void) const {

@@ -25,7 +25,7 @@ namespace R {
         }
     };
 
-    Mesh::Mesh(const Desc& desc) : _compiled(false) {
+    Mesh::Mesh(const Desc& desc) : _compiled(false), _radius(0.0f) {
         ArrayPtr<Vertex> vertices(desc.vertices, desc.numVertices);
         ArrayPtr<Index> indices(desc.indices, desc.numIndices);
 
@@ -45,6 +45,13 @@ namespace R {
 
     void Mesh::R_Compile(void) {
         if(_compiled) return;
+
+        // compute radius of bounding sphere
+        float rs = 0.0f;
+        for(unsigned i = 0; i < _desc.numVertices; ++i)
+            rs = M::Max(rs, M::Dot(_desc.vertices[i].position, _desc.vertices[i].position));
+        _radius = sqrtf(rs);
+
         _vertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, _desc.vertices, sizeof(Vertex) * _desc.numVertices));
         _indexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, _desc.indices, sizeof(Index) * _desc.numIndices));
         _compiled = true;

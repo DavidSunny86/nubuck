@@ -1,5 +1,7 @@
 #pragma once
 
+#include <common\common.h>
+
 #include <generic\pointer.h>
 #include <generic\uncopyable.h>
 
@@ -46,6 +48,8 @@ namespace R {
         GEN::Pointer<StaticBuffer> _vertexBuffer;
         GEN::Pointer<StaticBuffer> _indexBuffer;
         bool _compiled;
+
+        float _radius; // of bounding sphere
     public:
         struct MgrLink { // maintained my MeshMgr
             Mesh *prev, *next;
@@ -58,6 +62,8 @@ namespace R {
 
         unsigned NumIndices(void) const { return _desc.numIndices; }
         GLenum PrimitiveType(void) const { return _desc.primType; }
+
+        float Radius(void) const { COM_assert(_compiled); return _radius; }
 
         void R_Compile(void);
         void R_Bind(void);
