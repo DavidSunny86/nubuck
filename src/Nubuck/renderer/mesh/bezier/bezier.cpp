@@ -63,6 +63,12 @@ namespace R {
         return 0.5f * (t1 - t0) * s;
     }
 
+    void PolyBezier2U::Rebuild(void) {
+        _vertices.clear();
+        _indices.clear();
+        BuildStroke();
+    }
+
     void PolyBezier2U::Build(void) {
         const float dt = 0.01f;
         Mesh::Vertex vert;
@@ -81,7 +87,7 @@ namespace R {
 
     void PolyBezier2U::BuildStroke(void) {
         const float r = _length / 30.0f;
-        float accu = 0.0f;
+        float accu = 0.0;
         bool down = true;
         const float dd = 0.01f;
         Mesh::Vertex vert;
@@ -96,7 +102,9 @@ namespace R {
                 if(down) _indices.push_back(Mesh::RESTART_INDEX);
             }
             if(down) {
-                M::Vector2 p = FromDist(d);
+                float dist = d + _time;
+                while(dist > _length) dist -= _length;
+                M::Vector2 p = FromDist(dist);
                 vert.position = M::Vector3(p.x, p.y, 0.0f);
                 _vertices.push_back(vert);
                 _indices.push_back(idxCnt++);
@@ -128,7 +136,7 @@ namespace R {
         return (1.0f - t) * B(s0->l, s0->t) + t * B(s1->l, s1->t);
     }
 
-    PolyBezier2U::PolyBezier2U(const std::vector<M::Vector2>& points) : _points(points) {
+    PolyBezier2U::PolyBezier2U(const std::vector<M::Vector2>& points) : _points(points), _time(0.0f) {
         assert(0 < _points.size() && _points.size() / 2 * 2);
         ComputeTSamples();
         BuildStroke();
@@ -142,6 +150,11 @@ namespace R {
         desc.numIndices = _indices.size();
         desc.primType = GL_LINE_STRIP;
         return desc;
+    }
+
+    void PolyBezier2U::Update(float secsPassed) {
+        _time += secsPassed * 0.3;
+        Rebuild();
     }
 
 } // namespace R

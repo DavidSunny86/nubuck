@@ -33,10 +33,13 @@ namespace R {
         // l is the index of the first endpoint of this segment
         float Length(int l, float t0, float t1);
 
+        void Rebuild(void);
         void Build(void);
         void BuildStroke(void);
         void ComputeTSamples(void);
         M::Vector2 FromDist(float dist);
+
+        float _time;
     public:
         /*
         format of input: e c e c e ... e c e, where e are endpoints and c are controlpoints.
@@ -46,6 +49,8 @@ namespace R {
         PolyBezier2U(const std::vector<M::Vector2>& points);
 
         Mesh::Desc GetDesc(void);
+
+        void Update(float secsPassed);
     };
 
 } // namespace R

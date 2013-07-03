@@ -26,6 +26,11 @@ namespace W {
         _material.diffuseColor = R::Color::Black;
     }
 
+    void ENT_Dummy::Update(float secsPassed) {
+        _bezierCurve->Update(secsPassed);
+        _mesh->Invalidate(_bezierCurve->GetDesc().vertices);
+    }
+
     void ENT_Dummy::Render(std::vector<R::RenderJob>& renderList) {
         R::RenderJob rjob;
         rjob.fx = "Wireframe";

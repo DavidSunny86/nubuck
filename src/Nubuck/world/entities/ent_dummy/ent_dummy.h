@@ -15,6 +15,7 @@ namespace W {
     public:
         ENT_Dummy(void);
 
+        void Update(float secsPassed) override;
         void Render(std::vector<R::RenderJob>& renderList) override;
     };
 
