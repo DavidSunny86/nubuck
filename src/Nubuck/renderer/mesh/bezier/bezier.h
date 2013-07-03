@@ -13,13 +13,30 @@ namespace R {
     private:
         std::vector<M::Vector2> _points;
 
+        struct TSample {
+            float d;
+            int l;
+            float t;
+            TSample(float d, int l, float t) : d(d), l(l), t(t) { }
+            bool operator<(const TSample& other) { return d < other.d; }
+        };
+
+        std::vector<TSample> _tSamples;
+        float _length;
+
         std::vector<Mesh::Vertex> _vertices;        
         std::vector<Mesh::Index> _indices;
 
         // l is the index of the first endpoint of this segment
         M::Vector2 B(int l, float t);
 
+        // l is the index of the first endpoint of this segment
+        float Length(int l, float t0, float t1);
+
         void Build(void);
+        void BuildStroke(void);
+        void ComputeTSamples(void);
+        M::Vector2 FromDist(float dist);
     public:
         /*
         format of input: e c e c e ... e c e, where e are endpoints and c are controlpoints.
