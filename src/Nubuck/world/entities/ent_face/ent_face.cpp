@@ -58,8 +58,14 @@ namespace {
 namespace W {
 
     void ENT_Face::Rebuild(void) {
+        // avoid overlapping decals
+        float w = 0.6f;
+        int n = (int)(_polyBezier->Length() / w);
+        float def = _polyBezier->Length() - n * w;
+        w += def / n;
+
         _decalPos.clear();
-        _polyBezier->SampleEquidistantPoints(0.4f, _decalPos2);
+        _polyBezier->SampleEquidistantPoints(w, _decalPos2);
         for(unsigned i = 0; i < _decalPos2.size(); ++i) {
             M::Vector3 p = M::Transform(_M, M::Vector3(_decalPos2[i].x, _decalPos2[i].y, 0.0f)) + _p0;
             const float eps = 0.001f; // resolves z-fighting of faces and hull

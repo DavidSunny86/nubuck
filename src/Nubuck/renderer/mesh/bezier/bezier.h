@@ -48,6 +48,8 @@ namespace R {
         */
         PolyBezier2U(const std::vector<M::Vector2>& points);
 
+        float Length(void) const { return _length; }
+
         Mesh::Desc GetDesc(void);
 
         void SampleEquidistantPoints(float dd, std::vector<M::Vector2>& out);
