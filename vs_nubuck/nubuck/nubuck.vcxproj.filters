@@ -162,6 +162,12 @@
     <Filter Include="Private\UI\rendermetrics">
       <UniqueIdentifier>{c1d33feb-ce90-4fd2-9ea9-b35b32f3f6c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\mesh\bezier">
+      <UniqueIdentifier>{ce8b9add-0f0f-4035-a851-b2e45ea40c37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\world\entities\ent_dummy">
+      <UniqueIdentifier>{8c6ce0bd-32e1-4452-a882-1038d4c476b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -404,6 +410,12 @@
     <ClInclude Include="GeneratedFiles\ui_rendermetrics.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\bezier\bezier.h">
+      <Filter>Private\renderer\mesh\bezier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_dummy\ent_dummy.h">
+      <Filter>Private\world\entities\ent_dummy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -624,6 +636,12 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_rendermetrics.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\bezier\bezier.cpp">
+      <Filter>Private\renderer\mesh\bezier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_dummy\ent_dummy.cpp">
+      <Filter>Private\world\entities\ent_dummy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

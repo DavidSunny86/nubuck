@@ -9,6 +9,10 @@
 
 namespace W {
 
+    // register new entity types with W::world.RegisterEntity.
+    // entity types that are known at starting time should be registered
+    // in RunNubuck() (see nubuck.cpp)
+
     struct Event;
 
     class Entity {
