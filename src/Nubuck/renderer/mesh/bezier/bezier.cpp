@@ -152,8 +152,17 @@ namespace R {
         return desc;
     }
 
+    void PolyBezier2U::SampleEquidistantPoints(float dd, std::vector<M::Vector2>& out) {
+        out.clear();
+        for(float d = 0.0f; d < _length; d += dd) {
+            float dist = d + _time;
+            while(dist > _length) dist -= _length;
+            out.push_back(FromDist(dist));
+        }
+    }
+
     void PolyBezier2U::Update(float secsPassed) {
-        _time += secsPassed * 0.3;
+        _time += secsPassed * 0.1;
         Rebuild();
     }
 

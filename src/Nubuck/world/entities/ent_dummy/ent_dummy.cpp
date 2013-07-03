@@ -1,3 +1,4 @@
+#include <renderer\mesh\quad\quad.h>
 #include "ent_dummy.h"
 
 namespace W {
@@ -22,23 +23,31 @@ namespace W {
         points.push_back(c0);
         points.push_back(ln * c0 + lf * c1);
         _bezierCurve = GEN::Pointer<R::PolyBezier2U>(new R::PolyBezier2U(points));
-        _mesh = R::meshMgr.Create(_bezierCurve->GetDesc());
-        _material.diffuseColor = R::Color::Black;
+        _mesh = R::meshMgr.Create(R::CreateQuadDesc(0.05f));
+
+        R::SkinDesc skinDesc;
+        skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle.tga";
+        _skin = R::skinMgr.Create(skinDesc);
     }
 
     void ENT_Dummy::Update(float secsPassed) {
         _bezierCurve->Update(secsPassed);
-        _mesh->Invalidate(_bezierCurve->GetDesc().vertices);
+        _bezierCurve->SampleEquidistantPoints(0.1f, _decalPos);
     }
 
     void ENT_Dummy::Render(std::vector<R::RenderJob>& renderList) {
         R::RenderJob rjob;
-        rjob.fx = "Wireframe";
+        rjob.fx = "TexDiffuse";
         rjob.mesh = _mesh;
+        rjob.skin = _skin;
         rjob.primType = 0;
-        rjob.transform = M::Mat4::Translate(GetPosition());
-        rjob.material = _material;
-        renderList.push_back(rjob);
+        rjob.material = GetMaterial();
+
+        for(unsigned i = 0; i < _decalPos.size(); ++i) {
+            const M::Vector2& p = _decalPos[i];
+            rjob.transform = M::Mat4::Translate(GetPosition() + M::Vector3(p.x, p.y, 0.0f));
+            renderList.push_back(rjob);
+        }
     }
 
 } // namespace W

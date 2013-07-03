@@ -11,7 +11,9 @@ namespace W {
     private:
         GEN::Pointer<R::PolyBezier2U> _bezierCurve;
         R::MeshMgr::MeshPtr _mesh;
-        R::Material _material;
+        R::SkinMgr::handle_t _skin;
+
+        std::vector<M::Vector2> _decalPos;
     public:
         ENT_Dummy(void);
 

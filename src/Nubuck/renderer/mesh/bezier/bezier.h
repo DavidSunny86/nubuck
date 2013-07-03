@@ -50,6 +50,8 @@ namespace R {
 
         Mesh::Desc GetDesc(void);
 
+        void SampleEquidistantPoints(float dd, std::vector<M::Vector2>& out);
+
         void Update(float secsPassed);
     };
 
