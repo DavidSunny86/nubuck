@@ -1,6 +1,7 @@
 #pragma once
 
 #include <world\entity.h>
+#include <renderer\mesh\bezier\bezier.h>
 
 namespace W {
 
@@ -9,6 +10,10 @@ namespace W {
         R::meshPtr_t _mesh;
         R::SkinMgr::handle_t _skin;
         R::Material _material;
+        GEN::Pointer<R::PolyBezier2U> _polyBezier;
+
+        std::vector<M::Vector2> _decalPos2;
+        std::vector<M::Vector3> _decalPos;
     public:
         struct SpawnArgs {
             const graph_t*  G;

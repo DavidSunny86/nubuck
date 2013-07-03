@@ -1,6 +1,6 @@
 #include <common\common.h>
 #include <math\matrix3.h>
-#include <renderer\mesh\polygon\polygon.h>
+#include <renderer\mesh\quad\quad.h>
 #include <renderer\skin\skinmgr.h>
 #include <world\events.h>
 #include "ent_face.h"
@@ -39,6 +39,12 @@ namespace {
         }
     }
 
+    inline void PushTransformed(const M::Matrix3& invM, const M::Vector3& p0, const M::Vector3& p, std::vector<M::Vector2>& poly) {
+        M::Vector3 l = M::Transform(invM, p - p0);
+        assert(M::AlmostEqual(0.0f, l.z));
+        poly.push_back(M::Vector2(l.x, l.y));
+    }
+
 } // unnamed namespace
 
 namespace W {
@@ -56,7 +62,6 @@ namespace W {
             points.push_back(ToVector(G[source(it)]));
         } while(edge != (it = G.face_cycle_succ(it)));
         assert(3 <= points.size());
-        MakeObtuse(points);
 
         const M::Vector3& p0 = points[points.get_item(0)];
         const M::Vector3& p1 = points[points.get_item(1)];
@@ -66,18 +71,39 @@ namespace W {
         M::Vector3 v1 = M::Normalize(p2 - p0);
         M::Vector3 v2 = M::Normalize(M::Cross(v0, v1));
 
-        for(int i = 0; i < 1; ++i) R::Subdiv(points);
-        for(int i = 0; i < 4; ++i) points = R::ChaikinSubdiv(points);
+        M::Matrix3 M(M::Mat3::FromColumns(v0, v1, v2));
+        if(M::AlmostEqual(0.0f, M::Det(M))) common.printf("ERROR - ENT_Face: non-invertable matrix M.\n");
 
-        R::PolygonMesh polyMesh(points, v2);
+        // M does not need to be orthogonal
+        M::Matrix3 invM(M::Inverse(M));
 
-        const float eps = 0.001f; // resolves z-fighting of faces and hull
-        polyMesh.Transform(M::Mat4::Translate(eps * v2));
+        const float s = 0.2f;
 
-        _mesh = R::meshMgr.Create(polyMesh.GetDesc());
+        std::vector<M::Vector2> poly;
+        leda::list_item pIt = NULL;
+        forall_items(pIt, points) {
+            const M::Vector3& c0 = points[pIt];
+            const M::Vector3& c1 = points[points.cyclic_succ(pIt)];
+            PushTransformed(invM, p0, (1.0f - s) * c0 + s * c1, poly); // must start at first endpoint!
+            PushTransformed(invM, p0, 0.5f * c0 + 0.5f * c1, poly);
+            PushTransformed(invM, p0, s * c0 + (1.0f - s) * c1, poly);
+            PushTransformed(invM, p0, c1, poly);
+        }
+        poly.push_back(poly.front()); // close poly
+        _polyBezier = GEN::Pointer<R::PolyBezier2U>(new R::PolyBezier2U(poly));
+
+        _polyBezier->SampleEquidistantPoints(0.2f, _decalPos2);
+        for(unsigned i = 0; i < _decalPos2.size(); ++i) {
+            M::Vector3 p = M::Transform(M, M::Vector3(_decalPos2[i].x, _decalPos2[i].y, 0.0f)) + p0;
+            const float eps = 0.001f; // resolves z-fighting of faces and hull
+            p += eps * v2;
+            _decalPos.push_back(p);
+        }
+
+        _mesh = R::meshMgr.Create(R::CreateQuadDesc(0.1f));
 
         R::SkinDesc skinDesc;
-        skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\dot.tga";
+        skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle.tga";
         _skin = R::skinMgr.Create(skinDesc);
 
         _material.diffuseColor = R::Color(spawnArgs->r, spawnArgs->g, spawnArgs->b);
@@ -89,12 +115,14 @@ namespace W {
         renderJob.mesh      = _mesh;
         renderJob.primType  = 0;
         renderJob.skin      = _skin;
-        renderJob.transform = M::Mat4::Translate(GetPosition());
         renderJob.material  = _material;
 
         // solid
-        renderJob.fx = "FaceRing";
-        renderList.push_back(renderJob);
+        renderJob.fx = "TexDiffuse";
+        for(unsigned i = 0; i < _decalPos.size(); ++i) {
+            renderJob.transform = M::Mat4::Translate(GetPosition() + _decalPos[i]);
+            renderList.push_back(renderJob);
+        }
 
         // wireframe
         renderJob.fx = "GenericWireframe";
