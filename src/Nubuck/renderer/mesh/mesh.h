@@ -43,6 +43,8 @@ namespace R {
             Desc(void) : vertices(NULL), numVertices(0), indices(NULL), numIndices(0), primType(0) { }
         };
     private:
+        SYS::SpinLock _mtx;
+
         Desc _desc;
 
         GEN::Pointer<StaticBuffer> _vertexBuffer;
@@ -64,6 +66,9 @@ namespace R {
         GLenum PrimitiveType(void) const { return _desc.primType; }
 
         float Radius(void) const { COM_assert(_compiled); return _radius; }
+
+        // assumes number of vertices and indices is constant
+        void Invalidate(const Mesh::Vertex* const vertices);
 
         void R_Compile(void);
         void R_Bind(void);

@@ -26,13 +26,13 @@ namespace R {
     };
 
     Mesh::Mesh(const Desc& desc) : _compiled(false), _radius(0.0f) {
-        ArrayPtr<Vertex> vertices(desc.vertices, desc.numVertices);
-        ArrayPtr<Index> indices(desc.indices, desc.numIndices);
+        ArrayPtr<Vertex> vertexArray(desc.vertices, desc.numVertices);
+        ArrayPtr<Index> indexArray(desc.indices, desc.numIndices);
 
-        _desc.vertices = vertices.Release();
+        _desc.vertices = vertexArray.Release();
         _desc.numVertices = desc.numVertices;
 
-        _desc.indices = indices.Release();
+        _desc.indices = indexArray.Release();
         _desc.numIndices = desc.numIndices;
 
         _desc.primType = desc.primType;
@@ -43,8 +43,19 @@ namespace R {
         if(_desc.indices) delete[] _desc.indices;
     }
 
+    void Mesh::Invalidate(const Mesh::Vertex* vertices) {
+        ArrayPtr<Vertex> vertexArray(vertices, _desc.numVertices);
+        _mtx.Lock();
+        if(_desc.vertices) delete[] _desc.vertices;
+        _desc.vertices = vertexArray.Release();
+        _compiled = false;
+        _mtx.Unlock();
+    }
+
     void Mesh::R_Compile(void) {
         if(_compiled) return;
+
+        _mtx.Lock();
 
         // compute radius of bounding sphere
         float rs = 0.0f;
@@ -55,6 +66,8 @@ namespace R {
         _vertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, _desc.vertices, sizeof(Vertex) * _desc.numVertices));
         _indexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, _desc.indices, sizeof(Index) * _desc.numIndices));
         _compiled = true;
+
+        _mtx.Unlock();
     }
 
     void Mesh::R_Bind(void) {
