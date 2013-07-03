@@ -7,7 +7,7 @@ namespace W {
         points.push_back(M::Vector2(-1.0f, 0.0f));
         points.push_back(M::Vector2( 1.0f, 0.0f));
         points.push_back(M::Vector2( 0.0f, 1.0f));
-        _bezierCurve = GEN::Pointer<R::Bezier>(new R::Bezier(points));
+        _bezierCurve = GEN::Pointer<R::PolyBezier2U>(new R::PolyBezier2U(points));
         _mesh = R::meshMgr.Create(_bezierCurve->GetDesc());
         _material.diffuseColor = R::Color::Black;
     }

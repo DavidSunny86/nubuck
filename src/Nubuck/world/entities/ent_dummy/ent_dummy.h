@@ -9,7 +9,7 @@ namespace W {
 
     class ENT_Dummy : public Entity {
     private:
-        GEN::Pointer<R::Bezier> _bezierCurve;
+        GEN::Pointer<R::PolyBezier2U> _bezierCurve;
         R::MeshMgr::MeshPtr _mesh;
         R::Material _material;
     public:
