@@ -39,6 +39,14 @@ namespace {
         }
     }
 
+    void Shrink(leda::list<M::Vector3>& points, float f) {
+        leda::list_item it;
+        M::Vector3 center = M::Vector3::Zero;
+        forall_items(it, points) center += points[it];
+        center /= points.size();
+        forall_items(it, points) points[it] = points[it] - f * (points[it] - center);
+    }
+
     inline void PushTransformed(const M::Matrix3& invM, const M::Vector3& p0, const M::Vector3& p, std::vector<M::Vector2>& poly) {
         M::Vector3 l = M::Transform(invM, p - p0);
         assert(M::AlmostEqual(0.0f, l.z));
@@ -62,6 +70,7 @@ namespace W {
             points.push_back(ToVector(G[source(it)]));
         } while(edge != (it = G.face_cycle_succ(it)));
         assert(3 <= points.size());
+        Shrink(points, 0.2f);
 
         const M::Vector3& p0 = points[points.get_item(0)];
         const M::Vector3& p1 = points[points.get_item(1)];
@@ -91,7 +100,7 @@ namespace W {
         poly.push_back(poly.front()); // close poly
         _polyBezier = GEN::Pointer<R::PolyBezier2U>(new R::PolyBezier2U(poly));
 
-        _polyBezier->SampleEquidistantPoints(0.2f, _decalPos2);
+        _polyBezier->SampleEquidistantPoints(0.4f, _decalPos2);
         for(unsigned i = 0; i < _decalPos2.size(); ++i) {
             M::Vector3 p = M::Transform(_M, M::Vector3(_decalPos2[i].x, _decalPos2[i].y, 0.0f)) + p0;
             const float eps = 0.001f; // resolves z-fighting of faces and hull
@@ -99,7 +108,7 @@ namespace W {
             _decalPos.push_back(p);
         }
 
-        _mesh = R::meshMgr.Create(R::CreateQuadDesc(0.1f));
+        _mesh = R::meshMgr.Create(R::CreateQuadDesc(0.2f));
 
         R::SkinDesc skinDesc;
         skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle.tga";
