@@ -15,4 +15,8 @@ namespace M {
 		z /= len;
 	}
 
+    Vector3 Vector3::ProjectOn(const Vector3& other) {
+        return (Dot(*this, other) / Dot(other, other)) * other;
+    }
+
 } // namespace M

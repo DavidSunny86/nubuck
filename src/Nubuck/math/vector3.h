@@ -26,6 +26,8 @@ namespace M {
 
 		void Normalize(void);
 
+        Vector3 ProjectOn(const Vector3& other);
+
 		static Vector3 Zero;
 	};
 
@@ -43,6 +45,7 @@ namespace M {
 	float	Length(const Vector3& vector);
 	float	Distance(const Vector3& lhp, const Vector3& rhp);
 	bool	LinearlyDependent(const Vector3& u, const Vector3& v);
+    void    Orthogonalize(Vector3& v0, Vector3& v1, Vector3& v2);
 
 } // namespace M
 

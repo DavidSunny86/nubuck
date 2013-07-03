@@ -20,4 +20,9 @@ namespace M {
 			   AlmostEqual(u.x * v.z - u.z * v.x, 0.0f);
 	}
 
+    void Orthogonalize(Vector3& v0, Vector3& v1, Vector3& v2) {
+        v1 = v1 - v1.ProjectOn(v0);
+        v2 = v2 - v2.ProjectOn(v0) - v2.ProjectOn(v0);
+    }
+
 } // namespace M

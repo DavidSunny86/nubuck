@@ -1,5 +1,6 @@
 #pragma once
 
+#include <math\matrix3.h>
 #include <world\entity.h>
 #include <renderer\mesh\bezier\bezier.h>
 
@@ -14,6 +15,7 @@ namespace W {
 
         std::vector<M::Vector2> _decalPos2;
         std::vector<M::Vector3> _decalPos;
+        M::Matrix3 _M;
     public:
         struct SpawnArgs {
             const graph_t*  G;

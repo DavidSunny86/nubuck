@@ -77,6 +77,13 @@ namespace M {
 		A3.z = mat.m22;
 	}
 
+    void Orthonormalize(Matrix3& mat) {
+        Vector3 v0, v1, v2;
+        ToColumns(mat, v0, v1, v2);
+        Orthogonalize(v0, v1, v2);
+        mat = Mat3::FromColumns(Normalize(v0), Normalize(v1), Normalize(v2));
+    }
+
 	namespace Mat3 {
 
 		Matrix3 FromColumns(const M::Vector3& A1, const M::Vector3& A2, const M::Vector3& A3) {

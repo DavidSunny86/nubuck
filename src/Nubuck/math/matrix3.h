@@ -39,6 +39,8 @@ namespace M {
 
 	void	ToColumns(const M::Matrix3& mat, M::Vector3& A1, M::Vector3& A2, M::Vector3& A3);
 
+    void Orthonormalize(Matrix3& mat);
+
 	namespace Mat3 {
 		Matrix3 FromColumns(const M::Vector3& A1, const M::Vector3& A2, const M::Vector3& A3);
 		Matrix3 FromQuaternion(const Quaternion& q);

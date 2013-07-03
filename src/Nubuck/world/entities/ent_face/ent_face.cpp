@@ -71,11 +71,10 @@ namespace W {
         M::Vector3 v1 = M::Normalize(p2 - p0);
         M::Vector3 v2 = M::Normalize(M::Cross(v0, v1));
 
-        M::Matrix3 M(M::Mat3::FromColumns(v0, v1, v2));
-        if(M::AlmostEqual(0.0f, M::Det(M))) common.printf("ERROR - ENT_Face: non-invertable matrix M.\n");
-
-        // M does not need to be orthogonal
-        M::Matrix3 invM(M::Inverse(M));
+        _M = M::Matrix3(M::Mat3::FromColumns(v0, v1, v2));
+        if(M::AlmostEqual(0.0f, M::Det(_M))) common.printf("ERROR - ENT_Face: non-invertable matrix M.\n");
+        M::Orthonormalize(_M);
+        M::Matrix3 invM(M::Transpose(_M));
 
         const float s = 0.2f;
 
@@ -94,7 +93,7 @@ namespace W {
 
         _polyBezier->SampleEquidistantPoints(0.2f, _decalPos2);
         for(unsigned i = 0; i < _decalPos2.size(); ++i) {
-            M::Vector3 p = M::Transform(M, M::Vector3(_decalPos2[i].x, _decalPos2[i].y, 0.0f)) + p0;
+            M::Vector3 p = M::Transform(_M, M::Vector3(_decalPos2[i].x, _decalPos2[i].y, 0.0f)) + p0;
             const float eps = 0.001f; // resolves z-fighting of faces and hull
             p += eps * v2;
             _decalPos.push_back(p);
@@ -120,7 +119,7 @@ namespace W {
         // solid
         renderJob.fx = "TexDiffuse";
         for(unsigned i = 0; i < _decalPos.size(); ++i) {
-            renderJob.transform = M::Mat4::Translate(GetPosition() + _decalPos[i]);
+            renderJob.transform = M::Mat4::Translate(GetPosition() + _decalPos[i]) * M::Mat4::FromRigidTransform(_M, M::Vector3::Zero);
             renderList.push_back(renderJob);
         }
 
