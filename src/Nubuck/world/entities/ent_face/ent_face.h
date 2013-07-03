@@ -15,7 +15,12 @@ namespace W {
 
         std::vector<M::Vector2> _decalPos2;
         std::vector<M::Vector3> _decalPos;
+
+        M::Vector3 _p0; // origin
+        M::Vector3 _normal;
         M::Matrix3 _M;
+
+        void Rebuild(void);
     public:
         struct SpawnArgs {
             const graph_t*  G;
@@ -25,6 +30,7 @@ namespace W {
 
         void Spawn(const Event& event);
 
+        void Update(float secsPassed) override;
         void Render(std::vector<R::RenderJob>& renderList) override;
     };
 

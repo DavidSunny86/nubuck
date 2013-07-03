@@ -57,6 +57,17 @@ namespace {
 
 namespace W {
 
+    void ENT_Face::Rebuild(void) {
+        _decalPos.clear();
+        _polyBezier->SampleEquidistantPoints(0.4f, _decalPos2);
+        for(unsigned i = 0; i < _decalPos2.size(); ++i) {
+            M::Vector3 p = M::Transform(_M, M::Vector3(_decalPos2[i].x, _decalPos2[i].y, 0.0f)) + _p0;
+            const float eps = 0.001f; // resolves z-fighting of faces and hull
+            p += eps * _normal;
+            _decalPos.push_back(p);
+        }
+    }
+
     void ENT_Face::Spawn(const Event& event) {
         Entity::Spawn(event);
 
@@ -72,13 +83,15 @@ namespace W {
         assert(3 <= points.size());
         Shrink(points, 0.2f);
 
-        const M::Vector3& p0 = points[points.get_item(0)];
+        _p0 = points[points.get_item(0)];
         const M::Vector3& p1 = points[points.get_item(1)];
         const M::Vector3& p2 = points[points.get_item(2)];
 
-        M::Vector3 v0 = M::Normalize(p1 - p0);
-        M::Vector3 v1 = M::Normalize(p2 - p0);
+        M::Vector3 v0 = M::Normalize(p1 - _p0);
+        M::Vector3 v1 = M::Normalize(p2 - _p0);
         M::Vector3 v2 = M::Normalize(M::Cross(v0, v1));
+
+        _normal = v2;
 
         _M = M::Matrix3(M::Mat3::FromColumns(v0, v1, v2));
         if(M::AlmostEqual(0.0f, M::Det(_M))) common.printf("ERROR - ENT_Face: non-invertable matrix M.\n");
@@ -92,21 +105,14 @@ namespace W {
         forall_items(pIt, points) {
             const M::Vector3& c0 = points[pIt];
             const M::Vector3& c1 = points[points.cyclic_succ(pIt)];
-            PushTransformed(invM, p0, (1.0f - s) * c0 + s * c1, poly); // must start at first endpoint!
-            PushTransformed(invM, p0, 0.5f * c0 + 0.5f * c1, poly);
-            PushTransformed(invM, p0, s * c0 + (1.0f - s) * c1, poly);
-            PushTransformed(invM, p0, c1, poly);
+            PushTransformed(invM, _p0, (1.0f - s) * c0 + s * c1, poly); // must start at first endpoint!
+            PushTransformed(invM, _p0, 0.5f * c0 + 0.5f * c1, poly);
+            PushTransformed(invM, _p0, s * c0 + (1.0f - s) * c1, poly);
+            PushTransformed(invM, _p0, c1, poly);
         }
         poly.push_back(poly.front()); // close poly
         _polyBezier = GEN::Pointer<R::PolyBezier2U>(new R::PolyBezier2U(poly));
-
-        _polyBezier->SampleEquidistantPoints(0.4f, _decalPos2);
-        for(unsigned i = 0; i < _decalPos2.size(); ++i) {
-            M::Vector3 p = M::Transform(_M, M::Vector3(_decalPos2[i].x, _decalPos2[i].y, 0.0f)) + p0;
-            const float eps = 0.001f; // resolves z-fighting of faces and hull
-            p += eps * v2;
-            _decalPos.push_back(p);
-        }
+        Rebuild();
 
         _mesh = R::meshMgr.Create(R::CreateQuadDesc(0.2f));
 
@@ -115,6 +121,11 @@ namespace W {
         _skin = R::skinMgr.Create(skinDesc);
 
         _material.diffuseColor = R::Color(spawnArgs->r, spawnArgs->g, spawnArgs->b);
+    }
+
+    void ENT_Face::Update(float secsPassed) {
+        _polyBezier->Update(secsPassed);
+        Rebuild();
     }
 
     void ENT_Face::Render(std::vector<R::RenderJob>& renderList) {
