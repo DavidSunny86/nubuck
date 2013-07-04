@@ -32,10 +32,6 @@ namespace W {
         _numVisitorsLock.Unlock();
     }
 
-    void World::Add(const entPtr_t& entity) {
-        _entities.push_back(entity);
-    }
-
     void World::Send(const Event& event) {
         _eventsLock.Lock();
         _events.push(event);
@@ -82,6 +78,10 @@ namespace W {
                 _entities.push_back(entity);
                 _entitiesLock.Unlock();
             }
+            if(EVENT_DESTROY_ENTITY == event.id) {
+                entPtr_t ent = GetEntityById(event.entityId);
+                if(ent.IsValid()) ent->Destroy();
+            }
 
             if(0 < event.entityId) {
                 entPtr_t ent = GetEntityById(event.entityId);
@@ -97,9 +97,15 @@ namespace W {
 #endif
         }
 
+        _entitiesLock.Lock();
         for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
-            (*entIt)->Update(_secsPassed);
+            if((*entIt)->IsDead()) {
+                entIt = _entities.erase(entIt);
+                if(_entities.end() == entIt) break;
+            }
+            else (*entIt)->Update(_secsPassed);
         }
+        _entitiesLock.Unlock();
 
         _renderListLock.Lock();
         _renderList.clear();

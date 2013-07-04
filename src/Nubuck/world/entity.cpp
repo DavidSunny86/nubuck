@@ -43,7 +43,7 @@ namespace W {
         ChangeColor(IP_Ident, targetColor, dur);
     }
 
-    Entity::Entity(void) : _id(0), _position(M::Vector3::Zero) {
+    Entity::Entity(void) : _id(0), _isDead(false), _position(M::Vector3::Zero) {
         _state = IDLE;
         _material.diffuseColor = R::Color::White;
     }

@@ -92,9 +92,21 @@ void Polyhedron::SetFaceColor(leda::edge edge, float r, float g, float b) {
 void Polyhedron::Update(void) {
     W::Event event;
 
+    // destroy faces
+    event.id = W::EVENT_DESTROY_ENTITY;
+    event.sem = NULL;
+    leda::edge e;
+    forall_edges(e, _G) {
+        event.entityId = _faceEntIDs[e];
+        if(0 < event.entityId) {
+            _faceEntIDs[e] = 0;
+            W::world.Send(event);
+        }
+    }
+
+    // update hull
     event.id = W::EVENT_REBUILD;
     event.entityId = _hullID;
     event.sem = &_rebuildSem;
-
     W::world.Send(event);
 }

@@ -18,6 +18,7 @@ namespace W {
     class Entity {
     private:
         int         _id;
+        bool        _isDead;
         M::Vector3  _position;
 
         R::Material _material;
@@ -53,6 +54,9 @@ namespace W {
         virtual ~Entity(void);
 
         int GetID(void) const { return _id; }
+        bool IsDead(void) const { return _isDead; }
+
+        void Destroy(void) { _isDead = true; }
 
         virtual void Update(float secsPassed);
         virtual void Render(std::vector<R::RenderJob>& renderList);

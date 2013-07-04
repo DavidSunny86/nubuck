@@ -63,8 +63,6 @@ namespace W {
 
         template<typename TYPE> 
         void RegisterEntity(EntityType type);
-        
-        void Add(const entPtr_t& entity);
 
         // message passing
         void Send(const Event& event);

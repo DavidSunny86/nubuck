@@ -8,6 +8,7 @@ namespace W {
     enum {
 		EVENT_APOCALYPSE,
         EVENT_SPAWN_ENTITY,
+        EVENT_DESTROY_ENTITY,
         EVENT_CHANGE_COLOR,
         EVENT_REBUILD
     };
