@@ -11,7 +11,10 @@ namespace UI {
     private:
         Ui::FaceConfig _ui;
     private slots:
+        void OnSpeedChanged(double val);
         void OnDecalSizeChanged(double val);
+        void OnSpacingChanged(double val);
+        void OnCurvatureChanged(double val);
     public:
         FaceConfig(QWidget* parent = NULL);
     };

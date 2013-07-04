@@ -68,12 +68,12 @@
                </widget>
               </item>
               <item row="3" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+               <widget class="QDoubleSpinBox" name="sbCurvature">
                 <property name="minimum">
                  <double>0.100000000000000</double>
                 </property>
                 <property name="maximum">
-                 <double>1.000000000000000</double>
+                 <double>0.500000000000000</double>
                 </property>
                 <property name="singleStep">
                  <double>0.100000000000000</double>
@@ -98,7 +98,7 @@
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+               <widget class="QDoubleSpinBox" name="sbSpacing">
                 <property name="maximum">
                  <double>1.000000000000000</double>
                 </property>
@@ -111,7 +111,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox">
+               <widget class="QDoubleSpinBox" name="sbSpeed">
                 <property name="maximum">
                  <double>5.000000000000000</double>
                 </property>
@@ -236,8 +236,59 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>sbSpeed</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>FaceConfig</receiver>
+   <slot>OnSpeedChanged(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>213</x>
+     <y>86</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>153</x>
+     <y>154</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbSpacing</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>FaceConfig</receiver>
+   <slot>OnSpacingChanged(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>213</x>
+     <y>138</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>153</x>
+     <y>154</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbCurvature</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>FaceConfig</receiver>
+   <slot>OnCurvatureChanged(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>213</x>
+     <y>164</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>153</x>
+     <y>154</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>OnDecalSizeChanged(double)</slot>
+  <slot>OnSpacingChanged(double)</slot>
+  <slot>OnSpeedChanged(double)</slot>
+  <slot>OnCurvatureChanged(double)</slot>
  </slots>
 </ui>

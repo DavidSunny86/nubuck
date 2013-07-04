@@ -6,9 +6,12 @@
 #include <world\entity.h>
 #include <renderer\mesh\bezier\bezier.h>
 
-namespace W {
+extern COM::Config::Variable<float> cvar_faceSpeed;
+extern COM::Config::Variable<float> cvar_faceDecalSize;
+extern COM::Config::Variable<float> cvar_faceSpacing;
+extern COM::Config::Variable<float> cvar_faceCurvature;
 
-    extern COM::Config::Variable<float> cvar_faceDecalSize;
+namespace W {
 
     class ENT_Face : public Entity, public COM::Config::Observer {
     private:
@@ -20,11 +23,15 @@ namespace W {
         std::vector<M::Vector2> _decalPos2;
         std::vector<M::Vector3> _decalPos;
 
+        leda::list<M::Vector3> _points;
         M::Vector3 _p0; // origin
         M::Vector3 _normal;
-        M::Matrix3 _M;
+        M::Matrix3 _M, _invM;
 
-        void Rebuild(void);
+        bool _needsRebuild;
+
+        void ComputePolyBezier(void);
+        void ComputeDecalPositions(void);
         void CreateMesh(void);
     public:
         struct SpawnArgs {
@@ -32,6 +39,8 @@ namespace W {
             leda::edge      edge;
             float           r, g, b;
         };
+
+        ENT_Face(void) : _needsRebuild(false) { }
 
         void Spawn(const Event& event);
 

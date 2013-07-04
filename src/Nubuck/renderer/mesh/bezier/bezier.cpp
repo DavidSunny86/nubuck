@@ -162,7 +162,7 @@ namespace R {
     }
 
     void PolyBezier2U::Update(float secsPassed) {
-        _time += secsPassed * 0.1;
+        _time += secsPassed;
         Rebuild();
     }
 

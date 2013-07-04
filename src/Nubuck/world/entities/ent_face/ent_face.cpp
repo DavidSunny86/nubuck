@@ -5,6 +5,11 @@
 #include <world\events.h>
 #include "ent_face.h"
 
+COM::Config::Variable<float> cvar_faceSpeed("faceSpeed", 0.2f);
+COM::Config::Variable<float> cvar_faceDecalSize("faceDecalSize", 0.2f);
+COM::Config::Variable<float> cvar_faceSpacing("faceSpacing", 0.4f);
+COM::Config::Variable<float> cvar_faceCurvature("faceCurvature", 0.2f);
+
 namespace {
 
     M::Vector3 ToVector(const leda::d3_rat_point& p) {
@@ -57,11 +62,26 @@ namespace {
 
 namespace W {
 
-    COM::Config::Variable<float> cvar_faceDecalSize("faceDecalSize", 0.2f);
+    void ENT_Face::ComputePolyBezier(void) {
+        const float s = cvar_faceCurvature;
 
-    void ENT_Face::Rebuild(void) {
+        std::vector<M::Vector2> poly;
+        leda::list_item pIt = NULL;
+        forall_items(pIt, _points) {
+            const M::Vector3& c0 = _points[pIt];
+            const M::Vector3& c1 = _points[_points.cyclic_succ(pIt)];
+            PushTransformed(_invM, _p0, (1.0f - s) * c0 + s * c1, poly); // must start at first endpoint!
+            PushTransformed(_invM, _p0, 0.5f * c0 + 0.5f * c1, poly);
+            PushTransformed(_invM, _p0, s * c0 + (1.0f - s) * c1, poly);
+            PushTransformed(_invM, _p0, c1, poly);
+        }
+        poly.push_back(poly.front()); // close poly
+        _polyBezier = GEN::Pointer<R::PolyBezier2U>(new R::PolyBezier2U(poly));
+    }
+
+    void ENT_Face::ComputeDecalPositions(void) {
         // avoid overlapping decals
-        float w = 0.6f;
+        float w = cvar_faceDecalSize + cvar_faceSpacing;
         int n = (int)(_polyBezier->Length() / w);
         float def = _polyBezier->Length() - n * w;
         w += def / n;
@@ -84,22 +104,22 @@ namespace W {
         Entity::Spawn(event);
 
         cvar_faceDecalSize.Register(this);
+        cvar_faceCurvature.Register(this);
 
         const SpawnArgs* spawnArgs = (const SpawnArgs*)event.args;
         const graph_t& G = *spawnArgs->G;
         leda::edge edge = spawnArgs->edge;
 
-        leda::list<M::Vector3> points;
         leda::edge it = edge;
         do {
-            points.push_back(ToVector(G[source(it)]));
+            _points.push_back(ToVector(G[source(it)]));
         } while(edge != (it = G.face_cycle_succ(it)));
-        assert(3 <= points.size());
-        Shrink(points, 0.2f);
+        assert(3 <= _points.size());
+        Shrink(_points, 0.2f);
 
-        _p0 = points[points.get_item(0)];
-        const M::Vector3& p1 = points[points.get_item(1)];
-        const M::Vector3& p2 = points[points.get_item(2)];
+        _p0 = _points[_points.get_item(0)];
+        const M::Vector3& p1 = _points[_points.get_item(1)];
+        const M::Vector3& p2 = _points[_points.get_item(2)];
 
         M::Vector3 v0 = M::Normalize(p1 - _p0);
         M::Vector3 v1 = M::Normalize(p2 - _p0);
@@ -110,24 +130,10 @@ namespace W {
         _M = M::Matrix3(M::Mat3::FromColumns(v0, v1, v2));
         if(M::AlmostEqual(0.0f, M::Det(_M))) common.printf("ERROR - ENT_Face: non-invertable matrix M.\n");
         M::Orthonormalize(_M);
-        M::Matrix3 invM(M::Transpose(_M));
+        _invM = M::Transpose(_M);
 
-        const float s = 0.2f;
-
-        std::vector<M::Vector2> poly;
-        leda::list_item pIt = NULL;
-        forall_items(pIt, points) {
-            const M::Vector3& c0 = points[pIt];
-            const M::Vector3& c1 = points[points.cyclic_succ(pIt)];
-            PushTransformed(invM, _p0, (1.0f - s) * c0 + s * c1, poly); // must start at first endpoint!
-            PushTransformed(invM, _p0, 0.5f * c0 + 0.5f * c1, poly);
-            PushTransformed(invM, _p0, s * c0 + (1.0f - s) * c1, poly);
-            PushTransformed(invM, _p0, c1, poly);
-        }
-        poly.push_back(poly.front()); // close poly
-        _polyBezier = GEN::Pointer<R::PolyBezier2U>(new R::PolyBezier2U(poly));
-        Rebuild();
-
+        ComputePolyBezier();
+        ComputeDecalPositions();
         CreateMesh();
 
         R::SkinDesc skinDesc;
@@ -139,8 +145,15 @@ namespace W {
     }
 
     void ENT_Face::Update(float secsPassed) {
-        _polyBezier->Update(secsPassed);
-        Rebuild();
+        if(_needsRebuild) {
+            // by putting the rebuild here we let the W::world thread do
+            // the work. so we need no locking.
+            ComputePolyBezier();
+            _needsRebuild = false;
+        }
+
+        _polyBezier->Update(secsPassed * cvar_faceSpeed);
+        ComputeDecalPositions();
     }
 
     void ENT_Face::Render(std::vector<R::RenderJob>& renderList) {
@@ -166,6 +179,7 @@ namespace W {
 
     void ENT_Face::CVAR_Changed(const std::string& name) {
         if("faceDecalSize" == name) CreateMesh();
+        if("faceCurvature" == name) _needsRebuild = true;
     }
 
 } // namespace W
