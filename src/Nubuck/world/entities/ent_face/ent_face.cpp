@@ -100,11 +100,18 @@ namespace W {
         _mesh = R::meshMgr.Create(R::CreateQuadDesc(cvar_faceDecalSize));
     }
 
-    void ENT_Face::Spawn(const Event& event) {
-        Entity::Spawn(event);
-
+    ENT_Face::ENT_Face(void) : _needsRebuild(false) {
         cvar_faceDecalSize.Register(this);
         cvar_faceCurvature.Register(this);
+    }
+
+    ENT_Face::~ENT_Face(void) {
+        cvar_faceDecalSize.Unregister(this);
+        cvar_faceCurvature.Unregister(this);
+    }
+
+    void ENT_Face::Spawn(const Event& event) {
+        Entity::Spawn(event);
 
         const SpawnArgs* spawnArgs = (const SpawnArgs*)event.args;
         const graph_t& G = *spawnArgs->G;

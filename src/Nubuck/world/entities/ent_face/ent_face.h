@@ -40,7 +40,8 @@ namespace W {
             float           r, g, b;
         };
 
-        ENT_Face(void) : _needsRebuild(false) { }
+        ENT_Face(void);
+        ~ENT_Face(void);
 
         void Spawn(const Event& event);
 
