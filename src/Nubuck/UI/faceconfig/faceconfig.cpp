@@ -9,6 +9,8 @@ namespace UI {
     void FaceConfig::OnCurvatureChanged(double val) { cvar_faceCurvature = (float)val; }
 
     FaceConfig::FaceConfig(QWidget* parent) : QDialog(parent) {
+        setWindowFlags(Qt::WindowStaysOnTopHint);
+
         _ui.setupUi(this);
 
         _ui.sbSpeed->setValue(cvar_faceSpeed);

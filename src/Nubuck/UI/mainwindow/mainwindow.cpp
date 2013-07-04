@@ -52,8 +52,8 @@ namespace UI {
     }
 
     void MainWindow::OnShowFaceConfig(void) {
-        FaceConfig faceConfig;
-        faceConfig.exec();
+        FaceConfig* faceConfig = new FaceConfig();
+        faceConfig->show();
     }
 
     MainWindow::MainWindow(void) {
