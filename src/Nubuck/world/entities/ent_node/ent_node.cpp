@@ -62,6 +62,7 @@ namespace W {
         SetPosition(ToVector((*spawnArgs->G)[_node]));
 
         InitResources();
+        SetMaterial(s_material);
     }
 
     void ENT_Node::Render(std::vector<R::RenderJob>& renderList) {
@@ -71,7 +72,7 @@ namespace W {
         renderJob.mesh = s_mesh;
         renderJob.primType  = 0;
         renderJob.transform = M::Mat4::Translate(GetPosition());
-        renderJob.material  = s_material;
+        renderJob.material  = GetMaterial();
         renderList.push_back(renderJob);
     }
 

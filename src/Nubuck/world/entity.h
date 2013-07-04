@@ -45,6 +45,7 @@ namespace W {
         const R::Material& GetMaterial(void) const;
 
         void SetPosition(const M::Vector3& position);
+        void SetMaterial(const R::Material& material);
         void InvalidateMesh(void);
 
         void PulseColor(const R::Color& targetColor, float dur);

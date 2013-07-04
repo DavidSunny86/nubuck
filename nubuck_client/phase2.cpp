@@ -131,7 +131,7 @@ IPhase::StepRet Phase2::Step(void) {
 
         g.polyhedron->Update();
 
-        g.polyhedron->SetNodeColor(curNode, 1.0f, 1.0f, 1.0f);
+        g.polyhedron->SetNodeColor(curNode, 0.2f, 0.2f, 0.2f);
         if(g.L.empty()) return DONE;
         curNode = g.L.pop_back();
         g.polyhedron->SetNodeColor(curNode, 1.0f, 0.0f, 0.0f);

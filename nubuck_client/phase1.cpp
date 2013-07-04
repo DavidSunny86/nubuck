@@ -53,7 +53,7 @@ IPhase::StepRet Phase1::Step(void) {
     // reset node colors to white
     leda::node n;
     forall_nodes(n, g.G) {
-        g.polyhedron->SetNodeColor(n, 1.0f, 1.0f, 1.0f);
+        g.polyhedron->SetNodeColor(n, 0.2f, 0.2f, 0.2f);
     }
 
     return DONE;

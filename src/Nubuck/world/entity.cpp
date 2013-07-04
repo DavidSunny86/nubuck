@@ -19,6 +19,10 @@ namespace W {
         _position = position;
     }
 
+    void Entity::SetMaterial(const R::Material& material) {
+        _material = material;
+    }
+
     void Entity::InvalidateMesh(void) {
         //R::MeshMgr::Instance().GetMesh(_meshHandle).Invalidate();
     }
