@@ -16,7 +16,13 @@ namespace UI {
         void OnSpacingChanged(double val);
         void OnCurvatureChanged(double val);
     public:
-        FaceConfig(QWidget* parent = NULL);
+        FaceConfig(QWidget* parent = NULL); // Qt dictates public ctor
+
+        static void Show(void) {
+            static FaceConfig* instance = NULL;
+            if(!instance) instance = new FaceConfig();
+            instance->show();
+        }
     };
 
 } // namespace UI

@@ -14,7 +14,13 @@ namespace UI {
         void OnSizeChanged(double val);
         void OnSubdivisionsChanged(int val);
     public:
-        NodeConfig(QWidget* parent = NULL);
+        NodeConfig(QWidget* parent = NULL); // Qt dictates public ctor
+
+        static void Show(void) {
+            static NodeConfig* instance = NULL;
+            if(!instance) instance = new NodeConfig();
+            instance->show();
+        }
     };
 
 } // namespace UI

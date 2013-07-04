@@ -52,15 +52,8 @@ namespace UI {
         RenderMetrics::Instance()->show();
     }
 
-    void MainWindow::OnShowFaceConfig(void) {
-        FaceConfig* faceConfig = new FaceConfig();
-        faceConfig->show();
-    }
-
-    void MainWindow::OnShowNodeConfig(void) {
-        NodeConfig* nodeConfig = new NodeConfig();
-        nodeConfig->show();
-    }
+    void MainWindow::OnShowFaceConfig(void) { FaceConfig::Show(); }
+    void MainWindow::OnShowNodeConfig(void) { NodeConfig::Show(); }
 
     MainWindow::MainWindow(void) {
         _ui.setupUi(this);
