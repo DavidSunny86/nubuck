@@ -171,6 +171,9 @@
     <Filter Include="Private\UI\faceconfig">
       <UniqueIdentifier>{53c29a16-e7aa-47c5-b306-95880ac40544}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\mesh\sphere">
+      <UniqueIdentifier>{681efa7c-1f00-4a65-af58-2590c53f35da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -422,6 +425,9 @@
     <ClInclude Include="GeneratedFiles\ui_faceconfig.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.h">
+      <Filter>Private\renderer\mesh\sphere</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -657,6 +663,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_faceconfig.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.cpp">
+      <Filter>Private\renderer\mesh\sphere</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

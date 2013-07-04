@@ -10,6 +10,7 @@ namespace W {
         leda::node _node;
 
         static R::meshPtr_t s_mesh;
+        static R::Material s_material;
         static void InitResources(void);
     public:
         struct SpawnArgs {

@@ -1,5 +1,5 @@
 #include <renderer\mesh\meshmgr.h>
-#include <renderer\mesh\quad\quad.h>
+#include <renderer\mesh\sphere\sphere.h>
 #include <world\events.h>
 #include "ent_node.h"
 
@@ -15,12 +15,14 @@ namespace {
 namespace W {
 
     R::meshPtr_t ENT_Node::s_mesh;
+    R::Material ENT_Node::s_material;
 
     void ENT_Node::InitResources(void) {
         static bool init = false;
         if(!init) {
-            R::Mesh::Desc desc = R::CreateQuadDesc();
-            s_mesh = R::meshMgr.Create(desc);
+            R::Sphere sphere(2, true);
+            s_mesh = R::meshMgr.Create(sphere.GetDesc());
+            s_material.diffuseColor = R::Color(0.2f, 0.2f, 0.2f);
         }
         init = true;
     }
@@ -54,7 +56,7 @@ namespace W {
         renderJob.mesh = s_mesh;
         renderJob.primType  = 0;
         renderJob.transform = M::Mat4::Translate(GetPosition());
-        renderJob.material  = GetMaterial();
+        renderJob.material  = s_material;
         renderList.push_back(renderJob);
     }
 
