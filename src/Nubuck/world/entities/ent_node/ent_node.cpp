@@ -3,6 +3,9 @@
 #include <world\events.h>
 #include "ent_node.h"
 
+COM::Config::Variable<float> cvar_nodeSize("nodeSize", 1.0f);
+COM::Config::Variable<int> cvar_nodeSubdiv("nodeSubdiv", 2);
+
 namespace {
 
     M::Vector3 ToVector(const leda::d3_rat_point& p) {
@@ -14,14 +17,26 @@ namespace {
 
 namespace W {
 
+    ENT_Node::ConfigObserver ENT_Node::s_configObs;
     R::meshPtr_t ENT_Node::s_mesh;
     R::Material ENT_Node::s_material;
+
+    void ENT_Node::ConfigObserver::CVAR_Changed(const std::string&) {
+        ENT_Node::CreateMesh();
+    }
+
+    void ENT_Node::CreateMesh(void) {
+        R::Sphere sphere(cvar_nodeSubdiv, true);
+        sphere.Scale(cvar_nodeSize);
+        s_mesh = R::meshMgr.Create(sphere.GetDesc());
+    }
 
     void ENT_Node::InitResources(void) {
         static bool init = false;
         if(!init) {
-            R::Sphere sphere(2, true);
-            s_mesh = R::meshMgr.Create(sphere.GetDesc());
+            cvar_nodeSize.Register(&s_configObs);
+            cvar_nodeSubdiv.Register(&s_configObs);
+            CreateMesh();
             s_material.diffuseColor = R::Color(0.2f, 0.2f, 0.2f);
         }
         init = true;

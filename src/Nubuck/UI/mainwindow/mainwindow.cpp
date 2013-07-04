@@ -11,6 +11,7 @@
 #include <UI\algorithmwidget\algorithmwidget.h>
 #include <UI\logwidget\logwidget.h>
 #include <UI\faceconfig\faceconfig.h>
+#include <UI\nodeconfig\nodeconfig.h>
 #include "mainwindow.h"
 
 namespace {
@@ -54,6 +55,11 @@ namespace UI {
     void MainWindow::OnShowFaceConfig(void) {
         FaceConfig* faceConfig = new FaceConfig();
         faceConfig->show();
+    }
+
+    void MainWindow::OnShowNodeConfig(void) {
+        NodeConfig* nodeConfig = new NodeConfig();
+        nodeConfig->show();
     }
 
     MainWindow::MainWindow(void) {

@@ -174,6 +174,9 @@
     <Filter Include="Private\renderer\mesh\sphere">
       <UniqueIdentifier>{681efa7c-1f00-4a65-af58-2590c53f35da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\UI\nodeconfig">
+      <UniqueIdentifier>{2d9bdaa4-9366-4ec6-af68-14ad040b3b8b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -428,6 +431,9 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.h">
       <Filter>Private\renderer\mesh\sphere</Filter>
     </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_nodeconfig.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -667,6 +673,15 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.cpp">
       <Filter>Private\renderer\mesh\sphere</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\nodeconfig\nodeconfig.cpp">
+      <Filter>Private\UI\nodeconfig</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_nodeconfig.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_nodeconfig.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -707,6 +722,12 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\forms\faceconfig.ui">
       <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\nodeconfig.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\nodeconfig\nodeconfig.h">
+      <Filter>Private\UI\nodeconfig</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

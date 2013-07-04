@@ -14,6 +14,8 @@ namespace R {
         Sphere(int numSubdiv, bool smooth);
         ~Sphere(void);
 
+        void Scale(float scale);
+
         Mesh::Desc GetDesc(void);
     };
 

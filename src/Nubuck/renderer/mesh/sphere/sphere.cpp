@@ -111,6 +111,12 @@ namespace R {
         if(_indices) delete[] _indices;
     }
 
+    void Sphere::Scale(float scale) {
+        for(int i = 0; i < _numVerts; ++i) {
+			_vertices[i].position *= scale;
+		}
+    }
+
     Mesh::Desc Sphere::GetDesc(void) {
         Mesh::Desc desc;
         desc.vertices = _vertices;
