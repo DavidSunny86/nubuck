@@ -68,7 +68,7 @@ namespace R {
         pass0.state.blend.srcFactor = GL_SRC_ALPHA;
         pass0.state.blend.dstFactor = GL_ONE_MINUS_SRC_ALPHA;
         pass0.type = DEFAULT;
-        pass0.flags = USE_TEX_DIFFUSE;
+        pass0.flags = USE_TEX_DIFFUSE | USE_MATERIAL;
 
         fx.name = "TexDiffuse";
         fx.passes.push_back(pass0);
