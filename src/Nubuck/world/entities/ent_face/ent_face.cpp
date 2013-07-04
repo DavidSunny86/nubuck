@@ -126,7 +126,8 @@ namespace W {
         skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle.tga";
         _skin = R::skinMgr.Create(skinDesc);
 
-        _material.diffuseColor = R::Color(spawnArgs->r, spawnArgs->g, spawnArgs->b);
+        // _material.diffuseColor = R::Color(spawnArgs->r, spawnArgs->g, spawnArgs->b);
+        _material.diffuseColor = R::Color::White;
     }
 
     void ENT_Face::Update(float secsPassed) {

@@ -14,6 +14,11 @@ namespace R {
         return Color(RandomIn01(), RandomIn01(), RandomIn01());
     }
 
+    Color Color::FromBytes(char r, char g, char b) {
+        const float f = 1.0f / 255.0f;
+        return Color(f * r, f * g, f * b);
+    }
+
     Color Color::White	= Color(1.0f, 1.0f, 1.0f);
     Color Color::Black	= Color(0.0f, 0.0f, 0.0f);
     Color Color::Red	= Color(1.0f, 0.0f, 0.0f);
