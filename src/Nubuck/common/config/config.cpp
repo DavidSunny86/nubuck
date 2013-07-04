@@ -9,7 +9,7 @@ namespace COM {
             fprintf(file, "known variables:\n");
             VarInfo* varIt(_vars);
             while(varIt) {
-                fprintf(file, "%s", varIt->Name().c_str());
+                fprintf(file, "%s\n", varIt->Name().c_str());
                 varIt = varIt->next;
             }
         }
