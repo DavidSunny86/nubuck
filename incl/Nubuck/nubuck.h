@@ -18,6 +18,8 @@ struct ICommon {
 struct IPolyhedron {
     virtual ~IPolyhedron(void) { }
 
+    virtual void Destroy(void) = 0;
+
     virtual void SetNodeColor(leda::node node, float r, float g, float b) = 0;
     virtual void SetFaceColor(leda::edge edge, float r, float g, float b) = 0;
 
@@ -62,6 +64,9 @@ struct IAlgorithm {
     virtual ~IAlgorithm(void) { }
 
     virtual IPhase* Init(const Nubuck& nubuck, const leda::GRAPH<leda::d3_rat_point, int>& G) = 0;
+
+    // return false if the algorithm implements no special Run method
+    virtual bool Run(void) = 0;
 };
 
 typedef IAlgorithm* (*algAlloc_t)(void);

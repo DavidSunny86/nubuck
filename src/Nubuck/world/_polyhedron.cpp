@@ -28,6 +28,36 @@ Polyhedron::Polyhedron(const graph_t& G) : _G(G), _rebuildSem(0) {
     _hullID = world.Spawn(event);
 }
 
+void Polyhedron::Destroy(void) {
+    W::Event event;
+    event.id = W::EVENT_DESTROY_ENTITY;
+    event.sem = NULL;
+
+    // destroy nodes
+    leda::node n;
+    forall_nodes(n, _G) {
+        event.entityId = _nodeEntIDs[n];
+        if(0 < event.entityId) {
+            _nodeEntIDs[n] = 0;
+            W::world.Send(event);
+        }
+    }
+
+    // destroy faces
+    leda::edge e;
+    forall_edges(e, _G) {
+        event.entityId = _faceEntIDs[e];
+        if(0 < event.entityId) {
+            _faceEntIDs[e] = 0;
+            W::world.Send(event);
+        }
+    }
+
+    // destroy hull
+    event.entityId = _hullID;
+    W::world.Send(event);
+}
+
 void Polyhedron::SetNodeColor(leda::node node, float r, float g, float b) {
     W::Event event;
 

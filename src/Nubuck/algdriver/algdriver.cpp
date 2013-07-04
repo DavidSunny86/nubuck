@@ -43,6 +43,10 @@ namespace ALG {
     }
 
     void Driver::Run(void) {
+        if(_algorithm->Run()) {
+            SetPhase(GEN::Pointer<IPhase>());
+            return;
+        }
         while(_phase.IsValid() && !_phase->IsDone()) Next();
     }
 
