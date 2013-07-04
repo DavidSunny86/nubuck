@@ -17,6 +17,7 @@ namespace UI {
     public slots:
 	    void OnRandomPoints(void);
         void OnShowRenderMetrics(void);
+        void OnShowFaceConfig(void);
     public:
 		MainWindow(void);
 	};

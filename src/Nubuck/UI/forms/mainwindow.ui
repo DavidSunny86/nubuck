@@ -34,6 +34,8 @@
      <string>View</string>
     </property>
     <addaction name="actShowRenderMetrics"/>
+    <addaction name="separator"/>
+    <addaction name="actShowFaceConfig"/>
    </widget>
    <addaction name="menuScene"/>
    <addaction name="menuView"/>
@@ -47,6 +49,11 @@
   <action name="actShowRenderMetrics">
    <property name="text">
     <string>Render Metrics</string>
+   </property>
+  </action>
+  <action name="actShowFaceConfig">
+   <property name="text">
+    <string>Face Configuration</string>
    </property>
   </action>
  </widget>
@@ -84,9 +91,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actShowFaceConfig</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OnShowFaceConfig()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>OnRandomPoints()</slot>
   <slot>OnShowRenderMetrics()</slot>
+  <slot>OnShowFaceConfig()</slot>
  </slots>
 </ui>

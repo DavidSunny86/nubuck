@@ -168,6 +168,9 @@
     <Filter Include="Private\world\entities\ent_dummy">
       <UniqueIdentifier>{8c6ce0bd-32e1-4452-a882-1038d4c476b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\UI\faceconfig">
+      <UniqueIdentifier>{53c29a16-e7aa-47c5-b306-95880ac40544}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -416,6 +419,9 @@
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_dummy\ent_dummy.h">
       <Filter>Private\world\entities\ent_dummy</Filter>
     </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_faceconfig.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -643,6 +649,15 @@
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_dummy\ent_dummy.cpp">
       <Filter>Private\world\entities\ent_dummy</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\faceconfig\faceconfig.cpp">
+      <Filter>Private\UI\faceconfig</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_faceconfig.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_faceconfig.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -677,6 +692,12 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\rendermetrics\rendermetrics.h">
       <Filter>Private\UI\rendermetrics</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\faceconfig\faceconfig.h">
+      <Filter>Private\UI\faceconfig</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\faceconfig.ui">
+      <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

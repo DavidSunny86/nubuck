@@ -1,5 +1,6 @@
 #pragma once
 
+#include <common\types.h>
 #include <common\config\config.h>
 #include <math\matrix3.h>
 #include <world\entity.h>
@@ -9,7 +10,7 @@ namespace W {
 
     extern COM::Config::Variable<float> cvar_faceDecalSize;
 
-    class ENT_Face : public Entity {
+    class ENT_Face : public Entity, public COM::Config::Observer {
     private:
         R::meshPtr_t _mesh;
         R::SkinMgr::handle_t _skin;
@@ -24,6 +25,7 @@ namespace W {
         M::Matrix3 _M;
 
         void Rebuild(void);
+        void CreateMesh(void);
     public:
         struct SpawnArgs {
             const graph_t*  G;
@@ -35,6 +37,8 @@ namespace W {
 
         void Update(float secsPassed) override;
         void Render(std::vector<R::RenderJob>& renderList) override;
+
+        void CVAR_Changed(const std::string& name) override;
     };
 
 } // namespace W

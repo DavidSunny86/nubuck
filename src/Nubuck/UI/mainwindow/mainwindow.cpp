@@ -10,6 +10,7 @@
 #include <UI\randompoints\randompoints.h>
 #include <UI\algorithmwidget\algorithmwidget.h>
 #include <UI\logwidget\logwidget.h>
+#include <UI\faceconfig\faceconfig.h>
 #include "mainwindow.h"
 
 namespace {
@@ -48,6 +49,11 @@ namespace UI {
 
     void MainWindow::OnShowRenderMetrics(void) {
         RenderMetrics::Instance()->show();
+    }
+
+    void MainWindow::OnShowFaceConfig(void) {
+        FaceConfig faceConfig;
+        faceConfig.exec();
     }
 
     MainWindow::MainWindow(void) {

@@ -76,8 +76,14 @@ namespace W {
         }
     }
 
+    void ENT_Face::CreateMesh(void) {
+        _mesh = R::meshMgr.Create(R::CreateQuadDesc(cvar_faceDecalSize));
+    }
+
     void ENT_Face::Spawn(const Event& event) {
         Entity::Spawn(event);
+
+        cvar_faceDecalSize.Register(this);
 
         const SpawnArgs* spawnArgs = (const SpawnArgs*)event.args;
         const graph_t& G = *spawnArgs->G;
@@ -122,7 +128,7 @@ namespace W {
         _polyBezier = GEN::Pointer<R::PolyBezier2U>(new R::PolyBezier2U(poly));
         Rebuild();
 
-        _mesh = R::meshMgr.Create(R::CreateQuadDesc(cvar_faceDecalSize));
+        CreateMesh();
 
         R::SkinDesc skinDesc;
         skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle.tga";
@@ -156,6 +162,10 @@ namespace W {
         renderJob.fx = "GenericWireframe";
         renderJob.skin = R::SkinMgr::handle_t();
         // renderList.push_back(renderJob);
+    }
+
+    void ENT_Face::CVAR_Changed(const std::string& name) {
+        if("faceDecalSize" == name) CreateMesh();
     }
 
 } // namespace W
