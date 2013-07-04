@@ -1,10 +1,13 @@
 #pragma once
 
+#include <common\config\config.h>
 #include <math\matrix3.h>
 #include <world\entity.h>
 #include <renderer\mesh\bezier\bezier.h>
 
 namespace W {
+
+    extern COM::Config::Variable<float> cvar_faceDecalSize;
 
     class ENT_Face : public Entity {
     private:

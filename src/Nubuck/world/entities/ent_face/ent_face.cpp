@@ -57,6 +57,8 @@ namespace {
 
 namespace W {
 
+    COM::Config::Variable<float> cvar_faceDecalSize("faceDecalSize", 0.2f);
+
     void ENT_Face::Rebuild(void) {
         // avoid overlapping decals
         float w = 0.6f;
@@ -120,7 +122,7 @@ namespace W {
         _polyBezier = GEN::Pointer<R::PolyBezier2U>(new R::PolyBezier2U(poly));
         Rebuild();
 
-        _mesh = R::meshMgr.Create(R::CreateQuadDesc(0.2f));
+        _mesh = R::meshMgr.Create(R::CreateQuadDesc(cvar_faceDecalSize));
 
         R::SkinDesc skinDesc;
         skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle.tga";

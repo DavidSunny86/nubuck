@@ -31,6 +31,8 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     QGLFormat::setDefaultFormat(FmtAlphaMultisampling(4));
     QApplication app(argc, argv);
 
+    COM::Config::Instance().DumpVariables();
+
     common.Init(argc, argv);
     R::CreateDefaultEffects();
 

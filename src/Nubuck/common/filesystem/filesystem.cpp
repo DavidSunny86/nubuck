@@ -110,8 +110,10 @@ namespace FS {
 	}
 
 	Dump::Dump(void) : _delim(0xFF) {
-		const COM::Config& config = COM::Config::Instance();
-		if(_debug = config.Get("debug", 0)) {
+        // TODO
+		// const COM::Config& config = COM::Config::Instance();
+		// if(_debug = config.Get("debug", 0)) {
+        if(true) {
             common.printf("Dump::Dump: debug mode enabled, will read files from disk\n");
 		}
 

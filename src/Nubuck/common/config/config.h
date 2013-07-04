@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <string>
-#include <map>
+#include <vector>
 
 #include <generic\singleton.h>
 
@@ -10,27 +10,53 @@ namespace COM {
 
 	class Config : public GEN::Singleton<Config> {
 		friend class GEN::Singleton<Config>;
-	private:
-		struct Value {
-			std::string str;
-			int i;
-			float f;
-		};
+    private:
+        struct VarInfo {
+            VarInfo* next;
+            virtual const std::string& Name(void) const = 0;
+            // TODO: Serialize, Deserialize
+        };
+    public:
+        struct Observer {
+            virtual ~Observer(void) { }
+            virtual void CVAR_Changed(const std::string& name) = 0;
+        };
 
-		typedef std::map<std::string, Value>::const_iterator cvarIt_t;
+        template<typename TYPE>
+        class Variable : public VarInfo {
+        private:
+            std::string _name;
+            TYPE _val;
+            std::vector<Observer*> _obs;
+        public:
+            Variable(const std::string& name, const TYPE& defaultValue) : _name(name), _val(defaultValue) { 
+                Config::Instance().Add(this);
+            }
 
-		std::map<std::string, Value> _variables;
+            const std::string& Name(void) const override { return _name; }
 
-		Config(void);
-	public:
+            void Register(Observer* const obs) { _obs.push_back(obs); }
 
-		/*
-		conditional gets. type Get(name, defaultVal) returns value of
-		variable name, if it exists, defaultVal otherwise.
-		*/
-		const std::string& Get(const std::string& name, const std::string& defaultVal) const;
-		int Get(const std::string& name, int defaultVal) const;
-		float Get(const std::string& name, float defaultVal) const;
+            operator TYPE() const { return _val; }
+
+            Variable& operator=(const TYPE& val) {
+                _val = val;
+                for(std::vector<Observer*>::iterator obsIt(_obs.begin()); _obs.end() != obsIt; ++obsIt)
+                    if(*obsIt) (*obsIt)->CVAR_Changed(_name);
+                return *this;
+            }
+        };
+    private:
+        VarInfo* _vars;
+    
+        Config(void) : _vars(NULL) { }
+    public:
+        void Add(VarInfo* const varInfo) {
+            varInfo->next = _vars;
+            _vars = varInfo;
+        }
+
+        void DumpVariables(void);
 	};
 
 } // namespace COM
