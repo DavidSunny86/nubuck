@@ -10,7 +10,8 @@ namespace W {
         EVENT_SPAWN_ENTITY,
         EVENT_DESTROY_ENTITY,
         EVENT_CHANGE_COLOR,
-        EVENT_REBUILD
+        EVENT_UPDATE,   // new node positions, graph unchanged
+        EVENT_REBUILD   // graph changed. eg. removed nodes, added edges
     };
 
     struct ChangeColorArgs {

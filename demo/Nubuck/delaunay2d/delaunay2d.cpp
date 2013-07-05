@@ -7,14 +7,16 @@ private:
     Globals _globals;
 
     void Prepare(graph_t& G) {
-        // project all nodes on xy-plane
         leda::node n;
+
+        // project all nodes on xy-plane. scale, too
+        double s = 0.01;
+        _globals.nb.log->printf("Scaling points by factor %f.\n", s);
         forall_nodes(n, G)
-            G[n] = point_t(G[n].xcoord(), G[n].ycoord(), 0);
+            G[n] = point_t(s * G[n].xcoord(), s * G[n].ycoord(), 0);
 
         // add nodes for bounding rectangle
         const leda::rational size(50); // TODO
-
         G[G.new_node()] = point_t(-size, -size, 0);
         G[G.new_node()] = point_t( size, -size, 0);
         G[G.new_node()] = point_t( size,  size, 0);

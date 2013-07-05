@@ -121,7 +121,7 @@ namespace W {
         _renderListLock.Unlock();
     }
 
-    IPolyhedron* World::CreatePolyhedron(const graph_t& G) {
+    IPolyhedron* World::CreatePolyhedron(graph_t& G) {
         return new Polyhedron(G);
     }
 

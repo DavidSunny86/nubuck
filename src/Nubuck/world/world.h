@@ -74,7 +74,7 @@ namespace W {
         void CopyRenderList(std::vector<R::RenderJob>& renderList);
 
         // exported to client
-        IPolyhedron* CreatePolyhedron(const graph_t& G) override;
+        IPolyhedron* CreatePolyhedron(graph_t& G) override;
 
         // thread interface
         DWORD Run(void);

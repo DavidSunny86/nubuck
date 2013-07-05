@@ -4,7 +4,7 @@
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include "polyhedron.h"
 
-Polyhedron::Polyhedron(const graph_t& G) : _G(G), _rebuildSem(0) {
+Polyhedron::Polyhedron(graph_t& G) : _G(G), _rebuildSem(0) {
     _nodeEntIDs.init(_G);
     _faceEntIDs.init(_G, 0);
 
@@ -55,6 +55,16 @@ void Polyhedron::Destroy(void) {
 
     // destroy hull
     event.entityId = _hullID;
+    W::world.Send(event);
+}
+
+void Polyhedron::SetNodePosition(leda::node node, const point_t& position) {
+    _G[node] = position;
+
+    W::Event event;
+    event.id = W::EVENT_UPDATE;
+    event.sem = NULL;
+    event.entityId = _nodeEntIDs[node];
     W::world.Send(event);
 }
 

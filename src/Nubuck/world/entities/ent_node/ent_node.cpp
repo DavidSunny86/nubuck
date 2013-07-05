@@ -17,6 +17,14 @@ namespace {
 
 namespace W {
 
+    void ENT_Node::ChangePosition(const M::Vector3& targetPosition, float dur) {
+        _changePositionState.sourcePosition = GetPosition();
+        _changePositionState.targetPosition = targetPosition;
+        _changePositionState.dur            = dur;
+        _changePositionState.t              = 0.0f;
+        _changePositionState.isChanging     = true;
+    }
+
     ENT_Node::ConfigObserver ENT_Node::s_configObs;
     R::meshPtr_t ENT_Node::s_mesh;
     R::Material ENT_Node::s_material;
@@ -50,6 +58,8 @@ namespace W {
             if(ChangeColorArgs::MODE_PULSE == args->mode) PulseColor(color, 1.0f);
             if(ChangeColorArgs::MODE_LERP == args->mode) LerpColor(color, 1.0f);
         }
+
+        if(EVENT_UPDATE == event.id) ChangePosition(ToVector((*_G)[_node]), 1.0f);
     }
 
     void ENT_Node::Spawn(const Event& event) {
@@ -57,12 +67,23 @@ namespace W {
 
         const SpawnArgs* spawnArgs = (const SpawnArgs*)event.args;
 
+        _G = spawnArgs->G;
         _node = spawnArgs->node;
 
         SetPosition(ToVector((*spawnArgs->G)[_node]));
 
         InitResources();
         SetMaterial(s_material);
+    }
+
+    void ENT_Node::Update(float secsPassed) {
+        if(_changePositionState.isChanging) {
+            float l = M::Min(1.0f, _changePositionState.t / _changePositionState.dur);
+            SetPosition((1.0f - l) * _changePositionState.sourcePosition + l * _changePositionState.targetPosition);
+            _changePositionState.t += secsPassed;
+            if(_changePositionState.t >= _changePositionState.dur)
+                _changePositionState.isChanging = false;
+        }
     }
 
     void ENT_Node::Render(std::vector<R::RenderJob>& renderList) {

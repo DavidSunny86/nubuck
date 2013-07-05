@@ -20,6 +20,8 @@ struct IPolyhedron {
 
     virtual void Destroy(void) = 0;
 
+    virtual void SetNodePosition(leda::node, const leda::d3_rat_point& position) = 0;
+
     virtual void SetNodeColor(leda::node node, float r, float g, float b) = 0;
     virtual void SetFaceColor(leda::edge edge, float r, float g, float b) = 0;
 
@@ -27,7 +29,7 @@ struct IPolyhedron {
 };
 
 struct IWorld {
-    virtual IPolyhedron* CreatePolyhedron(const leda::GRAPH<leda::d3_rat_point, int>& G) = 0;
+    virtual IPolyhedron* CreatePolyhedron(leda::GRAPH<leda::d3_rat_point, int>& G) = 0;
 };
 
 struct ILog {

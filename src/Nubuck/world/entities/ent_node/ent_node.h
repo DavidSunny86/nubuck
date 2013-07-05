@@ -11,7 +11,20 @@ namespace W {
 
     class ENT_Node : public Entity {
     private:
+        const graph_t* _G;
         leda::node _node;
+
+        struct ChangePositionState {
+            M::Vector3  sourcePosition;
+            M::Vector3  targetPosition;
+            float       dur;
+            float       t;
+            bool        isChanging;
+
+            ChangePositionState(void) : isChanging(false) { }
+        } _changePositionState;
+
+        void ChangePosition(const M::Vector3& targetPosition, float dur);
 
         struct ConfigObserver : COM::Config::Observer {
             void CVAR_Changed(const std::string& name) override;
@@ -30,6 +43,7 @@ namespace W {
 
         void HandleEvent(const Event& event);
         void Spawn(const Event& event) override;
+        void Update(float secsPassed) override;
         void Render(std::vector<R::RenderJob>& renderList) override;
     };
 
