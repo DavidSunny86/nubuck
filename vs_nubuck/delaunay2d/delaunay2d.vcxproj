@@ -55,7 +55,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>NUBUCK_MT;LEDA_DLL;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LEDA_DLL;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -89,6 +89,7 @@
     <ClInclude Include="..\..\demo\Nubuck\delaunay2d\globals.h" />
     <ClInclude Include="..\..\demo\Nubuck\delaunay2d\phase0.h" />
     <ClInclude Include="..\..\demo\Nubuck\delaunay2d\phase1.h" />
+    <ClInclude Include="..\..\demo\Nubuck\delaunay2d\phase2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

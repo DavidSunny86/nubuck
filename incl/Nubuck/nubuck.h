@@ -20,12 +20,12 @@ struct IPolyhedron {
 
     virtual void Destroy(void) = 0;
 
-    virtual void SetNodePosition(leda::node, const leda::d3_rat_point& position) = 0;
-
     virtual void SetNodeColor(leda::node node, float r, float g, float b) = 0;
     virtual void SetFaceColor(leda::edge edge, float r, float g, float b) = 0;
 
+    // TODO: change names Update = Rebuild, WeakUpdate = Update
     virtual void Update(void) = 0;
+    virtual void WeakUpdate(void) = 0;
 };
 
 struct IWorld {

@@ -252,7 +252,8 @@ namespace R {
             if(0 > v.z + r) zMax = M::Max(zMax, v.z + r);
         }
 
-        M::Matrix4 projectionMat = M::Mat4::Perspective(45.0f, _aspect, -zMax, -zMin);
+        //M::Matrix4 projectionMat = M::Mat4::Perspective(45.0f, _aspect, -zMax, -zMin);
+        M::Matrix4 projectionMat = M::Mat4::Perspective(45.0f, _aspect, 0.1f, 1000.0f);
 
         DrawFrame(worldMat, projectionMat);
 

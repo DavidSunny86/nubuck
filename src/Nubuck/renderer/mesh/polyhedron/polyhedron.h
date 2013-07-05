@@ -29,8 +29,11 @@ namespace R {
 
         const graph_t& _G;
 
-        std::vector<Mesh::Vertex> _vertices;
-        std::vector<Mesh::Index>  _indices;
+        // position of _nodes[i] is _vertices[i].
+        // _nodes is used for fast updates of _vertices
+        std::vector<leda::node>     _nodes;
+        std::vector<Mesh::Vertex>   _vertices;
+        std::vector<Mesh::Index>    _indices;
 
         std::vector<Face>       _faces;
         leda::edge_array<Edge>  _edges;
@@ -43,6 +46,10 @@ namespace R {
 
         unsigned NumFaces(void) const;
         unsigned FaceOf(leda::edge e) const;
+
+        // recomputes vertex positions from nodes.
+        // assumes unchanged graph
+        void Update(void);
 
         const graph_t&  GetGraph(void) const;
 

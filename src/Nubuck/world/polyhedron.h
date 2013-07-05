@@ -23,10 +23,9 @@ public:
 
     void Destroy(void) override;
 
-    void SetNodePosition(leda::node node, const point_t& point) override;
-
     void SetNodeColor(leda::node node, float r, float g, float b) override;
     void SetFaceColor(leda::edge edge, float r, float g, float b) override;
 
     void Update(void) override;
+    void WeakUpdate(void) override;
 };

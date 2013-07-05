@@ -24,6 +24,7 @@ namespace R {
         common.printf("INFO - rebuilding polyhedron mesh with |V| = %d, |E| = %d.\n",
             _G.number_of_nodes(), _G.number_of_edges());
 
+        _nodes.clear();
         _vertices.clear();
         _indices.clear();
 
@@ -58,11 +59,13 @@ namespace R {
                 vert.color  = Color::White;
 
                 vert.position = p0;
+                _nodes.push_back(source(e));
                 _vertices.push_back(vert);
                 _indices.push_back(indexCnt);
                 indexCnt++;
 
                 vert.position = p1;
+                _nodes.push_back(source(it));
                 _vertices.push_back(vert);
                 _indices.push_back(indexCnt);
                 indexCnt++;
@@ -72,6 +75,7 @@ namespace R {
 
                 while((it = _G.face_cycle_succ(it)) != e) {
                     vert.position = ToVector(_G[source(it)]);
+                    _nodes.push_back(source(it));
                     _vertices.push_back(vert);
                     _indices.push_back(indexCnt++);
 
@@ -102,6 +106,11 @@ namespace R {
 
     unsigned PolyhedronMesh::FaceOf(leda::edge e) const {
         return _edges[e].faceIndex;
+    }
+
+    void PolyhedronMesh::Update(void) {
+        for(unsigned i = 0; i < _vertices.size(); ++i)
+            _vertices[i].position = ToVector(_G[_nodes[i]]);
     }
 
     const PolyhedronMesh::graph_t& PolyhedronMesh::GetGraph(void) const {

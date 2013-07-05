@@ -59,7 +59,10 @@ namespace W {
             if(ChangeColorArgs::MODE_LERP == args->mode) LerpColor(color, 1.0f);
         }
 
-        if(EVENT_UPDATE == event.id) ChangePosition(ToVector((*_G)[_node]), 1.0f);
+        if(EVENT_UPDATE == event.id) {
+            M::Vector3 vec = ToVector((*_G)[_node]);
+            ChangePosition(vec, 1.0f);
+        }
     }
 
     void ENT_Node::Spawn(const Event& event) {

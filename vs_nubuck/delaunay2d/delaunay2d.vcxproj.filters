@@ -7,5 +7,6 @@
     <ClInclude Include="..\..\demo\Nubuck\delaunay2d\globals.h" />
     <ClInclude Include="..\..\demo\Nubuck\delaunay2d\phase0.h" />
     <ClInclude Include="..\..\demo\Nubuck\delaunay2d\phase1.h" />
+    <ClInclude Include="..\..\demo\Nubuck\delaunay2d\phase2.h" />
   </ItemGroup>
 </Project>

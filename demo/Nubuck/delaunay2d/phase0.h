@@ -19,8 +19,11 @@ struct Phase0 : IPhase {
         forall_nodes(n, g.G) {
             const point_t& p = g.G[n];
             scalar_t z = p.xcoord() * p.xcoord() + p.ycoord() * p.ycoord();
-            g._delaunay->SetNodePosition(n, point_t(p.xcoord(), p.ycoord(), z));
+            point_t p2 = point_t(p.xcoord(), p.ycoord(), z);
+            float z2 = p2.zcoord().to_float();
+            g.G[n] = p2;
         }
+        g._delaunay->WeakUpdate();
         return DONE;
     }
 

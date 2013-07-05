@@ -1,6 +1,7 @@
 #include <LEDA\geo\d3_hull.h>
 #include <Nubuck\nubuck.h>
 #include "globals.h"
+#include "phase2.h"
 
 struct Phase1 : IPhase {
     Globals& g;
@@ -22,16 +23,14 @@ struct Phase1 : IPhase {
 
     StepRet Step(void) override {
         g.nb.log->printf("Step: computing convex hull.\n");
-
-        g._delaunay->Destroy();
+        /*g._delaunay->Destroy();
         leda::list<point_t> L(ToPointList(g.G));
         g.G.clear();
         leda::CONVEX_HULL(L, g.G);
         g._delaunay = g.nb.world->CreatePolyhedron(g.G);
-        g._delaunay->Update();
-
+        g._delaunay->Update();*/
         return DONE;
     }
 
-    IPhase* NextPhase(void) override { return new Phase1(g); }
+    IPhase* NextPhase(void) override { return new Phase2(g); }
 };

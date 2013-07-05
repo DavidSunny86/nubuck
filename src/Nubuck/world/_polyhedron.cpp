@@ -58,16 +58,6 @@ void Polyhedron::Destroy(void) {
     W::world.Send(event);
 }
 
-void Polyhedron::SetNodePosition(leda::node node, const point_t& position) {
-    _G[node] = position;
-
-    W::Event event;
-    event.id = W::EVENT_UPDATE;
-    event.sem = NULL;
-    event.entityId = _nodeEntIDs[node];
-    W::world.Send(event);
-}
-
 void Polyhedron::SetNodeColor(leda::node node, float r, float g, float b) {
     W::Event event;
 
@@ -149,4 +139,23 @@ void Polyhedron::Update(void) {
     event.entityId = _hullID;
     event.sem = &_rebuildSem;
     W::world.Send(event);
+}
+
+void Polyhedron::WeakUpdate(void) {
+    W::Event event;
+    event.id = W::EVENT_UPDATE;
+    event.sem = NULL;
+
+    // update nodes
+    leda::node n;
+    forall_nodes(n, _G) {
+        event.entityId = _nodeEntIDs[n];
+        if(0 < event.entityId) {
+            W::world.Send(event);
+        }
+    }
+
+    // update hull
+    /*event.entityId = _hullID;
+    W::world.Send(event);*/
 }

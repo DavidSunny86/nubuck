@@ -20,6 +20,8 @@ namespace W {
         for(unsigned i = 0; i < _polyDesc->NumFaces(); ++i) {
             _faceColorStates[i].changing = false;
         }
+
+        _isBuild = true;
     }
 
     void ENT_Polyhedron::ChangeFaceColor(ColorState::func_t func, leda::edge edge, const R::Color& targetColor, float dur) {
@@ -33,7 +35,22 @@ namespace W {
         state.rep           = edge;
     }
 
-    ENT_Polyhedron::ENT_Polyhedron(void) : _numAnimFaces(0) { 
+    void ENT_Polyhedron::ChangePosition(float dur) {
+        if(!_isBuild) return;
+        R::Mesh::Desc desc = _polyDesc->GetDesc();
+        _changePositionState.sourcePositions.resize(desc.numVertices);
+        _changePositionState.targetPositions.resize(desc.numVertices);
+        for(unsigned i = 0; i < desc.numVertices; ++i)
+            _changePositionState.sourcePositions[i] = desc.vertices[i].position;
+        _polyDesc->Update();
+        for(unsigned i = 0; i < desc.numVertices; ++i)
+            _changePositionState.targetPositions[i] = desc.vertices[i].position;
+        _changePositionState.dur = dur;
+        _changePositionState.t = 0.0f;
+        _changePositionState.isChanging = true;
+    }
+
+    ENT_Polyhedron::ENT_Polyhedron(void) : _numAnimFaces(0), _isBuild(false) { 
         _solidMat.diffuseColor = R::Color::White;
         _wireMat.diffuseColor = R::Color::Black;
     }
@@ -78,6 +95,21 @@ namespace W {
             R::meshMgr.Update(_vertices, desc.vertices, desc.numVertices);
             */
         } // if _numAnimFaces
+
+        if(_changePositionState.isChanging) {
+            R::Mesh::Desc desc = _polyDesc->GetDesc();
+            float l = M::Min(1.0f, _changePositionState.t / _changePositionState.dur);
+            for(unsigned i = 0; i < desc.numVertices; ++i) {
+                const M::Vector3& p0 = _changePositionState.sourcePositions[i];
+                const M::Vector3& p1 = _changePositionState.targetPositions[i];
+                // desc.vertices[i].position = (1.0f - l) * p0 + l * p1;
+                desc.vertices[i].position = p1;
+            }
+            _changePositionState.t += secsPassed;
+            if(_changePositionState.t >= _changePositionState.dur)
+                _changePositionState.isChanging = false;
+            _mesh->Invalidate(desc.vertices);
+        }
     }
 
     void ENT_Polyhedron::Render(std::vector<R::RenderJob>& renderList) {
@@ -89,7 +121,7 @@ namespace W {
         renderJob.primType  = GL_TRIANGLE_FAN;
         renderJob.transform = M::Mat4::Translate(GetPosition());
         renderJob.material  = _solidMat;
-        renderList.push_back(renderJob);
+        // renderList.push_back(renderJob);
 
         // wireframe hull
         renderJob.fx = "Wireframe";
@@ -123,6 +155,7 @@ namespace W {
         if(EVENT_CHANGE_COLOR == event.id) {
             _evBuffer.push_back(event);
         }
+        if(EVENT_UPDATE == event.id) ChangePosition(1.0f);
     }
 
 } // namespace W
