@@ -80,6 +80,7 @@ namespace W {
     }
 
     void ENT_Node::Update(float secsPassed) {
+        Entity::Update(secsPassed);
         if(_changePositionState.isChanging) {
             float l = M::Min(1.0f, _changePositionState.t / _changePositionState.dur);
             SetPosition((1.0f - l) * _changePositionState.sourcePosition + l * _changePositionState.targetPosition);
