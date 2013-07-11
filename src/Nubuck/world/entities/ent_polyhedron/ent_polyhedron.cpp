@@ -98,13 +98,13 @@ namespace W {
 
         if(_changePositionState.isChanging) {
             R::Mesh::Desc desc = _polyDesc->GetDesc();
+            _changePositionState.t += secsPassed;
             float l = M::Min(1.0f, _changePositionState.t / _changePositionState.dur);
             for(unsigned i = 0; i < desc.numVertices; ++i) {
                 const M::Vector3& p0 = _changePositionState.sourcePositions[i];
                 const M::Vector3& p1 = _changePositionState.targetPositions[i];
                 desc.vertices[i].position = (1.0f - l) * p0 + l * p1;
             }
-            _changePositionState.t += secsPassed;
             if(_changePositionState.t >= _changePositionState.dur)
                 _changePositionState.isChanging = false;
             _mesh->Invalidate(desc.vertices);
