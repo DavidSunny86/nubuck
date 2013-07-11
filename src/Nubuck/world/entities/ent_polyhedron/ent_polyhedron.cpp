@@ -120,7 +120,7 @@ namespace W {
         renderJob.primType  = GL_TRIANGLE_FAN;
         renderJob.transform = M::Mat4::Translate(GetPosition());
         renderJob.material  = _solidMat;
-        // renderList.push_back(renderJob);
+        renderList.push_back(renderJob);
 
         // wireframe hull
         renderJob.fx = "Wireframe";
