@@ -90,7 +90,7 @@ namespace W {
         _polyBezier->SampleEquidistantPoints(w, _decalPos2);
         for(unsigned i = 0; i < _decalPos2.size(); ++i) {
             M::Vector3 p = M::Transform(_M, M::Vector3(_decalPos2[i].x, _decalPos2[i].y, 0.0f)) + _p0;
-            const float eps = 0.001f; // resolves z-fighting of faces and hull
+            const float eps = 0.01f; // resolves z-fighting of faces and hull
             p += eps * _normal;
             _decalPos.push_back(p);
         }
@@ -172,7 +172,7 @@ namespace W {
         renderJob.material  = _material;
 
         // solid
-        renderJob.fx = "TexDiffuse";
+        renderJob.fx = "Face";
         for(unsigned i = 0; i < _decalPos.size(); ++i) {
             renderJob.transform = M::Mat4::Translate(GetPosition() + _decalPos[i]) * M::Mat4::FromRigidTransform(_M, M::Vector3::Zero);
             renderList.push_back(renderJob);
