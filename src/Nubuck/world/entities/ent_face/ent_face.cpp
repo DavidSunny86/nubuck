@@ -144,7 +144,8 @@ namespace W {
         CreateMesh();
 
         R::SkinDesc skinDesc;
-        skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle.tga";
+        if(0.0f < spawnArgs->b) skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle_hollow.tga";
+        else skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle.tga";
         _skin = R::skinMgr.Create(skinDesc);
 
         // _material.diffuseColor = R::Color(spawnArgs->r, spawnArgs->g, spawnArgs->b);
