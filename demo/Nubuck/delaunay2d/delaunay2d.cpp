@@ -14,13 +14,6 @@ private:
         _globals.nb.log->printf("Scaling points by factor %f.\n", s);
         forall_nodes(n, G)
             G[n] = point_t(s * G[n].xcoord(), s * G[n].ycoord(), 0);
-
-        // add nodes for bounding rectangle
-        const leda::rational size(50); // TODO
-        G[G.new_node()] = point_t(-size, -size, 0);
-        G[G.new_node()] = point_t( size, -size, 0);
-        G[G.new_node()] = point_t( size,  size, 0);
-        G[G.new_node()] = point_t(-size,  size, 0);
     }
 public:
     IPhase* Init(const Nubuck& nubuck, const graph_t& G) override {
