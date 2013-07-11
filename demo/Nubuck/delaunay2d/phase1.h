@@ -23,12 +23,12 @@ struct Phase1 : IPhase {
 
     StepRet Step(void) override {
         g.nb.log->printf("Step: computing convex hull.\n");
-        /*g._delaunay->Destroy();
+        g._delaunay->Destroy();
         leda::list<point_t> L(ToPointList(g.G));
         g.G.clear();
         leda::CONVEX_HULL(L, g.G);
         g._delaunay = g.nb.world->CreatePolyhedron(g.G);
-        g._delaunay->Update();*/
+        g._delaunay->Update();
         return DONE;
     }
 

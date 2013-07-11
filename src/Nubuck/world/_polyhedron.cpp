@@ -156,6 +156,6 @@ void Polyhedron::WeakUpdate(void) {
     }
 
     // update hull
-    /*event.entityId = _hullID;
-    W::world.Send(event);*/
+    event.entityId = _hullID;
+    W::world.Send(event);
 }

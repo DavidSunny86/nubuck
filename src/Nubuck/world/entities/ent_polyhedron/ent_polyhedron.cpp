@@ -102,8 +102,7 @@ namespace W {
             for(unsigned i = 0; i < desc.numVertices; ++i) {
                 const M::Vector3& p0 = _changePositionState.sourcePositions[i];
                 const M::Vector3& p1 = _changePositionState.targetPositions[i];
-                // desc.vertices[i].position = (1.0f - l) * p0 + l * p1;
-                desc.vertices[i].position = p1;
+                desc.vertices[i].position = (1.0f - l) * p0 + l * p1;
             }
             _changePositionState.t += secsPassed;
             if(_changePositionState.t >= _changePositionState.dur)
