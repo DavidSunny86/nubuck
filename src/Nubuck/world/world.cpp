@@ -1,5 +1,4 @@
 #include <common\common.h>
-#include <world\entities\ent_node\ent_node.h>
 #include "polyhedron.h"
 #include "entity.h"
 #include "world.h"

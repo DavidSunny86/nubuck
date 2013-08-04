@@ -102,17 +102,11 @@
     <Filter Include="Private\world\entities">
       <UniqueIdentifier>{80e705f5-6367-4b12-baa3-3a7e4280a3a8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\world\entities\ent_polyhedron">
-      <UniqueIdentifier>{d0d4eda9-af5e-479b-8a48-e75043dabe06}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\camera">
       <UniqueIdentifier>{b6528ad0-dcb5-43b5-ab7b-f070bdda70d3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Private\renderer\light">
       <UniqueIdentifier>{aa1872b8-242c-4661-8009-d3855a79d80c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\world\entities\ent_node">
-      <UniqueIdentifier>{be5c4589-a8b3-41a5-8584-688a0e775644}</UniqueIdentifier>
     </Filter>
     <Filter Include="Private\renderer\material">
       <UniqueIdentifier>{d4fef104-4ebd-44a0-be59-d17ac18acad1}</UniqueIdentifier>
@@ -138,9 +132,6 @@
     <Filter Include="Private\renderer\resource">
       <UniqueIdentifier>{b89b9d71-ffea-4c87-b00d-2a894bfb5bec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\world\entities\ent_face">
-      <UniqueIdentifier>{62deeed7-09d4-4c8c-bbfa-c8bc56451df7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\renderer\mesh\polygon">
       <UniqueIdentifier>{ed66ed19-3299-4159-b075-c15b2eb4ad3a}</UniqueIdentifier>
     </Filter>
@@ -164,9 +155,6 @@
     </Filter>
     <Filter Include="Private\renderer\mesh\bezier">
       <UniqueIdentifier>{ce8b9add-0f0f-4035-a851-b2e45ea40c37}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\world\entities\ent_dummy">
-      <UniqueIdentifier>{8c6ce0bd-32e1-4452-a882-1038d4c476b2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Private\UI\faceconfig">
       <UniqueIdentifier>{53c29a16-e7aa-47c5-b306-95880ac40544}</UniqueIdentifier>
@@ -311,9 +299,6 @@
     <ClInclude Include="..\..\src\Nubuck\common\types.h">
       <Filter>Private\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.h">
-      <Filter>Private\world\entities\ent_polyhedron</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\camera\arcball_camera.h">
       <Filter>Private\camera</Filter>
     </ClInclude>
@@ -328,9 +313,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\world\events.h">
       <Filter>Private\world</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_node\ent_node.h">
-      <Filter>Private\world\entities\ent_node</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\material\material.h">
       <Filter>Private\renderer\material</Filter>
@@ -380,9 +362,6 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\resource\resource.h">
       <Filter>Private\renderer\resource</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_face\ent_face.h">
-      <Filter>Private\world\entities\ent_face</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.h">
       <Filter>Private\renderer\mesh\polygon</Filter>
     </ClInclude>
@@ -421,9 +400,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\bezier\bezier.h">
       <Filter>Private\renderer\mesh\bezier</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_dummy\ent_dummy.h">
-      <Filter>Private\world\entities\ent_dummy</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_faceconfig.h">
       <Filter>Generated Files</Filter>
@@ -535,9 +511,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_mainwindow.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.cpp">
-      <Filter>Private\world\entities\ent_polyhedron</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\camera\arcball_camera.cpp">
       <Filter>Private\camera</Filter>
     </ClCompile>
@@ -549,9 +522,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\world\entity.cpp">
       <Filter>Private\world</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_node\ent_node.cpp">
-      <Filter>Private\world\entities\ent_node</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_renderview.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -607,9 +577,6 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\resource\resource.cpp">
       <Filter>Private\renderer\resource</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_face\ent_face.cpp">
-      <Filter>Private\world\entities\ent_face</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.cpp">
       <Filter>Private\renderer\mesh\polygon</Filter>
     </ClCompile>
@@ -657,9 +624,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\bezier\bezier.cpp">
       <Filter>Private\renderer\mesh\bezier</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_dummy\ent_dummy.cpp">
-      <Filter>Private\world\entities\ent_dummy</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\UI\faceconfig\faceconfig.cpp">
       <Filter>Private\UI\faceconfig</Filter>

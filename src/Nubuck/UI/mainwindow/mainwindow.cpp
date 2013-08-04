@@ -3,8 +3,6 @@
 
 #include <nubuck_private.h>
 #include <algdriver\algdriver.h>
-#include <world\entities\ent_node\ent_node.h>
-#include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include <UI\renderview\renderview.h>
 #include <UI\rendermetrics\rendermetrics.h>
 #include <UI\randompoints\randompoints.h>

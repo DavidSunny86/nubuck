@@ -108,7 +108,6 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL  "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
     </CustomBuild>
-    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_dummy\ent_dummy.h" />
     <ClInclude Include="GeneratedFiles\ui_faceconfig.h" />
     <ClInclude Include="GeneratedFiles\ui_nodeconfig.h" />
     <ClInclude Include="GeneratedFiles\ui_rendermetrics.h" />
@@ -134,9 +133,6 @@
     </CustomBuild>
     <ClInclude Include="..\..\src\Nubuck\UI\glwidget\glwidget.h" />
     <ClInclude Include="..\..\src\Nubuck\UI\logwidget\logwidget_inl.h" />
-    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_face\ent_face.h" />
-    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_node\ent_node.h" />
-    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.h" />
     <ClInclude Include="..\..\src\Nubuck\world\entity.h" />
     <ClInclude Include="..\..\src\Nubuck\world\events.h" />
     <ClInclude Include="..\..\src\Nubuck\world\polyhedron.h" />
@@ -237,10 +233,6 @@
     <ClCompile Include="..\..\src\Nubuck\UI\randompoints\randompoints.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\rendermetrics\rendermetrics.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\renderview\renderview.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_dummy\ent_dummy.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_face\ent_face.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_node\ent_node.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entity.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\_polyhedron.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\world.cpp" />

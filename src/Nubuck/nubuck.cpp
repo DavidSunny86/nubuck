@@ -5,11 +5,8 @@
 
 #include <Nubuck\nubuck.h>
 #include <common\common.h>
+#include <common\config\config.h>
 #include <world\world.h>
-#include <world\entities\ent_node\ent_node.h>
-#include <world\entities\ent_polyhedron\ent_polyhedron.h>
-#include <world\entities\ent_face\ent_face.h>
-#include <world\entities\ent_dummy\ent_dummy.h>
 #include <renderer\effects\effect.h>
 #include <algdriver\algdriver.h>
 #include <UI\mainwindow\mainwindow.h>
