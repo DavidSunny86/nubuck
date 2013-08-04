@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Windows.h> // defines MAX_INT
 #include <LEDA/geo/d3_rat_point.h>
 #include <LEDA/graph/graph.h>
 

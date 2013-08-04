@@ -2,6 +2,7 @@
 
 #include <QDialog>
 
+#include <Windows.h> // defines MAX_INT
 #include <LEDA\core\list.h>
 #include <LEDA\core\random_source.h>
 

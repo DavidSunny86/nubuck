@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include <Windows.h> // defines MAX_INT
 #include <LEDA\core\list.h>
 
 #include <math\vector2.h>
