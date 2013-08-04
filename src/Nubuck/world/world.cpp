@@ -8,28 +8,13 @@ namespace W {
 
     World world;
 
-    World::World(void) : _entIdCnt(0), _secsPassed(0.0f), _timePassed(0.0f), _numVisitors(0) { }
+    World::World(void) : _entIdCnt(0), _secsPassed(0.0f), _timePassed(0.0f) { }
 
     World::entPtr_t World::GetEntityById(int id) {
         for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
             if(id == (*entIt)->GetID()) return *entIt;
         }
         return entPtr_t();
-    }
-
-    void World::Accept(const Visitor& visitor) {
-        _numVisitorsLock.Lock();
-        if(1 == ++_numVisitors) _entitiesLock.Lock();
-        _numVisitorsLock.Unlock();
-
-        for(entIt_t entIt(_entities.begin()); _entities.end() != entIt; ++entIt) {
-            entPtr_t& entPtr = *entIt;
-            visitor.Visit(*entPtr);
-        }
-
-        _numVisitorsLock.Lock();
-        if(0 == --_numVisitors) _entitiesLock.Unlock();
-        _numVisitorsLock.Unlock();
     }
 
     void World::Send(const Event& event) {

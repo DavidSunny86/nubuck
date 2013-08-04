@@ -43,23 +43,12 @@ namespace W {
         float       _secsPassed;
         float       _timePassed;
 
-        int             _numVisitors;
-        SYS::SpinLock   _numVisitorsLock;
-
         std::vector<R::RenderJob>   _renderList;
         SYS::SpinLock               _renderListLock;
 
         entPtr_t GetEntityById(int id);
     public:
-        struct Visitor {
-            virtual ~Visitor(void) { }
-
-            virtual void Visit(Entity& entity) const = 0;
-        };
-
-        World(void);
-
-        void Accept(const Visitor& visitor);
+		World(void);
 
         template<typename TYPE> 
         void RegisterEntity(EntityType type);
