@@ -15,48 +15,19 @@
 
 namespace W {
 
-    enum EntityType {
-        ENT_NODE = 0,
-        ENT_POLYHEDRON,
-        ENT_FACE,
-        ENT_DUMMY
-    };
-
-    class Entity;
-
     class World : public IWorld, public SYS::Thread {
     private:
-        typedef GEN::Pointer<Entity>                entPtr_t;
-        typedef std::vector<entPtr_t>::iterator     entIt_t;
-
-        typedef Entity* (*entAlloc_t)(void);
-        std::map<EntityType, entAlloc_t> _entityAllocs;
-
-        std::vector<entPtr_t>   _entities;
-        SYS::SpinLock           _entitiesLock;
-        int                     _entIdCnt;
-
-        std::queue<Event> _events;
-        SYS::SpinLock _eventsLock;
-
         SYS::Timer  _timer;
         float       _secsPassed;
         float       _timePassed;
 
         std::vector<R::RenderJob>   _renderList;
         SYS::SpinLock               _renderListLock;
-
-        entPtr_t GetEntityById(int id);
     public:
 		World(void);
 
-        template<typename TYPE> 
-        void RegisterEntity(EntityType type);
-
         // message passing
         void Send(const Event& event);
-
-        int Spawn(Event event);
 
         void Update(void);
 

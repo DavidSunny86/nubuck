@@ -36,19 +36,9 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     common.Init(argc, argv);
     R::CreateDefaultEffects();
 
-    W::world.RegisterEntity<W::ENT_Node>(W::ENT_NODE);
-    W::world.RegisterEntity<W::ENT_Polyhedron>(W::ENT_POLYHEDRON);
-    W::world.RegisterEntity<W::ENT_Face>(W::ENT_FACE);
-    W::world.RegisterEntity<W::ENT_Dummy>(W::ENT_DUMMY);
 #ifdef NUBUCK_MT
     W::world.Start();
 #endif
-
-    // REMOVEME
-    W::Event event;
-    event.type = W::ENT_DUMMY;
-    event.sem = NULL;
-    W::world.Spawn(event);
 
     nubuck.common   = &common;
     nubuck.world    = &W::world;
