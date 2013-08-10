@@ -4,6 +4,8 @@
 #include <common\types.h>
 
 class Polyhedron : public IPolyhedron {
+private:
+    unsigned _entId;
 public:
     Polyhedron(const graph_t& G);
 

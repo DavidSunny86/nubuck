@@ -71,15 +71,18 @@ namespace UI {
         light.quadricAttenuation    = 0.0f;
 
         light.position          = M::Vector3(-dist,  dist, dist);
-        light.diffuseColor      = R::Color::Red;
+        // light.diffuseColor      = R::Color::Red;
+        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
         _renderer.Add(light);
 
         light.position          = M::Vector3( dist,  dist, dist);
-        light.diffuseColor      = R::Color::White;
+        // light.diffuseColor      = R::Color::White;
+        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
         _renderer.Add(light);
 
         light.position          = M::Vector3( dist, -dist, dist);
-        light.diffuseColor      = R::Color::Blue;
+        // light.diffuseColor      = R::Color::Blue;
+        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
         _renderer.Add(light);
     }
 

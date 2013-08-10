@@ -50,10 +50,10 @@ IPhase::StepRet Phase1::Step(void) {
     BuildTetrahedron(g.G, g.tVerts[0], g.tVerts[1], g.tVerts[2], g.tVerts[3]);
     g.polyhedron->Update();
 
-    // reset node colors to white
+    // reset node colors to black
     leda::node n;
     forall_nodes(n, g.G) {
-        g.polyhedron->SetNodeColor(n, 0.2f, 0.2f, 0.2f);
+        g.polyhedron->SetNodeColor(n, 0.0f, 0.0f, 0.0f);
     }
 
     return DONE;

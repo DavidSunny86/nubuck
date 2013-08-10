@@ -74,7 +74,6 @@ namespace W {
     }
 
     void Entity::Spawn(const Event& event) {
-        SetID(event.entityId);
     }
 
 } // namespace W
