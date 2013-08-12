@@ -106,7 +106,7 @@ namespace W {
         return new Polyhedron(G);
     }
 
-    DWORD World::Run(void) {
+    DWORD World::Thread_Func(void) {
         Polyhedron_InitResources();
         while(true) {
             Update();

@@ -47,7 +47,7 @@ namespace W {
         IPolyhedron* CreatePolyhedron(const graph_t& G) override;
 
         // thread interface
-        DWORD Run(void);
+        DWORD Thread_Func(void);
     };
 
     extern World world;

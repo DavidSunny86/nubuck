@@ -2,26 +2,26 @@
 
 DWORD WINAPI ThreadFunc(LPVOID param) {
 	SYS::Thread* thread = (SYS::Thread*)param;
-	return thread->Run();
+	return thread->Thread_Func();
 }
 
 namespace SYS {
 
 	Thread::~Thread(void) {
-		Kill();
+		Thread_Kill();
 	}
 
-	void Thread::Start(void) {
+	void Thread::Thread_StartAsync(void) {
 		_handle = CreateThread(NULL, 0, ThreadFunc, this, 0, NULL);
 	}
 
-	void Thread::Kill(void) {
+	void Thread::Thread_Kill(void) {
 		TerminateThread(_handle, 0);
 		CloseHandle(_handle);
 		_handle = NULL;
 	}
 
-	void Thread::Join(void) const {
+	void Thread::Thread_Join(void) const {
 		WaitForSingleObject(_handle, INFINITE);
 	}
 

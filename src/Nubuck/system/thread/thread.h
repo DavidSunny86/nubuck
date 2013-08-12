@@ -11,11 +11,11 @@ namespace SYS {
 	public:
 		virtual ~Thread(void);
 
-		virtual DWORD Run(void) = 0;
+		virtual DWORD Thread_Func(void) = 0;
 
-		void Start(void);
-		void Kill(void);
-		void Join(void) const;
+		void Thread_StartAsync(void);
+		void Thread_Kill(void);
+		void Thread_Join(void) const;
 	};
 
 } // namespace SYS

@@ -34,7 +34,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     R::CreateDefaultEffects();
 
 #ifdef NUBUCK_MT
-    W::world.Start();
+    W::world.Thread_StartAsync();
 #endif
 
     nubuck.common   = &common;
