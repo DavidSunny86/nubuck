@@ -99,6 +99,7 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
 
     if(!ph.hull.indices.empty() /* ie. hull exists */) {
         R::Mesh::Vertex vert;
+        vert.position = M::Vector3::Zero;
         vert.color = R::Color::White;
         ph.hull.vertices.resize(ph.hull.indices.size(), vert);
 
@@ -107,6 +108,7 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
         desc.numVertices = ph.hull.vertices.size();
         desc.indices = &ph.hull.indices[0];
         desc.numIndices = ph.hull.indices.size();
+        desc.primType = 0;
         ph.hull.mesh = R::meshMgr.Create(desc);
     }
 }
