@@ -100,15 +100,6 @@ static M::Vector2 FromDist(const PolyBezier2U& pb, float dist) {
     return (1.0f - t) * Eval(pb, s0->l, s0->t) + t * Eval(pb, s1->l, s1->t);
 }
 
-void SampleEquidistantPoints_old(const PolyBezier2U& pb, float off, float dd, std::vector<M::Vector2>& out) {
-    out.clear();
-    for(float d = 0.0f; d < pb.length; d += dd) {
-        float dist = d + off;
-        while(dist > pb.length) dist -= pb.length;
-        out.push_back(FromDist(pb, dist));
-    }
-}
-
 void SampleEquidistantPoints(const PolyBezier2U& pb, float off, float dd, std::vector<M::Vector2>& out) {
     unsigned lb = 0;
     const TSample *s0 = NULL, *s1 = NULL;
