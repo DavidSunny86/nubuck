@@ -18,8 +18,7 @@ namespace UI {
     }
 
     void AlgorithmWidget::OnReset(void) {
-        // TODO uncomment
-        // ALG::gs_algorithm.Reset();
+        ALG::gs_algorithm.Reset();
     }
 
     AlgorithmWidget::AlgorithmWidget(QWidget* parent) {
