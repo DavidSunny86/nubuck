@@ -14,11 +14,13 @@ namespace W {
     World::handle_t World::NewHandle(void) {
         _entMapMtx.Lock();
         handle_t h = INVALID_HANDLE;
-        for(unsigned i = 0; i < _entMap.size(); ++i) {
+        unsigned i = 0;
+        while(INVALID_HANDLE == h && i < _entMap.size()) {
             if(!_entMap[i].used) {
                 _entMap[i].used = true;
                 h = i;
             }
+            ++i;
         }
         if(INVALID_HANDLE == h) {
             h = _entMap.size();
@@ -54,7 +56,7 @@ namespace W {
         args->h = h;
         args->G = G;
         Send(event);
-        return 0;
+        return h;
 	}
 
     void World::Update(void) {
