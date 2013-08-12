@@ -1,5 +1,6 @@
 #pragma once
 
+#include <limits>
 #include <map>
 #include <vector>
 #include <queue>
@@ -20,6 +21,20 @@ namespace W {
     private:
         std::queue<Event> _events;
         SYS::SpinLock _eventsMtx;
+
+        // clients use handles to reference entities.
+        // _entMap maps handles to entities.
+        struct EntMapItem {
+            enum { INVALID_INDEX = UINT_MAX };
+            unsigned    entIdx; // indexes _polyhedrons
+            bool        used;
+        };
+        std::vector<EntMapItem> _entMap;
+        SYS::SpinLock _entMapMtx;
+        enum { INVALID_HANDLE = UINT_MAX };
+        typedef unsigned handle_t;
+
+        handle_t NewHandle(void);
 
 		std::vector<ENT_Polyhedron> _polyhedrons;
 

@@ -6,6 +6,7 @@
 namespace W {
 
     enum EventType {
+        EVENT_SPAWN_POLYHEDRON,
 		EVENT_REBUILD,
         EVENT_SET_NODE_COLOR,
         EVENT_SET_FACE_COLOR,
@@ -14,6 +15,11 @@ namespace W {
     struct Event {
         int type; // in EventType
         char args[64];
+    };
+
+    struct EvArgs_SpawnPolyhedron {
+        unsigned h;
+        const graph_t* G;
     };
 
     struct EvArgs_Rebuild {
