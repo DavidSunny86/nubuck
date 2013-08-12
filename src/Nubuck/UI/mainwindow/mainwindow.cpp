@@ -36,8 +36,7 @@ namespace UI {
     void MainWindow::OnRandomPoints(void) {
         RandomPoints randomPoints;
         if(QDialog::Accepted == randomPoints.exec()) {
-            ALG::Driver& algDrv = ALG::Driver::Instance();
-            algDrv.Init(randomPoints.AsGraph());
+            ALG::gs_algorithm.Init(randomPoints.AsGraph());
         }
     }
 

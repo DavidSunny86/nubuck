@@ -41,7 +41,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     nubuck.world    = &W::world;
     nubuck.log      = UI::LogWidget::Instance();
 
-    ALG::Driver::Instance().SetAlloc(algAlloc);
+    ALG::gs_algorithm.SetAlloc(algAlloc);
 
     UI::MainWindow mainWindow;
     mainWindow.show();

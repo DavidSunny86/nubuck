@@ -6,19 +6,20 @@
 namespace UI {
 
     void AlgorithmWidget::OnStep(void) {
-        ALG::Driver::Instance().Step();
+        ALG::gs_algorithm.Step();
     }
 
     void AlgorithmWidget::OnNext(void) {
-        ALG::Driver::Instance().Next();
+        ALG::gs_algorithm.Next();
     }
 
     void AlgorithmWidget::OnRun(void) {
-        ALG::Driver::Instance().Run();
+        ALG::gs_algorithm.Run();
     }
 
     void AlgorithmWidget::OnReset(void) {
-        ALG::Driver::Instance().Reset();
+        // TODO uncomment
+        // ALG::gs_algorithm.Reset();
     }
 
     AlgorithmWidget::AlgorithmWidget(QWidget* parent) {
