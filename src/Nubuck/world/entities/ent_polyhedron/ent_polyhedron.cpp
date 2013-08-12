@@ -2,13 +2,13 @@
 #include <renderer\mesh\quad\quad.h>
 #include "ent_polyhedron.h"
 
-COM::Config::Variable<float>    cvar_nodeSize("nodeSize", 1.0f);
+COM::Config::Variable<float>    cvar_nodeSize("nodeSize", 0.2f);
 COM::Config::Variable<int>      cvar_nodeSubdiv("nodeSubdiv", 2);
 
-COM::Config::Variable<float>    cvar_faceSpeed("faceSpeed", 0.2f);
-COM::Config::Variable<float>    cvar_faceDecalSize("faceDecalSize", 0.2f);
-COM::Config::Variable<float>    cvar_faceSpacing("faceSpacing", 0.4f);
-COM::Config::Variable<float>    cvar_faceCurvature("faceCurvature", 0.2f);
+COM::Config::Variable<float>    cvar_faceCurveSpeed("faceSpeed", 0.2f);
+COM::Config::Variable<float>    cvar_faceCurveDecalSize("faceDecalSize", 0.2f);
+COM::Config::Variable<float>    cvar_faceCurveSpacing("faceSpacing", 0.4f);
+COM::Config::Variable<float>    cvar_faceCurveCurvature("faceCurvature", 0.2f);
 
 static M::Vector3 ToVector(const leda::d3_rat_point& p) {
     const leda::d3_point fp = p.to_float();
@@ -25,7 +25,7 @@ void Polyhedron_InitResources(void) {
 	R::Sphere sphere(cvar_nodeSubdiv, true);
     sphere.Scale(cvar_nodeSize);
 	g_nodeMesh = R::meshMgr.Create(sphere.GetDesc());
-    g_faceCurveDecalMesh = R::meshMgr.Create(R::CreateQuadDesc(cvar_faceDecalSize));
+    g_faceCurveDecalMesh = R::meshMgr.Create(R::CreateQuadDesc(cvar_faceCurveDecalSize));
     R::SkinDesc skinDesc;
     skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle.tga";
     g_faceCurveDecalSkin = R::skinMgr.Create(skinDesc);
@@ -189,7 +189,7 @@ static inline M::Vector2 ProjXY(const M::Vector3& v) {
 
 static void Polyhedron_ComputeCurveDecals(PolyhedronFaceCurve& cv) {
     // avoid overlapping decals
-    float w = cvar_faceDecalSize + cvar_faceSpacing;
+    float w = cvar_faceCurveDecalSize + cvar_faceCurveSpacing;
     int n = (int)(cv.curve.length / w);
     float def = cv.curve.length - n * w;
     w += def / n;
@@ -266,7 +266,7 @@ void Polyhedron_AddCurve(ENT_Polyhedron& ph, leda::edge edge) {
 
 
 void Polyhedron_UpdateCurve(PolyhedronFaceCurve& cv, float secsPassed) {
-    cv.time += secsPassed;
+    cv.time += cvar_faceCurveSpeed * secsPassed;
     Polyhedron_ComputeCurveDecals(cv);
 }
 

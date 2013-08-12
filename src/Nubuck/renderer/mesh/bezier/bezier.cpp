@@ -100,12 +100,29 @@ static M::Vector2 FromDist(const PolyBezier2U& pb, float dist) {
     return (1.0f - t) * Eval(pb, s0->l, s0->t) + t * Eval(pb, s1->l, s1->t);
 }
 
-void SampleEquidistantPoints(const PolyBezier2U& pb, float off, float dd, std::vector<M::Vector2>& out) {
+void SampleEquidistantPoints_old(const PolyBezier2U& pb, float off, float dd, std::vector<M::Vector2>& out) {
     out.clear();
     for(float d = 0.0f; d < pb.length; d += dd) {
         float dist = d + off;
         while(dist > pb.length) dist -= pb.length;
         out.push_back(FromDist(pb, dist));
+    }
+}
+
+void SampleEquidistantPoints(const PolyBezier2U& pb, float off, float dd, std::vector<M::Vector2>& out) {
+    unsigned lb = 0;
+    const TSample *s0 = NULL, *s1 = NULL;
+    for(float d = 0.0f; d < pb.length; d += dd) {
+        float dist = fmod(off + d, pb.length);
+        if(pb.tSamples[lb].d > dist) lb = 0; // dist wrapped around
+        while(pb.tSamples[lb + 1].d <= dist) lb++; // note: off < pb.length = pb.tSamples.end().d
+        s0 = &pb.tSamples[lb];
+        s1 = &pb.tSamples[lb + 1];
+        assert(s0->d <= dist && dist <= s1->d);
+        assert(0 <= lb && lb < pb.tSamples.size() - 1);
+        float t = (dist - s0->d) / (s1->d - s0->d);
+        assert(0.0f <= t && t <= 1.0f);
+        out.push_back((1.0f - t) * Eval(pb, s0->l, s0->t) + t * Eval(pb, s1->l, s1->t));
     }
 }
 
