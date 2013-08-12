@@ -16,9 +16,11 @@ namespace SYS {
 	}
 
 	void Thread::Thread_Kill(void) {
-		TerminateThread(_handle, 0);
-		CloseHandle(_handle);
-		_handle = NULL;
+        if(_handle) {
+            TerminateThread(_handle, 0);
+            CloseHandle(_handle);
+            _handle = NULL;
+        }
 	}
 
 	void Thread::Thread_Join(void) const {
