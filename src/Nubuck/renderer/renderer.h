@@ -13,46 +13,48 @@
 
 namespace R {
 	
-    class   Effect;
-    class   Mesh;
+class   Effect;
+class   Mesh;
 
-    struct RenderJob {
-        std::string         fx;
-        meshPtr_t           mesh;
-        GLenum              primType; // value != 0 overrides prim type of mesh
-        Material	        material;
-        SkinMgr::handle_t   skin;
-        M::Matrix4          transform;
+struct RenderJob {
+    std::string         fx;
+    meshPtr_t           mesh;
+    GLenum              primType; // value != 0 overrides prim type of mesh
+    Material	        material;
+    SkinMgr::handle_t   skin;
+    M::Matrix4          transform;
 
-        // handled by renderer
-        RenderJob* next;
-    };
+    // handled by renderer
+    RenderJob* next;
+};
 
-	class Renderer {
-    private:
-        std::vector<RenderJob>  _renderList;
-        SYS::SpinLock           _renderListLock;
+struct RenderList {
+    M::Matrix4              worldMat;
+    std::vector<RenderJob>  jobs;
+};
 
-        std::vector<RenderJob>  _renderJobs;
-        std::vector<Light>      _lights;
+class Renderer {
+private:
+    RenderList              _nextRenderList;
+    SYS::SpinLock           _renderListLock;
 
-        SYS::Timer  _timer;
-        float       _time;
+    std::vector<Light>      _lights;
 
-        float _aspect;
+    SYS::Timer  _timer;
+    float       _time;
 
-        void DrawFrame(const M::Matrix4& worldMat, const M::Matrix4& projectionMat);
-	public:
-        Renderer(void);
+    float _aspect;
+public:
+    Renderer(void);
 
-        void Init(void); // requires gl context
+    void Init(void); // requires gl context
 
-        void Resize(int width, int height);
+    void Resize(int width, int height);
 
-        void Add(const Light& light);
+    void Add(const Light& light);
 
-        void SetRenderList(const std::vector<RenderJob>& renderList);
-        void Render(const M::Matrix4& worldMat);
-	};
+    void SetRenderList(const RenderList& renderList);
+    void Render(void);
+};
 
 } // namespace R

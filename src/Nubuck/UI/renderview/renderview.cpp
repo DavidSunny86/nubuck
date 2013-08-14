@@ -30,7 +30,7 @@ namespace UI {
 
         W::world.CopyRenderList(_renderList);
         _renderer.SetRenderList(_renderList);
-        _renderer.Render(_arcballCamera.GetWorldMatrix());
+        _renderer.Render();
     }
 
     void RenderView::mousePressEvent(QMouseEvent* event) {

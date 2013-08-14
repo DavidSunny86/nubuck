@@ -20,8 +20,8 @@ namespace UI {
 
         QTimer _timer;
 
-        R::Renderer                 _renderer;
-        std::vector<R::RenderJob>   _renderList;
+        R::Renderer     _renderer;
+        R::RenderList   _renderList;
 
         int         _numFrames;
         float       _time;

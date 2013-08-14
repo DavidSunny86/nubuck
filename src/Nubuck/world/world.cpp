@@ -34,7 +34,7 @@ namespace W {
     }
 
 	void World::AddRenderJobs(const ENT_Polyhedron& polyhedron) {
-		_renderList.insert(_renderList.end(),
+		_renderList.jobs.insert(_renderList.jobs.end(),
 			polyhedron.renderList.begin(),
 			polyhedron.renderList.end());
 	}
@@ -122,13 +122,14 @@ namespace W {
         std::for_each(_polyhedrons.begin(), _polyhedrons.end(), Polyhedron_BuildRenderList);
 
 		_renderListLock.Lock();
-		_renderList.clear();
+        _renderList.worldMat = M::Mat4::Translate(0.0f, 0.0f, -10.0f);
+		_renderList.jobs.clear();
 		std::for_each(_polyhedrons.begin(), _polyhedrons.end(),
 			std::bind(&World::AddRenderJobs, this, std::placeholders::_1));
 		_renderListLock.Unlock();
     }
 
-    void World::CopyRenderList(std::vector<R::RenderJob>& renderList) {
+    void World::CopyRenderList(R::RenderList& renderList) {
         _renderListLock.Lock();
         renderList = _renderList;
         _renderListLock.Unlock();

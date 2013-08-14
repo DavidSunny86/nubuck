@@ -42,8 +42,8 @@ namespace W {
         float       _secsPassed;
         float       _timePassed;
 
-        std::vector<R::RenderJob>   _renderList;
-        SYS::SpinLock               _renderListLock;
+        R::RenderList   _renderList;
+        SYS::SpinLock   _renderListLock;
 
 		void AddRenderJobs(const ENT_Polyhedron& polyhedron);
     public:
@@ -56,7 +56,7 @@ namespace W {
 
         void Update(void);
 
-        void CopyRenderList(std::vector<R::RenderJob>& renderList);
+        void CopyRenderList(R::RenderList& renderList);
 
         // exported to client
         IPolyhedron* CreatePolyhedron(const graph_t& G) override;

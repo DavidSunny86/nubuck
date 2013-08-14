@@ -18,10 +18,6 @@ private:
     M::TransformTRS	_transform;
     M::Quaternion	_dragRot;
     M::Vector3		_panTrans;
-
-    M::Vector3 VectorOnSphereFromMousePos(int mouseX, int mouseY);
-    M::Vector3 VectorInPlaneFromMousePos(int mouseX, int mouseY);
-    M::Vector3 VectorInXYPlaneFromMousePos(int mouseX, int mouseY);
 public:
     ArcballCamera(int width, int height);
 
@@ -46,6 +42,4 @@ public:
     M::Quaternion GetRotation(void) const;
 
     M::Matrix4 GetWorldMatrix(void) const;
-
-    void Render(void);
 };
