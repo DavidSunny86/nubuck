@@ -148,7 +148,7 @@ namespace W {
         std::for_each(_polyhedrons.begin(), _polyhedrons.end(), Polyhedron_BuildRenderList);
 
 		_renderListLock.Lock();
-        _renderList.worldMat = M::Mat4::Translate(0.0f, 0.0f, -10.0f);
+        _renderList.worldMat = M::Mat4::Translate(0.0f, 0.0f, -20.0f);
 		_renderList.jobs.clear();
 		std::for_each(_polyhedrons.begin(), _polyhedrons.end(),
 			std::bind(&World::AddRenderJobs, this, std::placeholders::_1));

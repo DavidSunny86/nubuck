@@ -1,3 +1,6 @@
+#include <assert.h>
+#include <algorithm>
+
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\quad\quad.h>
 #include "ent_polyhedron.h"
@@ -39,7 +42,27 @@ static void Polyhedron_RebuildNodes(ENT_Polyhedron& ph) {
     ph.nodes.colors.resize(ph.G->max_node_index() + 1, R::Color::Black);
 }
 
+static void Assert(int exp) { assert(exp); }
+
+static void CheckGraphIndices(const graph_t& G) {
+#ifdef NDEBUG
+#else
+    std::vector<int> v;
+    v.resize(G.max_node_index() + 1, 0);
+    leda::node n;
+    forall_nodes(n, G) v[n->id()] = 1;
+    std::for_each(v.begin(), v.end(), Assert);
+    v.clear();
+    v.resize(G.max_edge_index() + 1, 0);
+    leda::edge e;
+    forall_edges(e, G) v[e->id()] = 1;
+    std::for_each(v.begin(), v.end(), Assert);
+#endif
+}
+
 static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
+    CheckGraphIndices(*ph.G);
+
 	ph.hull.faceLists.clear();
     ph.hull.faceTrans.clear();
 	ph.hull.edges.clear();
@@ -121,6 +144,8 @@ void Polyhedron_Rebuild(ENT_Polyhedron& ph) {
     Polyhedron_RebuildHull(ph);
 }
 
+// the renderlist of a polyhedron ph can be build even though
+// it's graph ph.G is no longer valid.
 void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
 	ph.renderList.clear();
 
@@ -128,12 +153,12 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
 	renderJob.fx = "Lit";
     renderJob.material = R::Material::White;
 
-	leda::node n;
-	forall_nodes(n, *ph.G) {
-        renderJob.material.diffuseColor = ph.nodes.colors[n->id()];
+    unsigned numNodes = ph.nodes.positions.size();
+    for(unsigned i = 0; i < numNodes; ++i) {
+        renderJob.material.diffuseColor = ph.nodes.colors[i];
 		renderJob.mesh = g_nodeMesh;
 		renderJob.primType = 0;
-        renderJob.transform = M::Mat4::Translate(ph.nodes.positions[n->id()]);
+        renderJob.transform = M::Mat4::Translate(ph.nodes.positions[i]);
 		ph.renderList.push_back(renderJob);
 	}
 
