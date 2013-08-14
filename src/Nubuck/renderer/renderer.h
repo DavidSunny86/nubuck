@@ -31,14 +31,13 @@ struct RenderJob {
 struct RenderList {
     M::Matrix4              worldMat;
     std::vector<RenderJob>  jobs;
+    std::vector<Light>      lights;
 };
 
 class Renderer {
 private:
     RenderList              _nextRenderList;
     SYS::SpinLock           _renderListLock;
-
-    std::vector<Light>      _lights;
 
     SYS::Timer  _timer;
     float       _time;
@@ -50,8 +49,6 @@ public:
     void Init(void); // requires gl context
 
     void Resize(int width, int height);
-
-    void Add(const Light& light);
 
     void SetRenderList(const RenderList& renderList);
     void Render(void);

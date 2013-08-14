@@ -61,29 +61,6 @@ namespace UI {
     RenderView::RenderView(QWidget* parent) : glWidget_t(parent), _fpsLabel(NULL), _arcballCamera(DEFAULT_WIDTH, DEFAULT_HEIGHT) {        
         connect(&_timer, SIGNAL(timeout()), this, SLOT(Update()));
         _timer.start();
-
-        R::Light light;
-
-        float dist = 20;
-
-        light.constantAttenuation   = 1.0f;
-        light.linearAttenuation     = 0.01f;
-        light.quadricAttenuation    = 0.0f;
-
-        light.position          = M::Vector3(-dist,  dist, dist);
-        // light.diffuseColor      = R::Color::Red;
-        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
-        _renderer.Add(light);
-
-        light.position          = M::Vector3( dist,  dist, dist);
-        // light.diffuseColor      = R::Color::White;
-        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
-        _renderer.Add(light);
-
-        light.position          = M::Vector3( dist, -dist, dist);
-        // light.diffuseColor      = R::Color::Blue;
-        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
-        _renderer.Add(light);
     }
 
     RenderView::~RenderView(void) {

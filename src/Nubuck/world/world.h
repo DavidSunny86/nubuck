@@ -46,6 +46,7 @@ namespace W {
         SYS::SpinLock   _renderListLock;
 
 		void AddRenderJobs(const ENT_Polyhedron& polyhedron);
+        void SetupLights(void);
     public:
 		World(void);
 

@@ -39,7 +39,33 @@ namespace W {
 			polyhedron.renderList.end());
 	}
 
+    void World::SetupLights(void) {
+        R::Light light;
+
+        float dist = 20;
+
+        light.constantAttenuation   = 1.0f;
+        light.linearAttenuation     = 0.01f;
+        light.quadricAttenuation    = 0.0f;
+
+        light.position          = M::Vector3(-dist,  dist, dist);
+        // light.diffuseColor      = R::Color::Red;
+        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
+        _renderList.lights.push_back(light);
+
+        light.position          = M::Vector3( dist,  dist, dist);
+        // light.diffuseColor      = R::Color::White;
+        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
+        _renderList.lights.push_back(light);
+
+        light.position          = M::Vector3( dist, -dist, dist);
+        // light.diffuseColor      = R::Color::Blue;
+        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
+        _renderList.lights.push_back(light);
+    }
+
 	World::World(void) {
+        SetupLights();
 	}
 
     void World::Send(const Event& event) {

@@ -148,7 +148,7 @@ static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const
     return meshJob;
 }
 
-static void DrawFrame(RenderList& renderList, const std::vector<Light> lights, const M::Matrix4& projectionMat, float time) {
+static void DrawFrame(RenderList& renderList, const M::Matrix4& projectionMat, float time) {
     typedef std::vector<RenderJob>::iterator rjobIt_t;
 
     RenderJob* cur = &renderList.jobs[0];
@@ -180,15 +180,15 @@ static void DrawFrame(RenderList& renderList, const std::vector<Light> lights, c
                 }
 
                 if(FIRST_LIGHT_PASS == desc.type || DEFAULT == desc.type) {
-                    if(FIRST_LIGHT_PASS == desc.type && !lights.empty())
-                        SetLightUniforms(prog, lights[0]);
+                    if(FIRST_LIGHT_PASS == desc.type && !renderList.lights.empty())
+                        SetLightUniforms(prog, renderList.lights[0]);
 
                     next = DrawMeshList(prog, desc.type, desc.flags, renderList.worldMat, cur);
                 }
 
                 if(LIGHT_PASS == desc.type) {
-                    for(int j = 1; j < lights.size(); ++j) {
-                        SetLightUniforms(prog, lights[j]);
+                    for(int j = 1; j < renderList.lights.size(); ++j) {
+                        SetLightUniforms(prog, renderList.lights[j]);
                         next = DrawMeshList(prog, desc.type, desc.flags, renderList.worldMat, cur);
                     }
                 } // LIGHT_PASS == type
@@ -200,13 +200,10 @@ static void DrawFrame(RenderList& renderList, const std::vector<Light> lights, c
     glFinish();
 }
 
-void Renderer::Add(const Light& light) {
-    _lights.push_back(light);
-}
-
 void Renderer::SetRenderList(const RenderList& renderList) {
     _renderListLock.Lock();
     _nextRenderList.worldMat = renderList.worldMat;
+    _nextRenderList.lights = renderList.lights;
     _nextRenderList.jobs.clear();
     for(std::vector<RenderJob>::const_iterator rlistIt(renderList.jobs.cbegin());
         renderList.jobs.cend() != rlistIt; ++rlistIt)
@@ -277,7 +274,7 @@ void Renderer::Render(void) {
         std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
     M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, renderList.jobs);
 
-    DrawFrame(renderList, _lights, projectionMat, _time);
+    DrawFrame(renderList, projectionMat, _time);
 
     meshMgr.R_Update();
 }
