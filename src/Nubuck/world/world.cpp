@@ -164,7 +164,7 @@ namespace W {
                 }
                 Polyhedron_Update(ph);
                 */
-                Polyhedron_AddCurve(ph, args->edge);
+                Polyhedron_AddCurve(ph, args->edge, args->color);
             }
 
             if(EVENT_RESIZE == event.type) {

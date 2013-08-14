@@ -44,6 +44,7 @@ struct PolyhedronHullEdge {
 struct PolyhedronFaceCurve {
     unsigned        faceIdx;
     float           time;
+    R::Color        color;
     M::Matrix3      localToWorld; // face transformation. face's base vertex is local origin.
     M::Vector3      origin, normal;
     R::PolyBezier2U curve; // curve stores points in face's local space. 
@@ -72,7 +73,7 @@ void Polyhedron_Init(ENT_Polyhedron& ph);
 void Polyhedron_Rebuild(ENT_Polyhedron& ph);
 void Polyhedron_BuildRenderList(ENT_Polyhedron& ph);
 void Polyhedron_Update(ENT_Polyhedron& ph);
-void Polyhedron_AddCurve(ENT_Polyhedron& ph, leda::edge edge);
+void Polyhedron_AddCurve(ENT_Polyhedron& ph, leda::edge edge, const R::Color& color);
 void Polyhedron_UpdateCurve(PolyhedronFaceCurve& cv, float secsPassed);
 
 } // namespace W

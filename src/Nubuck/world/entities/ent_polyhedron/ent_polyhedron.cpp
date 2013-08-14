@@ -157,12 +157,12 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
     }
 
     renderJob.fx = "TexDiffuse";
-    renderJob.material.diffuseColor = R::Color::Black;
     renderJob.mesh = g_faceCurveDecalMesh;
     renderJob.primType = 0;
     renderJob.skin = g_faceCurveDecalSkin;
     for(unsigned i = 0; i < ph.hull.curves.size(); ++i) {
         for(unsigned j = 0; j < ph.hull.curves[i].curve.decalPos.size(); ++j) {
+            renderJob.material.diffuseColor = ph.hull.curves[i].color;
             renderJob.transform = 
                 M::Mat4::Translate(ph.hull.curves[i].curve.decalPos[j]) * 
                 M::Mat4::FromRigidTransform(ph.hull.curves[i].localToWorld, M::Vector3::Zero);
@@ -269,10 +269,11 @@ static void Polyhedron_RebuildCurve(const ENT_Polyhedron& ph, PolyhedronFaceCurv
     Polyhedron_ComputeCurveDecals(cv);
 }
 
-void Polyhedron_AddCurve(ENT_Polyhedron& ph, leda::edge edge) {
+void Polyhedron_AddCurve(ENT_Polyhedron& ph, leda::edge edge, const R::Color& color) {
     PolyhedronFaceCurve cv;
     cv.faceIdx = ph.hull.edges[edge->id()].faceIdx;
     cv.time = 0.0f;
+    cv.color = color;
     Polyhedron_RebuildCurve(ph, cv);
     ph.hull.curves.push_back(cv);
 }
