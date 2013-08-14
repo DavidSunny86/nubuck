@@ -18,6 +18,9 @@ extern COM::Config::Variable<int>	cvar_nodeSubdiv;
 namespace W {
 
 struct PolyhedronNodes {
+    // valid[i] != 0, if a node n exists with n->id() == i
+    // and 0, otherwise
+    std::vector<int>        valid;
     std::vector<M::Vector3> positions;
     std::vector<R::Color>   colors;
 };

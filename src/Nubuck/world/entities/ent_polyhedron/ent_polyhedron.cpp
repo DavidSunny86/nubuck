@@ -37,32 +37,16 @@ void Polyhedron_InitResources(void) {
 void Polyhedron_Init(ENT_Polyhedron&) { }
 
 static void Polyhedron_RebuildNodes(ENT_Polyhedron& ph) {
+    leda::node n;
+    ph.nodes.valid.clear();
+    ph.nodes.valid.resize(ph.G->max_node_index() + 1, 0);
+    forall_nodes(n, *ph.G) ph.nodes.valid[n->id()] = 1;
     ph.nodes.positions.resize(ph.G->max_node_index() + 1);
     ph.nodes.colors.clear();
     ph.nodes.colors.resize(ph.G->max_node_index() + 1, R::Color::Black);
 }
 
-static void Assert(int exp) { assert(exp); }
-
-static void CheckGraphIndices(const graph_t& G) {
-#ifdef NDEBUG
-#else
-    std::vector<int> v;
-    v.resize(G.max_node_index() + 1, 0);
-    leda::node n;
-    forall_nodes(n, G) v[n->id()] = 1;
-    std::for_each(v.begin(), v.end(), Assert);
-    v.clear();
-    v.resize(G.max_edge_index() + 1, 0);
-    leda::edge e;
-    forall_edges(e, G) v[e->id()] = 1;
-    std::for_each(v.begin(), v.end(), Assert);
-#endif
-}
-
 static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
-    CheckGraphIndices(*ph.G);
-
 	ph.hull.faceLists.clear();
     ph.hull.faceTrans.clear();
 	ph.hull.edges.clear();
@@ -155,11 +139,13 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
 
     unsigned numNodes = ph.nodes.positions.size();
     for(unsigned i = 0; i < numNodes; ++i) {
-        renderJob.material.diffuseColor = ph.nodes.colors[i];
-		renderJob.mesh = g_nodeMesh;
-		renderJob.primType = 0;
-        renderJob.transform = M::Mat4::Translate(ph.nodes.positions[i]);
-		ph.renderList.push_back(renderJob);
+        if(ph.nodes.valid[i]) {
+            renderJob.material.diffuseColor = ph.nodes.colors[i];
+            renderJob.mesh = g_nodeMesh;
+            renderJob.primType = 0;
+            renderJob.transform = M::Mat4::Translate(ph.nodes.positions[i]);
+            ph.renderList.push_back(renderJob);
+        }
 	}
 
     if(!ph.hull.indices.empty() /* ie. hull exists */) {
