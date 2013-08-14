@@ -10,6 +10,9 @@ namespace W {
 		EVENT_REBUILD,
         EVENT_SET_NODE_COLOR,
         EVENT_SET_FACE_COLOR,
+
+        EVENT_RESIZE,
+        EVENT_MOUSE
     };
 
     struct Event {
@@ -36,6 +39,20 @@ namespace W {
         unsigned entId;
         leda::edge edge;
         R::Color color;
+    };
+
+    struct EvArgs_Resize {
+        int width, height;
+    };
+
+    struct EvArgs_Mouse {
+        enum Type { MOUSE_DOWN, MOUSE_UP, MOUSE_WHEEL, MOUSE_MOVE };
+        enum Button { 
+            BUTTON_LEFT     = 1, // == Qt::LeftButton
+            BUTTON_RIGHT    = 2, // == Qt::RightButton
+            BUTTON_MIDDLE 
+        };
+        int type, button, delta, x, y;
     };
 
 } // namespace W

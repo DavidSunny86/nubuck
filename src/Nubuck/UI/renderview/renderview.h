@@ -26,8 +26,6 @@ namespace UI {
         int         _numFrames;
         float       _time;
         SYS::Timer  _rtimer;
-
-        ArcballCamera _arcballCamera;
     protected:
         void initializeGL(void) override;
         void resizeGL(int width, int height) override;

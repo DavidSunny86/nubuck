@@ -64,7 +64,35 @@ namespace W {
         _renderList.lights.push_back(light);
     }
 
-	World::World(void) {
+    void World::HandleMouseEvent(const Event& event) {
+        EvArgs_Mouse* args = (EvArgs_Mouse*)event.args;
+
+        if(EvArgs_Mouse::MOUSE_DOWN == args->type) {
+            if(EvArgs_Mouse::BUTTON_LEFT == args->button)
+                _camArcball.StartDragging(args->x, args->y);
+            if(EvArgs_Mouse::BUTTON_RIGHT == args->button)
+                _camArcball.StartPanning(args->x, args->y);
+        }
+
+        if(EvArgs_Mouse::MOUSE_UP == args->type) {
+            if(EvArgs_Mouse::BUTTON_LEFT  == args->button)
+                _camArcball.StopDragging();
+            if(EvArgs_Mouse::BUTTON_RIGHT == args->button)
+                _camArcball.StopPanning();
+        }
+
+        if(EvArgs_Mouse::MOUSE_MOVE == args->type) {
+            _camArcball.Drag(args->x, args->y);
+            _camArcball.Pan(args->x, args->y);
+        }
+
+        if(EvArgs_Mouse::MOUSE_WHEEL == args->type) {
+            if(args->delta > 0) _camArcball.ZoomIn();
+            if(args->delta < 0) _camArcball.ZoomOut();
+        }
+    }
+
+	World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
         SetupLights();
 	}
 
@@ -138,6 +166,13 @@ namespace W {
                 */
                 Polyhedron_AddCurve(ph, args->edge);
             }
+
+            if(EVENT_RESIZE == event.type) {
+                EvArgs_Resize* args = (EvArgs_Resize*)event.args;
+                _camArcball.SetScreenSize(args->width, args->height);
+            }
+
+            if(EVENT_MOUSE == event.type) HandleMouseEvent(event);
         } // while(!done)
 
         for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
@@ -148,7 +183,7 @@ namespace W {
         std::for_each(_polyhedrons.begin(), _polyhedrons.end(), Polyhedron_BuildRenderList);
 
 		_renderListLock.Lock();
-        _renderList.worldMat = M::Mat4::Translate(0.0f, 0.0f, -20.0f);
+        _renderList.worldMat = _camArcball.GetWorldMatrix();
 		_renderList.jobs.clear();
 		std::for_each(_polyhedrons.begin(), _polyhedrons.end(),
 			std::bind(&World::AddRenderJobs, this, std::placeholders::_1));

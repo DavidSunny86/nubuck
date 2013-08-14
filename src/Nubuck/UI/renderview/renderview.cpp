@@ -2,6 +2,7 @@
 
 #include <common\common.h>
 #include <world\world.h>
+#include <world\events.h>
 #include <renderer\effects\effectmgr.h>
 #include "renderview.h"
 
@@ -12,8 +13,14 @@ namespace UI {
     }
 
     void RenderView::resizeGL(int width, int height) {
+        W::Event event;
+        event.type = W::EVENT_RESIZE;
+        W::EvArgs_Resize* args = (W::EvArgs_Resize*)event.args;
+        args->width = width;
+        args->height = height;
+        W::world.Send(event);
+
         _renderer.Resize(width, height);
-        _arcballCamera.SetScreenSize(width, height);
         Update();
     }
 
@@ -32,32 +39,51 @@ namespace UI {
         _renderer.Render(_renderList);
     }
 
-    void RenderView::mousePressEvent(QMouseEvent* event) {
-        if(Qt::LeftButton == event->button())
-            _arcballCamera.StartDragging(event->x(), event->y());
-        if(Qt::RightButton == event->button())
-            _arcballCamera.StartPanning(event->x(), event->y());
+    void RenderView::mousePressEvent(QMouseEvent* qevent) {
+        W::Event wevent;
+        wevent.type = W::EVENT_MOUSE;
+        W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
+        args->type = W::EvArgs_Mouse::MOUSE_DOWN;
+        args->button = qevent->button();
+        args->x = qevent->x();
+        args->y = qevent->y();
+        W::world.Send(wevent);
     }
 
-    void RenderView::mouseReleaseEvent(QMouseEvent* event) {
-        if(Qt::LeftButton == event->button())
-            _arcballCamera.StopDragging();
-        if(Qt::RightButton == event->button())
-            _arcballCamera.StopPanning();
+    void RenderView::mouseReleaseEvent(QMouseEvent* qevent) {
+        W::Event wevent;
+        wevent.type = W::EVENT_MOUSE;
+        W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
+        args->type = W::EvArgs_Mouse::MOUSE_UP;
+        args->button = qevent->button();
+        args->x = qevent->x();
+        args->y = qevent->y();
+        W::world.Send(wevent);
     }
 
-    void RenderView::mouseMoveEvent(QMouseEvent* event) {
-        if(_arcballCamera.Drag(event->x(), event->y())) Update();
-        if(_arcballCamera.Pan(event->x(), event->y())) Update();
+    void RenderView::mouseMoveEvent(QMouseEvent* qevent) {
+        W::Event wevent;
+        wevent.type = W::EVENT_MOUSE;
+        W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
+        args->type = W::EvArgs_Mouse::MOUSE_MOVE;
+        args->button = qevent->button();
+        args->x = qevent->x();
+        args->y = qevent->y();
+        W::world.Send(wevent);
     }
 
-    void RenderView::wheelEvent(QWheelEvent* event) {
-        if(event->delta() > 0) _arcballCamera.ZoomIn();
-        if(event->delta() < 0) _arcballCamera.ZoomOut();
-        Update();
+    void RenderView::wheelEvent(QWheelEvent* qevent) {
+        W::Event wevent;
+        wevent.type = W::EVENT_MOUSE;
+        W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
+        args->type = W::EvArgs_Mouse::MOUSE_WHEEL;
+        args->delta = qevent->delta();
+        args->x = qevent->x();
+        args->y = qevent->y();
+        W::world.Send(wevent);
     }
 
-    RenderView::RenderView(QWidget* parent) : glWidget_t(parent), _fpsLabel(NULL), _arcballCamera(DEFAULT_WIDTH, DEFAULT_HEIGHT) {        
+    RenderView::RenderView(QWidget* parent) : glWidget_t(parent), _fpsLabel(NULL) {        
         connect(&_timer, SIGNAL(timeout()), this, SLOT(Update()));
         _timer.start();
     }

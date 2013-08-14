@@ -12,6 +12,7 @@
 #include <system\locks\spinlock.h>
 #include <common\types.h>
 #include <renderer\renderer.h>
+#include <camera\arcball_camera.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include "events.h"
 
@@ -47,6 +48,10 @@ namespace W {
 
 		void AddRenderJobs(const ENT_Polyhedron& polyhedron);
         void SetupLights(void);
+
+        ArcballCamera _camArcball;
+
+        void HandleMouseEvent(const Event& event);
     public:
 		World(void);
 
