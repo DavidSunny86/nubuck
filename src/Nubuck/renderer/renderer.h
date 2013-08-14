@@ -43,6 +43,8 @@ private:
     float       _time;
 
     float _aspect;
+
+    void SetRenderList(const RenderList& renderList);
 public:
     Renderer(void);
 
@@ -50,8 +52,7 @@ public:
 
     void Resize(int width, int height);
 
-    void SetRenderList(const RenderList& renderList);
-    void Render(void);
+    void Render(const RenderList& rlist);
 };
 
 } // namespace R

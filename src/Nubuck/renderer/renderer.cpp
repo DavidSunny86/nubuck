@@ -252,7 +252,9 @@ static M::Matrix4 ComputeProjectionMatrix(float aspect, const M::Matrix4& worldM
     return M::Mat4::Perspective(45.0f, aspect, -zMax, -zMin);
 }
 
-void Renderer::Render(void) {
+void Renderer::Render(const RenderList& rlist) {
+    SetRenderList(rlist);
+
     float secsPassed = _timer.Stop();
     _time += secsPassed;
     _timer.Start();

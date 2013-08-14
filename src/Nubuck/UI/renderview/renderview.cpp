@@ -29,8 +29,7 @@ namespace UI {
         _rtimer.Start();
 
         W::world.CopyRenderList(_renderList);
-        _renderer.SetRenderList(_renderList);
-        _renderer.Render();
+        _renderer.Render(_renderList);
     }
 
     void RenderView::mousePressEvent(QMouseEvent* event) {
