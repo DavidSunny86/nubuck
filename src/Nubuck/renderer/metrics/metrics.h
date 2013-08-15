@@ -8,6 +8,10 @@ namespace R {
             unsigned totalTextureBufferSize;
         } resources;
 
+        struct {
+            unsigned numDrawCalls;
+        } frame;
+
         Metrics(void);
     };
 

@@ -13,6 +13,7 @@
 #include <renderer\effects\pass.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\material\material.h>
+#include <renderer\metrics\metrics.h>
 #include "renderer.h"
 
 namespace {
@@ -141,6 +142,7 @@ static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const
         GLenum primType = meshJob->primType;
         if(!primType) primType = meshJob->mesh->PrimitiveType();
 
+        metrics.frame.numDrawCalls++;
         GL_CALL(glDrawElements(primType, numIndices, ToGLEnum<Mesh::Index>::ENUM, NULL));
 
         meshJob = meshJob->next;
@@ -276,6 +278,7 @@ void Renderer::Render(const RenderList& rlist) {
         std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
     M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, renderList.jobs);
 
+    metrics.frame.numDrawCalls = 0;
     DrawFrame(renderList, projectionMat, _time);
 
     meshMgr.R_Update();

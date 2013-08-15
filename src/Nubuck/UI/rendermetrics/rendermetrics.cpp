@@ -30,6 +30,7 @@ namespace UI {
     void RenderMetrics::Update(void) {
         _ui.lblTotalVertexBufferSizeValue->setText(FormatBytes(R::metrics.resources.totalVertexBufferSize));
         _ui.lblTotalTextureBufferSizeValue->setText(FormatBytes(R::metrics.resources.totalTextureBufferSize));
+        _ui.lblNumDrawCallsValue->setText(QString("%1").arg(R::metrics.frame.numDrawCalls));
     }
 
     RenderMetrics::RenderMetrics(QWidget* parent) : QWidget(parent) {
