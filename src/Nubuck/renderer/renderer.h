@@ -25,7 +25,7 @@ struct RenderJob {
     M::Matrix4          transform;
 
     // handled by renderer
-    RenderJob* next;
+    RenderJob*          next;
 };
 
 struct RenderList {
