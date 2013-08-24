@@ -66,15 +66,14 @@ void BindInstanceData(void) {
             3, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
             (void*)(offsetof(InstanceData, transform) + sizeof(float) * 4 * col)));
         GL_CALL(glEnableVertexAttribArray(IN_INS_TRANSFORM_A0 + col));
-        assert(0 != glVertexAttribDivisor);
-        GL_CALL(glVertexAttribDivisor(IN_INS_TRANSFORM_A0 + col, 1));
+        GL_CALL(glVertexAttribDivisorARB(IN_INS_TRANSFORM_A0 + col, 1));
     }
 
     GL_CALL(glVertexAttribPointer(IN_INS_MATERIAL_DIFFUSE,
         4, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
         (void*)offsetof(InstanceData, material)));
     GL_CALL(glEnableVertexAttribArray(IN_INS_MATERIAL_DIFFUSE));
-    GL_CALL(glVertexAttribDivisor(IN_INS_MATERIAL_DIFFUSE, 1));
+    GL_CALL(glVertexAttribDivisorARB(IN_INS_MATERIAL_DIFFUSE, 1));
 }
 
 template<typename T> struct ToGLEnum { };
