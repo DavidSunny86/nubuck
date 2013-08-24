@@ -165,6 +165,8 @@ void Renderer::Init(void) {
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);
 
+    instanceBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, NULL, INSTANCE_BUFFER_SIZE));
+
     _timer.Start();
 }
 
@@ -178,9 +180,8 @@ static void Draw(Program& prog, int passFlags, const M::Matrix4& worldMat, DrawC
         skinMgr.R_Bind(prog, drawCall.skin);
     }
 
-    instanceBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER,
-        &instanceData[drawCall.insIdx], sizeof(InstanceData) * drawCall.insCnt));
-    instanceBuffer->Bind();
+    instanceBuffer->Update(&instanceData[drawCall.insIdx], sizeof(InstanceData) * drawCall.insCnt);
+    // instanceBuffer->Bind(); bound by Update()
     BindInstanceData();
 
     drawCall.mesh->R_Bind();
@@ -192,6 +193,7 @@ static void Draw(Program& prog, int passFlags, const M::Matrix4& worldMat, DrawC
 
     metrics.frame.numDrawCalls++;
     GL_CALL(glDrawElementsInstanced(primType, numIndices, ToGLEnum<Mesh::Index>::ENUM, NULL, drawCall.insCnt));
+    instanceBuffer->Discard();
 }
 
 static void DrawFrame(
@@ -340,6 +342,9 @@ void Renderer::Render(const RenderList& rlist) {
 
     if(renderList.jobs.empty()) return;
 
+    static SYS::Timer frameTime;
+    frameTime.Start();
+
     Link(renderList.jobs);
     std::for_each(renderList.jobs.begin(), renderList.jobs.end(),
         std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
@@ -377,6 +382,9 @@ void Renderer::Render(const RenderList& rlist) {
     DrawFrame(renderList, drawCalls, projectionMat, _time);
 
     meshMgr.R_Update();
+
+    GL_CALL(glFinish());
+    metrics.frame.time = frameTime.Stop();
 }
 
 

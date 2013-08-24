@@ -8,6 +8,7 @@ namespace R {
         resources.totalVertexBufferSize     = 0;
         resources.totalTextureBufferSize    = 0;
         frame.numDrawCalls                  = 0;
+        frame.time                          = 0.0f;
     }
 
 } // namespace R

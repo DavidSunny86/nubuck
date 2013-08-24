@@ -9,7 +9,8 @@ namespace R {
         } resources;
 
         struct {
-            unsigned numDrawCalls;
+            unsigned    numDrawCalls;
+            float       time;
         } frame;
 
         Metrics(void);
