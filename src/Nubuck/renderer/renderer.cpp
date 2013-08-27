@@ -85,7 +85,8 @@ template<> struct ToGLEnum<int>         { enum { ENUM = GL_INT }; };
 namespace R {
 
 struct BillboardVertex {
-    M::Vector3 positions;
+    M::Vector3 position;
+    M::Vector2 texCoords; // used for clipping
 };
 
 struct Billboard {
@@ -93,7 +94,7 @@ struct Billboard {
 };
 
 static const unsigned NUM_BILLBOARDS = 10;
-static const float BILLBOARD_SIZE = 0.1f;
+static const float BILLBOARD_SIZE = 0.5f;
 static const unsigned NUM_BILLBOARD_INDICES = 5 * NUM_BILLBOARDS - 1; // 4 vertices + prim restart between bboards
 static std::vector<M::Vector3>      billboardPositions;
 static std::vector<Mesh::Index>     billboardIndices;
@@ -112,15 +113,17 @@ static void InitBillboards(void) {
 }
 
 static void BuildBillboards(const M::Matrix4& worldMat) {
-    M::Vector3 positions[4] = {
-        M::Vector3(-BILLBOARD_SIZE, -BILLBOARD_SIZE, 0.0f),
-        M::Vector3(-BILLBOARD_SIZE,  BILLBOARD_SIZE, 0.0f),
-        M::Vector3( BILLBOARD_SIZE,  BILLBOARD_SIZE, 0.0f),
-        M::Vector3( BILLBOARD_SIZE, -BILLBOARD_SIZE, 0.0f)
+    BillboardVertex vertices[4] = {
+        { M::Vector3(-BILLBOARD_SIZE, -BILLBOARD_SIZE, 0.0f), M::Vector2(-1.0f, -1.0f) },
+        { M::Vector3(-BILLBOARD_SIZE,  BILLBOARD_SIZE, 0.0f), M::Vector2(-1.0f,  1.0f) },
+        { M::Vector3( BILLBOARD_SIZE,  BILLBOARD_SIZE, 0.0f), M::Vector2( 1.0f,  1.0f) },
+        { M::Vector3( BILLBOARD_SIZE, -BILLBOARD_SIZE, 0.0f), M::Vector2( 1.0f, -1.0f) }
     };
     for(unsigned i = 0; i < NUM_BILLBOARDS; ++i) {
-        for(unsigned k = 0; k < 4; ++k) 
-            billboards[i].verts[k].positions = billboardPositions[i] + positions[k];
+        for(unsigned k = 0; k < 4; ++k) {
+            billboards[i].verts[k].position = billboardPositions[i] + vertices[k].position;
+            billboards[i].verts[k].texCoords = vertices[k].texCoords;
+        }
     }
     billboardIndices.clear();
     billboardIndices.reserve(NUM_BILLBOARD_INDICES);
@@ -133,14 +136,20 @@ static void BuildBillboards(const M::Matrix4& worldMat) {
 
 static void BindBillboardVertices(void) {
     GL_CALL(glVertexAttribPointer(IN_POSITION,
-        3, GL_FLOAT, GL_FALSE, 0, 0));
+        3, GL_FLOAT, GL_FALSE, sizeof(BillboardVertex),
+        (void*)offsetof(BillboardVertex, position)));
     GL_CALL(glEnableVertexAttribArray(IN_POSITION));
+
+    GL_CALL(glVertexAttribPointer(IN_TEXCOORDS,
+        2, GL_FLOAT, GL_FALSE, sizeof(BillboardVertex),
+        (void*)offsetof(BillboardVertex, texCoords)));
+    GL_CALL(glEnableVertexAttribArray(IN_TEXCOORDS));
 }
 
 void SetState(const State& state);
 
 static void DrawBillboards(const M::Matrix4& projectionMat) {
-    GEN::Pointer<Effect> fx = effectMgr.GetEffect("Default");
+    GEN::Pointer<Effect> fx = effectMgr.GetEffect("NodeBillboard");
     fx->Compile();
     Pass* pass = fx->GetPass(0);
     pass->Use();
@@ -245,7 +254,6 @@ void Renderer::Init(void) {
     BuildBillboards(M::Mat4::Identity());
     billboardVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, &billboards[0], sizeof(Billboard) * NUM_BILLBOARDS));
     billboardIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &billboardIndices[0], sizeof(unsigned) * NUM_BILLBOARD_INDICES));
-    assert(4 * sizeof(M::Vector3) == sizeof(Billboard));
 }
 
 void Renderer::Resize(int width, int height) {

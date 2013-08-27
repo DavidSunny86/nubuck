@@ -22,6 +22,22 @@ namespace R {
         fx.passes.push_back(pass0);
 		effectMgr.Register(fx);
         fx.passes.clear();
+            
+        // NodeBillboard Effect
+        // used to draw filled circles on billboards
+
+        pass0.name = "Pass0";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\node_billboard.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\node_billboard.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "NodeBillboard";
+        fx.passes.push_back(pass0);
+		effectMgr.Register(fx);
+        fx.passes.clear();
 
         // Default Wireframe Effect
 
