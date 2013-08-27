@@ -84,6 +84,82 @@ template<> struct ToGLEnum<int>         { enum { ENUM = GL_INT }; };
 
 namespace R {
 
+struct BillboardVertex {
+    M::Vector3 positions;
+};
+
+struct Billboard {
+    BillboardVertex verts[4];
+};
+
+static const unsigned NUM_BILLBOARDS = 10;
+static const float BILLBOARD_SIZE = 0.1f;
+static const unsigned NUM_BILLBOARD_INDICES = 5 * NUM_BILLBOARDS - 1; // 4 vertices + prim restart between bboards
+static std::vector<M::Vector3>      billboardPositions;
+static std::vector<Mesh::Index>     billboardIndices;
+static std::vector<Billboard>       billboards;
+static GEN::Pointer<StaticBuffer>   billboardVertexBuffer;
+static GEN::Pointer<StaticBuffer>   billboardIndexBuffer;
+
+static float RandFloat(float min, float max) {
+    return min + (rand() % 1000 / 1000.0f) * (max - min);
+}
+
+static void InitBillboards(void) {
+    for(unsigned i = 0; i < NUM_BILLBOARDS; ++i) {
+        billboardPositions[i] = M::Vector3(RandFloat(-2.0f, 2.0f), RandFloat(-2.0f, 2.0f), RandFloat(-2.0f, -1.0f));
+    }
+}
+
+static void BuildBillboards(const M::Matrix4& worldMat) {
+    M::Vector3 positions[4] = {
+        M::Vector3(-BILLBOARD_SIZE, -BILLBOARD_SIZE, 0.0f),
+        M::Vector3(-BILLBOARD_SIZE,  BILLBOARD_SIZE, 0.0f),
+        M::Vector3( BILLBOARD_SIZE,  BILLBOARD_SIZE, 0.0f),
+        M::Vector3( BILLBOARD_SIZE, -BILLBOARD_SIZE, 0.0f)
+    };
+    for(unsigned i = 0; i < NUM_BILLBOARDS; ++i) {
+        for(unsigned k = 0; k < 4; ++k) 
+            billboards[i].verts[k].positions = billboardPositions[i] + positions[k];
+    }
+    billboardIndices.clear();
+    billboardIndices.reserve(NUM_BILLBOARD_INDICES);
+    for(unsigned i = 0; i < 4 * NUM_BILLBOARDS; ++i) {
+        if(0 < i && 0 == i % 4) billboardIndices.push_back(Mesh::RESTART_INDEX);
+        billboardIndices.push_back(i);
+    }
+    assert(NUM_BILLBOARD_INDICES == billboardIndices.size());
+}
+
+static void BindBillboardVertices(void) {
+    GL_CALL(glVertexAttribPointer(IN_POSITION,
+        3, GL_FLOAT, GL_FALSE, 0, 0));
+    GL_CALL(glEnableVertexAttribArray(IN_POSITION));
+}
+
+void SetState(const State& state);
+
+static void DrawBillboards(const M::Matrix4& projectionMat) {
+    GEN::Pointer<Effect> fx = effectMgr.GetEffect("Default");
+    fx->Compile();
+    Pass* pass = fx->GetPass(0);
+    pass->Use();
+
+    SetState(pass->GetDesc().state);
+
+    Program& prog = pass->GetProgram();
+    prog.SetUniform("uProjection", projectionMat);
+    prog.SetUniform("uMatDiffuseColor", Color::Black);
+    prog.SetUniform("uTransform", M::Mat4::Translate(0.0f, 0.0f, -10.0f));
+
+    billboardVertexBuffer->Bind();
+    BindBillboardVertices();
+
+    billboardIndexBuffer->Bind();
+
+    glDrawElements(GL_TRIANGLE_FAN, NUM_BILLBOARD_INDICES, GL_UNSIGNED_INT, NULL);
+}
+
 struct DrawCall {
     GEN::Pointer<Effect>    fx;
     meshPtr_t               mesh;
@@ -95,14 +171,8 @@ struct DrawCall {
 
 static const unsigned INSTANCE_BUFFER_SIZE = 10 * 1024 * 1024 * sizeof(char);
 
-
 static std::vector<InstanceData> instanceData;
 static GEN::Pointer<StaticBuffer> instanceBuffer;
-
-struct EffectHash {
-    unsigned fx;
-    unsigned material;
-};
 
 void InitDebugOutput(void);
 
@@ -168,6 +238,14 @@ void Renderer::Init(void) {
     instanceBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, NULL, INSTANCE_BUFFER_SIZE));
 
     _timer.Start();
+
+    billboardPositions.resize(NUM_BILLBOARDS);
+    billboards.resize(NUM_BILLBOARDS);
+    InitBillboards();
+    BuildBillboards(M::Mat4::Identity());
+    billboardVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, &billboards[0], sizeof(Billboard) * NUM_BILLBOARDS));
+    billboardIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &billboardIndices[0], sizeof(unsigned) * NUM_BILLBOARD_INDICES));
+    assert(4 * sizeof(M::Vector3) == sizeof(Billboard));
 }
 
 void Renderer::Resize(int width, int height) {
@@ -241,8 +319,6 @@ static void DrawFrame(
             } // LIGHT_PASS == type
         } // forall passes
     } // forall drawcalls
-
-    glFinish();
 }
 
 void Renderer::SetRenderList(const RenderList& renderList) {
@@ -285,6 +361,7 @@ static void CompileAndTransform(const M::Matrix4& worldMat, R::RenderJob& rjob) 
 }
 
 static M::Matrix4 ComputeProjectionMatrix(float aspect, const M::Matrix4& worldMat, const std::vector<R::RenderJob>& renderJobs) {
+    /*
     float zMin = 10000.0f, zMax = -10000.0f;
     unsigned numJobs = renderJobs.size();
     for(unsigned i = 0; i < numJobs; ++i) {
@@ -295,6 +372,8 @@ static M::Matrix4 ComputeProjectionMatrix(float aspect, const M::Matrix4& worldM
         if(0 > v.z + r) zMax = M::Max(zMax, v.z + r);
     }
     return M::Mat4::Perspective(45.0f, aspect, -zMax, -zMin);
+    */
+    return M::Mat4::Perspective(45.0f, aspect, 0.1f, 1000.0f);
 }
 
 // arbitrary ordering on colors
@@ -380,6 +459,8 @@ void Renderer::Render(const RenderList& rlist) {
 
     metrics.frame.numDrawCalls = 0;
     DrawFrame(renderList, drawCalls, projectionMat, _time);
+
+    DrawBillboards(projectionMat);
 
     meshMgr.R_Update();
 
