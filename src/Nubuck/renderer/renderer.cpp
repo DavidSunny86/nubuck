@@ -294,7 +294,7 @@ static void Draw(Program& prog, int passFlags, const M::Matrix4& worldMat, DrawC
         skinMgr.R_Bind(prog, drawCall.skin);
     }
 
-    instanceBuffer->Update(&instanceData[drawCall.insIdx], sizeof(InstanceData) * drawCall.insCnt);
+    instanceBuffer->Update_Mapped(0, sizeof(InstanceData) * drawCall.insCnt, &instanceData[drawCall.insIdx]);
     // instanceBuffer->Bind(); bound by Update()
     BindInstanceData();
 
@@ -497,9 +497,9 @@ void Renderer::Render(const RenderList& rlist) {
     DrawFrame(renderList, drawCalls, projectionMat, _time);
 
     BuildBillboards(renderList.worldMat);
-    billboardVertexBuffer->Update(&billboards[0], sizeof(Billboard) * NUM_BILLBOARDS);
+    billboardVertexBuffer->Update_Mapped(0, sizeof(Billboard) * NUM_BILLBOARDS, &billboards[0]);
     DrawBillboards(renderList.worldMat, projectionMat);
-    // billboardVertexBuffer->Discard();
+    billboardVertexBuffer->Discard();
 
     meshMgr.R_Update();
 

@@ -19,7 +19,8 @@ namespace R {
         void Bind(void) const;
 
         void Discard(void); // Update(NULL), orphans buffer
-        void Update(const GLvoid* data, GLsizeiptr size);
+        void Update_SubData(GLintptr offset, GLsizeiptr size, const GLvoid* data);
+        void Update_Mapped(GLintptr offset, GLsizeiptr size, const GLvoid* data);
     };
 
 } // namespace R

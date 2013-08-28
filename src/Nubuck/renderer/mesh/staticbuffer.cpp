@@ -25,10 +25,19 @@ namespace R {
         GL_CALL(glBufferData(_type, _size, NULL, GL_STATIC_DRAW));
     }
 
-    void StaticBuffer::Update(const GLvoid* data, GLsizeiptr size) {
+    void StaticBuffer::Update_SubData(GLintptr offset, GLsizeiptr size, const GLvoid* data) {
+        assert(offset + size <= _size);
+        GL_CALL(glBindBuffer(_type, _id));
+        GL_CALL(glBufferSubData(_type, offset, size, data));
+    }
+
+    void StaticBuffer::Update_Mapped(GLintptr offset, GLsizeiptr size, const GLvoid* data) {
         assert(size <= _size);
         GL_CALL(glBindBuffer(_type, _id));
-        GL_CALL(glBufferData(_type, size, data, GL_STATIC_DRAW));
+        void* ptr = glMapBufferRange(_type, 0, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+        assert(ptr);
+        memcpy(ptr, data, size);
+        GL_CALL(glUnmapBuffer(_type));
     }
 
 } // namespace R
