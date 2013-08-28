@@ -1,4 +1,12 @@
-uniform vec4 uMatDiffuseColor;
+uniform vec4 uMatDiffuseColor0;
+uniform vec4 uMatDiffuseColor1;
+uniform vec4 uMatDiffuseColor2;
+uniform vec3 uLightPos0;
+uniform vec3 uLightPos1;
+uniform vec3 uLightPos2;
+uniform float   uLightConstantAttenuation;
+uniform float   uLightLinearAttenuation;
+uniform float	uLightQuadricAttenuation;
 
 in vec3 vPosition;
 in vec2 vTexCoord0;
@@ -6,13 +14,22 @@ in vec2 vTexCoord0;
 out vec4 fragColor;
  
 void main() {
-	vec3 lightPos = vec3(20.0, 20.0, 50.0);
 	float clip = dot(vTexCoord0, vTexCoord0);
 	if(clip <= 1.0) {
 		vec3 normal = normalize(vec3(vTexCoord0, sqrt(1.0 - clip)));
-		vec3 lightDir = normalize(lightPos - vPosition);
-		float d = clamp(dot(lightDir, normal), 0.0, 1.0);
-		fragColor = d * uMatDiffuseColor;
+		vec3 toLight0 = uLightPos0 - vPosition;
+		vec3 toLight1 = uLightPos1 - vPosition;
+		vec3 toLight2 = uLightPos2 - vPosition;
+		float dist0 = length(toLight0);
+		float dist1 = length(toLight1);
+		float dist2 = length(toLight2);
+		float d0 = clamp(dot(normalize(toLight0), normal), 0.0, 1.0);
+		float d1 = clamp(dot(normalize(toLight1), normal), 0.0, 1.0);
+		float d2 = clamp(dot(normalize(toLight2), normal), 0.0, 1.0);
+		float att0 = 1.0 / (uLightConstantAttenuation + uLightLinearAttenuation * dist0 + uLightQuadricAttenuation * dist0 * dist0);
+		float att1 = 1.0 / (uLightConstantAttenuation + uLightLinearAttenuation * dist1 + uLightQuadricAttenuation * dist1 * dist1);
+		float att2 = 1.0 / (uLightConstantAttenuation + uLightLinearAttenuation * dist2 + uLightQuadricAttenuation * dist2 * dist2);
+		fragColor = att0 * d0 * uMatDiffuseColor0 + att1 * d1 * uMatDiffuseColor1 + att2 * d2 * uMatDiffuseColor2;
 	}
 	else discard;
 }

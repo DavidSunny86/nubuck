@@ -215,8 +215,17 @@ static void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
 
     Program& prog = pass->GetProgram();
     prog.SetUniform("uProjection", projectionMat);
-    prog.SetUniform("uMatDiffuseColor", Color::White);
     prog.SetUniform("uTransform", M::Mat4::Identity());
+
+    prog.SetUniform("uMatDiffuseColor0", Color::White);
+    prog.SetUniform("uMatDiffuseColor1", Color::Blue);
+    prog.SetUniform("uMatDiffuseColor2", Color::Red);
+    prog.SetUniform("uLightPos0", M::Vector3(20.0f, 20.0f, 20.0f));
+    prog.SetUniform("uLightPos1", M::Vector3(-20.0f, 20.0f, 20.0f));
+    prog.SetUniform("uLightPos2", M::Vector3(20.0f, -20.0f, 20.0f));
+    prog.SetUniform("uLightConstantAttenuation", 1.0f);
+    prog.SetUniform("uLightLinearAttenuation", 0.0f);
+    prog.SetUniform("uLightQuadricAttenuation", 0.0f);
 
     billboardHotVertexBuffer->Bind();
     BindHotBillboardVertices();
