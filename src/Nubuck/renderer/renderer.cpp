@@ -93,7 +93,7 @@ struct Billboard {
     BillboardVertex verts[4];
 };
 
-static const unsigned NUM_BILLBOARDS = 4000;
+static const unsigned NUM_BILLBOARDS = 10000;
 static const float BILLBOARD_SIZE = 0.1f;
 static const unsigned NUM_BILLBOARD_INDICES = 5 * NUM_BILLBOARDS - 1; // 4 vertices + prim restart between bboards
 static std::vector<M::Vector3>      billboardPositions;
@@ -186,7 +186,7 @@ static void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
 
     Program& prog = pass->GetProgram();
     prog.SetUniform("uProjection", projectionMat);
-    prog.SetUniform("uMatDiffuseColor", Color::Black);
+    prog.SetUniform("uMatDiffuseColor", Color::White);
     prog.SetUniform("uTransform", M::Mat4::Identity());
 
     billboardVertexBuffer->Bind();
