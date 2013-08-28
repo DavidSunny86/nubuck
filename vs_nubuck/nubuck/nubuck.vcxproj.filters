@@ -469,9 +469,6 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\pass.cpp">
       <Filter>Private\renderer\effects</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\renderer\renderer.cpp">
-      <Filter>Private\renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\mesh.cpp">
       <Filter>Private\renderer\mesh</Filter>
     </ClCompile>
@@ -657,6 +654,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\material\material.cpp">
       <Filter>Private\renderer\material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\renderer.cpp">
+      <Filter>Private\renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

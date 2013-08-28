@@ -93,8 +93,8 @@ struct Billboard {
     BillboardVertex verts[4];
 };
 
-static const unsigned NUM_BILLBOARDS = 10;
-static const float BILLBOARD_SIZE = 0.5f;
+static const unsigned NUM_BILLBOARDS = 4000;
+static const float BILLBOARD_SIZE = 0.1f;
 static const unsigned NUM_BILLBOARD_INDICES = 5 * NUM_BILLBOARDS - 1; // 4 vertices + prim restart between bboards
 static std::vector<M::Vector3>      billboardPositions;
 static std::vector<Mesh::Index>     billboardIndices;
@@ -107,9 +107,34 @@ static float RandFloat(float min, float max) {
 }
 
 static void InitBillboards(void) {
+    const float radius = 5.0f;
     for(unsigned i = 0; i < NUM_BILLBOARDS; ++i) {
-        billboardPositions[i] = M::Vector3(RandFloat(-2.0f, 2.0f), RandFloat(-2.0f, 2.0f), RandFloat(-2.0f, -1.0f));
+        billboardPositions[i] = M::Vector3(RandFloat(-radius, radius), RandFloat(-radius, radius), RandFloat(-radius, radius));
     }
+}
+
+// camera position at 0
+static M::Matrix4 Billboard_FaceCamera(const M::Matrix4& worldMat, const M::Vector3& billboardPos) {
+    const M::Vector3 p = M::Transform(worldMat, billboardPos);
+    const M::Vector3 v2 = M::Normalize(-M::Vector3(p.x, 0.0f, p.z));
+    const M::Vector3 v1 = M::Vector3(0.0f, 1.0f, 0.0f);
+    const M::Vector3 v0 = M::Normalize(M::Cross(v1, v2));
+    const M::Matrix3 M = M::Mat3::FromColumns(v0, v1, v2);
+    const M::Vector3 w2 = M::Normalize(-M::Vector3(0.0f, p.y, p.z));
+    const M::Vector3 w0 = M::Vector3(1.0f, 0.0f, 0.0f);
+    const M::Vector3 w1 = M::Normalize(M::Cross(w0, w2));
+    const M::Matrix3 N = M::Mat3::FromColumns(w0, w1, w2);
+    return M::Mat4::FromRigidTransform(M * N, p);
+}
+
+// omits scale
+static M::Matrix4 Billboard_FaceViewingPlane(const M::Matrix4& worldMat, const M::Vector3& billboardPos) {
+    const M::Vector3 p = M::Transform(worldMat, billboardPos);
+    return M::Matrix4(
+        1.0f, 0.0f, 0.0f, worldMat.m03 + p.x,
+        0.0f, 1.0f, 0.0f, worldMat.m13 + p.y,
+        0.0f, 0.0f, 1.0f, worldMat.m23 + p.z,
+        0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 static void BuildBillboards(const M::Matrix4& worldMat) {
@@ -120,9 +145,12 @@ static void BuildBillboards(const M::Matrix4& worldMat) {
         { M::Vector3( BILLBOARD_SIZE, -BILLBOARD_SIZE, 0.0f), M::Vector2( 1.0f, -1.0f) }
     };
     for(unsigned i = 0; i < NUM_BILLBOARDS; ++i) {
+        // const M::Matrix4& T = Billboard_FaceCamera(worldMat, billboardPositions[i]);
+        const M::Matrix4& T = Billboard_FaceViewingPlane(worldMat, billboardPositions[i]);
         for(unsigned k = 0; k < 4; ++k) {
-            billboards[i].verts[k].position = billboardPositions[i] + vertices[k].position;
+            billboards[i].verts[k].position = vertices[k].position;
             billboards[i].verts[k].texCoords = vertices[k].texCoords;
+            billboards[i].verts[k].position = M::Transform(T, billboards[i].verts[k].position);
         }
     }
     billboardIndices.clear();
@@ -148,7 +176,7 @@ static void BindBillboardVertices(void) {
 
 void SetState(const State& state);
 
-static void DrawBillboards(const M::Matrix4& projectionMat) {
+static void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
     GEN::Pointer<Effect> fx = effectMgr.GetEffect("NodeBillboard");
     fx->Compile();
     Pass* pass = fx->GetPass(0);
@@ -159,7 +187,7 @@ static void DrawBillboards(const M::Matrix4& projectionMat) {
     Program& prog = pass->GetProgram();
     prog.SetUniform("uProjection", projectionMat);
     prog.SetUniform("uMatDiffuseColor", Color::Black);
-    prog.SetUniform("uTransform", M::Mat4::Translate(0.0f, 0.0f, -10.0f));
+    prog.SetUniform("uTransform", M::Mat4::Identity());
 
     billboardVertexBuffer->Bind();
     BindBillboardVertices();
@@ -468,7 +496,10 @@ void Renderer::Render(const RenderList& rlist) {
     metrics.frame.numDrawCalls = 0;
     DrawFrame(renderList, drawCalls, projectionMat, _time);
 
-    DrawBillboards(projectionMat);
+    BuildBillboards(renderList.worldMat);
+    billboardVertexBuffer->Update(&billboards[0], sizeof(Billboard) * NUM_BILLBOARDS);
+    DrawBillboards(renderList.worldMat, projectionMat);
+    // billboardVertexBuffer->Discard();
 
     meshMgr.R_Update();
 
