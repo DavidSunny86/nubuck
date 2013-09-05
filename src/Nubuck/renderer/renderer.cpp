@@ -478,11 +478,14 @@ static int CompareMaterials(const Material& lhp, const Material& rhp) {
 static int CompareRenderJobs(const RenderJob& lhp, const RenderJob& rhp) {
     int cmp = 0;
     cmp = lhp.fx.compare(rhp.fx);
-    if(0 != cmp) return cmp;
+    if(cmp < 0) return true;
+    if(cmp > 0) return false;
     cmp = SkinMgr::Compare(lhp.skin, rhp.skin);
-    if(0 != cmp) return cmp;
+    if(cmp < 0) return true;
+    if(cmp > 0) return false;
     cmp = CompareMaterials(lhp.material, rhp.material);
-    return cmp;
+    if(cmp < 0) return true;
+    return false;
 }
 
 void Renderer::Render(const RenderList& rlist) {
