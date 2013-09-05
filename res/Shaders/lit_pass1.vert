@@ -12,7 +12,9 @@ layout(location = 4) in vec3 aInsTransformA0;
 layout(location = 5) in vec3 aInsTransformA1;
 layout(location = 6) in vec3 aInsTransformA2;
 layout(location = 7) in vec3 aInsTransformA3;
+layout(location = 8) in vec4 aMatDiffuseColor;
 
+out vec4	vMatDiffuseColor;
 out vec3    vNormal;
 out vec4    vColor;
 out float   vDist; // distance between light source and vertex
@@ -26,6 +28,8 @@ void main() {
 	transform[1] = vec4(aInsTransformA1, 0.0);
 	transform[2] = vec4(aInsTransformA2, 0.0);
 	transform[3] = vec4(aInsTransformA3, 1.0);
+	
+	vMatDiffuseColor = aMatDiffuseColor;
 
     vec3 worldPos = (transform * aPosition).xyz;
     vDist = length(uLightPosition - worldPos);
