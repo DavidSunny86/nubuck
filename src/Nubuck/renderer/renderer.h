@@ -30,8 +30,10 @@ struct RenderJob {
 
 struct RenderList {
     M::Matrix4              worldMat;
-    std::vector<RenderJob>  jobs;
+    Light                   dirLights[3];
     std::vector<Light>      lights;
+    std::vector<RenderJob>  jobs;
+    std::vector<M::Vector3> nodePositions;
 };
 
 class Renderer {

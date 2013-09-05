@@ -65,7 +65,7 @@ struct ENT_Polyhedron {
 	const graph_t*              G;
     PolyhedronNodes             nodes;
 	PolyhedronHull              hull;
-	std::vector<R::RenderJob>   renderList;
+    R::RenderList               renderList;
 };
 
 void Polyhedron_InitResources(void);

@@ -131,21 +131,16 @@ void Polyhedron_Rebuild(ENT_Polyhedron& ph) {
 // the renderlist of a polyhedron ph can be build even though
 // it's graph ph.G is no longer valid.
 void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
-	ph.renderList.clear();
+    ph.renderList.jobs.clear();
 
 	R::RenderJob renderJob;
 	renderJob.fx = "Lit";
     renderJob.material = R::Material::White;
 
     unsigned numNodes = ph.nodes.positions.size();
+    ph.renderList.nodePositions.clear();
     for(unsigned i = 0; i < numNodes; ++i) {
-        if(ph.nodes.valid[i]) {
-            renderJob.material.diffuseColor = ph.nodes.colors[i];
-            renderJob.mesh = g_nodeMesh;
-            renderJob.primType = 0;
-            renderJob.transform = M::Mat4::Translate(ph.nodes.positions[i]);
-            ph.renderList.push_back(renderJob);
-        }
+        if(ph.nodes.valid[i]) ph.renderList.nodePositions.push_back(ph.nodes.positions[i]);
 	}
 
     if(!ph.hull.indices.empty() /* ie. hull exists */) {
@@ -153,7 +148,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
         renderJob.mesh = ph.hull.mesh;
         renderJob.primType = GL_TRIANGLE_FAN;
         renderJob.transform = M::Mat4::Identity();
-        ph.renderList.push_back(renderJob);
+        ph.renderList.jobs.push_back(renderJob);
     }
 
     renderJob.fx = "TexDiffuse";
@@ -166,7 +161,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
             renderJob.transform = 
                 M::Mat4::Translate(ph.hull.curves[i].curve.decalPos[j]) * 
                 M::Mat4::FromRigidTransform(ph.hull.curves[i].localToWorld, M::Vector3::Zero);
-            ph.renderList.push_back(renderJob);
+            ph.renderList.jobs.push_back(renderJob);
         }
     }
 }

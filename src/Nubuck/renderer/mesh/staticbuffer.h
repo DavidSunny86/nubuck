@@ -14,7 +14,10 @@ namespace R {
         StaticBuffer(GLenum type, const GLvoid* data, GLsizeiptr size);
         ~StaticBuffer(void);
 
+        void Destroy(void);
+
         GLuint GetID(void) const { return _id; }
+        GLsizeiptr GetSize(void) const { return _size; }
 
         void Bind(void) const;
 

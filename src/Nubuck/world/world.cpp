@@ -35,8 +35,11 @@ namespace W {
 
 	void World::AddRenderJobs(const ENT_Polyhedron& polyhedron) {
 		_renderList.jobs.insert(_renderList.jobs.end(),
-			polyhedron.renderList.begin(),
-			polyhedron.renderList.end());
+			polyhedron.renderList.jobs.begin(),
+			polyhedron.renderList.jobs.end());
+        _renderList.nodePositions.insert(_renderList.nodePositions.end(),
+            polyhedron.renderList.nodePositions.begin(),
+            polyhedron.renderList.nodePositions.end());
 	}
 
     void World::SetupLights(void) {
@@ -185,6 +188,7 @@ namespace W {
 		_renderListLock.Lock();
         _renderList.worldMat = _camArcball.GetWorldMatrix();
 		_renderList.jobs.clear();
+        _renderList.nodePositions.clear();
 		std::for_each(_polyhedrons.begin(), _polyhedrons.end(),
 			std::bind(&World::AddRenderJobs, this, std::placeholders::_1));
 		_renderListLock.Unlock();
