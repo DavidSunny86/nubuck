@@ -279,8 +279,6 @@ void Renderer::Init(void) {
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);
 
-    instanceBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, NULL, INSTANCE_BUFFER_SIZE));
-
     _timer.Start();
 }
 
@@ -317,6 +315,8 @@ static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const
 
 static void DrawFrame(RenderList& renderList, const M::Matrix4& projectionMat, float time) {
     typedef std::vector<RenderJob>::iterator rjobIt_t;
+
+    if(renderList.jobs.empty()) return;
 
     RenderJob* cur = &renderList.jobs[0];
     RenderJob* next = NULL;
