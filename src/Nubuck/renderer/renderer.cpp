@@ -113,20 +113,15 @@ static float RandFloat(float min, float max) {
     return min + (rand() % 1000 / 1000.0f) * (max - min);
 }
 
-static void InitBillboards(const std::vector<M::Vector3>& positions) {
-    unsigned numBillboards = positions.size();
+static void ReserveBillboards(unsigned numBillboards) {
+    if(numBillboards <= billboardsHot.size()) return;
+
     unsigned numBillboardIndices = 5 * numBillboards - 1;
-
-    if(!numBillboards) return;
-
-    billboardPositions = positions;
 
     billboardsHot.clear();
     billboardsHot.resize(numBillboards);
-    if(!billboardHotVertexBuffer.IsValid() || sizeof(BillboardHot) * numBillboards > billboardHotVertexBuffer->GetSize()) {
-        if(billboardHotVertexBuffer.IsValid()) billboardHotVertexBuffer->Destroy();
-        billboardHotVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, NULL, sizeof(BillboardHot) * numBillboards));
-    }
+    if(billboardHotVertexBuffer.IsValid()) billboardHotVertexBuffer->Destroy();
+    billboardHotVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, NULL, sizeof(BillboardHot) * numBillboards));
 
     static const BillboardColdVertex coldVertices[4] = {
         { M::Vector2(-1.0f, -1.0f) },
@@ -139,10 +134,8 @@ static void InitBillboards(const std::vector<M::Vector3>& positions) {
     for(unsigned i = 0; i < numBillboards; ++i) {
         memcpy(billboardsCold[i].verts, coldVertices, sizeof(coldVertices));
     }
-    if(!billboardColdVertexBuffer.IsValid() || sizeof(BillboardCold) * numBillboards > billboardColdVertexBuffer->GetSize()) {
-        if(billboardColdVertexBuffer.IsValid()) billboardColdVertexBuffer->Destroy();
-        billboardColdVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, &billboardsCold[0], sizeof(BillboardCold) * numBillboards));
-    }
+    if(billboardColdVertexBuffer.IsValid()) billboardColdVertexBuffer->Destroy();
+    billboardColdVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, &billboardsCold[0], sizeof(BillboardCold) * numBillboards));
 
     billboardIndices.clear();
     billboardIndices.reserve(numBillboardIndices);
@@ -151,9 +144,16 @@ static void InitBillboards(const std::vector<M::Vector3>& positions) {
         billboardIndices.push_back(i);
     }
     assert(numBillboardIndices == billboardIndices.size());
-    if(!billboardIndexBuffer.IsValid() || sizeof(Mesh::Index) * numBillboardIndices > billboardIndexBuffer->GetSize()) {
-        if(billboardIndexBuffer.IsValid()) billboardIndexBuffer->Destroy();
-        billboardIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &billboardIndices[0], sizeof(Mesh::Index) * numBillboardIndices));
+    if(billboardIndexBuffer.IsValid()) billboardIndexBuffer->Destroy();
+    billboardIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &billboardIndices[0], sizeof(Mesh::Index) * numBillboardIndices));
+}
+
+static void InitBillboards(const std::vector<M::Vector3>& positions) {
+    unsigned numBillboards = positions.size();
+    unsigned numBillboardIndices = 5 * numBillboards - 1;
+    if(numBillboards) {
+        billboardPositions = positions;
+        ReserveBillboards(numBillboards);
     }
 }
 
