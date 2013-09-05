@@ -14,7 +14,6 @@ namespace M {
 	template<typename TYPE> TYPE Min(TYPE lhp, TYPE rhp);
 	template<typename TYPE> TYPE Max(TYPE lhp, TYPE rhp);
 	template<typename TYPE> TYPE Clamp(TYPE min, TYPE val, TYPE max);
-    template<typename TYPE> int  Sign(const TYPE& val);
 
 	float Deg2Rad(float deg);
 	float Rad2Deg(float rad);

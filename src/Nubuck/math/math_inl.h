@@ -29,13 +29,6 @@ namespace M {
 		return Max(min, Min(val, max));
 	}
 
-    template<typename TYPE>
-    M_INLINE int Sign(const TYPE& val) {
-        if(0 < val) return  1;
-        if(0 > val) return -1;
-        return 0;
-    }
-
 	M_INLINE float Deg2Rad(float deg) {
 		const float factor = PI / 180.0f;
 		return deg * factor;

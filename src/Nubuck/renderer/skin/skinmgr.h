@@ -50,16 +50,6 @@ namespace R {
 
         void R_Compile(handle_t& handle);
         void R_Bind(Program& program, handle_t& handle);
-
-        // don't make any assumtions about the ordering of skins
-        static int Compare(const handle_t& lhp, const handle_t& rhp) {
-            if(lhp.IsValid() && rhp.IsValid()) {
-                const std::string& lhpTex = lhp._res->skinDesc.diffuseTexture;
-                const std::string& rhpTex = rhp._res->skinDesc.diffuseTexture;
-                return lhpTex.compare(rhpTex);
-            }
-            return 0;
-        }
     };
 
     extern SkinMgr skinMgr;

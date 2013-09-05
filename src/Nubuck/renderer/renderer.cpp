@@ -18,22 +18,11 @@
 
 namespace {
 
-struct InstanceData {
-    M::Matrix4  transform;
-    R::Material    material;
-};
-
 enum {
-    IN_POSITION         = 0,
-    IN_NORMAL           = 1,
-    IN_COLOR            = 2,
-    IN_TEXCOORDS        = 3,
-
-    IN_INS_TRANSFORM_A0             = 4,
-    IN_INS_TRANSFORM_A1     		= 5,
-    IN_INS_TRANSFORM_A2     		= 6,
-    IN_INS_TRANSFORM_A3     		= 7,
-    IN_INS_MATERIAL_DIFFUSE         = 8
+    IN_POSITION     = 0,
+    IN_NORMAL       = 1,
+    IN_COLOR        = 2,
+    IN_TEXCOORDS    = 3
 };
 
 void BindVertices(void) {
@@ -56,24 +45,6 @@ void BindVertices(void) {
         2, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
         (void*)offsetof(R::Mesh::Vertex, texCoords)));
     GL_CALL(glEnableVertexAttribArray(IN_TEXCOORDS));
-}
-
-void BindInstanceData(void) {
-    // the 4x4 transformation matrix is passed as 3 vec3 values.
-    // Ai is the vector of the top 3 elements fo the i-th column of the matrix
-    for(int col = 0; col < 4; ++col) {
-        GL_CALL(glVertexAttribPointer(IN_INS_TRANSFORM_A0 + col, 
-            3, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
-            (void*)(offsetof(InstanceData, transform) + sizeof(float) * 4 * col)));
-        GL_CALL(glEnableVertexAttribArray(IN_INS_TRANSFORM_A0 + col));
-        GL_CALL(glVertexAttribDivisorARB(IN_INS_TRANSFORM_A0 + col, 1));
-    }
-
-    GL_CALL(glVertexAttribPointer(IN_INS_MATERIAL_DIFFUSE,
-        4, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
-        (void*)offsetof(InstanceData, material)));
-    GL_CALL(glEnableVertexAttribArray(IN_INS_MATERIAL_DIFFUSE));
-    GL_CALL(glVertexAttribDivisorARB(IN_INS_MATERIAL_DIFFUSE, 1));
 }
 
 template<typename T> struct ToGLEnum { };
@@ -248,20 +219,6 @@ static void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
     glDrawElements(GL_TRIANGLE_FAN, numBillboardIndices, GL_UNSIGNED_INT, NULL);
 }
 
-struct DrawCall {
-    GEN::Pointer<Effect>    fx;
-    meshPtr_t               mesh;
-    GLenum                  primType;
-    SkinMgr::handle_t       skin;
-    unsigned                insIdx;
-    unsigned                insCnt;
-};
-
-static const unsigned INSTANCE_BUFFER_SIZE = 10 * 1024 * 1024 * sizeof(char);
-
-static std::vector<InstanceData> instanceData;
-static GEN::Pointer<StaticBuffer> instanceBuffer;
-
 void InitDebugOutput(void);
 
 void SetEnabled(GLenum state, GLboolean enabled) {
@@ -292,8 +249,7 @@ void SetMaterialUniforms(Program& prog, const Material& mat) {
     prog.SetUniform("uMatDiffuseColor", mat.diffuseColor);
 }
 
-Renderer::Renderer(void) : _time(0.0f) {
-}
+Renderer::Renderer(void) : _time(0.0f) { }
 
 void Renderer::Init(void) {
     GL_CHECK_ERROR;
@@ -333,72 +289,80 @@ void Renderer::Resize(int width, int height) {
     _aspect = (float)width / height;
 }
 
-static void Draw(Program& prog, int passFlags, const M::Matrix4& worldMat, DrawCall& drawCall) {
-    if(USE_TEX_DIFFUSE & passFlags) {
-        skinMgr.R_Bind(prog, drawCall.skin);
+static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const M::Matrix4& worldMat, RenderJob* first) {
+    RenderJob* meshJob = first;
+    while(meshJob && meshJob->fx == first->fx) {
+        if(FIRST_LIGHT_PASS == passType || LIGHT_PASS == passType || USE_MATERIAL & passFlags)
+            SetMaterialUniforms(prog, meshJob->material);
+
+        prog.SetUniform("uTransform", meshJob->transform);
+
+        if(USE_TEX_DIFFUSE & passFlags) {
+            skinMgr.R_Bind(prog, meshJob->skin);
+        }
+
+        meshJob->mesh->R_Bind();
+        BindVertices();
+        unsigned numIndices = meshJob->mesh->NumIndices();
+
+        GLenum primType = meshJob->primType;
+        if(!primType) primType = meshJob->mesh->PrimitiveType();
+
+        metrics.frame.numDrawCalls++;
+        GL_CALL(glDrawElements(primType, numIndices, ToGLEnum<Mesh::Index>::ENUM, NULL));
+        meshJob = meshJob->next;
     }
-
-    instanceBuffer->Update_Mapped(0, sizeof(InstanceData) * drawCall.insCnt, &instanceData[drawCall.insIdx]);
-    // instanceBuffer->Bind(); bound by Update()
-    BindInstanceData();
-
-    drawCall.mesh->R_Bind();
-    BindVertices();
-    unsigned numIndices = drawCall.mesh->NumIndices();
-
-    GLenum primType = drawCall.primType;
-    if(!primType) primType = drawCall.mesh->PrimitiveType();
-
-    metrics.frame.numDrawCalls++;
-    GL_CALL(glDrawElementsInstanced(primType, numIndices, ToGLEnum<Mesh::Index>::ENUM, NULL, drawCall.insCnt));
-    instanceBuffer->Discard();
+    return meshJob;
 }
 
-static void DrawFrame(
-    RenderList& renderList, 
-    std::vector<DrawCall> drawCalls,
-    const M::Matrix4& projectionMat, 
-    float time) 
-{
-    for(unsigned i = 0; i < drawCalls.size(); ++i) {
-        DrawCall& drawCall = drawCalls[i];
-        GEN::Pointer<Effect> fx = drawCall.fx;
+static void DrawFrame(RenderList& renderList, const M::Matrix4& projectionMat, float time) {
+    typedef std::vector<RenderJob>::iterator rjobIt_t;
 
-        int numPasses = fx->NumPasses();
-        for(int i = 0; i < numPasses; ++i) {
-            Pass* pass = fx->GetPass(i);
-            pass->Use();
-            
-            Program&        prog = pass->GetProgram();
-            const PassDesc& desc = pass->GetDesc();
+    RenderJob* cur = &renderList.jobs[0];
+    RenderJob* next = NULL;
+    while(cur) {
+        next = NULL;
+        if(true) {
+            GEN::Pointer<Effect> fx = effectMgr.GetEffect(cur->fx);
 
-            SetState(desc.state);
+            int numPasses = fx->NumPasses();
+            for(int i = 0; i < numPasses; ++i) {
+                Pass* pass = fx->GetPass(i);
+                pass->Use();
+                
+                Program&        prog = pass->GetProgram();
+                const PassDesc& desc = pass->GetDesc();
 
-            prog.SetUniform("uProjection", projectionMat);
-            // prog.SetUniform("uTransform", worldMat);
+                SetState(desc.state);
 
-            if(USE_TIME & desc.flags) prog.SetUniform("uTime", time);
-            if(USE_COLOR & desc.flags) prog.SetUniform("uColor", desc.state.color);
+                prog.SetUniform("uProjection", projectionMat);
+                // prog.SetUniform("uTransform", worldMat);
 
-            if(FIRST_LIGHT_PASS == desc.type || LIGHT_PASS == desc.type) {
-                M::Matrix3 normalMat = M::Transpose(M::Inverse(M::RotationOf(renderList.worldMat)));
-                prog.SetUniform("uNormalMat", normalMat);
-            }
+                if(USE_TIME & desc.flags) prog.SetUniform("uTime", time);
+                if(USE_COLOR & desc.flags) prog.SetUniform("uColor", desc.state.color);
 
-            if(FIRST_LIGHT_PASS == desc.type || DEFAULT == desc.type) {
-                if(FIRST_LIGHT_PASS == desc.type && !renderList.lights.empty())
-                    SetLightUniforms(prog, renderList.lights[0]);
-                Draw(prog, desc.flags, renderList.worldMat, drawCall);
-            }
-
-            if(LIGHT_PASS == desc.type) {
-                for(int j = 1; j < renderList.lights.size(); ++j) {
-                    SetLightUniforms(prog, renderList.lights[j]);
-                    Draw(prog, desc.flags, renderList.worldMat, drawCall);
+                if(FIRST_LIGHT_PASS == desc.type || LIGHT_PASS == desc.type) {
+                    M::Matrix3 normalMat = M::Transpose(M::Inverse(M::RotationOf(renderList.worldMat)));
+                    prog.SetUniform("uNormalMat", normalMat);
                 }
-            } // LIGHT_PASS == type
-        } // forall passes
-    } // forall drawcalls
+
+                if(FIRST_LIGHT_PASS == desc.type || DEFAULT == desc.type) {
+                    if(FIRST_LIGHT_PASS == desc.type && !renderList.lights.empty())
+                        SetLightUniforms(prog, renderList.lights[0]);
+
+                    next = DrawMeshList(prog, desc.type, desc.flags, renderList.worldMat, cur);
+                }
+
+                if(LIGHT_PASS == desc.type) {
+                    for(int j = 1; j < renderList.lights.size(); ++j) {
+                        SetLightUniforms(prog, renderList.lights[j]);
+                        next = DrawMeshList(prog, desc.type, desc.flags, renderList.worldMat, cur);
+                    }
+                } // LIGHT_PASS == type
+            }
+        }
+        cur = next;
+    }
 }
 
 void Renderer::SetRenderList(const RenderList& renderList) {
@@ -457,37 +421,6 @@ static M::Matrix4 ComputeProjectionMatrix(float aspect, const M::Matrix4& worldM
     return M::Mat4::Perspective(45.0f, aspect, 0.1f, 1000.0f);
 }
 
-// arbitrary ordering on colors
-static int CompareColors(const Color& lhp, const Color& rhp) {
-    int s = 0;
-    s = M::Sign(lhp.r - rhp.r);
-    if(0 != s) return s;
-    s = M::Sign(lhp.g - rhp.g);
-    if(0 != s) return s;
-    s = M::Sign(lhp.b - rhp.b);
-    if(0 != s) return s;
-    s = M::Sign(lhp.a - rhp.a);
-    return s;
-}
-
-// arbitrary ordering on materials
-static int CompareMaterials(const Material& lhp, const Material& rhp) {
-    return CompareColors(lhp.diffuseColor, rhp.diffuseColor);
-}
-
-static int CompareRenderJobs(const RenderJob& lhp, const RenderJob& rhp) {
-    int cmp = 0;
-    cmp = lhp.fx.compare(rhp.fx);
-    if(cmp < 0) return true;
-    if(cmp > 0) return false;
-    cmp = SkinMgr::Compare(lhp.skin, rhp.skin);
-    if(cmp < 0) return true;
-    if(cmp > 0) return false;
-    cmp = CompareMaterials(lhp.material, rhp.material);
-    if(cmp < 0) return true;
-    return false;
-}
-
 void Renderer::Render(const RenderList& rlist) {
     SetRenderList(rlist);
 
@@ -508,41 +441,15 @@ void Renderer::Render(const RenderList& rlist) {
     static SYS::Timer frameTime;
     frameTime.Start();
 
+    // TODO: sort
+
     Link(renderList.jobs);
     std::for_each(renderList.jobs.begin(), renderList.jobs.end(),
         std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
     M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, renderList.jobs);
 
-    instanceData.clear();
-    std::vector<DrawCall> drawCalls;
-    std::sort(renderList.jobs.begin(), renderList.jobs.end(), CompareRenderJobs);
-    for(unsigned i = 0; i < renderList.jobs.size(); ) {
-        const RenderJob& rjob = renderList.jobs[i];
-        DrawCall drawCall;
-        drawCall.fx = effectMgr.GetEffect(rjob.fx);
-        drawCall.mesh = rjob.mesh;
-        drawCall.primType = rjob.primType;
-        drawCall.skin = rjob.skin;
-        drawCall.insIdx = instanceData.size();
-        drawCall.insCnt = 1;
-        InstanceData insData;
-        insData.material = rjob.material;
-        insData.transform = rjob.transform;
-        instanceData.push_back(insData);
-        i++;
-        while(i < renderList.jobs.size() && drawCall.mesh == renderList.jobs[i].mesh) {
-            InstanceData insData;
-            insData.material = renderList.jobs[i].material;
-            insData.transform = renderList.jobs[i].transform;
-            instanceData.push_back(insData);
-            drawCall.insCnt++;
-            i++;
-        }
-        drawCalls.push_back(drawCall);
-    }
-
     metrics.frame.numDrawCalls = 0;
-    DrawFrame(renderList, drawCalls, projectionMat, _time);
+    DrawFrame(renderList, projectionMat, _time);
 
     InitBillboards(renderList.nodePositions);
     BuildBillboards(renderList.worldMat);

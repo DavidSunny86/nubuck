@@ -33,10 +33,6 @@ namespace R {
                 return *this;
             }
 
-            bool operator==(const MeshPtr& other) {
-                return _mesh == other._mesh;
-            }
-
             bool IsValid(void) const { return _mesh; }
 
             Mesh*       operator->(void) { return _mesh; }
