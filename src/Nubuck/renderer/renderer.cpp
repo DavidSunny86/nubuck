@@ -71,7 +71,7 @@ struct BillboardCold {
     BillboardColdVertex verts[4];
 };
 
-static const float BILLBOARD_SIZE = 0.1f;
+static const float BILLBOARD_SIZE = 2.0f;
 static std::vector<M::Vector3>      billboardPositions;
 static std::vector<Mesh::Index>     billboardIndices;
 static std::vector<BillboardHot>    billboardsHot;
