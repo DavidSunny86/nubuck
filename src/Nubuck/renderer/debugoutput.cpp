@@ -66,11 +66,15 @@ namespace R {
 
     void InitDebugOutput(void) {
         PFNGLDEBUGMESSAGECALLBACKARBPROC DebugMessageCallbackARB = NULL;
+		DWORD lastError = GetLastError();
         if(DebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)wglGetProcAddress("glDebugMessageCallbackARB")) {
             common.printf("INFO - GL_ARB_debug_output supported.\n");
             DebugMessageCallbackARB(DebugOutputCallback, NULL);
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-        }
+        } else {
+			common.printf("INFO - GL_ARB_debug_output not supported.\n");
+			SetLastError(lastError);
+		}
     }
 
 } // namespace R
