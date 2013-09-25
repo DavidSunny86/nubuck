@@ -198,10 +198,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cbSmooth</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>NodeConfig</receiver>
+   <slot>OnSmoothChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>93</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>93</x>
+     <y>90</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>OnSizeChanged(double)</slot>
   <slot>OnSubdivisionsChanged(int)</slot>
   <slot>OnTypeChanged(int)</slot>
+  <slot>OnSmoothChanged(int)</slot>
  </slots>
 </ui>

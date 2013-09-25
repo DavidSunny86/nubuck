@@ -14,6 +14,7 @@ namespace UI {
 		void OnTypeChanged(int idx);
         void OnSizeChanged(double val);
         void OnSubdivisionsChanged(int val);
+        void OnSmoothChanged(int val);
     public:
         NodeConfig(QWidget* parent = NULL); // Qt dictates public ctor
 

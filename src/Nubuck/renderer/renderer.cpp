@@ -58,6 +58,7 @@ template<> struct ToGLEnum<int>         { enum { ENUM = GL_INT }; };
 COM::Config::Variable<int>		cvar_r_nodeType("r_nodeType", 0);
 COM::Config::Variable<float>	cvar_r_nodeSize("r_nodeSize", 1.0f);
 COM::Config::Variable<int>		cvar_r_nodeSubdiv("r_nodeSubdiv", 3);
+COM::Config::Variable<int>		cvar_r_nodeSmooth("r_nodeSmooth", 1);
 
 namespace R {
 
@@ -258,13 +259,14 @@ void SetMaterialUniforms(Program& prog, const Material& mat) {
 }
 
 static void CreateNodeMesh(void) {
-	Sphere sphere(cvar_r_nodeSubdiv, true);
+	Sphere sphere(cvar_r_nodeSubdiv, cvar_r_nodeSmooth);
 	sphere.Scale(cvar_r_nodeSize);
 	nodeMesh = meshMgr.Create(sphere.GetDesc());
 }
 
 static void CreateNodeMeshCallback(const std::string& name) {
-	if("r_nodeSize" == name || "r_nodeSubdiv" == name) CreateNodeMesh();
+	if("r_nodeSize" == name || "r_nodeSubdiv" == name || "r_nodeSmooth" == name) 
+        CreateNodeMesh();
 }
 
 Renderer::Renderer(void) : _time(0.0f) { }
@@ -299,6 +301,7 @@ void Renderer::Init(void) {
 
 	cvar_r_nodeSize.Register(CreateNodeMeshCallback);
 	cvar_r_nodeSubdiv.Register(CreateNodeMeshCallback);
+    cvar_r_nodeSmooth.Register(CreateNodeMeshCallback);
 
 	CreateNodeMesh();
 
