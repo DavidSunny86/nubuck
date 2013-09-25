@@ -228,6 +228,18 @@ static void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
     glDrawElements(GL_TRIANGLE_FAN, numBillboardIndices, GL_UNSIGNED_INT, NULL);
 }
 
+// rotates the coordinate space such that the new z axis coincides
+// with the vector d.  
+// let  M = AlignZ(d). then AlignZ(d) * d = Length(d) * (0, 0, 1)
+static M::Matrix4 AlignZ(const M::Vector3& d) {
+    const float len_yz = sqrt(d.y * d.y + d.z * d.z);
+    const float len = d.Length();
+    return M::Matrix4(len_yz * len_yz, -d.x * d.y, -d.x * d.z, 0.0f,
+        0.0f, len * d.z, -len * d.y, 0.0f,
+        len_yz * d.x, len_yz * d.y, len_yz * d.z, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f);
+}
+
 void InitDebugOutput(void);
 
 void SetEnabled(GLenum state, GLboolean enabled) {
@@ -464,7 +476,7 @@ void Renderer::Render(const RenderList& rlist) {
     _renderListLock.Lock();
     renderList = _nextRenderList;
     _renderListLock.Unlock();
-
+    
 	if(R_NODETYPE_GEOMETRY == cvar_r_nodeType) {
 		RenderJob rjob;
 		rjob.fx = "Lit";
