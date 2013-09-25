@@ -51,6 +51,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\light\light.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\material\material.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\bezier\bezier.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\cylinder\cylinder.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\mesh.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr_inl.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c" />
     <ClCompile Include="..\..\src\Nubuck\renderer\material\material.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\bezier\bezier.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\cylinder\cylinder.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\mesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\meshmgr.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.cpp" />

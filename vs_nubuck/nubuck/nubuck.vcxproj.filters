@@ -168,6 +168,9 @@
     <Filter Include="Private\world\entities\ent_polyhedron">
       <UniqueIdentifier>{7340b45c-e95b-4810-a3fe-f1c3549ab4d0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\mesh\cylinder">
+      <UniqueIdentifier>{fc9c3fbb-3558-4100-b384-c2df5b50b9b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -416,6 +419,9 @@
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.h">
       <Filter>Private\world\entities\ent_polyhedron</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\cylinder\cylinder.h">
+      <Filter>Private\renderer\mesh\cylinder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -657,6 +663,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\renderer.cpp">
       <Filter>Private\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\cylinder\cylinder.cpp">
+      <Filter>Private\renderer\mesh\cylinder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
