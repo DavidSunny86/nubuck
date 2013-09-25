@@ -5,9 +5,6 @@
 #include <renderer\mesh\quad\quad.h>
 #include "ent_polyhedron.h"
 
-COM::Config::Variable<float>    cvar_nodeSize("nodeSize", 0.2f);
-COM::Config::Variable<int>      cvar_nodeSubdiv("nodeSubdiv", 2);
-
 COM::Config::Variable<float>    cvar_faceCurveSpeed("faceSpeed", 0.2f);
 COM::Config::Variable<float>    cvar_faceCurveDecalSize("faceDecalSize", 0.2f);
 COM::Config::Variable<float>    cvar_faceCurveSpacing("faceSpacing", 0.4f);
@@ -20,14 +17,10 @@ static M::Vector3 ToVector(const leda::d3_rat_point& p) {
 
 namespace W {
 
-static R::meshPtr_t         g_nodeMesh;
 static R::meshPtr_t         g_faceCurveDecalMesh;
 static R::SkinMgr::handle_t g_faceCurveDecalSkin;
 
 void Polyhedron_InitResources(void) {
-	R::Sphere sphere(cvar_nodeSubdiv, true);
-    sphere.Scale(cvar_nodeSize);
-	g_nodeMesh = R::meshMgr.Create(sphere.GetDesc());
     g_faceCurveDecalMesh = R::meshMgr.Create(R::CreateQuadDesc(cvar_faceCurveDecalSize));
     R::SkinDesc skinDesc;
     skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle.tga";

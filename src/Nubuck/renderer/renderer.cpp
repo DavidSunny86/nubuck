@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include <common\common.h>
+#include <common\config\config.h>
 #include <math\matrix3.h>
 #include <math\matrix4.h>
 #include <renderer\glew\glew.h>
@@ -12,6 +13,7 @@
 #include <renderer\effects\effectmgr.h>
 #include <renderer\effects\pass.h>
 #include <renderer\mesh\mesh.h>
+#include <renderer\mesh\sphere\sphere.h>
 #include <renderer\material\material.h>
 #include <renderer\metrics\metrics.h>
 #include "renderer.h"
@@ -53,7 +55,13 @@ template<> struct ToGLEnum<int>         { enum { ENUM = GL_INT }; };
 
 } // unnamed namespace
 
+COM::Config::Variable<int>		cvar_r_nodeType("r_nodeType", 0);
+COM::Config::Variable<float>	cvar_r_nodeSize("r_nodeSize", 1.0f);
+COM::Config::Variable<int>		cvar_r_nodeSubdiv("r_nodeSubdiv", 3);
+
 namespace R {
+
+static meshPtr_t nodeMesh;
 
 struct BillboardHotVertex {
     M::Vector3 position;
@@ -71,7 +79,6 @@ struct BillboardCold {
     BillboardColdVertex verts[4];
 };
 
-static const float BILLBOARD_SIZE = 2.0f;
 static std::vector<M::Vector3>      billboardPositions;
 static std::vector<Mesh::Index>     billboardIndices;
 static std::vector<BillboardHot>    billboardsHot;
@@ -153,11 +160,12 @@ static M::Matrix4 Billboard_FaceViewingPlane(const M::Matrix4& worldMat, const M
 }
 
 static void BuildBillboards(const M::Matrix4& worldMat) {
-    static const BillboardHotVertex hotVertices[4] = {
-        { M::Vector3(-BILLBOARD_SIZE, -BILLBOARD_SIZE, 0.0f) },
-        { M::Vector3(-BILLBOARD_SIZE,  BILLBOARD_SIZE, 0.0f) },
-        { M::Vector3( BILLBOARD_SIZE,  BILLBOARD_SIZE, 0.0f) },
-        { M::Vector3( BILLBOARD_SIZE, -BILLBOARD_SIZE, 0.0f) }
+	float nodeSize = cvar_r_nodeSize;
+    const BillboardHotVertex hotVertices[4] = {
+        { M::Vector3(-nodeSize, -nodeSize, 0.0f) },
+        { M::Vector3(-nodeSize,  nodeSize, 0.0f) },
+        { M::Vector3( nodeSize,  nodeSize, 0.0f) },
+        { M::Vector3( nodeSize, -nodeSize, 0.0f) }
     };
     unsigned numBillboards = billboardPositions.size();
     for(unsigned i = 0; i < numBillboards; ++i) {
@@ -249,6 +257,16 @@ void SetMaterialUniforms(Program& prog, const Material& mat) {
     prog.SetUniform("uMatDiffuseColor", mat.diffuseColor);
 }
 
+static void CreateNodeMesh(void) {
+	Sphere sphere(cvar_r_nodeSubdiv, true);
+	sphere.Scale(cvar_r_nodeSize);
+	nodeMesh = meshMgr.Create(sphere.GetDesc());
+}
+
+static void CreateNodeMeshCallback(const std::string& name) {
+	if("r_nodeSize" == name || "r_nodeSubdiv" == name) CreateNodeMesh();
+}
+
 Renderer::Renderer(void) : _time(0.0f) { }
 
 void Renderer::Init(void) {
@@ -278,6 +296,11 @@ void Renderer::Init(void) {
     
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);
+
+	cvar_r_nodeSize.Register(CreateNodeMeshCallback);
+	cvar_r_nodeSubdiv.Register(CreateNodeMeshCallback);
+
+	CreateNodeMesh();
 
     _timer.Start();
 }
@@ -384,10 +407,13 @@ void Renderer::SetRenderList(const RenderList& renderList) {
 
 static void Link(std::vector<R::RenderJob>& renderJobs) {
     unsigned numJobs = renderJobs.size();
-    for(unsigned i = 0; i < numJobs; ++i) {
-        RenderJob& rjob = renderJobs[i];
-        if(i < numJobs - 1) rjob.next = &renderJobs[i + 1];
-    }
+	if(0 < numJobs) {
+		for(unsigned i = 0; i < numJobs; ++i) {
+			RenderJob& rjob = renderJobs[i];
+			rjob.next = &renderJobs[(i + 1) % numJobs];
+		}
+		renderJobs[numJobs - 1].next = NULL;
+	}
 }
 
 static void Compile(R::RenderJob& rjob) {
@@ -436,6 +462,18 @@ void Renderer::Render(const RenderList& rlist) {
     renderList = _nextRenderList;
     _renderListLock.Unlock();
 
+	if(R_NODETYPE_GEOMETRY == cvar_r_nodeType) {
+		RenderJob rjob;
+		rjob.fx = "Lit";
+		rjob.material.diffuseColor = Color::White;
+		rjob.mesh = nodeMesh;
+		rjob.primType = 0;
+		for(unsigned i = 0; i < renderList.nodePositions.size(); ++i) {
+			rjob.transform = M::Mat4::Translate(renderList.nodePositions[i]);
+			renderList.jobs.push_back(rjob);
+		}
+	}
+
     if(renderList.jobs.empty() && renderList.nodePositions.empty()) return;
 
     static SYS::Timer frameTime;
@@ -451,14 +489,16 @@ void Renderer::Render(const RenderList& rlist) {
     metrics.frame.numDrawCalls = 0;
     DrawFrame(renderList, projectionMat, _time);
 
-    InitBillboards(renderList.nodePositions);
-    BuildBillboards(renderList.worldMat);
-    unsigned numBillboards = billboardPositions.size();
-    if(numBillboards) {
-        billboardHotVertexBuffer->Update_Mapped(0, sizeof(BillboardHot) * numBillboards, &billboardsHot[0]);
-        DrawBillboards(renderList.worldMat, projectionMat);
-        billboardHotVertexBuffer->Discard();
-    }
+	if(R_NODETYPE_BILLBOARD == cvar_r_nodeType) {
+		InitBillboards(renderList.nodePositions);
+		BuildBillboards(renderList.worldMat);
+		unsigned numBillboards = billboardPositions.size();
+		if(numBillboards) {
+			billboardHotVertexBuffer->Update_Mapped(0, sizeof(BillboardHot) * numBillboards, &billboardsHot[0]);
+			DrawBillboards(renderList.worldMat, projectionMat);
+			billboardHotVertexBuffer->Discard();
+		}
+	} 
 
     meshMgr.R_Update();
 

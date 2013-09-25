@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <generic\pointer.h>
+#include <common\config\config.h>
 #include <system\locks\spinlock.h>
 #include <system\timer\timer.h>
 #include <math\matrix4.h>
@@ -10,6 +11,15 @@
 #include "mesh\meshmgr.h"
 #include "skin\skinmgr.h"
 #include "light\light.h"
+
+enum NodeRenderType {
+	R_NODETYPE_GEOMETRY		= 0,
+	R_NODETYPE_BILLBOARD	= 1
+};
+
+extern COM::Config::Variable<int>	cvar_r_nodeType;
+extern COM::Config::Variable<float>	cvar_r_nodeSize;
+extern COM::Config::Variable<int>	cvar_r_nodeSubdiv;
 
 namespace R {
 	

@@ -12,9 +12,6 @@
 #include <renderer\renderer.h>
 #include <renderer\mesh\bezier\bezier.h>
 
-extern COM::Config::Variable<float> cvar_nodeSize;
-extern COM::Config::Variable<int>	cvar_nodeSubdiv;
-
 namespace W {
 
 struct PolyhedronNodes {

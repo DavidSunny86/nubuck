@@ -1,17 +1,23 @@
+#include <renderer\renderer.h>
 #include "nodeconfig.h"
 
 namespace UI {
 
-    void NodeConfig::OnSizeChanged(double val) { /*cvar_nodeSize = (float)val;*/ }
-    void NodeConfig::OnSubdivisionsChanged(int val) { /*cvar_nodeSubdiv = val;*/ }
+	void NodeConfig::OnTypeChanged(int idx) {
+		// keep combobox consistent with NodeRenderType in renderer.h
+		cvar_r_nodeType = idx;
+	}
+
+    void NodeConfig::OnSizeChanged(double val) { cvar_r_nodeSize = (float)val; }
+    void NodeConfig::OnSubdivisionsChanged(int val) { cvar_r_nodeSubdiv = val; }
 
     NodeConfig::NodeConfig(QWidget* parent) : QDialog(parent) {
         setWindowFlags(Qt::WindowStaysOnTopHint);
 
         _ui.setupUi(this);
 
-        /*_ui.sbSize->setValue(cvar_nodeSize);
-        _ui.sbSubdiv->setValue(cvar_nodeSubdiv);*/
+        _ui.sbSize->setValue(cvar_r_nodeSize);
+        _ui.sbSubdiv->setValue(cvar_r_nodeSubdiv);
     }
 
 } // namespace UI

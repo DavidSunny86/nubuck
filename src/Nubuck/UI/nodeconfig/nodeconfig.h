@@ -11,6 +11,7 @@ namespace UI {
     private:
         Ui::NodeConfig _ui;
     private slots:
+		void OnTypeChanged(int idx);
         void OnSizeChanged(double val);
         void OnSubdivisionsChanged(int val);
     public:
