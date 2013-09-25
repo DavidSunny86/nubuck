@@ -75,4 +75,9 @@ namespace R {
         _indexBuffer->Bind();
     }
 
+	void Mesh::R_Destroy(void) {
+		if(_vertexBuffer.IsValid()) _vertexBuffer->Destroy();
+		if(_indexBuffer.IsValid()) _indexBuffer->Destroy();
+	}
+
 } // namespace R

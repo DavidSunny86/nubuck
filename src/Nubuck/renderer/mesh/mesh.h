@@ -72,6 +72,7 @@ namespace R {
 
         void R_Compile(void);
         void R_Bind(void);
+		void R_Destroy(void); // destroys gpu buffers
     };
 
 } // namespace R

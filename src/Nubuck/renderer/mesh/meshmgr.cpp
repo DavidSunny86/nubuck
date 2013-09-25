@@ -30,6 +30,7 @@ namespace R {
                 if(link.next) link.next->mgrLink.prev = link.prev;
                 if(link.prev) link.prev->mgrLink.next = link.next;
                 if(_meshes == it) _meshes = next;
+				it->R_Destroy();
                 delete it;
             }
             it = next;
