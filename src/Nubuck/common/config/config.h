@@ -18,10 +18,12 @@ namespace COM {
             // TODO: Serialize, Deserialize
         };
     public:
-        struct Observer {
-            virtual ~Observer(void) { }
+        struct CallbackObject {
+            virtual ~CallbackObject(void) { }
             virtual void CVAR_Changed(const std::string& name) = 0;
         };
+
+		typedef void (*CallbackFunction)(const std::string& name);
 
         template<typename TYPE>
         class Variable : public VarInfo {
@@ -29,38 +31,58 @@ namespace COM {
             std::string _name;
             TYPE _val;
             SYS::SpinLock _mtx; // locks observers
-            std::vector<Observer*> _obs;
+            std::vector<CallbackObject*> _cbObjs;
+			std::vector<CallbackFunction> _cbFuncs;
         public:
-            Variable(const std::string& name, const TYPE& defaultValue) : _name(name), _val(defaultValue), _obs(NULL) { 
+            Variable(const std::string& name, const TYPE& defaultValue) : _name(name), _val(defaultValue) { 
                 Config::Instance().Add(this);
             }
 
             const std::string& Name(void) const override { return _name; }
 
-            void Register(Observer* const obs) { 
+            void Register(CallbackObject* const cb) { 
                 _mtx.Lock();
-                _obs.push_back(obs);
+                _cbObjs.push_back(cb);
                 _mtx.Unlock();
             }
 
-            void Unregister(Observer* const obs) {
+            void Unregister(CallbackObject* const cb) {
                 _mtx.Lock();
-                for(std::vector<Observer*>::iterator obsIt(_obs.begin()); _obs.end() != obsIt; ++obsIt) {
-                    if(*obsIt == obs) {
-                        _obs.erase(obsIt);
+                for(std::vector<CallbackObject*>::iterator cbIt(_cbObjs.begin()); _cbObjs.end() != cbIt; ++cbIt) {
+                    if(*cbIt == cb) {
+                        _cbObjs.erase(cbIt);
                         break;
                     }
                 }
                 _mtx.Unlock();
             }
 
+			void Register(CallbackFunction cb) {
+				_mtx.Lock();
+				_cbFuncs.push_back(cb);
+				_mtx.Unlock();
+			}
+
+			void Unregister(CallbackFunction cb) {
+				_mtx.Lock();
+				for(std::vector<CallbackFunction>::iterator cbIt(_cbFuncs.begin()); _cbFuncs.end() != cbIt; ++cbIt) {
+					if(*cbIt == cb) {
+						_cbFuncs.erase(cbIt);
+						break;
+					}
+				}
+				_mtx.Unlock();
+			}
+
             operator TYPE() const { return _val; }
 
             Variable& operator=(const TYPE& val) {
                 _val = val;
                 _mtx.Lock();
-                for(std::vector<Observer*>::iterator obsIt(_obs.begin()); _obs.end() != obsIt; ++obsIt)
-                    if(*obsIt) (*obsIt)->CVAR_Changed(_name);
+                for(std::vector<CallbackObject*>::iterator cbIt(_cbObjs.begin()); _cbObjs.end() != cbIt; ++cbIt)
+                    if(*cbIt) (*cbIt)->CVAR_Changed(_name);
+				for(std::vector<CallbackFunction>::iterator cbIt(_cbFuncs.begin()); _cbFuncs.end() != cbIt; ++cbIt)
+					if(*cbIt) (*cbIt)(_name);
                 _mtx.Unlock();
                 return *this;
             }
