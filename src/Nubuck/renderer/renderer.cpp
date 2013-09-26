@@ -64,6 +64,8 @@ namespace R {
 
 static meshPtr_t nodeMesh;
 
+static State curState;
+
 struct BillboardHotVertex {
     M::Vector3 position;
 };
@@ -248,14 +250,30 @@ void SetEnabled(GLenum state, GLboolean enabled) {
 }
 
 void SetState(const State& state) {
-    SetEnabled(GL_BLEND, state.blend.enabled);
-    glBlendFunc(state.blend.srcFactor, state.blend.dstFactor);
+    if(curState.blend.enabled != state.blend.enabled) {
+        SetEnabled(GL_BLEND, state.blend.enabled);
+        curState.blend.enabled = state.blend.enabled;
+    }
+    if(curState.blend.srcFactor != state.blend.srcFactor || curState.blend.dstFactor != state.blend.dstFactor) {
+        glBlendFunc(state.blend.srcFactor, state.blend.dstFactor);
+        curState.blend.srcFactor = state.blend.srcFactor;
+        curState.blend.dstFactor = state.blend.dstFactor;
+    }
 
     // SetEnabled(GL_DEPTH_TEST, state.depth.enabled);
-    GL_CALL(glDepthMask(state.depth.maskEnabled));
-    GL_CALL(glDepthFunc(state.depth.func));
+    if(curState.depth.maskEnabled != state.depth.maskEnabled) {
+        GL_CALL(glDepthMask(state.depth.maskEnabled));
+        curState.depth.maskEnabled = state.depth.maskEnabled;
+    }
+    if(curState.depth.func != state.depth.func) {
+        GL_CALL(glDepthFunc(state.depth.func));
+        curState.depth.func = state.depth.func;
+    }
 
-    GL_CALL(glLineWidth(state.raster.lineWidth));
+    if(curState.raster.lineWidth != state.raster.lineWidth) {
+        GL_CALL(glLineWidth(state.raster.lineWidth));
+        curState.raster.lineWidth = state.raster.lineWidth;
+    }
 }
 
 void SetLightUniforms(Program& prog, const Light& light) {
@@ -301,6 +319,9 @@ void Renderer::Init(void) {
     const GLubyte* glVersion = glGetString(GL_VERSION);
     common.printf("INFO - supported GL version: '%s'.\n", glVersion);
     */
+
+    curState.SetDefault();
+
     GL_CALL(glEnable(GL_PRIMITIVE_RESTART));
     GL_CALL(glPrimitiveRestartIndex(Mesh::RESTART_INDEX));
 
