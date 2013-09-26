@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+#include <unordered_map>
 #include <generic\uncopyable.h>
 #include <renderer\glew\glew.h>
 
@@ -18,6 +20,7 @@ namespace R {
     private:
         GLuint  _id;
         bool    _linked;
+        std::unordered_map<std::string, GLint> _uniformLocations;
     public:
         Program(void);
         ~Program(void);

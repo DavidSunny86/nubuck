@@ -85,6 +85,8 @@ namespace R {
     }
 
     GLint Program::GetUniformLocation(const char* name) {
+        std::unordered_map<std::string, GLint>::const_iterator locIt(_uniformLocations.find(name));
+        if(_uniformLocations.end() != locIt) return locIt->second;
         if(!_linked) Link();
         GLint loc = glGetUniformLocation(_id, name);
         if(0 > loc) {
@@ -96,6 +98,7 @@ namespace R {
 #endif
             Crash();
         }
+        _uniformLocations[name] = loc;
         return loc;
     }
 
