@@ -10,6 +10,7 @@
 #include <system\timer\timer.h>
 #include <system\thread\thread.h>
 #include <system\locks\spinlock.h>
+#include <system\locks\semaphore.h>
 #include <common\types.h>
 #include <renderer\renderer.h>
 #include <camera\arcball_camera.h>
@@ -17,6 +18,8 @@
 #include "events.h"
 
 namespace W {
+
+    extern SYS::Semaphore g_worldSem;
 
     class World : public IWorld, public SYS::Thread {
     private:
@@ -43,10 +46,6 @@ namespace W {
         float       _secsPassed;
         float       _timePassed;
 
-        R::RenderList   _renderList;
-        SYS::SpinLock   _renderListLock;
-
-		void AddRenderJobs(const ENT_Polyhedron& polyhedron);
         void SetupLights(void);
 
         ArcballCamera _camArcball;
@@ -61,8 +60,6 @@ namespace W {
 		unsigned SpawnPolyhedron(const graph_t* const G);
 
         void Update(void);
-
-        void CopyRenderList(R::RenderList& renderList);
 
         // exported to client
         IPolyhedron* CreatePolyhedron(const graph_t& G) override;

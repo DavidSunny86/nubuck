@@ -17,6 +17,7 @@
 #include <renderer\material\material.h>
 #include <renderer\metrics\metrics.h>
 #include "renderer.h"
+#include <world\world.h>
 
 namespace {
 
@@ -61,6 +62,10 @@ COM::Config::Variable<int>		cvar_r_nodeSubdiv("r_nodeSubdiv", 3);
 COM::Config::Variable<int>		cvar_r_nodeSmooth("r_nodeSmooth", 1);
 
 namespace R {
+
+RenderList g_renderLists[2];
+SYS::Semaphore g_rendererSem(0);
+static int rlIdx = 0;
 
 static meshPtr_t nodeMesh;
 
@@ -424,23 +429,6 @@ static void DrawFrame(RenderList& renderList, const M::Matrix4& projectionMat, f
     }
 }
 
-void Renderer::SetRenderList(const RenderList& renderList) {
-    _renderListLock.Lock();
-    _nextRenderList.worldMat = renderList.worldMat;
-    _nextRenderList.lights = renderList.lights;
-    _nextRenderList.jobs.clear();
-    for(std::vector<RenderJob>::const_iterator rlistIt(renderList.jobs.cbegin());
-        renderList.jobs.cend() != rlistIt; ++rlistIt)
-    {
-        const RenderJob& renderJob = *rlistIt;
-        if(renderJob.fx.empty() || !renderJob.mesh.IsValid()) return;
-        _nextRenderList.jobs.push_back(renderJob);
-        _nextRenderList.jobs.back().next = NULL;
-    }
-    _nextRenderList.nodePositions = renderList.nodePositions;
-    _renderListLock.Unlock();
-}
-
 static void Link(std::vector<R::RenderJob>& renderJobs) {
     unsigned numJobs = renderJobs.size();
 	if(0 < numJobs) {
@@ -483,9 +471,7 @@ static M::Matrix4 ComputeProjectionMatrix(float aspect, const M::Matrix4& worldM
     return M::Mat4::Perspective(45.0f, aspect, 0.1f, 1000.0f);
 }
 
-void Renderer::Render(const RenderList& rlist) {
-    SetRenderList(rlist);
-
+void Renderer::Render(void) {
     float secsPassed = _timer.Stop();
     _time += secsPassed;
     _timer.Start();
@@ -493,10 +479,7 @@ void Renderer::Render(const RenderList& rlist) {
     GL_CALL(glDepthMask(GL_TRUE));
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-    RenderList renderList;
-    _renderListLock.Lock();
-    renderList = _nextRenderList;
-    _renderListLock.Unlock();
+    RenderList& renderList = g_renderLists[rlIdx];
     
 	if(R_NODETYPE_GEOMETRY == cvar_r_nodeType) {
 		RenderJob rjob;
@@ -510,7 +493,9 @@ void Renderer::Render(const RenderList& rlist) {
 		}
 	}
 
-    if(renderList.jobs.empty() && renderList.nodePositions.empty()) return;
+    if(renderList.jobs.empty() && renderList.nodePositions.empty()) {
+    }
+    else {
 
     static SYS::Timer frameTime;
     frameTime.Start();
@@ -538,8 +523,13 @@ void Renderer::Render(const RenderList& rlist) {
 
     meshMgr.R_Update();
 
-    GL_CALL(glFinish());
+    // GL_CALL(glFinish());
     metrics.frame.time = frameTime.Stop();
+    }
+
+    g_rendererSem.Signal();
+    W::g_worldSem.Wait();
+    rlIdx = 1 - rlIdx;
 }
 
 

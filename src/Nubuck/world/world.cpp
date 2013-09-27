@@ -8,6 +8,9 @@
 #include "world.h"
 
 namespace W {
+    
+    SYS::Semaphore g_worldSem(0);
+    static int rlIdx = 1;
 
     World world;
 
@@ -33,7 +36,8 @@ namespace W {
         return h;
     }
 
-	void World::AddRenderJobs(const ENT_Polyhedron& polyhedron) {
+	static void AddRenderJobs(const ENT_Polyhedron& polyhedron) {
+        R::RenderList& _renderList = R::g_renderLists[rlIdx];
 		_renderList.jobs.insert(_renderList.jobs.end(),
 			polyhedron.renderList.jobs.begin(),
 			polyhedron.renderList.jobs.end());
@@ -44,6 +48,9 @@ namespace W {
 
     void World::SetupLights(void) {
         R::Light light;
+
+        R::RenderList& _renderList = R::g_renderLists[rlIdx];
+        _renderList.lights.clear();
 
         float dist = 20;
 
@@ -121,6 +128,8 @@ namespace W {
         _timePassed += _secsPassed;
         _timer.Start();
 
+        SetupLights();
+
         bool done = false;
         while(!done) {
             Event event;
@@ -185,19 +194,15 @@ namespace W {
 
         std::for_each(_polyhedrons.begin(), _polyhedrons.end(), Polyhedron_BuildRenderList);
 
-		_renderListLock.Lock();
+        R::RenderList& _renderList = R::g_renderLists[rlIdx];
         _renderList.worldMat = _camArcball.GetWorldMatrix();
 		_renderList.jobs.clear();
         _renderList.nodePositions.clear();
 		std::for_each(_polyhedrons.begin(), _polyhedrons.end(),
-			std::bind(&World::AddRenderJobs, this, std::placeholders::_1));
-		_renderListLock.Unlock();
-    }
-
-    void World::CopyRenderList(R::RenderList& renderList) {
-        _renderListLock.Lock();
-        renderList = _renderList;
-        _renderListLock.Unlock();
+			std::bind(AddRenderJobs, std::placeholders::_1));
+        g_worldSem.Signal();
+        R::g_rendererSem.Wait();
+        rlIdx = 1 - rlIdx;
     }
 
     IPolyhedron* World::CreatePolyhedron(const graph_t& G) {
@@ -208,7 +213,7 @@ namespace W {
         Polyhedron_InitResources();
         while(true) {
             Update();
-            Sleep(10);
+            // Sleep(10);
         }
     }
 

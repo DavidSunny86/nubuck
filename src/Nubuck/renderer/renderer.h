@@ -5,6 +5,7 @@
 #include <generic\pointer.h>
 #include <common\config\config.h>
 #include <system\locks\spinlock.h>
+#include <system\locks\semaphore.h>
 #include <system\timer\timer.h>
 #include <math\matrix4.h>
 #include "material\material.h"
@@ -47,17 +48,15 @@ struct RenderList {
     std::vector<M::Vector3> nodePositions;
 };
 
+extern RenderList g_renderLists[2];
+extern SYS::Semaphore g_rendererSem;
+
 class Renderer {
 private:
-    RenderList              _nextRenderList;
-    SYS::SpinLock           _renderListLock;
-
     SYS::Timer  _timer;
     float       _time;
 
     float _aspect;
-
-    void SetRenderList(const RenderList& renderList);
 public:
     Renderer(void);
 
@@ -65,7 +64,7 @@ public:
 
     void Resize(int width, int height);
 
-    void Render(const RenderList& rlist);
+    void Render(void);
 };
 
 } // namespace R
