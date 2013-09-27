@@ -476,7 +476,10 @@ void Renderer::Render(void) {
     _time += secsPassed;
     _timer.Start();
 
-    GL_CALL(glDepthMask(GL_TRUE));
+    if(curState.depth.maskEnabled != GL_TRUE) {
+        GL_CALL(glDepthMask(GL_TRUE));
+        curState.depth.maskEnabled = GL_TRUE;
+    }
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
     RenderList& renderList = g_renderLists[rlIdx];
