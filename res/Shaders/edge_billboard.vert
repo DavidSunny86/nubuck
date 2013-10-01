@@ -16,14 +16,26 @@ out float   vHalfHeightSq;
 out vec4    vEyePos;
 out vec3    vLightDir;
 
+mat4 InvertTR(mat4 m) {
+    mat3 R = transpose(mat3(m));
+    vec3 dt = R * -vec3(m[3]);
+    return mat4(
+        vec4(R[0], 0.0), 
+        vec4(R[1], 0.0), 
+        vec4(R[2], 0.0),
+        vec4(dt, 1.0)
+    );
+}
+
 void main() {
-    mat4 worldToObject = mat4(
+    mat4 objectToWorld = mat4(
         vec4(aA0, 0.0),
         vec4(aA1, 0.0),
         vec4(aA2, 0.0),
         vec4(aA3, 1.0)
     );
-    vObjectToWindow = uProjection * uTransform * inverse(worldToObject);
+    mat4 worldToObject = InvertTR(objectToWorld);
+    vObjectToWindow = uProjection * uTransform * objectToWorld;
     mat4 eyeToObject = worldToObject * uInvTransform;
     vPosition = worldToObject * aPosition;
     vHalfHeightSq = aHalfHeightSq;

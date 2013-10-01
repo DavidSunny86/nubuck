@@ -277,7 +277,6 @@ static std::vector<EdgeBBoxVertex>  edgeBBoxVertices;
 static std::vector<Mesh::Index>     edgeBBoxIndices;
 static GEN::Pointer<StaticBuffer>   edgeBBoxVertexBuffer;
 static GEN::Pointer<StaticBuffer>   edgeBBoxIndexBuffer;
-static M::Matrix4 g_worldToObject;
 
 static void BindEdgeBBoxVertices(void) {
     GL_CALL(glVertexAttribPointer(IN_POSITION,
@@ -321,9 +320,7 @@ static void CreateEdges(const std::vector<Edge>& edges) {
         const Edge& edge = edges[i];
         const M::Vector3 center = 0.5f * (edge.p1 + edge.p0);
         M::Matrix4 R = AlignZ(edge.p1 - edge.p0);
-        M::Matrix4 worldToObject = R * M::Mat4::Translate(-center);
         M::Matrix4 objectToWorld = M::Mat4::Translate(center) * M::Transpose(R);
-        g_worldToObject = worldToObject;
 
         const float h = 0.5f * M::Length(edge.p1 - edge.p0);
         const float r = 1.0f;
@@ -341,10 +338,10 @@ static void CreateEdges(const std::vector<Edge>& edges) {
         Mesh::Index bboxIndices[] = { 3, 2, 6, 7, 4, 2, 0, 3, 1, 6, 5, 4, 1, 0 };
         const unsigned numIndices = 14;
         EdgeBBoxVertex vertex;
-        vertex.A[0] = M::Vector3(worldToObject.m00, worldToObject.m10, worldToObject.m20);
-        vertex.A[1] = M::Vector3(worldToObject.m01, worldToObject.m11, worldToObject.m21);
-        vertex.A[2] = M::Vector3(worldToObject.m02, worldToObject.m12, worldToObject.m22);
-        vertex.A[3] = M::Vector3(worldToObject.m03, worldToObject.m13, worldToObject.m23);
+        vertex.A[0] = M::Vector3(objectToWorld.m00, objectToWorld.m10, objectToWorld.m20);
+        vertex.A[1] = M::Vector3(objectToWorld.m01, objectToWorld.m11, objectToWorld.m21);
+        vertex.A[2] = M::Vector3(objectToWorld.m02, objectToWorld.m12, objectToWorld.m22);
+        vertex.A[3] = M::Vector3(objectToWorld.m03, objectToWorld.m13, objectToWorld.m23);
         vertex.halfHeightSq = h * h;
         for(unsigned i = 0; i < numVertices; ++i) {
             vertex.position = M::Transform(objectToWorld, bboxVertexPositions[i]);
