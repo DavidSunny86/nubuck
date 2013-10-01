@@ -32,8 +32,10 @@ namespace M {
 
 	Vector3 Transform(const Matrix4& mat, const Vector3& vec);
     
+    float   Det(const Matrix4& m);
     Matrix4 Transpose(const Matrix4& mat);
     Matrix4 RigidInverse(const Matrix4& mat);
+    bool    TryInvert(const Matrix4& m, Matrix4& inv);
 
     Vector3 TranslationOf(const Matrix4& mat);
     Matrix3 RotationOf(const Matrix4& mat);

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "vector3.h"
 #include "matrix3.h"
 #include "quaternion.h"
@@ -40,12 +41,170 @@ namespace M {
 		return ret;
 	}
 
+    float Det(const Matrix4& m) {
+        return
+              m.m00 * m.m11 * m.m22 * m.m33 + m.m00 * m.m12 * m.m23 * m.m31 + m.m00 * m.m13 * m.m21 * m.m32
+            + m.m01 * m.m10 * m.m23 * m.m32 + m.m01 * m.m12 * m.m20 * m.m33 + m.m01 * m.m13 * m.m22 * m.m30
+            + m.m02 * m.m10 * m.m21 * m.m33 + m.m02 * m.m11 * m.m23 * m.m30 + m.m02 * m.m13 * m.m20 * m.m31
+            + m.m03 * m.m10 * m.m22 * m.m31 + m.m03 * m.m11 * m.m20 * m.m32 + m.m03 * m.m12 * m.m21 * m.m30
+            - m.m00 * m.m11 * m.m23 * m.m32 - m.m00 * m.m12 * m.m21 * m.m33 - m.m00 * m.m13 * m.m22 * m.m31
+            - m.m01 * m.m10 * m.m22 * m.m33 - m.m01 * m.m12 * m.m23 * m.m30 - m.m01 * m.m13 * m.m20 * m.m32
+            - m.m02 * m.m10 * m.m23 * m.m31 - m.m02 * m.m11 * m.m20 * m.m33 - m.m02 * m.m13 * m.m21 * m.m30
+            - m.m03 * m.m10 * m.m21 * m.m32 - m.m03 * m.m11 * m.m22 * m.m30 - m.m03 * m.m12 * m.m20 * m.m31;
+    }
+
     Matrix4 Transpose(const Matrix4& mat) {
         return Matrix4(
                 mat.m00, mat.m10, mat.m20, mat.m30,
                 mat.m01, mat.m11, mat.m21, mat.m31,
                 mat.m02, mat.m12, mat.m22, mat.m32,
                 mat.m03, mat.m13, mat.m23, mat.m33);
+    }
+
+    // cnf 'http://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix'
+    bool TryInvert(const Matrix4& m, Matrix4& inv) {
+        inv.mat[0] = 
+            m.mat[5]  * m.mat[10] * m.mat[15] - 
+            m.mat[5]  * m.mat[11] * m.mat[14] - 
+            m.mat[9]  * m.mat[6]  * m.mat[15] + 
+            m.mat[9]  * m.mat[7]  * m.mat[14] +
+            m.mat[13] * m.mat[6]  * m.mat[11] - 
+            m.mat[13] * m.mat[7]  * m.mat[10];
+
+        inv.mat[4] = 
+            -m.mat[4]  * m.mat[10] * m.mat[15] + 
+             m.mat[4]  * m.mat[11] * m.mat[14] + 
+             m.mat[8]  * m.mat[6]  * m.mat[15] - 
+             m.mat[8]  * m.mat[7]  * m.mat[14] - 
+             m.mat[12] * m.mat[6]  * m.mat[11] + 
+             m.mat[12] * m.mat[7]  * m.mat[10];
+
+        inv.mat[8] = 
+            m.mat[4]  * m.mat[9]  * m.mat[15] - 
+            m.mat[4]  * m.mat[11] * m.mat[13] - 
+            m.mat[8]  * m.mat[5]  * m.mat[15] + 
+            m.mat[8]  * m.mat[7]  * m.mat[13] + 
+            m.mat[12] * m.mat[5]  * m.mat[11] - 
+            m.mat[12] * m.mat[7]  * m.mat[9];
+
+        inv.mat[12] = 
+            -m.mat[4]  * m.mat[9]  * m.mat[14] + 
+             m.mat[4]  * m.mat[10] * m.mat[13] +
+             m.mat[8]  * m.mat[5]  * m.mat[14] - 
+             m.mat[8]  * m.mat[6]  * m.mat[13] - 
+             m.mat[12] * m.mat[5]  * m.mat[10] + 
+             m.mat[12] * m.mat[6]  * m.mat[9];
+
+        inv.mat[1] = 
+            -m.mat[1]  * m.mat[10] * m.mat[15] + 
+             m.mat[1]  * m.mat[11] * m.mat[14] + 
+             m.mat[9]  * m.mat[2]  * m.mat[15] - 
+             m.mat[9]  * m.mat[3]  * m.mat[14] - 
+             m.mat[13] * m.mat[2]  * m.mat[11] + 
+             m.mat[13] * m.mat[3]  * m.mat[10];
+
+        inv.mat[5] = 
+            m.mat[0]  * m.mat[10] * m.mat[15] - 
+            m.mat[0]  * m.mat[11] * m.mat[14] - 
+            m.mat[8]  * m.mat[2]  * m.mat[15] + 
+            m.mat[8]  * m.mat[3]  * m.mat[14] + 
+            m.mat[12] * m.mat[2]  * m.mat[11] - 
+            m.mat[12] * m.mat[3]  * m.mat[10];
+
+        inv.mat[9] = 
+            -m.mat[0]  * m.mat[9]  * m.mat[15] + 
+             m.mat[0]  * m.mat[11] * m.mat[13] + 
+             m.mat[8]  * m.mat[1]  * m.mat[15] - 
+             m.mat[8]  * m.mat[3]  * m.mat[13] - 
+             m.mat[12] * m.mat[1]  * m.mat[11] + 
+             m.mat[12] * m.mat[3]  * m.mat[9];
+
+        inv.mat[13] = 
+            m.mat[0]  * m.mat[9]  * m.mat[14] - 
+            m.mat[0]  * m.mat[10] * m.mat[13] - 
+            m.mat[8]  * m.mat[1]  * m.mat[14] + 
+            m.mat[8]  * m.mat[2]  * m.mat[13] + 
+            m.mat[12] * m.mat[1]  * m.mat[10] - 
+            m.mat[12] * m.mat[2]  * m.mat[9];
+
+        inv.mat[2] = 
+            m.mat[1]  * m.mat[6] * m.mat[15] - 
+            m.mat[1]  * m.mat[7] * m.mat[14] - 
+            m.mat[5]  * m.mat[2] * m.mat[15] + 
+            m.mat[5]  * m.mat[3] * m.mat[14] + 
+            m.mat[13] * m.mat[2] * m.mat[7] - 
+            m.mat[13] * m.mat[3] * m.mat[6];
+
+        inv.mat[6] = 
+            -m.mat[0]  * m.mat[6] * m.mat[15] + 
+             m.mat[0]  * m.mat[7] * m.mat[14] + 
+             m.mat[4]  * m.mat[2] * m.mat[15] - 
+             m.mat[4]  * m.mat[3] * m.mat[14] - 
+             m.mat[12] * m.mat[2] * m.mat[7] + 
+             m.mat[12] * m.mat[3] * m.mat[6];
+
+        inv.mat[10] = 
+            m.mat[0]  * m.mat[5] * m.mat[15] - 
+            m.mat[0]  * m.mat[7] * m.mat[13] - 
+            m.mat[4]  * m.mat[1] * m.mat[15] + 
+            m.mat[4]  * m.mat[3] * m.mat[13] + 
+            m.mat[12] * m.mat[1] * m.mat[7] - 
+            m.mat[12] * m.mat[3] * m.mat[5];
+
+        inv.mat[14] = 
+            -m.mat[0]  * m.mat[5] * m.mat[14] + 
+             m.mat[0]  * m.mat[6] * m.mat[13] + 
+             m.mat[4]  * m.mat[1] * m.mat[14] - 
+             m.mat[4]  * m.mat[2] * m.mat[13] - 
+             m.mat[12] * m.mat[1] * m.mat[6] + 
+             m.mat[12] * m.mat[2] * m.mat[5];
+
+        inv.mat[3] = 
+            -m.mat[1] * m.mat[6] * m.mat[11] + 
+             m.mat[1] * m.mat[7] * m.mat[10] + 
+             m.mat[5] * m.mat[2] * m.mat[11] - 
+             m.mat[5] * m.mat[3] * m.mat[10] - 
+             m.mat[9] * m.mat[2] * m.mat[7] + 
+             m.mat[9] * m.mat[3] * m.mat[6];
+
+        inv.mat[7] = 
+            m.mat[0] * m.mat[6] * m.mat[11] - 
+            m.mat[0] * m.mat[7] * m.mat[10] - 
+            m.mat[4] * m.mat[2] * m.mat[11] + 
+            m.mat[4] * m.mat[3] * m.mat[10] + 
+            m.mat[8] * m.mat[2] * m.mat[7] - 
+            m.mat[8] * m.mat[3] * m.mat[6];
+
+        inv.mat[11] = 
+            -m.mat[0] * m.mat[5] * m.mat[11] + 
+             m.mat[0] * m.mat[7] * m.mat[9] + 
+             m.mat[4] * m.mat[1] * m.mat[11] - 
+             m.mat[4] * m.mat[3] * m.mat[9] - 
+             m.mat[8] * m.mat[1] * m.mat[7] + 
+             m.mat[8] * m.mat[3] * m.mat[5];
+
+        inv.mat[15] = 
+            m.mat[0] * m.mat[5] * m.mat[10] - 
+            m.mat[0] * m.mat[6] * m.mat[9] - 
+            m.mat[4] * m.mat[1] * m.mat[10] + 
+            m.mat[4] * m.mat[2] * m.mat[9] + 
+            m.mat[8] * m.mat[1] * m.mat[6] - 
+            m.mat[8] * m.mat[2] * m.mat[5];
+
+        float det = m.mat[0] * inv.mat[0] + m.mat[1] * inv.mat[4] + m.mat[2] * inv.mat[8] + m.mat[3] * inv.mat[12];
+
+        if (det == 0) return false;
+
+        const float oneOverDet = 1.0f / det;
+        for (int i = 0; i < 16; i++) inv.mat[i] = inv.mat[i] * oneOverDet;
+
+#ifdef _DEBUG
+        M::Matrix4 id0 = M::Mat4::Identity();
+        M::Matrix4 id1 = inv * m;
+        for(int i = 0; i < 16; ++i) assert(M::AlmostEqual(id0.mat[i], id1.mat[i]));
+#endif
+
+        return true;
     }
 
     Matrix4 RigidInverse(const Matrix4& mat) {
