@@ -369,7 +369,8 @@ static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMa
     pass->GetProgram().SetUniform("uTransform", worldMat);
 
     M::Matrix4 invWorldMat;
-    assert(M::TryInvert(worldMat, invWorldMat));
+    bool reg = M::TryInvert(worldMat, invWorldMat); 
+    assert(reg);
     pass->GetProgram().SetUniform("uInvTransform", invWorldMat);
 
     SetState(pass->GetDesc().state);
