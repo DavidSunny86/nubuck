@@ -28,6 +28,7 @@ namespace M {
 	};
 
 	Matrix4 operator*(const Matrix4& lhp, const Matrix4& rhp);
+    Matrix4 operator/(const Matrix4& mat, float scalar);
 
 	Vector3 Transform(const Matrix4& mat, const Vector3& vec);
     

@@ -25,7 +25,13 @@ enum {
     IN_POSITION     = 0,
     IN_NORMAL       = 1,
     IN_COLOR        = 2,
-    IN_TEXCOORDS    = 3
+    IN_TEXCOORDS    = 3,
+
+    // encodes 3x4 matrix
+    IN_A0           = 4,
+    IN_A1           = 5,
+    IN_A2           = 6,
+    IN_A3           = 7
 };
 
 void BindVertices(void) {
@@ -238,13 +244,115 @@ static void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
 // rotates the coordinate space such that the new z axis coincides
 // with the vector d.  
 // let  M = AlignZ(d). then AlignZ(d) * d = Length(d) * (0, 0, 1)
+// FIXME: alpha = 0
 static M::Matrix4 AlignZ(const M::Vector3& d) {
     const float len_yz = sqrt(d.y * d.y + d.z * d.z);
     const float len = d.Length();
     return M::Matrix4(len_yz * len_yz, -d.x * d.y, -d.x * d.z, 0.0f,
         0.0f, len * d.z, -len * d.y, 0.0f,
         len_yz * d.x, len_yz * d.y, len_yz * d.z, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f);
+        0.0f, 0.0f, 0.0f, len_yz * len) / (len_yz * len);
+}
+
+struct EdgeBBoxVertex {
+    M::Vector3 position;
+    M::Vector3 A[4];
+};
+
+static std::vector<EdgeBBoxVertex>  edgeBBoxVertices;
+static std::vector<Mesh::Index>     edgeBBoxIndices;
+static GEN::Pointer<StaticBuffer>   edgeBBoxVertexBuffer;
+static GEN::Pointer<StaticBuffer>   edgeBBoxIndexBuffer;
+static M::Matrix4 g_worldToObject;
+
+static void BindEdgeBBoxVertices(void) {
+    GL_CALL(glVertexAttribPointer(IN_POSITION,
+        3, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
+        (void*)offsetof(EdgeBBoxVertex, position)));
+    GL_CALL(glEnableVertexAttribArray(IN_POSITION));
+
+    GL_CALL(glVertexAttribPointer(IN_A0,
+        3, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
+        (void*)(offsetof(EdgeBBoxVertex, A) + sizeof(M::Vector3) * 0)));
+    GL_CALL(glEnableVertexAttribArray(IN_A0));
+
+    GL_CALL(glVertexAttribPointer(IN_A1,
+        3, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
+        (void*)(offsetof(EdgeBBoxVertex, A) + sizeof(M::Vector3) * 1)));
+    GL_CALL(glEnableVertexAttribArray(IN_A1));
+
+    GL_CALL(glVertexAttribPointer(IN_A2,
+        3, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
+        (void*)(offsetof(EdgeBBoxVertex, A) + sizeof(M::Vector3) * 2)));
+    GL_CALL(glEnableVertexAttribArray(IN_A2));
+
+    GL_CALL(glVertexAttribPointer(IN_A3,
+        3, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
+        (void*)(offsetof(EdgeBBoxVertex, A) + sizeof(M::Vector3) * 3)));
+    GL_CALL(glEnableVertexAttribArray(IN_A3));
+}
+
+static void CreateEdges(const std::vector<Edge>& edges) {
+    if(edges.empty()) return;
+
+    edgeBBoxVertices.clear();
+    edgeBBoxIndices.clear();
+    for(unsigned i = 0; i < edges.size(); ++i) {
+        const Edge& edge = edges[i];
+        const M::Vector3 center = 0.5f * (edge.p1 + edge.p0);
+        M::Matrix4 R = AlignZ(edge.p1 - edge.p0);
+        M::Matrix4 worldToObject = R * M::Mat4::Translate(-center);
+        M::Matrix4 objectToWorld = M::Mat4::Translate(center) * M::Transpose(R);
+        g_worldToObject = worldToObject;
+
+        const float h = 0.5f * M::Length(edge.p1 - edge.p0);
+        const float r = 1.0f;
+        M::Vector3 bboxVertexPositions[] = {
+            M::Vector3( r,  r, -h),
+            M::Vector3(-r,  r, -h),
+            M::Vector3( r,  r,  h),
+            M::Vector3(-r,  r,  h),
+            M::Vector3( r, -r, -h),
+            M::Vector3(-r, -r, -h),
+            M::Vector3(-r, -r,  h),
+            M::Vector3( r, -r,  h)
+        };
+        const unsigned numVertices = 8;
+        Mesh::Index bboxIndices[] = { 3, 2, 6, 7, 4, 2, 0, 3, 1, 6, 5, 4, 1, 0 };
+        const unsigned numIndices = 14;
+        EdgeBBoxVertex vertex;
+        vertex.A[0] = M::Vector3(worldToObject.m00, worldToObject.m10, worldToObject.m20);
+        vertex.A[1] = M::Vector3(worldToObject.m01, worldToObject.m11, worldToObject.m21);
+        vertex.A[2] = M::Vector3(worldToObject.m02, worldToObject.m12, worldToObject.m22);
+        vertex.A[3] = M::Vector3(worldToObject.m03, worldToObject.m13, worldToObject.m23);
+        for(unsigned i = 0; i < numVertices; ++i) {
+            vertex.position = M::Transform(objectToWorld, bboxVertexPositions[i]);
+            edgeBBoxVertices.push_back(vertex);
+        }
+        for(unsigned i = 0; i < numIndices; ++i) edgeBBoxIndices.push_back(bboxIndices[i]);
+    } // for all edges
+
+    if(!edgeBBoxVertexBuffer.IsValid()) edgeBBoxVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, &edgeBBoxVertices[0], sizeof(EdgeBBoxVertex) * edgeBBoxVertices.size()));
+    if(!edgeBBoxIndexBuffer.IsValid()) edgeBBoxIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &edgeBBoxIndices[0], sizeof(Mesh::Index) * edgeBBoxIndices.size()));
+}
+
+static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMat) {
+    GEN::Pointer<Effect> fx = effectMgr.GetEffect("EdgeBillboard");
+    // GEN::Pointer<Effect> fx = effectMgr.GetEffect("GenericWireframe");
+    fx->Compile();
+    Pass* pass = fx->GetPass(0);
+    pass->Use();
+    pass->GetProgram().SetUniform("uProjection", projectionMat);
+    pass->GetProgram().SetUniform("uTransform", worldMat);
+    pass->GetProgram().SetUniform("uWorldToObject", g_worldToObject);
+    SetState(pass->GetDesc().state);
+
+    edgeBBoxVertexBuffer->Bind();
+    BindEdgeBBoxVertices();
+
+    edgeBBoxIndexBuffer->Bind();
+
+    glDrawElements(GL_TRIANGLE_STRIP, 14, GL_UNSIGNED_INT, NULL);
 }
 
 void InitDebugOutput(void);
@@ -483,6 +591,18 @@ void Renderer::Render(void) {
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
     RenderList& renderList = g_renderLists[rlIdx];
+
+    Edge edge;
+    /*
+    edge.p0 = M::Vector3(0.0f, 0.0f, -5.0f);
+    edge.p1 = M::Vector3(0.0f, 0.0f,  5.0f);
+    /*
+    edge.p0 = M::Vector3(-2.0f, -2.0f, -2.0f);
+    edge.p1 = M::Vector3(2.0f, 2.0f, 2.0f);
+    */
+    edge.p0 = M::Vector3(0.0f, -5.0f, -10.0f);
+    edge.p1 = M::Vector3(0.0f, 5.0f,  -10.0f);
+    renderList.edges.push_back(edge);
     
 	if(R_NODETYPE_GEOMETRY == cvar_r_nodeType) {
 		RenderJob rjob;
@@ -523,6 +643,9 @@ void Renderer::Render(void) {
 			billboardHotVertexBuffer->Discard();
 		}
 	} 
+
+    CreateEdges(renderList.edges);
+    DrawEdges(projectionMat, renderList.worldMat);
 
     meshMgr.R_Update();
 

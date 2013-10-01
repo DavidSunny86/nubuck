@@ -38,6 +38,22 @@ namespace R {
         fx.passes.push_back(pass0);
 		effectMgr.Register(fx);
         fx.passes.clear();
+        
+        // EdgeBillboard Effect
+        // used to draw filled cylinders on bounding box of edges
+
+        pass0.name = "Pass0";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\edge_billboard.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\edge_billboard.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "EdgeBillboard";
+        fx.passes.push_back(pass0);
+		effectMgr.Register(fx);
+        fx.passes.clear();
 
         // Default Wireframe Effect
 

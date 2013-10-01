@@ -40,12 +40,17 @@ struct RenderJob {
     RenderJob* next;
 };
 
+struct Edge {
+    M::Vector3 p0, p1;
+};
+
 struct RenderList {
     M::Matrix4              worldMat;
     Light                   dirLights[3];
     std::vector<Light>      lights;
     std::vector<RenderJob>  jobs;
     std::vector<M::Vector3> nodePositions;
+    std::vector<Edge>       edges;
 };
 
 extern RenderList g_renderLists[2];

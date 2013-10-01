@@ -18,6 +18,15 @@ namespace M {
 		}
 		return mat;
 	}
+    
+    Matrix4 operator/(const Matrix4& mat, float scalar) {
+        const float f = 1.0f / scalar;
+        return Matrix4(
+            f * mat.m00, f * mat.m01, f * mat.m02, f * mat.m03,
+            f * mat.m10, f * mat.m11, f * mat.m12, f * mat.m13,
+            f * mat.m20, f * mat.m21, f * mat.m22, f * mat.m23,
+            f * mat.m30, f * mat.m31, f * mat.m32, f * mat.m33);
+    }
 
 	Vector3 Transform(const Matrix4& mat, const Vector3& vec) {
 		Vector3 ret;
