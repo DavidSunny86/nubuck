@@ -355,7 +355,6 @@ static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMa
     pass->Use();
     pass->GetProgram().SetUniform("uProjection", projectionMat);
     pass->GetProgram().SetUniform("uTransform", worldMat);
-    pass->GetProgram().SetUniform("uWorldToObject", g_worldToObject);
     SetState(pass->GetDesc().state);
 
     edgeBBoxVertexBuffer->Bind();
