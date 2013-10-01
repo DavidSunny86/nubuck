@@ -201,6 +201,7 @@ namespace W {
         _renderList.worldMat = _camArcball.GetWorldMatrix();
 		_renderList.jobs.clear();
         _renderList.nodePositions.clear();
+        _renderList.edges.clear();
 		std::for_each(_polyhedrons.begin(), _polyhedrons.end(),
 			std::bind(AddRenderJobs, std::placeholders::_1));
         g_worldSem.Signal();
