@@ -18,7 +18,7 @@ void main() {
         if(p.z * p.z > vHalfHeightSq) p = s + ( d - f) * v;
         if(p.z * p.z > vHalfHeightSq) discard;
         
-        vec3 normal = vec3(p.x, p.y, 0.0);
+        vec3 normal = normalize(vec3(p.x, p.y, 0.0));
         float d = clamp(dot(normal, normalize(vLightDir)), 0.0, 1.0);
         fragColor = d * vec4(1.0, 1.0, 1.0, 1.0);
 
