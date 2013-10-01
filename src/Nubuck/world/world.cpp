@@ -44,6 +44,9 @@ namespace W {
         _renderList.nodePositions.insert(_renderList.nodePositions.end(),
             polyhedron.renderList.nodePositions.begin(),
             polyhedron.renderList.nodePositions.end());
+        _renderList.edges.insert(_renderList.edges.end(),
+            polyhedron.renderList.edges.begin(),
+            polyhedron.renderList.edges.end());
 	}
 
     void World::SetupLights(void) {

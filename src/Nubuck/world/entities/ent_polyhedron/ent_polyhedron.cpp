@@ -136,6 +136,16 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
         if(ph.nodes.valid[i]) ph.renderList.nodePositions.push_back(ph.nodes.positions[i]);
 	}
 
+    leda::edge e;
+    R::Edge re;
+    ph.renderList.edges.clear();
+    forall_edges(e, *ph.G) {
+        re.p0 = ph.nodes.positions[leda::source(e)->id()];
+        re.p1 = ph.nodes.positions[leda::target(e)->id()];
+        ph.renderList.edges.push_back(re);
+    }
+
+
     if(!ph.hull.indices.empty() /* ie. hull exists */) {
         renderJob.material = R::Material::White;
         renderJob.mesh = ph.hull.mesh;

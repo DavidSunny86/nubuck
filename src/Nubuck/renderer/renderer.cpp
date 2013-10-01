@@ -31,7 +31,9 @@ enum {
     IN_A0           = 4,
     IN_A1           = 5,
     IN_A2           = 6,
-    IN_A3           = 7
+    IN_A3           = 7,
+
+    IN_HALF_HEIGHT_SQ  = 8
 };
 
 void BindVertices(void) {
@@ -266,8 +268,9 @@ static M::Matrix4 AlignZ(const M::Vector3& d) {
 }
 
 struct EdgeBBoxVertex {
-    M::Vector3 position;
-    M::Vector3 A[4];
+    M::Vector3  position;
+    M::Vector3  A[4];
+    float       halfHeightSq;
 };
 
 static std::vector<EdgeBBoxVertex>  edgeBBoxVertices;
@@ -301,6 +304,11 @@ static void BindEdgeBBoxVertices(void) {
         3, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
         (void*)(offsetof(EdgeBBoxVertex, A) + sizeof(M::Vector3) * 3)));
     GL_CALL(glEnableVertexAttribArray(IN_A3));
+
+    GL_CALL(glVertexAttribPointer(IN_HALF_HEIGHT_SQ,
+        1, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
+        (void*)(offsetof(EdgeBBoxVertex, halfHeightSq))));
+    GL_CALL(glEnableVertexAttribArray(IN_HALF_HEIGHT_SQ));
 }
 
 static void CreateEdges(const std::vector<Edge>& edges) {
@@ -308,6 +316,7 @@ static void CreateEdges(const std::vector<Edge>& edges) {
 
     edgeBBoxVertices.clear();
     edgeBBoxIndices.clear();
+    unsigned baseIdx = 0;
     for(unsigned i = 0; i < edges.size(); ++i) {
         const Edge& edge = edges[i];
         const M::Vector3 center = 0.5f * (edge.p1 + edge.p0);
@@ -336,11 +345,14 @@ static void CreateEdges(const std::vector<Edge>& edges) {
         vertex.A[1] = M::Vector3(worldToObject.m01, worldToObject.m11, worldToObject.m21);
         vertex.A[2] = M::Vector3(worldToObject.m02, worldToObject.m12, worldToObject.m22);
         vertex.A[3] = M::Vector3(worldToObject.m03, worldToObject.m13, worldToObject.m23);
+        vertex.halfHeightSq = h * h;
         for(unsigned i = 0; i < numVertices; ++i) {
             vertex.position = M::Transform(objectToWorld, bboxVertexPositions[i]);
             edgeBBoxVertices.push_back(vertex);
         }
-        for(unsigned i = 0; i < numIndices; ++i) edgeBBoxIndices.push_back(bboxIndices[i]);
+        for(unsigned i = 0; i < numIndices; ++i) edgeBBoxIndices.push_back(baseIdx + bboxIndices[i]);
+        edgeBBoxIndices.push_back(Mesh::RESTART_INDEX);
+        baseIdx += numVertices;
     } // for all edges
 
     if(!edgeBBoxVertexBuffer.IsValid()) edgeBBoxVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, &edgeBBoxVertices[0], sizeof(EdgeBBoxVertex) * edgeBBoxVertices.size()));
@@ -367,7 +379,7 @@ static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMa
 
     edgeBBoxIndexBuffer->Bind();
 
-    glDrawElements(GL_TRIANGLE_STRIP, 14, GL_UNSIGNED_INT, NULL);
+    glDrawElements(GL_TRIANGLE_STRIP, edgeBBoxIndices.size(), GL_UNSIGNED_INT, NULL);
 }
 
 void InitDebugOutput(void);
@@ -607,18 +619,6 @@ void Renderer::Render(void) {
 
     RenderList& renderList = g_renderLists[rlIdx];
 
-    Edge edge;
-    /*
-    edge.p0 = M::Vector3(0.0f, 0.0f, -5.0f);
-    edge.p1 = M::Vector3(0.0f, 0.0f,  5.0f);
-    /*
-    edge.p0 = M::Vector3(-2.0f, -2.0f, -2.0f);
-    edge.p1 = M::Vector3(2.0f, 2.0f, 2.0f);
-    */
-    edge.p0 = M::Vector3(0.0f, -5.0f, -10.0f);
-    edge.p1 = M::Vector3(0.0f, 5.0f,  -10.0f);
-    renderList.edges.push_back(edge);
-    
 	if(R_NODETYPE_GEOMETRY == cvar_r_nodeType) {
 		RenderJob rjob;
 		rjob.fx = "Lit";
@@ -659,8 +659,10 @@ void Renderer::Render(void) {
 		}
 	} 
 
-    CreateEdges(renderList.edges);
-    DrawEdges(projectionMat, renderList.worldMat);
+    if(!renderList.edges.empty()) {
+        CreateEdges(renderList.edges);
+        DrawEdges(projectionMat, renderList.worldMat);
+    }
 
     meshMgr.R_Update();
 
