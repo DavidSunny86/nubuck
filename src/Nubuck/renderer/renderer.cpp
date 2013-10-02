@@ -103,6 +103,14 @@ static GEN::Pointer<StaticBuffer>   uniformsHotBuffer;
 static UniformsLights               uniformsLights;
 static GEN::Pointer<StaticBuffer>   uniformsLightsBuffer;
 
+static void BindUniformBuffers(void) {
+    // somehow these bindings break on intel gpus.
+    uniformsHotBuffer->Bind();
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniformsHotBuffer->GetID());
+    uniformsLightsBuffer->Bind();
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformsLightsBuffer->GetID());
+}
+
 struct BillboardHotVertex {
     M::Vector3 position;
 };
@@ -235,6 +243,8 @@ static void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
     unsigned numBillboards = billboardPositions.size();
     unsigned numBillboardIndices = 5 * numBillboards - 1;
 
+    BindUniformBuffers();
+
     GEN::Pointer<Effect> fx = effectMgr.GetEffect("NodeBillboard");
     fx->Compile();
     Pass* pass = fx->GetPass(0);
@@ -245,10 +255,12 @@ static void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
     Program& prog = pass->GetProgram();
 
     GLuint idx = glGetUniformBlockIndex(prog.GetID(), "UniformsHot");
-    glUniformBlockBinding(prog.GetID(), idx, 0);
+    assert(GL_INVALID_INDEX != idx);
+    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 0));
 
     idx = glGetUniformBlockIndex(prog.GetID(), "UniformsLights");
-    glUniformBlockBinding(prog.GetID(), idx, 1);
+    assert(GL_INVALID_INDEX != idx);
+    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 1));
 
     /*
     prog.SetUniform("uLightVec0", M::Vector3(0.0f, 0.0f, 1.0f));
@@ -384,6 +396,7 @@ static void CreateEdges(const std::vector<Edge>& edges) {
 }
 
 static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMat) {
+    BindUniformBuffers();
     GEN::Pointer<Effect> fx = effectMgr.GetEffect("EdgeBillboard");
     // GEN::Pointer<Effect> fx = effectMgr.GetEffect("GenericWireframe");
     fx->Compile();
@@ -391,9 +404,11 @@ static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMa
     pass->Use();
     Program& prog = pass->GetProgram();
     GLuint idx = glGetUniformBlockIndex(prog.GetID(), "UniformsHot");
-    glUniformBlockBinding(prog.GetID(), idx, 0);
+    assert(GL_INVALID_INDEX != idx);
+    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 0));
     idx = glGetUniformBlockIndex(prog.GetID(), "UniformsLights");
-    glUniformBlockBinding(prog.GetID(), idx, 1);
+    assert(GL_INVALID_INDEX != idx);
+    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 1));
     pass->GetProgram().SetUniform("uEdgeRadiusSq", cvar_r_edgeRadius * cvar_r_edgeRadius);
 
     SetState(pass->GetDesc().state);
