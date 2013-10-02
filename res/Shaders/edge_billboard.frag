@@ -12,8 +12,8 @@ uniform float uEdgeRadiusSq;
 out vec4 fragColor;
 
 // in edge's local space
-in mat4     vObjectToWorld;
-in mat4     vObjectToWindow; 
+in mat4     vObjectToEye;
+in mat4     vObjectToClip; 
 in vec4     vPosition;
 in float    vHalfHeightSq;
 in vec4     vEyePos;
@@ -29,13 +29,13 @@ void main() {
         if(p.z * p.z > vHalfHeightSq) p = s + ( d - f) * v;
         if(p.z * p.z > vHalfHeightSq) discard;
         
-        vec3 normal = normalize(vObjectToWorld * vec4(p.x, p.y, 0.0, 0.0)).xyz;
+        vec3 normal = normalize(vObjectToEye * vec4(p.x, p.y, 0.0, 0.0)).xyz;
         float d0 = clamp(dot(normal, normalize(uLightVec0)), 0.0, 1.0);
         float d1 = clamp(dot(normal, normalize(uLightVec1)), 0.0, 1.0);
         float d2 = clamp(dot(normal, normalize(uLightVec2)), 0.0, 1.0);
 		fragColor = d0 * uLightDiffuseColor0 + d1 * uLightDiffuseColor1 + d2 * uLightDiffuseColor2;
 
-		vec4 proj = vObjectToWindow * p;
+		vec4 proj = vObjectToClip * p;
 		gl_FragDepth = 0.5 * (1.0 + proj.z / proj.w);
     } else discard;
 }

@@ -12,8 +12,8 @@ layout(location = 7) in vec3    aA3;
 layout(location = 8) in float   aHalfHeightSq;
 
 // in edge's local space
-out mat4    vObjectToWorld;
-out mat4    vObjectToWindow;
+out mat4    vObjectToEye;
+out mat4    vObjectToClip;
 out vec4    vPosition;
 out float   vHalfHeightSq;
 out vec4    vEyePos;
@@ -38,8 +38,8 @@ void main() {
         vec4(aA3, 1.0)
     );
     mat4 worldToObject = InvertTR(objectToWorld);
-    vObjectToWorld = uTransform * objectToWorld;
-    vObjectToWindow = uProjection * vObjectToWorld;
+    vObjectToEye = uTransform * objectToWorld;
+    vObjectToClip = uProjection * vObjectToEye;
     mat4 eyeToObject = worldToObject * uInvTransform;
     vPosition = worldToObject * aPosition;
     vHalfHeightSq = aHalfHeightSq;
