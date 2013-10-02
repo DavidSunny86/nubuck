@@ -19,16 +19,27 @@ in vec2 vTexCoord0;
 out vec4 fragColor;
  
 void main() {
+    float shininess = 100.0;
 	float clip = dot(vTexCoord0, vTexCoord0);
 	if(clip <= 1.0) {
 		float n = sqrt(1.0 - clip);
 		vec3 position = vPosition;
 		position.z += 2.0 * n;
 		vec3 normal = normalize(vec3(vTexCoord0, n));
+
 		float d0 = clamp(dot(normalize(uLightVec0), normal), 0.0, 1.0);
 		float d1 = clamp(dot(normalize(uLightVec1), normal), 0.0, 1.0);
 		float d2 = clamp(dot(normalize(uLightVec2), normal), 0.0, 1.0);
-		fragColor = d0 * uLightDiffuseColor0 + d1 * uLightDiffuseColor1 + d2 * uLightDiffuseColor2;
+		vec4 diff = d0 * uLightDiffuseColor0 + d1 * uLightDiffuseColor1 + d2 * uLightDiffuseColor2;
+
+        vec3 view = -normalize(position);
+
+        float h0 = pow(dot(normal, normalize(view + uLightVec0)), shininess);
+        float h1 = pow(dot(normal, normalize(view + uLightVec1)), shininess);
+        float h2 = pow(dot(normal, normalize(view + uLightVec2)), shininess);
+        vec4 spec = h0 * uLightDiffuseColor0 + h1 * uLightDiffuseColor1 + h2 * uLightDiffuseColor2;
+
+        fragColor = diff + spec;
 		
 		vec4 proj = uProjection * vec4(position, 1.0);
 		gl_FragDepth = 0.5 * (1.0 + proj.z / proj.w);
