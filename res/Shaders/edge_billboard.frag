@@ -1,3 +1,10 @@
+layout(std140) uniform UniformsHot {
+    mat4 uProjection;
+    mat4 uTransform;
+    mat4 uInvTransform;
+    mat3 uNormalMat;
+};
+
 layout(std140) uniform UniformsLights {
   vec3 uLightVec0;
   vec3 uLightVec1;
@@ -20,6 +27,7 @@ in vec4     vEyePos;
 in vec3     vLightDir;
 
 void main() {
+    float shininess = 100.0;
     vec4 s = vEyePos;
     vec4 v = normalize(vPosition - s);
     float f = (s.x * v.x + s.y * v.y) / (v.x * v.x + v.y * v.y);
@@ -33,9 +41,19 @@ void main() {
         float d0 = clamp(dot(normal, normalize(uLightVec0)), 0.0, 1.0);
         float d1 = clamp(dot(normal, normalize(uLightVec1)), 0.0, 1.0);
         float d2 = clamp(dot(normal, normalize(uLightVec2)), 0.0, 1.0);
-		fragColor = d0 * uLightDiffuseColor0 + d1 * uLightDiffuseColor1 + d2 * uLightDiffuseColor2;
+		vec4 diff = d0 * uLightDiffuseColor0 + d1 * uLightDiffuseColor1 + d2 * uLightDiffuseColor2;
 
-		vec4 proj = vObjectToClip * p;
+        vec4 tp = vObjectToEye * p;
+        vec3 view = -normalize(tp.xyz);
+
+        float h0 = pow(dot(normal, normalize(view + uLightVec0)), shininess);
+        float h1 = pow(dot(normal, normalize(view + uLightVec1)), shininess);
+        float h2 = pow(dot(normal, normalize(view + uLightVec2)), shininess);
+		vec4 spec = h0 * uLightDiffuseColor0 + h1 * uLightDiffuseColor1 + h2 * uLightDiffuseColor2;
+
+        fragColor = diff + spec;
+
+		vec4 proj = uProjection * tp;
 		gl_FragDepth = 0.5 * (1.0 + proj.z / proj.w);
     } else discard;
 }
