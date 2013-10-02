@@ -44,9 +44,14 @@ struct Edge {
     M::Vector3 p0, p1;
 };
 
+struct DirectionalLight {
+    M::Vector3  direction; // NOTE: lightVec = -direction
+    Color       diffuseColor;
+};
+
 struct RenderList {
     M::Matrix4              worldMat;
-    Light                   dirLights[3];
+    DirectionalLight        dirLights[3];
     std::vector<Light>      lights;
     std::vector<RenderJob>  jobs;
     std::vector<M::Vector3> nodePositions;

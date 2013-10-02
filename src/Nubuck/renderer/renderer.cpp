@@ -80,6 +80,29 @@ static meshPtr_t nodeMesh;
 
 static State curState;
 
+struct UniformsHot {
+    M::Matrix4 uProjection;
+    M::Matrix4 uTransform;
+    M::Matrix4 uInvTransform;
+};
+
+struct UniformsLights {
+    M::Vector3  uLightVec0;
+    float       padding0;
+    M::Vector3  uLightVec1;
+    float       padding1;
+    M::Vector3  uLightVec2;
+    float       padding2;
+    Color       uLightDiffuseColor0;
+    Color 		uLightDiffuseColor1;
+    Color 		uLightDiffuseColor2;
+};
+
+static UniformsHot                  uniformsHot;
+static GEN::Pointer<StaticBuffer>   uniformsHotBuffer;
+static UniformsLights               uniformsLights;
+static GEN::Pointer<StaticBuffer>   uniformsLightsBuffer;
+
 struct BillboardHotVertex {
     M::Vector3 position;
 };
@@ -220,18 +243,21 @@ static void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
     SetState(pass->GetDesc().state);
 
     Program& prog = pass->GetProgram();
-    prog.SetUniform("uProjection", projectionMat);
-    prog.SetUniform("uTransform", M::Mat4::Identity());
 
-    prog.SetUniform("uMatDiffuseColor0", Color::White);
-    prog.SetUniform("uMatDiffuseColor1", Color::Blue);
-    prog.SetUniform("uMatDiffuseColor2", Color::Red);
-    prog.SetUniform("uLightPos0", M::Vector3(20.0f, 20.0f, 20.0f));
-    prog.SetUniform("uLightPos1", M::Vector3(-20.0f, 20.0f, 20.0f));
-    prog.SetUniform("uLightPos2", M::Vector3(20.0f, -20.0f, 20.0f));
-    prog.SetUniform("uLightConstantAttenuation", 1.0f);
-    prog.SetUniform("uLightLinearAttenuation", 0.0f);
-    prog.SetUniform("uLightQuadricAttenuation", 0.0f);
+    GLuint idx = glGetUniformBlockIndex(prog.GetID(), "UniformsHot");
+    glUniformBlockBinding(prog.GetID(), idx, 0);
+
+    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsLights");
+    glUniformBlockBinding(prog.GetID(), idx, 1);
+
+    /*
+    prog.SetUniform("uLightVec0", M::Vector3(0.0f, 0.0f, 1.0f));
+    prog.SetUniform("uLightVec1", M::Vector3(0.0f, 0.0f, 1.0f));
+    prog.SetUniform("uLightVec2", M::Vector3(0.0f, 0.0f, 1.0f));
+    prog.SetUniform("uLightDiffuseColor0", Color(0.8f, 0.8f, 0.8f));
+    prog.SetUniform("uLightDiffuseColor1", Color(0.8f, 0.8f, 0.8f));
+    prog.SetUniform("uLightDiffuseColor2", Color(0.8f, 0.8f, 0.8f));
+    */
 
     billboardHotVertexBuffer->Bind();
     BindHotBillboardVertices();
@@ -363,14 +389,9 @@ static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMa
     fx->Compile();
     Pass* pass = fx->GetPass(0);
     pass->Use();
-    pass->GetProgram().SetUniform("uProjection", projectionMat);
-    pass->GetProgram().SetUniform("uTransform", worldMat);
-
-    M::Matrix4 invWorldMat;
-    bool reg = M::TryInvert(worldMat, invWorldMat); 
-    assert(reg);
-    pass->GetProgram().SetUniform("uInvTransform", invWorldMat);
-
+    Program& prog = pass->GetProgram();
+    GLuint idx = glGetUniformBlockIndex(prog.GetID(), "UniformsHot");
+    glUniformBlockBinding(prog.GetID(), idx, 0);
     pass->GetProgram().SetUniform("uEdgeRadiusSq", cvar_r_edgeRadius * cvar_r_edgeRadius);
 
     SetState(pass->GetDesc().state);
@@ -478,6 +499,14 @@ void Renderer::Init(void) {
     cvar_r_nodeSmooth.Register(CreateNodeMeshCallback);
 
 	CreateNodeMesh();
+
+    uniformsHotBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsHot)));
+    uniformsHotBuffer->Bind();
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniformsHotBuffer->GetID());
+
+    uniformsLightsBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsLights)));
+    uniformsLightsBuffer->Bind();
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformsLightsBuffer->GetID());
 
     _timer.Start();
 }
@@ -645,6 +674,21 @@ void Renderer::Render(void) {
     std::for_each(renderList.jobs.begin(), renderList.jobs.end(),
         std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
     M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, renderList.jobs);
+
+    uniformsHot.uProjection = projectionMat;
+    uniformsHot.uTransform = renderList.worldMat;
+    M::TryInvert(renderList.worldMat, uniformsHot.uInvTransform);
+    uniformsHotBuffer->Bind();
+    uniformsHotBuffer->Update_Mapped(0, sizeof(UniformsHot), &uniformsHot);
+
+    uniformsLights.uLightVec0 = -renderList.dirLights[0].direction;
+    uniformsLights.uLightVec1 = -renderList.dirLights[1].direction;
+    uniformsLights.uLightVec2 = -renderList.dirLights[2].direction;
+    uniformsLights.uLightDiffuseColor0 = renderList.dirLights[0].diffuseColor;
+    uniformsLights.uLightDiffuseColor1 = renderList.dirLights[1].diffuseColor;
+    uniformsLights.uLightDiffuseColor2 = renderList.dirLights[2].diffuseColor;
+    uniformsLightsBuffer->Bind();
+    uniformsLightsBuffer->Update_Mapped(0, sizeof(UniformsLights), &uniformsLights);
 
     metrics.frame.numDrawCalls = 0;
     DrawFrame(renderList, projectionMat, _time);

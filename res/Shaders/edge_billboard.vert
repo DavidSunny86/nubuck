@@ -1,6 +1,8 @@
-uniform mat4 uProjection;
-uniform mat4 uTransform;
-uniform mat4 uInvTransform;
+layout(std140) uniform UniformsHot {
+    mat4 uProjection;
+    mat4 uTransform;
+    mat4 uInvTransform;
+};
 
 layout(location = 0) in vec4    aPosition;
 layout(location = 4) in vec3    aA0;
