@@ -392,6 +392,8 @@ static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMa
     Program& prog = pass->GetProgram();
     GLuint idx = glGetUniformBlockIndex(prog.GetID(), "UniformsHot");
     glUniformBlockBinding(prog.GetID(), idx, 0);
+    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsLights");
+    glUniformBlockBinding(prog.GetID(), idx, 1);
     pass->GetProgram().SetUniform("uEdgeRadiusSq", cvar_r_edgeRadius * cvar_r_edgeRadius);
 
     SetState(pass->GetDesc().state);
