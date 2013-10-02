@@ -84,6 +84,7 @@ struct UniformsHot {
     M::Matrix4 uProjection;
     M::Matrix4 uTransform;
     M::Matrix4 uInvTransform;
+    M::Matrix3 uNormalMat;
 };
 
 struct UniformsLights {
@@ -539,7 +540,7 @@ static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const
         if(FIRST_LIGHT_PASS == passType || LIGHT_PASS == passType || USE_MATERIAL & passFlags)
             SetMaterialUniforms(prog, meshJob->material);
 
-        prog.SetUniform("uTransform", meshJob->transform);
+        // prog.SetUniform("uTransform", meshJob->transform);
 
         if(USE_TEX_DIFFUSE & passFlags) {
             skinMgr.R_Bind(prog, meshJob->skin);
@@ -552,6 +553,7 @@ static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const
         GLenum primType = meshJob->primType;
         if(!primType) primType = meshJob->mesh->PrimitiveType();
 
+        BindUniformBuffers();
         metrics.frame.numDrawCalls++;
         GL_CALL(glDrawElements(primType, numIndices, ToGLEnum<Mesh::Index>::ENUM, NULL));
         meshJob = meshJob->next;
@@ -579,9 +581,14 @@ static void DrawFrame(RenderList& renderList, const M::Matrix4& projectionMat, f
                 Program&        prog = pass->GetProgram();
                 const PassDesc& desc = pass->GetDesc();
 
+                GLuint idx = glGetUniformBlockIndex(prog.GetID(), "UniformsHot");
+                if(GL_INVALID_INDEX != idx) GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 0));
+                idx = glGetUniformBlockIndex(prog.GetID(), "UniformsLights");
+                if(GL_INVALID_INDEX != idx) GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 1));
+
                 SetState(desc.state);
 
-                prog.SetUniform("uProjection", projectionMat);
+                // prog.SetUniform("uProjection", projectionMat);
                 // prog.SetUniform("uTransform", worldMat);
 
                 if(USE_TIME & desc.flags) prog.SetUniform("uTime", time);
@@ -695,6 +702,7 @@ void Renderer::Render(void) {
     uniformsHot.uProjection = projectionMat;
     uniformsHot.uTransform = renderList.worldMat;
     M::TryInvert(renderList.worldMat, uniformsHot.uInvTransform);
+    uniformsHot.uNormalMat = M::Transpose(M::Inverse(M::RotationOf(renderList.worldMat)));
     uniformsHotBuffer->Bind();
     uniformsHotBuffer->Update_Mapped(0, sizeof(UniformsHot), &uniformsHot);
 

@@ -127,7 +127,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
     ph.renderList.jobs.clear();
 
 	R::RenderJob renderJob;
-	renderJob.fx = "Lit";
+	renderJob.fx = "LitDirectional";
     renderJob.material = R::Material::White;
 
     unsigned numNodes = ph.nodes.positions.size();

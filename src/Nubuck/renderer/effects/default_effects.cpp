@@ -125,6 +125,22 @@ namespace R {
         effectMgr.Register(fx);
         fx.passes.clear();
 
+        // LitDirectional Effect
+        // uses renderList.dirLights only
+
+        pass0.name = "Pass0";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\lit_directional.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\lit_directional.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "LitDirectional";
+        fx.passes.push_back(pass0);
+		effectMgr.Register(fx);
+        fx.passes.clear();
+
         // DefaultLit Effect
         // lit
 
