@@ -65,9 +65,10 @@ template<> struct ToGLEnum<int>         { enum { ENUM = GL_INT }; };
 } // unnamed namespace
 
 COM::Config::Variable<int>		cvar_r_nodeType("r_nodeType", 0);
-COM::Config::Variable<float>	cvar_r_nodeSize("r_nodeSize", 1.0f);
+COM::Config::Variable<float>	cvar_r_nodeSize("r_nodeSize", 0.2f);
 COM::Config::Variable<int>		cvar_r_nodeSubdiv("r_nodeSubdiv", 3);
 COM::Config::Variable<int>		cvar_r_nodeSmooth("r_nodeSmooth", 1);
+COM::Config::Variable<float>    cvar_r_edgeRadius("r_edgeRadius", 0.1f);
 
 namespace R {
 
@@ -323,7 +324,7 @@ static void CreateEdges(const std::vector<Edge>& edges) {
         M::Matrix4 objectToWorld = M::Mat4::Translate(center) * M::Transpose(R);
 
         const float h = 0.5f * M::Length(edge.p1 - edge.p0);
-        const float r = 1.0f;
+        const float r = cvar_r_edgeRadius;
         M::Vector3 bboxVertexPositions[] = {
             M::Vector3( r,  r, -h),
             M::Vector3(-r,  r, -h),
@@ -369,6 +370,8 @@ static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMa
     bool reg = M::TryInvert(worldMat, invWorldMat); 
     assert(reg);
     pass->GetProgram().SetUniform("uInvTransform", invWorldMat);
+
+    pass->GetProgram().SetUniform("uEdgeRadiusSq", cvar_r_edgeRadius * cvar_r_edgeRadius);
 
     SetState(pass->GetDesc().state);
 
