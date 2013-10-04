@@ -42,6 +42,10 @@ namespace UI {
         RenderMetrics::Instance()->show();
     }
 
+    void MainWindow::OnShowRenderConfig(void) {
+        _renderConfig->show();
+    }
+
     MainWindow::MainWindow(void) {
         _ui.setupUi(this);
 
@@ -54,6 +58,10 @@ namespace UI {
 
         UI::LogWidget* logWidget = UI::LogWidget::Instance();
         addDockWidget(Qt::RightDockWidgetArea, ScrollableDockWidget("LogWidget", logWidget));
+
+        _renderConfig = new RenderConfig(this);
+        _renderConfig->setFloating(true);
+        _renderConfig->hide();
     }
 
 } // namespace UI

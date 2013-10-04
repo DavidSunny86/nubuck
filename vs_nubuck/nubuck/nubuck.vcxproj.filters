@@ -165,6 +165,9 @@
     <Filter Include="Private\renderer\mesh\cylinder">
       <UniqueIdentifier>{fc9c3fbb-3558-4100-b384-c2df5b50b9b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\UI\renderconfig">
+      <UniqueIdentifier>{d82575ec-0fda-4022-bed0-366025105d4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -410,6 +413,9 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\cylinder\cylinder.h">
       <Filter>Private\renderer\mesh\cylinder</Filter>
     </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_renderconfig.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -637,6 +643,15 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\cylinder\cylinder.cpp">
       <Filter>Private\renderer\mesh\cylinder</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\renderconfig\renderconfig.cpp">
+      <Filter>Private\UI\renderconfig</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_renderconfig.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_renderconfig.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -671,6 +686,12 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\rendermetrics\rendermetrics.h">
       <Filter>Private\UI\rendermetrics</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\renderconfig.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\renderconfig\renderconfig.h">
+      <Filter>Private\UI\renderconfig</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

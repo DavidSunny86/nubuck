@@ -64,7 +64,7 @@ template<> struct ToGLEnum<int>         { enum { ENUM = GL_INT }; };
 
 } // unnamed namespace
 
-COM::Config::Variable<int>		cvar_r_nodeType("r_nodeType", 0);
+COM::Config::Variable<int>		cvar_r_nodeType("r_nodeType", 1);
 COM::Config::Variable<float>	cvar_r_nodeSize("r_nodeSize", 0.2f);
 COM::Config::Variable<int>		cvar_r_nodeSubdiv("r_nodeSubdiv", 3);
 COM::Config::Variable<int>		cvar_r_nodeSmooth("r_nodeSmooth", 1);
@@ -102,6 +102,7 @@ struct UniformsLights {
 
 struct UniformsSkeleton {
     Color       uColor;
+    float       uEdgeRadiusSq;
 };
 
 static UniformsHot                  uniformsHot;
@@ -405,8 +406,11 @@ static void CreateEdges(const std::vector<Edge>& edges) {
         baseIdx += numVertices;
     } // for all edges
 
-    if(!edgeBBoxVertexBuffer.IsValid()) edgeBBoxVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, &edgeBBoxVertices[0], sizeof(EdgeBBoxVertex) * edgeBBoxVertices.size()));
-    if(!edgeBBoxIndexBuffer.IsValid()) edgeBBoxIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &edgeBBoxIndices[0], sizeof(Mesh::Index) * edgeBBoxIndices.size()));
+    if(!edgeBBoxVertexBuffer.IsValid()) edgeBBoxVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, NULL, sizeof(EdgeBBoxVertex) * edgeBBoxVertices.size()));
+    if(!edgeBBoxIndexBuffer.IsValid()) edgeBBoxIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL, sizeof(Mesh::Index) * edgeBBoxIndices.size()));
+
+    edgeBBoxVertexBuffer->Update_Mapped(0, sizeof(EdgeBBoxVertex) * edgeBBoxVertices.size(), &edgeBBoxVertices[0]);
+    edgeBBoxIndexBuffer->Update_Mapped(0, sizeof(Mesh::Index) * edgeBBoxIndices.size(), &edgeBBoxIndices[0]);
 }
 
 static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMat) {
@@ -426,7 +430,6 @@ static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMa
     idx = glGetUniformBlockIndex(prog.GetID(), "UniformsSkeleton");
     assert(GL_INVALID_INDEX != idx);
     GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 2));
-    pass->GetProgram().SetUniform("uEdgeRadiusSq", cvar_r_edgeRadius * cvar_r_edgeRadius);
 
     SetState(pass->GetDesc().state);
 
@@ -740,6 +743,7 @@ void Renderer::Render(void) {
     uniformsLightsBuffer->Update_Mapped(0, sizeof(UniformsLights), &uniformsLights);
 
     uniformsSkeleton.uColor = Color(0.4f, 0.4f, 0.4f, 1.0f);
+    uniformsSkeleton.uEdgeRadiusSq = cvar_r_edgeRadius * cvar_r_edgeRadius;
     uniformsSkeletonBuffer->Bind();
     uniformsSkeletonBuffer->Update_Mapped(0, sizeof(UniformsSkeleton), &uniformsSkeleton);
 
