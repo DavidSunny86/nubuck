@@ -102,6 +102,7 @@ struct UniformsLights {
 
 struct UniformsSkeleton {
     Color       uColor;
+    float       uNodeSize;
     float       uEdgeRadiusSq;
 };
 
@@ -743,6 +744,7 @@ void Renderer::Render(void) {
     uniformsLightsBuffer->Update_Mapped(0, sizeof(UniformsLights), &uniformsLights);
 
     uniformsSkeleton.uColor = Color(0.4f, 0.4f, 0.4f, 1.0f);
+    uniformsSkeleton.uNodeSize = cvar_r_nodeSize;
     uniformsSkeleton.uEdgeRadiusSq = cvar_r_edgeRadius * cvar_r_edgeRadius;
     uniformsSkeletonBuffer->Bind();
     uniformsSkeletonBuffer->Update_Mapped(0, sizeof(UniformsSkeleton), &uniformsSkeleton);

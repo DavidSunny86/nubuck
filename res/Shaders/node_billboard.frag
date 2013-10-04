@@ -16,6 +16,7 @@ layout(std140) uniform UniformsLights {
 
 layout(std140) uniform UniformsSkeleton {
     vec4    uColor;
+    float   uNodeSize;
     float   uEdgeRadiusSq;
 };
 
@@ -29,7 +30,7 @@ void main() {
 	if(clip <= 1.0) {
 		float n = sqrt(1.0 - clip);
 		vec3 position = vPosition;
-		position.z += 2.0 * n;
+		position.z += uNodeSize * n;
 		vec3 normal = normalize(vec3(vTexCoord0, n));
 
 		float d0 = clamp(dot(normalize(uLightVec0), normal), 0.0, 1.0);
