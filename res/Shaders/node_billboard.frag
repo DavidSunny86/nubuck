@@ -34,9 +34,9 @@ void main() {
 
         vec3 view = -normalize(position);
 
-        float h0 = pow(dot(normal, normalize(view + uLightVec0)), shininess);
-        float h1 = pow(dot(normal, normalize(view + uLightVec1)), shininess);
-        float h2 = pow(dot(normal, normalize(view + uLightVec2)), shininess);
+        float h0 = pow(clamp(dot(normal, normalize(view + uLightVec0)), 0.0, 1.0), shininess);
+        float h1 = pow(clamp(dot(normal, normalize(view + uLightVec1)), 0.0, 1.0), shininess);
+        float h2 = pow(clamp(dot(normal, normalize(view + uLightVec2)), 0.0, 1.0), shininess);
         vec4 spec = h0 * uLightDiffuseColor0 + h1 * uLightDiffuseColor1 + h2 * uLightDiffuseColor2;
 
         fragColor = diff + spec;
