@@ -8,8 +8,6 @@
 #include <UI\randompoints\randompoints.h>
 #include <UI\algorithmwidget\algorithmwidget.h>
 #include <UI\logwidget\logwidget.h>
-#include <UI\faceconfig\faceconfig.h>
-#include <UI\nodeconfig\nodeconfig.h>
 #include "mainwindow.h"
 
 namespace {
@@ -43,9 +41,6 @@ namespace UI {
     void MainWindow::OnShowRenderMetrics(void) {
         RenderMetrics::Instance()->show();
     }
-
-    void MainWindow::OnShowFaceConfig(void) { FaceConfig::Show(); }
-    void MainWindow::OnShowNodeConfig(void) { NodeConfig::Show(); }
 
     MainWindow::MainWindow(void) {
         _ui.setupUi(this);

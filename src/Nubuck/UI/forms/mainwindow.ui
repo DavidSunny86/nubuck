@@ -33,16 +33,8 @@
     <property name="title">
      <string>View</string>
     </property>
-    <widget class="QMenu" name="menuConfiguration">
-     <property name="title">
-      <string>Configuration</string>
-     </property>
-     <addaction name="actShowFaceConfig"/>
-     <addaction name="actShowNodeConfig"/>
-    </widget>
     <addaction name="actShowRenderMetrics"/>
     <addaction name="separator"/>
-    <addaction name="menuConfiguration"/>
    </widget>
    <addaction name="menuScene"/>
    <addaction name="menuView"/>
@@ -56,16 +48,6 @@
   <action name="actShowRenderMetrics">
    <property name="text">
     <string>Render Metrics</string>
-   </property>
-  </action>
-  <action name="actShowFaceConfig">
-   <property name="text">
-    <string>Face Configuration</string>
-   </property>
-  </action>
-  <action name="actShowNodeConfig">
-   <property name="text">
-    <string>Node Configuration</string>
    </property>
   </action>
  </widget>
@@ -103,43 +85,9 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>actShowFaceConfig</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>OnShowFaceConfig()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>299</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actShowNodeConfig</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>OnShowNodeConfig()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>299</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>OnRandomPoints()</slot>
   <slot>OnShowRenderMetrics()</slot>
-  <slot>OnShowFaceConfig()</slot>
-  <slot>OnShowNodeConfig()</slot>
  </slots>
 </ui>

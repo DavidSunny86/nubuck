@@ -156,14 +156,8 @@
     <Filter Include="Private\renderer\mesh\bezier">
       <UniqueIdentifier>{ce8b9add-0f0f-4035-a851-b2e45ea40c37}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\UI\faceconfig">
-      <UniqueIdentifier>{53c29a16-e7aa-47c5-b306-95880ac40544}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\renderer\mesh\sphere">
       <UniqueIdentifier>{681efa7c-1f00-4a65-af58-2590c53f35da}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\UI\nodeconfig">
-      <UniqueIdentifier>{2d9bdaa4-9366-4ec6-af68-14ad040b3b8b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Private\world\entities\ent_polyhedron">
       <UniqueIdentifier>{7340b45c-e95b-4810-a3fe-f1c3549ab4d0}</UniqueIdentifier>
@@ -407,14 +401,8 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\bezier\bezier.h">
       <Filter>Private\renderer\mesh\bezier</Filter>
     </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_faceconfig.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.h">
       <Filter>Private\renderer\mesh\sphere</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_nodeconfig.h">
-      <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.h">
       <Filter>Private\world\entities\ent_polyhedron</Filter>
@@ -634,26 +622,8 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\bezier\bezier.cpp">
       <Filter>Private\renderer\mesh\bezier</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\UI\faceconfig\faceconfig.cpp">
-      <Filter>Private\UI\faceconfig</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_faceconfig.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_faceconfig.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.cpp">
       <Filter>Private\renderer\mesh\sphere</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\UI\nodeconfig\nodeconfig.cpp">
-      <Filter>Private\UI\nodeconfig</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_nodeconfig.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_nodeconfig.cpp">
-      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.cpp">
       <Filter>Private\world\entities\ent_polyhedron</Filter>
@@ -701,18 +671,6 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\rendermetrics\rendermetrics.h">
       <Filter>Private\UI\rendermetrics</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\src\Nubuck\UI\faceconfig\faceconfig.h">
-      <Filter>Private\UI\faceconfig</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\src\Nubuck\UI\forms\faceconfig.ui">
-      <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\src\Nubuck\UI\forms\nodeconfig.ui">
-      <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\src\Nubuck\UI\nodeconfig\nodeconfig.h">
-      <Filter>Private\UI\nodeconfig</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
