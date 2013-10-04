@@ -365,6 +365,22 @@ static void BindEdgeBBoxVertices(void) {
     GL_CALL(glEnableVertexAttribArray(IN_HALF_HEIGHT_SQ));
 }
 
+static void ReserveEdgeBBoxBuffers(unsigned numEdges) {
+    // numbers per bbox
+    const unsigned numVertices = 8;
+    const unsigned numIndices = 14 + 1; // including restart index
+
+    unsigned vbSize = sizeof(EdgeBBoxVertex) * numVertices * numEdges;
+    unsigned ibSize = sizeof(Mesh::Index) * numIndices * numEdges;
+
+    if(edgeBBoxVertexBuffer.IsValid() && edgeBBoxVertexBuffer->GetSize() >= vbSize) return;
+
+    if(edgeBBoxVertexBuffer.IsValid()) edgeBBoxVertexBuffer->Destroy();
+    edgeBBoxVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, NULL, vbSize));
+    if(edgeBBoxIndexBuffer.IsValid()) edgeBBoxIndexBuffer->Destroy();
+    edgeBBoxIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL, ibSize));
+}
+
 static void CreateEdges(const std::vector<Edge>& edges) {
     if(edges.empty()) return;
 
@@ -406,9 +422,6 @@ static void CreateEdges(const std::vector<Edge>& edges) {
         edgeBBoxIndices.push_back(Mesh::RESTART_INDEX);
         baseIdx += numVertices;
     } // for all edges
-
-    if(!edgeBBoxVertexBuffer.IsValid()) edgeBBoxVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, NULL, sizeof(EdgeBBoxVertex) * edgeBBoxVertices.size()));
-    if(!edgeBBoxIndexBuffer.IsValid()) edgeBBoxIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL, sizeof(Mesh::Index) * edgeBBoxIndices.size()));
 
     edgeBBoxVertexBuffer->Update_Mapped(0, sizeof(EdgeBBoxVertex) * edgeBBoxVertices.size(), &edgeBBoxVertices[0]);
     edgeBBoxIndexBuffer->Update_Mapped(0, sizeof(Mesh::Index) * edgeBBoxIndices.size(), &edgeBBoxIndices[0]);
@@ -764,6 +777,7 @@ void Renderer::Render(void) {
 	} 
 
     if(!renderList.edges.empty()) {
+        ReserveEdgeBBoxBuffers(renderList.edges.size());
         CreateEdges(renderList.edges);
         DrawEdges(projectionMat, renderList.worldMat);
     }
