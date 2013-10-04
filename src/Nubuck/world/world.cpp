@@ -55,14 +55,14 @@ namespace W {
         R::RenderList& _renderList = R::g_renderLists[rlIdx];
         _renderList.lights.clear();
 
-        _renderList.dirLights[0].direction      = M::Vector3(-1.0f, 1.0f, -1.0f);
-        _renderList.dirLights[0].diffuseColor   = R::Color(0.0f, 0.0f, 0.5f);
+        _renderList.dirLights[0].direction      = M::Vector3(-1.0f,  1.0f,  0.0f);
+        _renderList.dirLights[0].diffuseColor   = R::Color(0.6f, 0.85f, 0.91f);
 
-        _renderList.dirLights[1].direction      = M::Vector3(1.0f, 1.0f, -1.0f);
-        _renderList.dirLights[1].diffuseColor   = R::Color(0.5f, 0.0f, 0.0f);
+        _renderList.dirLights[1].direction      = M::Vector3( 1.0f,  1.0f,  0.0f);
+        _renderList.dirLights[1].diffuseColor   = R::Color(1.0f, 0.5f, 0.15f);
 
-        _renderList.dirLights[2].direction      = M::Vector3(1.0f, -1.0f, -1.0f);
-        _renderList.dirLights[2].diffuseColor   = R::Color(0.5f, 0.5f, 0.5f);
+        _renderList.dirLights[2].direction      = M::Vector3( 0.0f, -1.0f, -1.0f);
+        _renderList.dirLights[2].diffuseColor   = R::Color(1.0f, 1.0f, 1.0f);
 
         float dist = 20;
 

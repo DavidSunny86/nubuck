@@ -521,7 +521,10 @@ void Renderer::Init(void) {
     GL_CALL(glEnable(GL_PRIMITIVE_RESTART));
     GL_CALL(glPrimitiveRestartIndex(Mesh::RESTART_INDEX));
 
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    float f = 1.0f / 255.0f;
+    // glClearColor(f * 176, f * 196, f * 222, 1.0f); // light steel blue
+    // glClearColor(f * 70, f * 130, f * 180, 1.0f); // steel blue
+    glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
     glClearDepth(1.0f);
     glEnable(GL_DEPTH_TEST);
     

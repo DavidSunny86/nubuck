@@ -18,14 +18,16 @@ Nubuck nubuck;
 QGLFormat FmtAlphaMultisampling(int numSamples) {
 	QGLFormat fmt(QGL::AlphaChannel | QGL::SampleBuffers);
 
-	fmt.setSampleBuffers(true);
-	fmt.setSamples(numSamples);
+    if(0 < numSamples) {
+        fmt.setSampleBuffers(true);
+        fmt.setSamples(numSamples);
+    }
 
 	return fmt;
 }
 
 int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
-    QGLFormat::setDefaultFormat(FmtAlphaMultisampling(4));
+    QGLFormat::setDefaultFormat(FmtAlphaMultisampling(0));
     QApplication app(argc, argv);
 
     COM::Config::Instance().DumpVariables();
