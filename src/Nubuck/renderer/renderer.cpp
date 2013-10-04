@@ -84,7 +84,7 @@ struct UniformsHot {
     M::Matrix4 uProjection;
     M::Matrix4 uTransform;
     M::Matrix4 uInvTransform;
-    M::Matrix3 uNormalMat;
+    M::Matrix4 uNormalMat; // use mat4 to avoid padding issues
 };
 
 struct UniformsLights {
@@ -702,7 +702,7 @@ void Renderer::Render(void) {
     uniformsHot.uProjection = projectionMat;
     uniformsHot.uTransform = renderList.worldMat;
     M::TryInvert(renderList.worldMat, uniformsHot.uInvTransform);
-    uniformsHot.uNormalMat = M::Transpose(M::Inverse(M::RotationOf(renderList.worldMat)));
+    uniformsHot.uNormalMat = M::Mat4::FromRigidTransform(M::Transpose(M::Inverse(M::RotationOf(renderList.worldMat))), M::Vector3::Zero);
     uniformsHotBuffer->Bind();
     uniformsHotBuffer->Update_Mapped(0, sizeof(UniformsHot), &uniformsHot);
 
