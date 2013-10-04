@@ -57,7 +57,10 @@ namespace W {
             BUTTON_RIGHT    = 2, // == Qt::RightButton
             BUTTON_MIDDLE 
         };
-        int type, button, delta, x, y;
+        enum Modifier {
+            MODIFIER_SHIFT = 0x02000000 // == Qt::ShiftModifier
+        };
+        int type, button, mods, delta, x, y;
     };
 
 } // namespace W

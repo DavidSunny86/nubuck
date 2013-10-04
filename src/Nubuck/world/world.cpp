@@ -90,15 +90,20 @@ namespace W {
         EvArgs_Mouse* args = (EvArgs_Mouse*)event.args;
 
         if(EvArgs_Mouse::MOUSE_DOWN == args->type) {
-            if(EvArgs_Mouse::BUTTON_LEFT == args->button)
-                _camArcball.StartDragging(args->x, args->y);
+            if(EvArgs_Mouse::BUTTON_LEFT == args->button) {
+                if(EvArgs_Mouse::MODIFIER_SHIFT == args->mods)
+                    _camArcball.StartZooming(args->x, args->y);
+                else _camArcball.StartDragging(args->x, args->y);
+            }
             if(EvArgs_Mouse::BUTTON_RIGHT == args->button)
                 _camArcball.StartPanning(args->x, args->y);
         }
 
         if(EvArgs_Mouse::MOUSE_UP == args->type) {
-            if(EvArgs_Mouse::BUTTON_LEFT  == args->button)
+            if(EvArgs_Mouse::BUTTON_LEFT  == args->button) {
                 _camArcball.StopDragging();
+                _camArcball.StopZooming();
+            }
             if(EvArgs_Mouse::BUTTON_RIGHT == args->button)
                 _camArcball.StopPanning();
         }
@@ -106,6 +111,7 @@ namespace W {
         if(EvArgs_Mouse::MOUSE_MOVE == args->type) {
             _camArcball.Drag(args->x, args->y);
             _camArcball.Pan(args->x, args->y);
+            _camArcball.Zoom(args->x, args->y);
         }
 
         if(EvArgs_Mouse::MOUSE_WHEEL == args->type) {

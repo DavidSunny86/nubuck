@@ -13,11 +13,14 @@ private:
 
     bool _dragging;
     bool _panning;
+    bool _zooming;
     M::Vector3 _v0;
+    float _y0;
 
     M::TransformTRS	_transform;
     M::Quaternion	_dragRot;
     M::Vector3		_panTrans;
+    M::Vector3      _zoomTrans;
 public:
     ArcballCamera(int width, int height);
 
@@ -35,6 +38,10 @@ public:
     void StartPanning(int mouseX, int mouseY);
     bool Pan(int mouseX, int mouseY);
     void StopPanning(void);
+
+    void StartZooming(int mouseX, int mouseY);
+    bool Zoom(int mouseX, int mouseY);
+    void StopZooming(void);
 
     bool IsDragging(void) const { return _dragging; }
 

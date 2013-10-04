@@ -44,6 +44,7 @@ namespace UI {
         W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
         args->type = W::EvArgs_Mouse::MOUSE_DOWN;
         args->button = qevent->button();
+        args->mods = qevent->modifiers();
         args->x = qevent->x();
         args->y = qevent->y();
         W::world.Send(wevent);
@@ -55,6 +56,7 @@ namespace UI {
         W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
         args->type = W::EvArgs_Mouse::MOUSE_UP;
         args->button = qevent->button();
+        args->mods = qevent->modifiers();
         args->x = qevent->x();
         args->y = qevent->y();
         W::world.Send(wevent);
@@ -66,6 +68,7 @@ namespace UI {
         W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
         args->type = W::EvArgs_Mouse::MOUSE_MOVE;
         args->button = qevent->button();
+        args->mods = qevent->modifiers();
         args->x = qevent->x();
         args->y = qevent->y();
         W::world.Send(wevent);
@@ -76,6 +79,7 @@ namespace UI {
         wevent.type = W::EVENT_MOUSE;
         W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
         args->type = W::EvArgs_Mouse::MOUSE_WHEEL;
+        args->mods = qevent->modifiers();
         args->delta = qevent->delta();
         args->x = qevent->x();
         args->y = qevent->y();
