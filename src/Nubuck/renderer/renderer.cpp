@@ -97,19 +97,28 @@ struct UniformsLights {
     Color       uLightDiffuseColor0;
     Color 		uLightDiffuseColor1;
     Color 		uLightDiffuseColor2;
+    float       uShininess;
+};
+
+struct UniformsSkeleton {
+    Color       uColor;
 };
 
 static UniformsHot                  uniformsHot;
-static GEN::Pointer<StaticBuffer>   uniformsHotBuffer;
 static UniformsLights               uniformsLights;
+static UniformsSkeleton             uniformsSkeleton;
+static GEN::Pointer<StaticBuffer>   uniformsHotBuffer;
 static GEN::Pointer<StaticBuffer>   uniformsLightsBuffer;
+static GEN::Pointer<StaticBuffer>   uniformsSkeletonBuffer;
 
 static void BindUniformBuffers(void) {
     // somehow these bindings break on intel gpus.
-    uniformsHotBuffer->Bind();
+    uniformsHotBuffer->Bind(); // TODO: need buffers to be bound?
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniformsHotBuffer->GetID());
     uniformsLightsBuffer->Bind();
     glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformsLightsBuffer->GetID());
+    uniformsSkeletonBuffer->Bind();
+    glBindBufferBase(GL_UNIFORM_BUFFER, 2, uniformsSkeletonBuffer->GetID());
 }
 
 struct BillboardHotVertex {
@@ -263,6 +272,10 @@ static void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
     assert(GL_INVALID_INDEX != idx);
     GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 1));
 
+    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsSkeleton");
+    assert(GL_INVALID_INDEX != idx);
+    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 2));
+
     /*
     prog.SetUniform("uLightVec0", M::Vector3(0.0f, 0.0f, 1.0f));
     prog.SetUniform("uLightVec1", M::Vector3(0.0f, 0.0f, 1.0f));
@@ -410,6 +423,9 @@ static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMa
     idx = glGetUniformBlockIndex(prog.GetID(), "UniformsLights");
     assert(GL_INVALID_INDEX != idx);
     GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 1));
+    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsSkeleton");
+    assert(GL_INVALID_INDEX != idx);
+    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 2));
     pass->GetProgram().SetUniform("uEdgeRadiusSq", cvar_r_edgeRadius * cvar_r_edgeRadius);
 
     SetState(pass->GetDesc().state);
@@ -525,6 +541,10 @@ void Renderer::Init(void) {
     uniformsLightsBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsLights)));
     uniformsLightsBuffer->Bind();
     glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformsLightsBuffer->GetID());
+
+    uniformsSkeletonBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsSkeleton)));
+    uniformsSkeletonBuffer->Bind();
+    glBindBufferBase(GL_UNIFORM_BUFFER, 2, uniformsSkeletonBuffer->GetID());
 
     _timer.Start();
 }
@@ -712,8 +732,13 @@ void Renderer::Render(void) {
     uniformsLights.uLightDiffuseColor0 = renderList.dirLights[0].diffuseColor;
     uniformsLights.uLightDiffuseColor1 = renderList.dirLights[1].diffuseColor;
     uniformsLights.uLightDiffuseColor2 = renderList.dirLights[2].diffuseColor;
+    uniformsLights.uShininess = 50.0f;
     uniformsLightsBuffer->Bind();
     uniformsLightsBuffer->Update_Mapped(0, sizeof(UniformsLights), &uniformsLights);
+
+    uniformsSkeleton.uColor = Color(0.4f, 0.4f, 0.4f, 1.0f);
+    uniformsSkeletonBuffer->Bind();
+    uniformsSkeletonBuffer->Update_Mapped(0, sizeof(UniformsSkeleton), &uniformsSkeleton);
 
     metrics.frame.numDrawCalls = 0;
     DrawFrame(renderList, projectionMat, _time);
