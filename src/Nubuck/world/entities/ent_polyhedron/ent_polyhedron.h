@@ -27,6 +27,12 @@ struct PolyhedronHullFaceList {
 	unsigned size;
 };
 
+struct PolyhedronHullFaceColor {
+    R::Color    v0, v1, cur;
+    float       t;
+    bool        ip;
+};
+
 struct PolyhedronHullFaceTrans {
     // base vertex is local origin
     M::Matrix3  localToWorld;
@@ -49,6 +55,7 @@ struct PolyhedronFaceCurve {
 
 struct PolyhedronHull {
 	std::vector<PolyhedronHullFaceList>     faceLists;
+    std::vector<PolyhedronHullFaceColor>    faceColors;
     std::vector<PolyhedronHullFaceTrans>    faceTrans;
 	std::vector<PolyhedronHullEdge>         edges;
 	std::vector<unsigned>                   vnmap; // maps vertices to nodes
@@ -72,5 +79,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph);
 void Polyhedron_Update(ENT_Polyhedron& ph);
 void Polyhedron_AddCurve(ENT_Polyhedron& ph, leda::edge edge, const R::Color& color);
 void Polyhedron_UpdateCurve(PolyhedronFaceCurve& cv, float secsPassed);
+void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed);
+void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Color& color);
 
 } // namespace W

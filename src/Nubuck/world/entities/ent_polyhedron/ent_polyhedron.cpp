@@ -41,6 +41,7 @@ static void Polyhedron_RebuildNodes(ENT_Polyhedron& ph) {
 
 static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
 	ph.hull.faceLists.clear();
+    ph.hull.faceColors.clear();
     ph.hull.faceTrans.clear();
 	ph.hull.edges.clear();
 	ph.hull.vnmap.clear();
@@ -53,6 +54,12 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
 
     unsigned indexCnt = 0;
 
+    const R::Color defaultFaceColor = R::Color::White;
+    PolyhedronHullFaceColor faceColor;
+    faceColor.cur = defaultFaceColor;
+    faceColor.t = 0.0f;
+    faceColor.ip = false;
+
     leda::edge e;
     forall_edges(e, *ph.G) {
         if(!visitedEdge[e]) {
@@ -63,6 +70,7 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
             face.size = 2; // v0 and v1
 
 			ph.hull.faceLists.push_back(face);
+            ph.hull.faceColors.push_back(faceColor);
 			unsigned faceIndex = ph.hull.faceLists.size() - 1;
 			PolyhedronHullFaceList& faceRef = ph.hull.faceLists.back();
 
@@ -100,7 +108,7 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
     if(!ph.hull.indices.empty() /* ie. hull exists */) {
         R::Mesh::Vertex vert;
         vert.position = M::Vector3::Zero;
-        vert.color = R::Color::White;
+        vert.color = defaultFaceColor;
         ph.hull.vertices.resize(ph.hull.indices.size(), vert);
 
         R::Mesh::Desc desc;
@@ -280,6 +288,42 @@ void Polyhedron_AddCurve(ENT_Polyhedron& ph, leda::edge edge, const R::Color& co
 void Polyhedron_UpdateCurve(PolyhedronFaceCurve& cv, float secsPassed) {
     cv.time += cvar_faceCurveSpeed * secsPassed;
     Polyhedron_ComputeCurveDecals(cv);
+}
+
+void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed) {
+    const float IP_DUR = 2.0f;
+    for(unsigned i = 0; i < ph.hull.faceColors.size(); ++i) {
+        PolyhedronHullFaceColor& fc = ph.hull.faceColors[i];
+        if(fc.ip) {
+            const float l = M::Min(1.0f, fc.t / IP_DUR);
+            fc.cur = (1.0f - l) * fc.v0 + l * fc.v1;
+            fc.t += secsPassed;
+            if(IP_DUR < fc.t) {
+                fc.t = 0.0f;
+                fc.ip = false;
+            }
+        }
+    }
+
+    // update vertex colors
+    for(unsigned i = 0; i < ph.hull.faceLists.size(); ++i) {
+        PolyhedronHullFaceList& fl = ph.hull.faceLists[i];
+        PolyhedronHullFaceColor& fc = ph.hull.faceColors[i];
+        for(unsigned j = 0; j < fl.size; ++j) {
+            ph.hull.vertices[fl.base + j].color = fc.cur;
+        }
+    }
+
+    if(!ph.hull.indices.empty()) ph.hull.mesh->Invalidate(&ph.hull.vertices[0]);
+}
+
+void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Color& color) {
+    unsigned faceIdx = ph.hull.edges[e->id()].faceIdx;
+    PolyhedronHullFaceColor& fc = ph.hull.faceColors[faceIdx];
+    fc.v0 = fc.cur;
+    fc.v1 = color;
+    fc.t = 0.0f;
+    fc.ip = true;
 }
 
 } // namespace W

@@ -206,7 +206,8 @@ namespace W {
                 }
                 Polyhedron_Update(ph);
                 */
-                Polyhedron_AddCurve(ph, args->edge, args->color);
+                // Polyhedron_AddCurve(ph, args->edge, args->color);
+                Polyhedron_SetFaceColor(ph, args->edge, args->color);
             }
 
             if(EVENT_RESIZE == event.type) {
@@ -220,6 +221,10 @@ namespace W {
         for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
             for(unsigned j = 0; j < _polyhedrons[i].hull.curves.size(); ++j)
                 Polyhedron_UpdateCurve(_polyhedrons[i].hull.curves[j], _secsPassed);
+        }
+
+        for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+            Polyhedron_UpdateFaceColors(_polyhedrons[i], _secsPassed);
         }
 
         std::for_each(_polyhedrons.begin(), _polyhedrons.end(), Polyhedron_BuildRenderList);
