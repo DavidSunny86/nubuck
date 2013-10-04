@@ -114,6 +114,11 @@ namespace W {
         }
     }
 
+    void World::DestroyPolyhedron(handle_t handle) {
+        std::swap(_polyhedrons[_entMap[handle].entIdx], _polyhedrons.back());
+        _polyhedrons.erase(_polyhedrons.end() - 1);
+    }
+
 	World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
         SetupLights();
 	}
@@ -163,6 +168,13 @@ namespace W {
                 Polyhedron_Update(ph);
                 _entMap[args->h].entIdx = _polyhedrons.size();
                 _polyhedrons.push_back(ph);
+            }
+
+            if(EVENT_DESTROY_POLYHEDRON == event.type) {
+                EvArgs_DestroyPolyhedron* args = (EvArgs_DestroyPolyhedron*)event.args;
+                DestroyPolyhedron(args->entId);
+                _entMap[args->entId].entIdx = EntMapItem::INVALID_INDEX;
+                _entMap[args->entId].used = false;
             }
 
             if(EVENT_REBUILD == event.type) {

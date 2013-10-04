@@ -6,6 +6,12 @@ Polyhedron::Polyhedron(const graph_t& G) {
 }
 
 void Polyhedron::Destroy(void) {
+    W::Event event;
+    event.type = W::EVENT_DESTROY_POLYHEDRON;
+    W::EvArgs_DestroyPolyhedron* args = (W::EvArgs_DestroyPolyhedron*)event.args;
+    args->entId = _entId;
+    W::world.Send(event);
+    _entId = 0;
 }
 
 void Polyhedron::SetNodeColor(leda::node node, float r, float g, float b) {

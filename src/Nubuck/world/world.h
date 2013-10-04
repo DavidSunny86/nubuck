@@ -51,6 +51,8 @@ namespace W {
         ArcballCamera _camArcball;
 
         void HandleMouseEvent(const Event& event);
+
+        void DestroyPolyhedron(handle_t handle);
     public:
 		World(void);
 
