@@ -18,6 +18,10 @@ namespace UI {
     }
 
     void AlgorithmWidget::OnReset(void) {
+        W::Event event;
+        event.type = W::EVENT_APOCALYPSE;
+        W::world.Send(event);
+
         ALG::gs_algorithm.Reset();
     }
 

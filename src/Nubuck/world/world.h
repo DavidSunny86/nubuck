@@ -26,20 +26,6 @@ namespace W {
         std::queue<Event> _events;
         SYS::SpinLock _eventsMtx;
 
-        // clients use handles to reference entities.
-        // _entMap maps handles to entities.
-        struct EntMapItem {
-            enum { INVALID_INDEX = UINT_MAX };
-            unsigned    entIdx; // indexes _polyhedrons
-            bool        used;
-        };
-        std::vector<EntMapItem> _entMap;
-        SYS::SpinLock _entMapMtx;
-        enum { INVALID_HANDLE = UINT_MAX };
-        typedef unsigned handle_t;
-
-        handle_t NewHandle(void);
-
 		std::vector<ENT_Polyhedron> _polyhedrons;
 
         SYS::Timer  _timer;
@@ -52,7 +38,7 @@ namespace W {
 
         void HandleMouseEvent(const Event& event);
 
-        void DestroyPolyhedron(handle_t handle);
+        ENT_Polyhedron* FindByEntityID(unsigned entId);
     public:
 		World(void);
 

@@ -6,6 +6,7 @@
 namespace W {
 
     enum EventType {
+        EVENT_APOCALYPSE,
         EVENT_SPAWN_POLYHEDRON,
         EVENT_DESTROY_POLYHEDRON,
 		EVENT_REBUILD,

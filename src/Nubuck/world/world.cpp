@@ -8,33 +8,14 @@
 #include "world.h"
 
 namespace W {
+
+    static SYS::SpinLock entIdCntMtx;
+    static unsigned entIdCnt = 0;
     
     SYS::Semaphore g_worldSem(0);
     static int rlIdx = 1;
 
     World world;
-
-    World::handle_t World::NewHandle(void) {
-        _entMapMtx.Lock();
-        handle_t h = INVALID_HANDLE;
-        unsigned i = 0;
-        while(INVALID_HANDLE == h && i < _entMap.size()) {
-            if(!_entMap[i].used) {
-                _entMap[i].used = true;
-                h = i;
-            }
-            ++i;
-        }
-        if(INVALID_HANDLE == h) {
-            h = _entMap.size();
-            EntMapItem item;
-            item.entIdx = EntMapItem::INVALID_INDEX;
-            item.used = true;
-            _entMap.push_back(item);
-        }
-        _entMapMtx.Unlock();
-        return h;
-    }
 
 	static void AddRenderJobs(const ENT_Polyhedron& polyhedron) {
         R::RenderList& _renderList = R::g_renderLists[rlIdx];
@@ -120,9 +101,11 @@ namespace W {
         }
     }
 
-    void World::DestroyPolyhedron(handle_t handle) {
-        std::swap(_polyhedrons[_entMap[handle].entIdx], _polyhedrons.back());
-        _polyhedrons.erase(_polyhedrons.end() - 1);
+    ENT_Polyhedron* World::FindByEntityID(unsigned entId) {
+        for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+            if(_polyhedrons[i].entId == entId) return &_polyhedrons[i];
+        }
+        return NULL;
     }
 
 	World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
@@ -136,14 +119,18 @@ namespace W {
     }
 
 	unsigned World::SpawnPolyhedron(const graph_t* const G) {
-        handle_t h = NewHandle();
+        entIdCntMtx.Lock();
+        unsigned entId = entIdCnt++;
+        entIdCntMtx.Unlock();
+
         Event event;
         event.type = EVENT_SPAWN_POLYHEDRON;
         EvArgs_SpawnPolyhedron* args = (EvArgs_SpawnPolyhedron*)event.args;
-        args->h = h;
+        args->h = entId;
         args->G = G;
         Send(event);
-        return h;
+
+        return entId;
 	}
 
     void World::Update(void) {
@@ -165,40 +152,51 @@ namespace W {
             _eventsMtx.Unlock();
             if(done) break;
 
+            if(EVENT_APOCALYPSE == event.type) {
+                _polyhedrons.clear();
+            }
+
             if(EVENT_SPAWN_POLYHEDRON == event.type) {
                 EvArgs_SpawnPolyhedron* args = (EvArgs_SpawnPolyhedron*)event.args;
                 ENT_Polyhedron ph;
+                ph.entId = args->h;
                 ph.G = args->G;
                 Polyhedron_Init(ph);
                 Polyhedron_Rebuild(ph);
                 Polyhedron_Update(ph);
-                _entMap[args->h].entIdx = _polyhedrons.size();
                 _polyhedrons.push_back(ph);
             }
 
             if(EVENT_DESTROY_POLYHEDRON == event.type) {
                 EvArgs_DestroyPolyhedron* args = (EvArgs_DestroyPolyhedron*)event.args;
-                DestroyPolyhedron(args->entId);
-                _entMap[args->entId].entIdx = EntMapItem::INVALID_INDEX;
-                _entMap[args->entId].used = false;
+                for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+                    if(_polyhedrons[i].entId == args->entId) {
+                        std::swap(_polyhedrons[i], _polyhedrons.back());
+                        _polyhedrons.erase(_polyhedrons.end() - 1);
+                    }
+                }
             }
 
             if(EVENT_REBUILD == event.type) {
                 EvArgs_Rebuild* args = (EvArgs_Rebuild*)event.args;
-                ENT_Polyhedron& ph = _polyhedrons[_entMap[args->entId].entIdx];
-                Polyhedron_Rebuild(ph);
-                Polyhedron_Update(ph);
+                ENT_Polyhedron* ph = FindByEntityID(args->entId);
+                if(ph) {
+                    Polyhedron_Rebuild(*ph);
+                    Polyhedron_Update(*ph);
+                }
             }
 
             if(EVENT_SET_NODE_COLOR == event.type) {
                 EvArgs_SetNodeColor* args = (EvArgs_SetNodeColor*)event.args;
-                ENT_Polyhedron& ph = _polyhedrons[_entMap[args->entId].entIdx];
-                ph.nodes.colors[args->node->id()] = args->color;
+                ENT_Polyhedron* ph = FindByEntityID(args->entId);
+                if(ph) {
+                    ph->nodes.colors[args->node->id()] = args->color;
+                }
             }
 
             if(EVENT_SET_FACE_COLOR == event.type) {
                 EvArgs_SetFaceColor* args = (EvArgs_SetFaceColor*)event.args;
-                ENT_Polyhedron& ph = _polyhedrons[_entMap[args->entId].entIdx];
+                ENT_Polyhedron* ph = FindByEntityID(args->entId);
                 /*
                 PolyhedronHullFaceList& face = ph.hull.faceLists[ph.hull.edges[args->edge->id()].faceIdx];
                 for(unsigned i = 0; i < face.size; ++i) {
@@ -207,7 +205,7 @@ namespace W {
                 Polyhedron_Update(ph);
                 */
                 // Polyhedron_AddCurve(ph, args->edge, args->color);
-                Polyhedron_SetFaceColor(ph, args->edge, args->color);
+                Polyhedron_SetFaceColor(*ph, args->edge, args->color);
             }
 
             if(EVENT_RESIZE == event.type) {

@@ -66,6 +66,7 @@ struct PolyhedronHull {
 };
 
 struct ENT_Polyhedron {
+    unsigned                    entId;
 	const graph_t*              G;
     PolyhedronNodes             nodes;
 	PolyhedronHull              hull;
