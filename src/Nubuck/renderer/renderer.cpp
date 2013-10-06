@@ -209,9 +209,9 @@ static void ReserveBillboards(unsigned numBillboards) {
 
     static const BillboardColdVertex coldVertices[4] = {
         { M::Vector2(-1.0f, -1.0f) },
-        { M::Vector2(-1.0f,  1.0f) },
+        { M::Vector2( 1.0f, -1.0f) },
         { M::Vector2( 1.0f,  1.0f) },
-        { M::Vector2( 1.0f, -1.0f) }
+        { M::Vector2(-1.0f,  1.0f) }
     };
     billboardsCold.clear();
     billboardsCold.resize(numBillboards);
@@ -269,9 +269,9 @@ static void BuildBillboards(const M::Matrix4& worldMat) {
 	float nodeSize = cvar_r_nodeSize;
     const BillboardHotVertex hotVertices[4] = {
         { M::Vector3(-nodeSize, -nodeSize, 0.0f) },
-        { M::Vector3(-nodeSize,  nodeSize, 0.0f) },
+        { M::Vector3( nodeSize, -nodeSize, 0.0f) },
         { M::Vector3( nodeSize,  nodeSize, 0.0f) },
-        { M::Vector3( nodeSize, -nodeSize, 0.0f) }
+        { M::Vector3(-nodeSize,  nodeSize, 0.0f) }
     };
     unsigned numBillboards = billboardPositions.size();
     for(unsigned i = 0; i < numBillboards; ++i) {
@@ -537,6 +537,7 @@ void Renderer::Init(void) {
     glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
     glClearDepth(1.0f);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);
