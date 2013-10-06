@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <common\common.h>
 #include "vector3.h"
 #include "matrix3.h"
 #include "quaternion.h"
@@ -201,7 +202,11 @@ namespace M {
 #ifdef _DEBUG
         M::Matrix4 id0 = M::Mat4::Identity();
         M::Matrix4 id1 = inv * m;
-        for(int i = 0; i < 16; ++i) assert(M::AlmostEqual(id0.mat[i], id1.mat[i]));
+        for(int i = 0; i < 16; ++i) {
+            if(!M::AlmostEqual(id0.mat[i], id1.mat[i])) {
+                common.printf("WARNING - A = M * inv(M) != I, A.mat[%d] = %f.\n", i, id1.mat[i]);
+            }
+        }
 #endif
 
         return true;
