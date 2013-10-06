@@ -34,6 +34,10 @@ namespace UI {
     void MainWindow::OnRandomPoints(void) {
         RandomPoints randomPoints;
         if(QDialog::Accepted == randomPoints.exec()) {
+            W::Event event;
+            event.type = W::EVENT_APOCALYPSE;
+            W::world.Send(event);
+
             ALG::gs_algorithm.Init(randomPoints.AsGraph());
         }
     }
