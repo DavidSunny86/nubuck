@@ -17,17 +17,17 @@ namespace W {
 
     World world;
 
-	static void AddRenderJobs(const ENT_Polyhedron& polyhedron) {
+	static void AddRenderJobs(const ENT_Polyhedron* polyhedron) {
         R::RenderList& _renderList = R::g_renderLists[rlIdx];
 		_renderList.jobs.insert(_renderList.jobs.end(),
-			polyhedron.renderList.jobs.begin(),
-			polyhedron.renderList.jobs.end());
+			polyhedron->renderList.jobs.begin(),
+			polyhedron->renderList.jobs.end());
         _renderList.nodePositions.insert(_renderList.nodePositions.end(),
-            polyhedron.renderList.nodePositions.begin(),
-            polyhedron.renderList.nodePositions.end());
+            polyhedron->renderList.nodePositions.begin(),
+            polyhedron->renderList.nodePositions.end());
         _renderList.edges.insert(_renderList.edges.end(),
-            polyhedron.renderList.edges.begin(),
-            polyhedron.renderList.edges.end());
+            polyhedron->renderList.edges.begin(),
+            polyhedron->renderList.edges.end());
 	}
 
     void World::SetupLights(void) {
@@ -103,7 +103,7 @@ namespace W {
 
     ENT_Polyhedron* World::FindByEntityID(unsigned entId) {
         for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-            if(_polyhedrons[i].entId == entId) return &_polyhedrons[i];
+            if(_polyhedrons[i]->entId == entId) return _polyhedrons[i];
         }
         return NULL;
     }
@@ -158,19 +158,19 @@ namespace W {
 
             if(EVENT_SPAWN_POLYHEDRON == event.type) {
                 EvArgs_SpawnPolyhedron* args = (EvArgs_SpawnPolyhedron*)event.args;
-                ENT_Polyhedron ph;
-                ph.entId = args->h;
-                ph.G = args->G;
-                Polyhedron_Init(ph);
-                Polyhedron_Rebuild(ph);
-                Polyhedron_Update(ph);
+                ENT_Polyhedron* ph = new ENT_Polyhedron();
+                ph->entId = args->h;
+                ph->G = args->G;
+                Polyhedron_Init(*ph);
+                Polyhedron_Rebuild(*ph);
+                Polyhedron_Update(*ph);
                 _polyhedrons.push_back(ph);
             }
 
             if(EVENT_DESTROY_POLYHEDRON == event.type) {
                 EvArgs_DestroyPolyhedron* args = (EvArgs_DestroyPolyhedron*)event.args;
                 for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-                    if(_polyhedrons[i].entId == args->entId) {
+                    if(_polyhedrons[i]->entId == args->entId) {
                         std::swap(_polyhedrons[i], _polyhedrons.back());
                         _polyhedrons.erase(_polyhedrons.end() - 1);
                     }
@@ -217,15 +217,16 @@ namespace W {
         } // while(!done)
 
         for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-            for(unsigned j = 0; j < _polyhedrons[i].hull.curves.size(); ++j)
-                Polyhedron_UpdateCurve(_polyhedrons[i].hull.curves[j], _secsPassed);
+            for(unsigned j = 0; j < _polyhedrons[i]->hull.curves.size(); ++j)
+                Polyhedron_UpdateCurve(_polyhedrons[i]->hull.curves[j], _secsPassed);
         }
 
         for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-            Polyhedron_UpdateFaceColors(_polyhedrons[i], _secsPassed);
+            Polyhedron_UpdateFaceColors(*_polyhedrons[i], _secsPassed);
         }
 
-        std::for_each(_polyhedrons.begin(), _polyhedrons.end(), Polyhedron_BuildRenderList);
+        for(unsigned i = 0; i < _polyhedrons.size(); ++i)
+            Polyhedron_BuildRenderList(*_polyhedrons[i]);
 
         R::RenderList& _renderList = R::g_renderLists[rlIdx];
         _renderList.worldMat = _camArcball.GetWorldMatrix();

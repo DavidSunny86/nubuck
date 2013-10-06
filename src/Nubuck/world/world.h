@@ -26,7 +26,7 @@ namespace W {
         std::queue<Event> _events;
         SYS::SpinLock _eventsMtx;
 
-		std::vector<ENT_Polyhedron> _polyhedrons;
+		std::vector<ENT_Polyhedron*> _polyhedrons;
 
         SYS::Timer  _timer;
         float       _secsPassed;
