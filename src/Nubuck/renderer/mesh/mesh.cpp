@@ -63,8 +63,10 @@ namespace R {
             rs = M::Max(rs, M::Dot(_desc.vertices[i].position, _desc.vertices[i].position));
         _radius = sqrtf(rs);
 
-        _vertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, _desc.vertices, sizeof(Vertex) * _desc.numVertices));
-        _indexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, _desc.indices, sizeof(Index) * _desc.numIndices));
+        if(!_vertexBuffer.IsValid()) _vertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, _desc.vertices, sizeof(Vertex) * _desc.numVertices));
+        else _vertexBuffer->Update_Mapped(0, sizeof(Vertex) * _desc.numVertices, _desc.vertices);
+        if(!_indexBuffer.IsValid()) _indexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, _desc.indices, sizeof(Index) * _desc.numIndices));
+        else _indexBuffer->Update_Mapped(0, sizeof(Index) * _desc.numIndices, _desc.indices);
         _compiled = true;
 
         _mtx.Unlock();
