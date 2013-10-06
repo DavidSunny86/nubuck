@@ -18,10 +18,7 @@ enum NodeRenderType {
 	R_NODETYPE_BILLBOARD	= 1
 };
 
-extern COM::Config::Variable<int>	cvar_r_nodeType;
 extern COM::Config::Variable<float>	cvar_r_nodeSize;
-extern COM::Config::Variable<int>	cvar_r_nodeSubdiv;
-extern COM::Config::Variable<int>   cvar_r_nodeSmooth;
 extern COM::Config::Variable<float> cvar_r_edgeRadius;
 
 namespace R {

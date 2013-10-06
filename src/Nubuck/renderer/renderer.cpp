@@ -64,10 +64,7 @@ template<> struct ToGLEnum<int>         { enum { ENUM = GL_INT }; };
 
 } // unnamed namespace
 
-COM::Config::Variable<int>		cvar_r_nodeType("r_nodeType", 1);
 COM::Config::Variable<float>	cvar_r_nodeSize("r_nodeSize", 0.2f);
-COM::Config::Variable<int>		cvar_r_nodeSubdiv("r_nodeSubdiv", 3);
-COM::Config::Variable<int>		cvar_r_nodeSmooth("r_nodeSmooth", 1);
 COM::Config::Variable<float>    cvar_r_edgeRadius("r_edgeRadius", 0.1f);
 
 namespace R {
@@ -79,6 +76,12 @@ static int rlIdx = 0;
 static meshPtr_t nodeMesh;
 
 static State curState;
+
+enum UniformBindingIndices {
+    BINDING_INDEX_HOT       = 0,
+    BINDING_INDEX_LIGHTS    = 1,
+    BINDING_INDEX_SKELETON  = 2
+};
 
 struct UniformsHot {
     M::Matrix4 uProjection;
@@ -113,15 +116,58 @@ static GEN::Pointer<StaticBuffer>   uniformsHotBuffer;
 static GEN::Pointer<StaticBuffer>   uniformsLightsBuffer;
 static GEN::Pointer<StaticBuffer>   uniformsSkeletonBuffer;
 
-static void BindUniformBuffers(void) {
-    // somehow these bindings break on intel gpus.
-    uniformsHotBuffer->Bind(); // TODO: need buffers to be bound?
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniformsHotBuffer->GetID());
-    uniformsLightsBuffer->Bind();
-    glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformsLightsBuffer->GetID());
-    uniformsSkeletonBuffer->Bind();
-    glBindBufferBase(GL_UNIFORM_BUFFER, 2, uniformsSkeletonBuffer->GetID());
+static void Uniforms_InitBuffers(void) {
+    uniformsHotBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsHot)));
+    uniformsLightsBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsLights)));
+    uniformsSkeletonBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsSkeleton)));
 }
+
+static void Uniforms_BindBuffers(void) {
+    // somehow these bindings break on intel gpus.
+    GL_CALL(glBindBufferBase(GL_UNIFORM_BUFFER, BINDING_INDEX_HOT, uniformsHotBuffer->GetID()));
+    GL_CALL(glBindBufferBase(GL_UNIFORM_BUFFER, BINDING_INDEX_LIGHTS, uniformsLightsBuffer->GetID()));
+    GL_CALL(glBindBufferBase(GL_UNIFORM_BUFFER, BINDING_INDEX_SKELETON, uniformsSkeletonBuffer->GetID()));
+}
+
+static void Uniforms_BindBlocks(const Program& prog) {
+    GLuint idx = 0;
+    
+    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsHot");
+    if(GL_INVALID_INDEX != idx) GL_CALL(glUniformBlockBinding(prog.GetID(), idx, BINDING_INDEX_HOT));
+
+    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsLights");
+    if(GL_INVALID_INDEX != idx) GL_CALL(glUniformBlockBinding(prog.GetID(), idx, BINDING_INDEX_LIGHTS));
+
+    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsSkeleton");
+    if(GL_INVALID_INDEX != idx) GL_CALL(glUniformBlockBinding(prog.GetID(), idx, BINDING_INDEX_SKELETON));
+}
+
+static void Uniforms_Update(
+    const M::Matrix4& projectionMat, 
+    const M::Matrix4& worldMat,
+    const DirectionalLight dirLights[])
+{
+    uniformsHot.uProjection = projectionMat;
+    uniformsHot.uTransform = worldMat;
+    M::TryInvert(worldMat, uniformsHot.uInvTransform);
+    uniformsHot.uNormalMat = M::Mat4::FromRigidTransform(M::Transpose(M::Inverse(M::RotationOf(worldMat))), M::Vector3::Zero);
+    uniformsHotBuffer->Update_Mapped(0, sizeof(UniformsHot), &uniformsHot);
+
+    uniformsLights.uLightVec0 = -dirLights[0].direction;
+    uniformsLights.uLightVec1 = -dirLights[1].direction;
+    uniformsLights.uLightVec2 = -dirLights[2].direction;
+    uniformsLights.uLightDiffuseColor0 = dirLights[0].diffuseColor;
+    uniformsLights.uLightDiffuseColor1 = dirLights[1].diffuseColor;
+    uniformsLights.uLightDiffuseColor2 = dirLights[2].diffuseColor;
+    uniformsLights.uShininess = 50.0f;
+    uniformsLightsBuffer->Update_Mapped(0, sizeof(UniformsLights), &uniformsLights);
+
+    uniformsSkeleton.uColor = Color(0.4f, 0.4f, 0.4f, 1.0f);
+    uniformsSkeleton.uNodeSize = cvar_r_nodeSize;
+    uniformsSkeleton.uEdgeRadiusSq = cvar_r_edgeRadius * cvar_r_edgeRadius;
+    uniformsSkeletonBuffer->Update_Mapped(0, sizeof(UniformsSkeleton), &uniformsSkeleton);
+}
+
 
 struct BillboardHotVertex {
     M::Vector3 position;
@@ -255,37 +301,15 @@ static void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
     unsigned numBillboards = billboardPositions.size();
     unsigned numBillboardIndices = 5 * numBillboards - 1;
 
-    BindUniformBuffers();
-
     GEN::Pointer<Effect> fx = effectMgr.GetEffect("NodeBillboard");
     fx->Compile();
     Pass* pass = fx->GetPass(0);
     pass->Use();
 
-    SetState(pass->GetDesc().state);
-
     Program& prog = pass->GetProgram();
-
-    GLuint idx = glGetUniformBlockIndex(prog.GetID(), "UniformsHot");
-    assert(GL_INVALID_INDEX != idx);
-    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 0));
-
-    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsLights");
-    assert(GL_INVALID_INDEX != idx);
-    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 1));
-
-    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsSkeleton");
-    assert(GL_INVALID_INDEX != idx);
-    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 2));
-
-    /*
-    prog.SetUniform("uLightVec0", M::Vector3(0.0f, 0.0f, 1.0f));
-    prog.SetUniform("uLightVec1", M::Vector3(0.0f, 0.0f, 1.0f));
-    prog.SetUniform("uLightVec2", M::Vector3(0.0f, 0.0f, 1.0f));
-    prog.SetUniform("uLightDiffuseColor0", Color(0.8f, 0.8f, 0.8f));
-    prog.SetUniform("uLightDiffuseColor1", Color(0.8f, 0.8f, 0.8f));
-    prog.SetUniform("uLightDiffuseColor2", Color(0.8f, 0.8f, 0.8f));
-    */
+    Uniforms_BindBlocks(prog);
+    Uniforms_BindBuffers();
+    SetState(pass->GetDesc().state);
 
     billboardHotVertexBuffer->Bind();
     BindHotBillboardVertices();
@@ -428,23 +452,15 @@ static void CreateEdges(const std::vector<Edge>& edges) {
 }
 
 static void DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4& worldMat) {
-    BindUniformBuffers();
     GEN::Pointer<Effect> fx = effectMgr.GetEffect("EdgeBillboard");
     // GEN::Pointer<Effect> fx = effectMgr.GetEffect("GenericWireframe");
     fx->Compile();
     Pass* pass = fx->GetPass(0);
     pass->Use();
-    Program& prog = pass->GetProgram();
-    GLuint idx = glGetUniformBlockIndex(prog.GetID(), "UniformsHot");
-    assert(GL_INVALID_INDEX != idx);
-    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 0));
-    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsLights");
-    assert(GL_INVALID_INDEX != idx);
-    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 1));
-    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsSkeleton");
-    assert(GL_INVALID_INDEX != idx);
-    GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 2));
 
+    Program& prog = pass->GetProgram();
+    Uniforms_BindBlocks(prog);
+    Uniforms_BindBuffers();
     SetState(pass->GetDesc().state);
 
     edgeBBoxVertexBuffer->Bind();
@@ -489,29 +505,6 @@ void SetState(const State& state) {
     }
 }
 
-void SetLightUniforms(Program& prog, const Light& light) {
-    prog.SetUniform("uLightPosition", light.position);
-    prog.SetUniform("uLightConstantAttenuation", light.constantAttenuation);
-    prog.SetUniform("uLightLinearAttenuation", light.linearAttenuation);
-    prog.SetUniform("uLightQuadricAttenuation", light.quadricAttenuation);
-    prog.SetUniform("uLightDiffuseColor", light.diffuseColor);
-}
-
-void SetMaterialUniforms(Program& prog, const Material& mat) {
-    prog.SetUniform("uMatDiffuseColor", mat.diffuseColor);
-}
-
-static void CreateNodeMesh(void) {
-	Sphere sphere(cvar_r_nodeSubdiv, cvar_r_nodeSmooth);
-	sphere.Scale(cvar_r_nodeSize);
-	nodeMesh = meshMgr.Create(sphere.GetDesc());
-}
-
-static void CreateNodeMeshCallback(const std::string& name) {
-	if("r_nodeSize" == name || "r_nodeSubdiv" == name || "r_nodeSmooth" == name) 
-        CreateNodeMesh();
-}
-
 Renderer::Renderer(void) : _time(0.0f) { }
 
 void Renderer::Init(void) {
@@ -548,23 +541,7 @@ void Renderer::Init(void) {
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);
 
-	cvar_r_nodeSize.Register(CreateNodeMeshCallback);
-	cvar_r_nodeSubdiv.Register(CreateNodeMeshCallback);
-    cvar_r_nodeSmooth.Register(CreateNodeMeshCallback);
-
-	CreateNodeMesh();
-
-    uniformsHotBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsHot)));
-    uniformsHotBuffer->Bind();
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniformsHotBuffer->GetID());
-
-    uniformsLightsBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsLights)));
-    uniformsLightsBuffer->Bind();
-    glBindBufferBase(GL_UNIFORM_BUFFER, 1, uniformsLightsBuffer->GetID());
-
-    uniformsSkeletonBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsSkeleton)));
-    uniformsSkeletonBuffer->Bind();
-    glBindBufferBase(GL_UNIFORM_BUFFER, 2, uniformsSkeletonBuffer->GetID());
+    Uniforms_InitBuffers();
 
     _timer.Start();
 }
@@ -577,23 +554,11 @@ void Renderer::Resize(int width, int height) {
 static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const M::Matrix4& worldMat, RenderJob* first) {
     RenderJob* meshJob = first;
     while(meshJob && meshJob->fx == first->fx) {
-        if(FIRST_LIGHT_PASS == passType || LIGHT_PASS == passType || USE_MATERIAL & passFlags)
-            SetMaterialUniforms(prog, meshJob->material);
-
-        // prog.SetUniform("uTransform", meshJob->transform);
-
-        if(USE_TEX_DIFFUSE & passFlags) {
-            skinMgr.R_Bind(prog, meshJob->skin);
-        }
-
         meshJob->mesh->R_Bind();
         BindVertices();
         unsigned numIndices = meshJob->mesh->NumIndices();
-
         GLenum primType = meshJob->primType;
         if(!primType) primType = meshJob->mesh->PrimitiveType();
-
-        BindUniformBuffers();
         metrics.frame.numDrawCalls++;
         GL_CALL(glDrawElements(primType, numIndices, ToGLEnum<Mesh::Index>::ENUM, NULL));
         meshJob = meshJob->next;
@@ -602,57 +567,25 @@ static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const
 }
 
 static void DrawFrame(RenderList& renderList, const M::Matrix4& projectionMat, float time) {
-    typedef std::vector<RenderJob>::iterator rjobIt_t;
-
     if(renderList.jobs.empty()) return;
 
     RenderJob* cur = &renderList.jobs[0];
     RenderJob* next = NULL;
     while(cur) {
         next = NULL;
-        if(true) {
-            GEN::Pointer<Effect> fx = effectMgr.GetEffect(cur->fx);
+        GEN::Pointer<Effect> fx = effectMgr.GetEffect(cur->fx);
+        int numPasses = fx->NumPasses();
+        for(int i = 0; i < numPasses; ++i) {
+            Pass* pass = fx->GetPass(i);
+            pass->Use();
+            
+            Program&        prog = pass->GetProgram();
+            const PassDesc& desc = pass->GetDesc();
+            Uniforms_BindBlocks(prog);
+            Uniforms_BindBuffers();
+            SetState(desc.state);
 
-            int numPasses = fx->NumPasses();
-            for(int i = 0; i < numPasses; ++i) {
-                Pass* pass = fx->GetPass(i);
-                pass->Use();
-                
-                Program&        prog = pass->GetProgram();
-                const PassDesc& desc = pass->GetDesc();
-
-                GLuint idx = glGetUniformBlockIndex(prog.GetID(), "UniformsHot");
-                if(GL_INVALID_INDEX != idx) GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 0));
-                idx = glGetUniformBlockIndex(prog.GetID(), "UniformsLights");
-                if(GL_INVALID_INDEX != idx) GL_CALL(glUniformBlockBinding(prog.GetID(), idx, 1));
-
-                SetState(desc.state);
-
-                // prog.SetUniform("uProjection", projectionMat);
-                // prog.SetUniform("uTransform", worldMat);
-
-                if(USE_TIME & desc.flags) prog.SetUniform("uTime", time);
-                if(USE_COLOR & desc.flags) prog.SetUniform("uColor", desc.state.color);
-
-                if(FIRST_LIGHT_PASS == desc.type || LIGHT_PASS == desc.type) {
-                    M::Matrix3 normalMat = M::Transpose(M::Inverse(M::RotationOf(renderList.worldMat)));
-                    prog.SetUniform("uNormalMat", normalMat);
-                }
-
-                if(FIRST_LIGHT_PASS == desc.type || DEFAULT == desc.type) {
-                    if(FIRST_LIGHT_PASS == desc.type && !renderList.lights.empty())
-                        SetLightUniforms(prog, renderList.lights[0]);
-
-                    next = DrawMeshList(prog, desc.type, desc.flags, renderList.worldMat, cur);
-                }
-
-                if(LIGHT_PASS == desc.type) {
-                    for(int j = 1; j < renderList.lights.size(); ++j) {
-                        SetLightUniforms(prog, renderList.lights[j]);
-                        next = DrawMeshList(prog, desc.type, desc.flags, renderList.worldMat, cur);
-                    }
-                } // LIGHT_PASS == type
-            }
+            next = DrawMeshList(prog, desc.type, desc.flags, renderList.worldMat, cur);
         }
         cur = next;
     }
@@ -672,7 +605,6 @@ static void Link(std::vector<R::RenderJob>& renderJobs) {
 static void Compile(R::RenderJob& rjob) {
     effectMgr.GetEffect(rjob.fx)->Compile();
     rjob.mesh->R_Compile();
-    if(rjob.skin.IsValid()) skinMgr.R_Compile(rjob.skin);
 }
 
 static void Transform(const M::Matrix4& worldMat, R::RenderJob& rjob) {
@@ -713,79 +645,40 @@ void Renderer::Render(void) {
 
     RenderList& renderList = g_renderLists[rlIdx];
 
-	if(R_NODETYPE_GEOMETRY == cvar_r_nodeType) {
-		RenderJob rjob;
-		rjob.fx = "Lit";
-		rjob.material.diffuseColor = Color::White;
-		rjob.mesh = nodeMesh;
-		rjob.primType = 0;
-		for(unsigned i = 0; i < renderList.nodePositions.size(); ++i) {
-			rjob.transform = M::Mat4::Translate(renderList.nodePositions[i]);
-			renderList.jobs.push_back(rjob);
-		}
-	}
+    if(!(renderList.jobs.empty() && renderList.nodePositions.empty())) {
 
-    if(renderList.jobs.empty() && renderList.nodePositions.empty()) {
-    }
-    else {
+        static SYS::Timer frameTime;
+        frameTime.Start();
 
-    static SYS::Timer frameTime;
-    frameTime.Start();
+        metrics.frame.numDrawCalls = 0;
 
-    // TODO: sort
+        M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, renderList.jobs);
 
-    Link(renderList.jobs);
-    std::for_each(renderList.jobs.begin(), renderList.jobs.end(),
-        std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
-    M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, renderList.jobs);
+        Uniforms_Update(projectionMat, renderList.worldMat, renderList.dirLights);
 
-    uniformsHot.uProjection = projectionMat;
-    uniformsHot.uTransform = renderList.worldMat;
-    M::TryInvert(renderList.worldMat, uniformsHot.uInvTransform);
-    uniformsHot.uNormalMat = M::Mat4::FromRigidTransform(M::Transpose(M::Inverse(M::RotationOf(renderList.worldMat))), M::Vector3::Zero);
-    uniformsHotBuffer->Bind();
-    uniformsHotBuffer->Update_Mapped(0, sizeof(UniformsHot), &uniformsHot);
+        Link(renderList.jobs);
+        std::for_each(renderList.jobs.begin(), renderList.jobs.end(),
+            std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
+        DrawFrame(renderList, projectionMat, _time);
 
-    uniformsLights.uLightVec0 = -renderList.dirLights[0].direction;
-    uniformsLights.uLightVec1 = -renderList.dirLights[1].direction;
-    uniformsLights.uLightVec2 = -renderList.dirLights[2].direction;
-    uniformsLights.uLightDiffuseColor0 = renderList.dirLights[0].diffuseColor;
-    uniformsLights.uLightDiffuseColor1 = renderList.dirLights[1].diffuseColor;
-    uniformsLights.uLightDiffuseColor2 = renderList.dirLights[2].diffuseColor;
-    uniformsLights.uShininess = 50.0f;
-    uniformsLightsBuffer->Bind();
-    uniformsLightsBuffer->Update_Mapped(0, sizeof(UniformsLights), &uniformsLights);
+        InitBillboards(renderList.nodePositions);
+        BuildBillboards(renderList.worldMat);
+        unsigned numBillboards = billboardPositions.size();
+        if(numBillboards) {
+            billboardHotVertexBuffer->Update_Mapped(0, sizeof(BillboardHot) * numBillboards, &billboardsHot[0]);
+            DrawBillboards(renderList.worldMat, projectionMat);
+            billboardHotVertexBuffer->Discard();
+        }
 
-    uniformsSkeleton.uColor = Color(0.4f, 0.4f, 0.4f, 1.0f);
-    uniformsSkeleton.uNodeSize = cvar_r_nodeSize;
-    uniformsSkeleton.uEdgeRadiusSq = cvar_r_edgeRadius * cvar_r_edgeRadius;
-    uniformsSkeletonBuffer->Bind();
-    uniformsSkeletonBuffer->Update_Mapped(0, sizeof(UniformsSkeleton), &uniformsSkeleton);
+        if(!renderList.edges.empty()) {
+            ReserveEdgeBBoxBuffers(renderList.edges.size());
+            CreateEdges(renderList.edges);
+            DrawEdges(projectionMat, renderList.worldMat);
+        }
 
-    metrics.frame.numDrawCalls = 0;
-    DrawFrame(renderList, projectionMat, _time);
+        meshMgr.R_Update();
 
-	if(R_NODETYPE_BILLBOARD == cvar_r_nodeType) {
-		InitBillboards(renderList.nodePositions);
-		BuildBillboards(renderList.worldMat);
-		unsigned numBillboards = billboardPositions.size();
-		if(numBillboards) {
-			billboardHotVertexBuffer->Update_Mapped(0, sizeof(BillboardHot) * numBillboards, &billboardsHot[0]);
-			DrawBillboards(renderList.worldMat, projectionMat);
-			billboardHotVertexBuffer->Discard();
-		}
-	} 
-
-    if(!renderList.edges.empty()) {
-        ReserveEdgeBBoxBuffers(renderList.edges.size());
-        CreateEdges(renderList.edges);
-        DrawEdges(projectionMat, renderList.worldMat);
-    }
-
-    meshMgr.R_Update();
-
-    // GL_CALL(glFinish());
-    metrics.frame.time = frameTime.Stop();
+        metrics.frame.time = frameTime.Stop();
     }
 
     g_rendererSem.Signal();
