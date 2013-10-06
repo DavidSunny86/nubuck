@@ -48,7 +48,8 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
 	ph.hull.vertices.clear();
 	ph.hull.indices.clear();
 
-	ph.hull.edges.resize(ph.G->max_edge_index() + 1);
+    PolyhedronHullEdge invalidEdge = { PolyhedronHullEdge::INVALID_FACE_INDEX, 0, 0 };
+	ph.hull.edges.resize(ph.G->max_edge_index() + 1, invalidEdge);
 
     leda::edge_array<bool> visitedEdge(*ph.G, false);
 
@@ -62,6 +63,8 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
 
     leda::edge e;
     forall_edges(e, *ph.G) {
+        ph.hull.edges[e->id()].n0 = leda::source(e)->id();
+        ph.hull.edges[e->id()].n1 = leda::target(e)->id();
         if(!visitedEdge[e]) {
 			leda::edge it = ph.G->face_cycle_succ(e);
 
@@ -144,15 +147,18 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
         if(ph.nodes.valid[i]) ph.renderList.nodePositions.push_back(ph.nodes.positions[i]);
 	}
 
-    leda::edge e;
     R::Edge re;
+    unsigned numEdges = ph.hull.edges.size();
     ph.renderList.edges.clear();
-    forall_edges(e, *ph.G) {
-        re.p0 = ph.nodes.positions[leda::source(e)->id()];
-        re.p1 = ph.nodes.positions[leda::target(e)->id()];
-        ph.renderList.edges.push_back(re);
+    for(unsigned i = 0; i < numEdges; ++i) {
+        const PolyhedronHullEdge& e = ph.hull.edges[i];
+        if(PolyhedronHullEdge::INVALID_FACE_INDEX != e.faceIdx) // ie. edge is valid
+        {
+            re.p0 = ph.nodes.positions[e.n0];
+            re.p1 = ph.nodes.positions[e.n1];
+            ph.renderList.edges.push_back(re);
+        }
     }
-
 
     if(!ph.hull.indices.empty() /* ie. hull exists */) {
         renderJob.material = R::Material::White;
