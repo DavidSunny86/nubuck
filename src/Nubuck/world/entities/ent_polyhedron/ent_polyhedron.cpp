@@ -30,12 +30,18 @@ void Polyhedron_InitResources(void) {
 
 void Polyhedron_Init(ENT_Polyhedron&) { }
 
+static void Polyhedron_RebuildSelection(ENT_Polyhedron& ph) {
+    ph.selection.nodes.clear();
+    ph.selection.nodes.resize(ph.G->max_node_index() + 1, false);
+}
+
 static void Polyhedron_RebuildNodes(ENT_Polyhedron& ph) {
     leda::node n;
     ph.nodes.valid.clear();
     ph.nodes.valid.resize(ph.G->max_node_index() + 1, 0);
     forall_nodes(n, *ph.G) ph.nodes.valid[n->id()] = 1;
     ph.nodes.positions.resize(ph.G->max_node_index() + 1);
+    ph.nodes.oldPositions.resize(ph.G->max_node_index() + 1);
     ph.nodes.colors.clear();
     ph.nodes.colors.resize(ph.G->max_node_index() + 1, R::Color::Black);
 }
@@ -131,6 +137,7 @@ void Polyhedron_Rebuild(ENT_Polyhedron& ph) {
     common.printf("INFO - Polyhedron_Rebuild: rebuilding polyhedron with |V| = %d, |E| = %d.\n",
         ph.G->number_of_nodes(), ph.G->number_of_edges());
 
+    Polyhedron_RebuildSelection(ph);
     Polyhedron_RebuildNodes(ph);
     Polyhedron_RebuildHull(ph);
 }
@@ -150,7 +157,9 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
     for(unsigned i = 0; i < numNodes; ++i) {
         if(ph.nodes.valid[i]) {
             ph.renderList.nodePositions.push_back(ph.nodes.positions[i]);
-            ph.renderList.nodeColors.push_back(R::Color(0.4f, 0.4f, 0.4f, 1.0f));
+
+            if(ph.selection.nodes[i]) ph.renderList.nodeColors.push_back(R::Color(1.0f, 1.0f, 0.0f, 1.0f));
+            else ph.renderList.nodeColors.push_back(R::Color(0.4f, 0.4f, 0.4f, 1.0f)); 
         }
 	}
 

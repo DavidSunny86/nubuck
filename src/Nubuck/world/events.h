@@ -14,7 +14,8 @@ namespace W {
         EVENT_SET_FACE_COLOR,
 
         EVENT_RESIZE,
-        EVENT_MOUSE
+        EVENT_MOUSE,
+        EVENT_KEY
     };
 
     struct Event {
@@ -62,6 +63,12 @@ namespace W {
             MODIFIER_SHIFT = 0x02000000 // == Qt::ShiftModifier
         };
         int type, button, mods, delta, x, y;
+    };
+
+    struct EvArgs_Key {
+        enum Type { KEY_DOWN = 0, KEY_UP };
+        int type;
+        int keyCode;
     };
 
 } // namespace W

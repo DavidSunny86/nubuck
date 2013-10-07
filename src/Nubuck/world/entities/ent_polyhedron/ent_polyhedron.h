@@ -19,6 +19,7 @@ struct PolyhedronNodes {
     // and 0, otherwise
     std::vector<int>        valid;
     std::vector<M::Vector3> positions;
+    std::vector<M::Vector3> oldPositions;
     std::vector<R::Color>   colors;
 };
 
@@ -67,11 +68,16 @@ struct PolyhedronHull {
 	R::meshPtr_t                            mesh;
 };
 
+struct PolyhedronSelection {
+    std::vector<bool> nodes;
+};
+
 struct ENT_Polyhedron {
     unsigned                    entId;
 	const graph_t*              G;
     PolyhedronNodes             nodes;
 	PolyhedronHull              hull;
+    PolyhedronSelection         selection;
     R::RenderList               renderList;
 };
 

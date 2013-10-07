@@ -39,6 +39,9 @@ namespace W {
         void HandleMouseEvent(const Event& event);
 
         ENT_Polyhedron* FindByEntityID(unsigned entId);
+
+        bool        _isGrabbing;
+        M::Vector3  _grabPivot;
     public:
 		World(void);
 

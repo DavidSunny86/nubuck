@@ -1,4 +1,5 @@
 #include <QMouseEvent>
+#include <QKeyEvent>
 
 #include <common\common.h>
 #include <world\world.h>
@@ -36,6 +37,10 @@ namespace UI {
         _rtimer.Start();
 
         _renderer.Render();
+    }
+
+    void RenderView::enterEvent(QEvent* event) {
+        setFocus(Qt::OtherFocusReason);
     }
 
     void RenderView::mousePressEvent(QMouseEvent* qevent) {
@@ -86,7 +91,27 @@ namespace UI {
         W::world.Send(wevent);
     }
 
+    void RenderView::keyPressEvent(QKeyEvent* qevent) {
+        W::Event event;
+        event.type = W::EVENT_KEY;
+        W::EvArgs_Key* args =  (W::EvArgs_Key*)event.args;
+        args->type = W::EvArgs_Key::KEY_DOWN;
+        args->keyCode = qevent->key();
+        W::world.Send(event);
+    }
+
+    void RenderView::keyReleaseEvent(QKeyEvent* qevent) {
+        W::Event event;
+        event.type = W::EVENT_KEY;
+        W::EvArgs_Key* args =  (W::EvArgs_Key*)event.args;
+        args->type = W::EvArgs_Key::KEY_UP;
+        args->keyCode = qevent->key();
+        W::world.Send(event);
+    }
+
     RenderView::RenderView(QWidget* parent) : glWidget_t(parent), _fpsLabel(NULL) {        
+        setMouseTracking(true);
+
         connect(&_timer, SIGNAL(timeout()), this, SLOT(Update()));
         _timer.start();
     }

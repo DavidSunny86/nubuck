@@ -124,9 +124,23 @@ namespace W {
 
         if(EvArgs_Mouse::MOUSE_DOWN == args->type) {
             if(EvArgs_Mouse::BUTTON_LEFT == args->button) {
+                if(_isGrabbing) _isGrabbing = false;
+
                 if(EvArgs_Mouse::MODIFIER_SHIFT == args->mods)
                     _camArcball.StartZooming(args->x, args->y);
-                // else _camArcball.StartDragging(args->x, args->y);
+                else _camArcball.StartDragging(args->x, args->y);
+            }
+            if(EvArgs_Mouse::BUTTON_RIGHT == args->button) {
+                if(_isGrabbing) {
+                    for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+                        ENT_Polyhedron& ph = *_polyhedrons[i];
+                        ph.nodes.positions = ph.nodes.oldPositions;
+                    }
+
+                    _isGrabbing = false;
+                }
+
+                // _camArcball.StartPanning(args->x, args->y);
 
                 // picking
                 M::Matrix4 projectionMat = M::Mat4::Perspective(45.0f, aspect, 0.1f, 1000.0f);
@@ -142,13 +156,13 @@ namespace W {
                 printf("dir = %f, %f, %f\n", rayDir.x, rayDir.y, rayDir.z);
                 for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
                     leda::node hitNode = NULL;
-                    if(Polyhedron_RaycastNodes(*_polyhedrons[i], rayOrig, rayDir, hitNode)) {
+                    ENT_Polyhedron& ph = *_polyhedrons[i];
+                    if(Polyhedron_RaycastNodes(ph, rayOrig, rayDir, hitNode)) {
                         printf("Hit!\n");
+                        ph.selection.nodes[hitNode->id()] = !ph.selection.nodes[hitNode->id()];
                     } else printf("No hit...\n");
                 }
             }
-            if(EvArgs_Mouse::BUTTON_RIGHT == args->button)
-                _camArcball.StartPanning(args->x, args->y);
         }
 
         if(EvArgs_Mouse::MOUSE_UP == args->type) {
@@ -182,6 +196,8 @@ namespace W {
     }
 
 	World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
+        _isGrabbing = false;
+
         SetupLights();
 	}
 
@@ -290,7 +306,40 @@ namespace W {
             }
 
             if(EVENT_MOUSE == event.type) HandleMouseEvent(event);
+
+            if(EVENT_KEY == event.type) {
+                EvArgs_Key* args = (EvArgs_Key*)event.args;
+                if(!_isGrabbing && 'G' == args->keyCode) {
+                    if(W::EvArgs_Key::KEY_DOWN == args->type) {
+                        _grabPivot.x = mouseX;
+                        _grabPivot.y = mouseY;
+                        _isGrabbing = true;
+
+                        for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+                            ENT_Polyhedron& ph = *_polyhedrons[i];
+                            ph.nodes.oldPositions = ph.nodes.positions;
+                        }
+                    } else _isGrabbing = false;
+                }
+            }
         } // while(!done)
+
+        if(_isGrabbing) {
+            float dx = mouseX - _grabPivot.x;
+            float dy = -mouseY + _grabPivot.y;
+            dx *= 0.05f;
+            dy *= 0.05f;
+            for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+                ENT_Polyhedron& ph = *_polyhedrons[i];
+                unsigned numNodes = ph.nodes.positions.size();
+                for(unsigned j = 0; j < numNodes; ++j) {
+                    if(ph.selection.nodes[j]) {
+                        ph.nodes.positions[j].x = ph.nodes.oldPositions[j].x + dx;
+                        ph.nodes.positions[j].y = ph.nodes.oldPositions[j].y + dy;
+                    }
+                }
+            }
+        }
 
         for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
             for(unsigned j = 0; j < _polyhedrons[i]->hull.curves.size(); ++j)
