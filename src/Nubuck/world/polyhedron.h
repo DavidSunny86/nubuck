@@ -7,7 +7,7 @@ class Polyhedron : public IPolyhedron {
 private:
     unsigned _entId;
 public:
-    Polyhedron(const graph_t& G);
+    Polyhedron(graph_t& G);
 
     void Destroy(void) override;
 

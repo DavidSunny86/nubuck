@@ -2,6 +2,7 @@
 #include <algorithm>
 
 #include <common\common.h>
+#include <algdriver\algdriver.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include "polyhedron.h"
 #include "entity.h"
@@ -124,7 +125,19 @@ namespace W {
 
         if(EvArgs_Mouse::MOUSE_DOWN == args->type) {
             if(EvArgs_Mouse::BUTTON_LEFT == args->button) {
-                if(_isGrabbing) _isGrabbing = false;
+                if(_isGrabbing) {
+                    _isGrabbing = false;
+
+                    for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+                        ENT_Polyhedron& ph = *_polyhedrons[i];
+                        leda::node n;
+                        forall_nodes(n, *ph.G) {
+                            const M::Vector3& p = ph.nodes.positions[n->id()];
+                            (*ph.G)[n] = point_t(p.x, p.y, p.z);
+                        }
+                    }
+                    ALG::gs_algorithm.GetPhase()->OnNodesMoved();
+                }
 
                 if(EvArgs_Mouse::MODIFIER_SHIFT == args->mods)
                     _camArcball.StartZooming(args->x, args->y);
@@ -207,7 +220,7 @@ namespace W {
         _eventsMtx.Unlock();
     }
 
-	unsigned World::SpawnPolyhedron(const graph_t* const G) {
+	unsigned World::SpawnPolyhedron(graph_t* const G) {
         entIdCntMtx.Lock();
         unsigned entId = entIdCnt++;
         entIdCntMtx.Unlock();
@@ -367,7 +380,7 @@ namespace W {
         rlIdx = 1 - rlIdx;
     }
 
-    IPolyhedron* World::CreatePolyhedron(const graph_t& G) {
+    IPolyhedron* World::CreatePolyhedron(graph_t& G) {
         return new Polyhedron(G);
     }
 

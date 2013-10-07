@@ -73,12 +73,12 @@ struct PolyhedronSelection {
 };
 
 struct ENT_Polyhedron {
-    unsigned                    entId;
-	const graph_t*              G;
-    PolyhedronNodes             nodes;
-	PolyhedronHull              hull;
-    PolyhedronSelection         selection;
-    R::RenderList               renderList;
+    unsigned                entId;
+	graph_t*                G;
+    PolyhedronNodes         nodes;
+	PolyhedronHull          hull;
+    PolyhedronSelection     selection;
+    R::RenderList           renderList;
 };
 
 void Polyhedron_InitResources(void);

@@ -25,7 +25,7 @@ namespace W {
 
     struct EvArgs_SpawnPolyhedron {
         unsigned h;
-        const graph_t* G;
+        graph_t* G;
     };
 
     struct EvArgs_DestroyPolyhedron {

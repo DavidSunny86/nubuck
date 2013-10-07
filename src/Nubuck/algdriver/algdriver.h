@@ -29,6 +29,8 @@ namespace ALG {
     public:
         Driver(const GEN::Pointer<IAlgorithm>& algorithm, const GEN::Pointer<IPhase>& phase);
 
+        GEN::Pointer<IPhase> GetPhase(void) { return _phase; }
+
         enum Command { CMD_STEP = 0, CMD_NEXT, CMD_RUN, CMD_TERMINATE };
         void AddCommand(unsigned cmd);
 
@@ -51,6 +53,8 @@ namespace ALG {
         void Step(void);
         void Next(void);
         void Run(void);
+
+        GEN::Pointer<IPhase> GetPhase(void) { return _driver->GetPhase(); }
     };
 
     // global interface to client algorithm

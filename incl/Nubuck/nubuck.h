@@ -28,7 +28,7 @@ struct IPolyhedron {
 };
 
 struct IWorld {
-    virtual IPolyhedron* CreatePolyhedron(const leda::GRAPH<leda::d3_rat_point, int>& G) = 0;
+    virtual IPolyhedron* CreatePolyhedron(leda::GRAPH<leda::d3_rat_point, int>& G) = 0;
 };
 
 struct ILog {
@@ -59,6 +59,8 @@ struct IPhase {
 
     virtual StepRet     Step(void) = 0;
     virtual IPhase*     NextPhase(void) = 0;
+
+    virtual void        OnNodesMoved(void) = 0;
 };
 
 struct IAlgorithm {

@@ -48,12 +48,12 @@ namespace W {
         // message passing
         void Send(const Event& event);
 
-		unsigned SpawnPolyhedron(const graph_t* const G);
+		unsigned SpawnPolyhedron(graph_t* const G);
 
         void Update(void);
 
         // exported to client
-        IPolyhedron* CreatePolyhedron(const graph_t& G) override;
+        IPolyhedron* CreatePolyhedron(graph_t& G) override;
 
         // thread interface
         DWORD Thread_Func(void);
