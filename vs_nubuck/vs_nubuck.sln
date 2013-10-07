@@ -15,6 +15,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo_delaunay2d", "demo_del
 		{41FA7EED-25F5-4CD7-8656-42AB6FD66983} = {41FA7EED-25F5-4CD7-8656-42AB6FD66983}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo_grabbing", "demo_grabbing\demo_grabbing.vcxproj", "{01EF025E-DA50-48E3-83C0-BE70528CA9B7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{41FA7EED-25F5-4CD7-8656-42AB6FD66983} = {41FA7EED-25F5-4CD7-8656-42AB6FD66983}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -33,6 +38,10 @@ Global
 		{D084EF5C-8F80-49CE-9074-5C3ACA418753}.Debug|Win32.Build.0 = Debug|Win32
 		{D084EF5C-8F80-49CE-9074-5C3ACA418753}.Release|Win32.ActiveCfg = Release|Win32
 		{D084EF5C-8F80-49CE-9074-5C3ACA418753}.Release|Win32.Build.0 = Release|Win32
+		{01EF025E-DA50-48E3-83C0-BE70528CA9B7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{01EF025E-DA50-48E3-83C0-BE70528CA9B7}.Debug|Win32.Build.0 = Debug|Win32
+		{01EF025E-DA50-48E3-83C0-BE70528CA9B7}.Release|Win32.ActiveCfg = Release|Win32
+		{01EF025E-DA50-48E3-83C0-BE70528CA9B7}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

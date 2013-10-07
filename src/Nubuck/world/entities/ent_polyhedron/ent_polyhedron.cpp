@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <algorithm>
 
+#include <renderer\renderer.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\quad\quad.h>
 #include "ent_polyhedron.h"
@@ -65,7 +66,7 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
     forall_edges(e, *ph.G) {
         ph.hull.edges[e->id()].n0 = leda::source(e)->id();
         ph.hull.edges[e->id()].n1 = leda::target(e)->id();
-        if(!visitedEdge[e]) {
+        if(false && !visitedEdge[e]) {
 			leda::edge it = ph.G->face_cycle_succ(e);
 
             PolyhedronHullFaceList face;
@@ -102,10 +103,12 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
     } // forall_edges
 
 #ifdef PARANOID
+    /*
     forall_edges(e, *ph.G) {
         assert(visitedEdge[e]);
 		assert(PolyhedronHullEdge::INVALID_FACE_INDEX != ph.hull.edges[e->id()].faceIdx);
     }
+    */
 #endif
 
     if(!ph.hull.indices.empty() /* ie. hull exists */) {
@@ -152,7 +155,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
     ph.renderList.edges.clear();
     for(unsigned i = 0; i < numEdges; ++i) {
         const PolyhedronHullEdge& e = ph.hull.edges[i];
-        if(PolyhedronHullEdge::INVALID_FACE_INDEX != e.faceIdx) // ie. edge is valid
+        if(true || PolyhedronHullEdge::INVALID_FACE_INDEX != e.faceIdx) // ie. edge is valid
         {
             re.p0 = ph.nodes.positions[e.n0];
             re.p1 = ph.nodes.positions[e.n1];
@@ -330,6 +333,87 @@ void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Co
     fc.v1 = color;
     fc.t = 0.0f;
     fc.ip = true;
+}
+
+struct Ray {
+    M::Vector3 origin;
+    M::Vector3 direction;
+};
+
+struct Sphere {
+    M::Vector3  center;
+    float       radius;
+};
+
+struct Info {
+    M::Vector3  where;
+    M::Vector3  normal;
+    float       distance;
+};
+
+bool RaycastSphere(const Ray& ray, const Sphere& sphere, Info* info) {
+    const float B = 2.0f *
+        (ray.direction.x * (ray.origin.x - sphere.center.x) +
+         ray.direction.y * (ray.origin.y - sphere.center.y) +
+         ray.direction.z * (ray.origin.z - sphere.center.z));
+    const float C = (ray.origin.x - sphere.center.x) * (ray.origin.x - sphere.center.x)
+        + (ray.origin.y - sphere.center.y) * (ray.origin.y - sphere.center.y)
+        + (ray.origin.z - sphere.center.z) * (ray.origin.z - sphere.center.z)
+        - sphere.radius * sphere.radius;
+
+    const float M = B * B - 4.0f * C;
+    if(0.0f > M) return false;
+    const float D = sqrt(M);
+
+    const float t0 = 0.5f * (-B - D);
+    if(t0 > 0) {
+        if(info) {
+            info->where = ray.origin + t0 * ray.direction;
+            info->normal = M::Normalize(info->where - sphere.center);
+            info->distance = t0;
+        }
+        return true;
+    }
+
+    const float t1 = 0.5f * (-B + D);
+    if(t1 > 0) {
+        if(info) {
+            info->where = ray.origin + t1 * ray.direction;
+            info->normal = M::Normalize(info->where - sphere.center);
+            info->distance = t1;
+        }
+        return true;
+    }
+
+    return false;
+}
+
+
+bool Polyhedron_RaycastNodes(ENT_Polyhedron& ph, const M::Vector3& rayOrig, const M::Vector3& rayDir, leda::node& hitNode) {
+    Ray ray = { rayOrig, rayDir };
+    Sphere sphere;
+    sphere.radius = cvar_r_nodeSize;
+    Info info;
+    std::vector<leda::node> nodes;
+    std::vector<float>      dists;
+    bool hit = false;
+    leda::node n;
+    forall_nodes(n, *ph.G) {
+        if(ph.nodes.valid[n->id()]) {
+            sphere.center = ph.nodes.positions[n->id()];
+            if(RaycastSphere(ray, sphere, &info)) {
+                nodes.push_back(n);
+                dists.push_back(info.distance);
+                hit = true;
+            }
+        }
+    }
+    if(!hit) return false;
+    unsigned minIdx = 0;
+    for(unsigned i = 1; i < dists.size(); ++i)
+        if(dists[minIdx] > dists[i]) minIdx = i;
+    hitNode = nodes[minIdx];
+    return true;
 }
 
 } // namespace W

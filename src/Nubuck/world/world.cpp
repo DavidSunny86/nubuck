@@ -17,6 +17,51 @@ namespace W {
 
     World world;
 
+    static M::Vector3 Transform(const M::Matrix4& mat, const M::Vector3& vec, float w) {
+		M::Vector3 ret;
+		for(int i = 0; i < 3; ++i) {
+			float el = 0.0f;
+			for(int j = 0; j < 3; ++j) {
+				el += mat.mat[i + 4 * j] * vec.vec[j];
+			}
+			ret.vec[i] = el + w * mat.mat[i + 12];
+		}
+		return ret;
+    }
+
+    // given a point p in window space, return a point q in world space
+    // that lies on the near clipping plane with the same window space
+    // coordinates as p
+    static M::Vector3 UnprojectPoint(
+        const M::Matrix4& projectionMat, 
+        const M::Matrix4& worldMat, 
+        float screenWidth, 
+        float screenHeight, 
+        const M::Vector2& p) 
+    {
+        M::Vector3 q; 
+        
+        // in NDC
+        q.x = 2.0f * (p.x / screenWidth) - 1.0f;
+        q.y = -(2.0f * (p.y / screenHeight) - 1.0f);
+        q.z = -1.0f; // on near clipping plane
+
+        // clip.w = -eye.z, where eye.z is z-coord 
+        // of near clipping plane
+        const float fov = M::Deg2Rad(45.0f);
+        float clipW = 1.0f / tan(0.5f * fov);
+
+        // in clip space
+        q *= clipW; // q.w = clipW
+
+        M::Matrix4 M;
+        M::TryInvert(projectionMat, M);
+        M::Vector3 t = Transform(M, q, clipW); // in world space
+        printf("eye = %f, %f, %f\n", t.x, t.y, t.z);
+        M::Matrix3 normalMat = M::Inverse(M::RotationOf(worldMat));
+        return Transform(normalMat, t);
+    }
+
 	static void AddRenderJobs(const ENT_Polyhedron* polyhedron) {
         R::RenderList& _renderList = R::g_renderLists[rlIdx];
 		_renderList.jobs.insert(_renderList.jobs.end(),
@@ -67,6 +112,10 @@ namespace W {
         _renderList.lights.push_back(light);
     }
 
+    static float mouseX, mouseY;
+    static float screenWidth, screenHeight;
+    static float aspect;
+
     void World::HandleMouseEvent(const Event& event) {
         EvArgs_Mouse* args = (EvArgs_Mouse*)event.args;
 
@@ -74,7 +123,26 @@ namespace W {
             if(EvArgs_Mouse::BUTTON_LEFT == args->button) {
                 if(EvArgs_Mouse::MODIFIER_SHIFT == args->mods)
                     _camArcball.StartZooming(args->x, args->y);
-                else _camArcball.StartDragging(args->x, args->y);
+                // else _camArcball.StartDragging(args->x, args->y);
+
+                // picking
+                M::Matrix4 projectionMat = M::Mat4::Perspective(45.0f, aspect, 0.1f, 1000.0f);
+                M::Matrix4 invWorldMat;
+                M::TryInvert(_camArcball.GetWorldMatrix(), invWorldMat);
+                M::Vector3 rayOrig = M::Transform(invWorldMat, M::Vector3::Zero);
+                mouseX = args->x;
+                mouseY = args->y;
+                M::Vector3 rayDir = UnprojectPoint(projectionMat, _camArcball.GetWorldMatrix(), screenWidth, screenHeight, M::Vector2(mouseX, mouseY));
+                rayDir.Normalize();
+
+                printf("orig = %f, %f, %f\n", rayOrig.x, rayOrig.y, rayOrig.z);
+                printf("dir = %f, %f, %f\n", rayDir.x, rayDir.y, rayDir.z);
+                for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+                    leda::node hitNode = NULL;
+                    if(Polyhedron_RaycastNodes(*_polyhedrons[i], rayOrig, rayDir, hitNode)) {
+                        printf("Hit!\n");
+                    } else printf("No hit...\n");
+                }
             }
             if(EvArgs_Mouse::BUTTON_RIGHT == args->button)
                 _camArcball.StartPanning(args->x, args->y);
@@ -93,6 +161,8 @@ namespace W {
             _camArcball.Drag(args->x, args->y);
             _camArcball.Pan(args->x, args->y);
             _camArcball.Zoom(args->x, args->y);
+            mouseX = args->x;
+            mouseY = args->y;
         }
 
         if(EvArgs_Mouse::MOUSE_WHEEL == args->type) {
@@ -211,6 +281,9 @@ namespace W {
             if(EVENT_RESIZE == event.type) {
                 EvArgs_Resize* args = (EvArgs_Resize*)event.args;
                 _camArcball.SetScreenSize(args->width, args->height);
+                aspect = (float)args->width / args->height;
+                screenWidth = args->width;
+                screenHeight = args->height;
             }
 
             if(EVENT_MOUSE == event.type) HandleMouseEvent(event);
@@ -235,6 +308,7 @@ namespace W {
         _renderList.edges.clear();
 		std::for_each(_polyhedrons.begin(), _polyhedrons.end(),
 			std::bind(AddRenderJobs, std::placeholders::_1));
+
         g_worldSem.Signal();
         R::g_rendererSem.Wait();
         rlIdx = 1 - rlIdx;
