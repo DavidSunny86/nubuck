@@ -1,36 +1,10 @@
 #include <Nubuck\nubuck.h>
-#include <LEDA\geo\geo_alg.h>
 #include "globals.h"
 #include "phase0.h"
 
 class Algorithm : public IAlgorithm {
 private:
-    typedef leda::rat_point point2_t;
-    typedef leda::GRAPH<point2_t, int> graph2_t;
-
     Globals _globals;
-
-    leda::list<point2_t> ToPointList2(const graph_t& G) {
-        leda::list<point2_t> L;
-        leda::node n;
-        forall_nodes(n, G) L.push_back(point2_t(G[n].xcoord(), G[n].ycoord()));
-        return L;
-    }
-
-    void FromProjection(const graph2_t& G2, graph_t& G3) {
-        leda::node_array<leda::node> nmap(G2, NULL);
-
-        leda::node n2;
-        forall_nodes(n2, G2) {
-            leda::node n3 = nmap[n2] = G3.new_node();
-            G3[n3] = point_t(G2[n2].xcoord(), G2[n2].ycoord(), 0);
-        }
-
-        leda::edge e2;
-        forall_edges(e2, G2) {
-            G3.new_edge(nmap[leda::source(e2)], nmap[leda::target(e2)]); 
-        }
-    }
 
     void Prepare(graph_t& G) {
         leda::node n;
@@ -45,17 +19,17 @@ public:
     IPhase* Init(const Nubuck& nubuck, const graph_t& G) override {
         // we are expected to copy these parameters
         _globals.nb = nubuck;
-        _globals.G  = G;
+        _globals.grNodes  = G;
 
-        Prepare(_globals.G);
+        Prepare(_globals.grNodes);
+        Delaunay2D(_globals.grNodes, _globals.grDelaunay);
 
-        leda::list<point2_t> L(ToPointList2(_globals.G));
-        graph2_t G2;
-        leda::DELAUNAY_DIAGRAM(L, G2);
-        _globals.G.clear();
-        FromProjection(G2, _globals.G);
+        _globals.phNodes = _globals.nb.world->CreatePolyhedron(_globals.grNodes);
+        _globals.phNodes->SetRenderFlags(POLYHEDRON_RENDER_NODES);
+        _globals.phNodes->SetPickable(true);
 
-        _globals._delaunay = _globals.nb.world->CreatePolyhedron(_globals.G);
+        _globals.phDelaunay = _globals.nb.world->CreatePolyhedron(_globals.grDelaunay);
+        _globals.phDelaunay->SetRenderFlags(POLYHEDRON_RENDER_EDGES);
 
         return new Phase0(_globals);
     }

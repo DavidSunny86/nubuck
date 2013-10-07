@@ -16,11 +16,17 @@ struct ICommon {
     virtual void printf(const char* format, ...) = 0;
 };
 
+#define POLYHEDRON_RENDER_HULL      (1 << 0)
+#define POLYHEDRON_RENDER_NODES     (1 << 1)
+#define POLYHEDRON_RENDER_EDGES     (1 << 2)
+
 struct IPolyhedron {
     virtual ~IPolyhedron(void) { }
 
     virtual void Destroy(void) = 0;
 
+    virtual void SetRenderFlags(int flags) = 0;
+    virtual void SetPickable(bool isPickable) = 0;
     virtual void SetNodeColor(leda::node node, float r, float g, float b) = 0;
     virtual void SetFaceColor(leda::edge edge, float r, float g, float b) = 0;
 

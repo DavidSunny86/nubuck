@@ -10,6 +10,8 @@ namespace W {
         EVENT_SPAWN_POLYHEDRON,
         EVENT_DESTROY_POLYHEDRON,
 		EVENT_REBUILD,
+        EVENT_SET_RENDER_FLAGS,
+        EVENT_SET_PICKABLE,
         EVENT_SET_NODE_COLOR,
         EVENT_SET_FACE_COLOR,
 
@@ -34,6 +36,16 @@ namespace W {
 
     struct EvArgs_Rebuild {
         unsigned entId;
+    };
+
+    struct EvArgs_SetRenderFlags {
+        unsigned    entId;
+        int         flags;
+    };
+
+    struct EvArgs_SetPickable {
+        unsigned    entId;
+        bool        isPickable;
     };
 
     struct EvArgs_SetNodeColor {

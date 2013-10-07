@@ -655,7 +655,7 @@ void Renderer::Render(void) {
 
     RenderList& renderList = g_renderLists[rlIdx];
 
-    if(!(renderList.jobs.empty() && renderList.nodePositions.empty())) {
+    if(!(renderList.jobs.empty() && renderList.nodePositions.empty() && renderList.edges.empty())) { 
 
         static SYS::Timer frameTime;
         frameTime.Start();

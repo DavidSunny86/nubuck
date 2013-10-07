@@ -132,8 +132,10 @@ namespace W {
                         ENT_Polyhedron& ph = *_polyhedrons[i];
                         leda::node n;
                         forall_nodes(n, *ph.G) {
-                            const M::Vector3& p = ph.nodes.positions[n->id()];
-                            (*ph.G)[n] = point_t(p.x, p.y, p.z);
+                            if(ph.selection.nodes[n->id()]) {
+                                const M::Vector3& p = ph.nodes.positions[n->id()];
+                                (*ph.G)[n] = point_t(leda::rational(p.x), leda::rational(p.y), leda::rational(p.z));
+                            }
                         }
                     }
                     ALG::gs_algorithm.GetPhase()->OnNodesMoved();
@@ -149,6 +151,18 @@ namespace W {
                         ENT_Polyhedron& ph = *_polyhedrons[i];
                         ph.nodes.positions = ph.nodes.oldPositions;
                     }
+                    // update
+                    for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+                        ENT_Polyhedron& ph = *_polyhedrons[i];
+                        leda::node n;
+                        forall_nodes(n, *ph.G) {
+                            if(ph.selection.nodes[n->id()]) {
+                                const M::Vector3& p = ph.nodes.positions[n->id()];
+                                (*ph.G)[n] = point_t(leda::rational(p.x), leda::rational(p.y), leda::rational(p.z));
+                            }
+                        }
+                    }
+                    ALG::gs_algorithm.GetPhase()->OnNodesMoved();
 
                     _isGrabbing = false;
                 }
@@ -288,6 +302,18 @@ namespace W {
                 }
             }
 
+            if(EVENT_SET_RENDER_FLAGS == event.type) {
+                EvArgs_SetRenderFlags* args = (EvArgs_SetRenderFlags*)event.args;
+                ENT_Polyhedron* ph = FindByEntityID(args->entId);
+                if(ph) ph->renderFlags = args->flags;
+            }
+
+            if(EVENT_SET_PICKABLE == event.type) {
+                EvArgs_SetPickable* args = (EvArgs_SetPickable*)event.args;
+                ENT_Polyhedron* ph = FindByEntityID(args->entId);
+                if(ph) ph->isPickable = args->isPickable;
+            }
+
             if(EVENT_SET_NODE_COLOR == event.type) {
                 EvArgs_SetNodeColor* args = (EvArgs_SetNodeColor*)event.args;
                 ENT_Polyhedron* ph = FindByEntityID(args->entId);
@@ -352,6 +378,19 @@ namespace W {
                     }
                 }
             }
+
+            // update
+            for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+                ENT_Polyhedron& ph = *_polyhedrons[i];
+                leda::node n;
+                forall_nodes(n, *ph.G) {
+                    if(ph.selection.nodes[n->id()]) {
+                        const M::Vector3& p = ph.nodes.positions[n->id()];
+                        (*ph.G)[n] = point_t(leda::rational(p.x), leda::rational(p.y), leda::rational(p.z));
+                    }
+                }
+            }
+            ALG::gs_algorithm.GetPhase()->OnNodesMoved();
         }
 
         for(unsigned i = 0; i < _polyhedrons.size(); ++i) {

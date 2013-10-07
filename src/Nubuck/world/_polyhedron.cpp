@@ -14,6 +14,24 @@ void Polyhedron::Destroy(void) {
     _entId = 0;
 }
 
+void Polyhedron::SetRenderFlags(int flags) {
+    W::Event event;
+    event.type = W::EVENT_SET_RENDER_FLAGS;
+    W::EvArgs_SetRenderFlags* args = (W::EvArgs_SetRenderFlags*)event.args;
+    args->entId = _entId;
+    args->flags = flags;
+    W::world.Send(event);
+}
+
+void Polyhedron::SetPickable(bool isPickable) {
+    W::Event event;
+    event.type = W::EVENT_SET_PICKABLE;
+    W::EvArgs_SetPickable* args = (W::EvArgs_SetPickable*)event.args;
+    args->entId = _entId;
+    args->isPickable = isPickable;
+    W::world.Send(event);
+}
+
 void Polyhedron::SetNodeColor(leda::node node, float r, float g, float b) {
     W::Event event;
     event.type = W::EVENT_SET_NODE_COLOR;

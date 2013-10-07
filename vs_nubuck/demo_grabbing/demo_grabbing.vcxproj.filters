@@ -6,5 +6,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\demo\Nubuck\grabbing\grabbing.cpp" />
+    <ClCompile Include="..\..\demo\Nubuck\grabbing\globals.cpp" />
   </ItemGroup>
 </Project>

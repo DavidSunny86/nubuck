@@ -6,9 +6,15 @@ typedef leda::rational              scalar_t;
 typedef leda::d3_rat_point          point_t;
 typedef leda::GRAPH<point_t, int>   graph_t;
 
+typedef leda::rat_point point2_t;
+typedef leda::GRAPH<point2_t, int> graph2_t;
+
 struct Globals {
     Nubuck  nb;
-    graph_t G;
-
-    IPolyhedron* _delaunay;
+    graph_t grNodes;
+    graph_t grDelaunay;
+    IPolyhedron* phNodes;
+    IPolyhedron* phDelaunay;
 };
+
+void Delaunay2D(const graph_t& in, graph_t& out);

@@ -28,7 +28,10 @@ void Polyhedron_InitResources(void) {
     g_faceCurveDecalSkin = R::skinMgr.Create(skinDesc);
 }
 
-void Polyhedron_Init(ENT_Polyhedron&) { }
+void Polyhedron_Init(ENT_Polyhedron& ph) { 
+    ph.renderFlags = 0;
+    ph.isPickable = false;
+}
 
 static void Polyhedron_RebuildSelection(ENT_Polyhedron& ph) {
     ph.selection.nodes.clear();
@@ -154,35 +157,41 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
     unsigned numNodes = ph.nodes.positions.size();
     ph.renderList.nodePositions.clear();
     ph.renderList.nodeColors.clear();
-    for(unsigned i = 0; i < numNodes; ++i) {
-        if(ph.nodes.valid[i]) {
-            ph.renderList.nodePositions.push_back(ph.nodes.positions[i]);
+    if(POLYHEDRON_RENDER_NODES & ph.renderFlags) {
+        for(unsigned i = 0; i < numNodes; ++i) {
+            if(ph.nodes.valid[i]) {
+                ph.renderList.nodePositions.push_back(ph.nodes.positions[i]);
 
-            if(ph.selection.nodes[i]) ph.renderList.nodeColors.push_back(R::Color(1.0f, 1.0f, 0.0f, 1.0f));
-            else ph.renderList.nodeColors.push_back(R::Color(0.4f, 0.4f, 0.4f, 1.0f)); 
+                if(ph.selection.nodes[i]) ph.renderList.nodeColors.push_back(R::Color(1.0f, 1.0f, 0.0f, 1.0f));
+                else ph.renderList.nodeColors.push_back(R::Color(0.4f, 0.4f, 0.4f, 1.0f)); 
+            }
         }
-	}
+    } // if(renderNodes)
 
     R::Edge re;
     unsigned numEdges = ph.hull.edges.size();
     ph.renderList.edges.clear();
-    for(unsigned i = 0; i < numEdges; ++i) {
-        const PolyhedronHullEdge& e = ph.hull.edges[i];
-        if(true || PolyhedronHullEdge::INVALID_FACE_INDEX != e.faceIdx) // ie. edge is valid
-        {
-            re.p0 = ph.nodes.positions[e.n0];
-            re.p1 = ph.nodes.positions[e.n1];
-            ph.renderList.edges.push_back(re);
+    if(POLYHEDRON_RENDER_EDGES & ph.renderFlags) {
+        for(unsigned i = 0; i < numEdges; ++i) {
+            const PolyhedronHullEdge& e = ph.hull.edges[i];
+            if(true || PolyhedronHullEdge::INVALID_FACE_INDEX != e.faceIdx) // ie. edge is valid
+            {
+                re.p0 = ph.nodes.positions[e.n0];
+                re.p1 = ph.nodes.positions[e.n1];
+                ph.renderList.edges.push_back(re);
+            }
         }
-    }
+    } // if(renderEdges)
 
-    if(!ph.hull.indices.empty() /* ie. hull exists */) {
-        renderJob.material = R::Material::White;
-        renderJob.mesh = ph.hull.mesh;
-        renderJob.primType = GL_TRIANGLE_FAN;
-        renderJob.transform = M::Mat4::Identity();
-        ph.renderList.jobs.push_back(renderJob);
-    }
+    if(POLYHEDRON_RENDER_HULL & ph.renderFlags) {
+        if(!ph.hull.indices.empty() /* ie. hull exists */) {
+            renderJob.material = R::Material::White;
+            renderJob.mesh = ph.hull.mesh;
+            renderJob.primType = GL_TRIANGLE_FAN;
+            renderJob.transform = M::Mat4::Identity();
+            ph.renderList.jobs.push_back(renderJob);
+        }
+    } // if(renderHull)
 
     renderJob.fx = "TexDiffuse";
     renderJob.mesh = g_faceCurveDecalMesh;
@@ -403,6 +412,8 @@ bool RaycastSphere(const Ray& ray, const Sphere& sphere, Info* info) {
 
 
 bool Polyhedron_RaycastNodes(ENT_Polyhedron& ph, const M::Vector3& rayOrig, const M::Vector3& rayDir, leda::node& hitNode) {
+    if(!ph.isPickable) return false;
+
     Ray ray = { rayOrig, rayDir };
     Sphere sphere;
     sphere.radius = cvar_r_nodeSize;

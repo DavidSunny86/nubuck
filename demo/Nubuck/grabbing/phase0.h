@@ -16,16 +16,6 @@ struct Phase0 : IPhase {
     bool IsDone(void) const override { return false; }
 
     StepRet Step(void) override {
-        g.nb.log->printf("Step: projection of points on paraboloid.\n");
-        leda::node n;
-        forall_nodes(n, g.G) {
-            const point_t& p = g.G[n];
-            scalar_t z = p.xcoord() * p.xcoord() + p.ycoord() * p.ycoord();
-            point_t p2 = point_t(p.xcoord(), p.ycoord(), z);
-            float z2 = p2.zcoord().to_float();
-            g.G[n] = p2;
-        }
-        g._delaunay->Update();
         return DONE;
     }
 
@@ -54,11 +44,7 @@ struct Phase0 : IPhase {
     }
 
     void OnNodesMoved(void) override {
-        leda::list<point2_t> L(ToPointList2(g.G));
-        graph2_t G2;
-        leda::DELAUNAY_DIAGRAM(L, G2);
-        g.G.clear();
-        FromProjection(G2, g.G);
-        g._delaunay->Update();
+        Delaunay2D(g.grNodes, g.grDelaunay);
+        g.phDelaunay->Update();
     }
 };

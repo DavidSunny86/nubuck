@@ -75,6 +75,8 @@ struct PolyhedronSelection {
 struct ENT_Polyhedron {
     unsigned                entId;
 	graph_t*                G;
+    int                     renderFlags;
+    bool                    isPickable;
     PolyhedronNodes         nodes;
 	PolyhedronHull          hull;
     PolyhedronSelection     selection;
