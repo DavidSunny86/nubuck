@@ -146,8 +146,12 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
 
     unsigned numNodes = ph.nodes.positions.size();
     ph.renderList.nodePositions.clear();
+    ph.renderList.nodeColors.clear();
     for(unsigned i = 0; i < numNodes; ++i) {
-        if(ph.nodes.valid[i]) ph.renderList.nodePositions.push_back(ph.nodes.positions[i]);
+        if(ph.nodes.valid[i]) {
+            ph.renderList.nodePositions.push_back(ph.nodes.positions[i]);
+            ph.renderList.nodeColors.push_back(R::Color(0.4f, 0.4f, 0.4f, 1.0f));
+        }
 	}
 
     R::Edge re;

@@ -70,6 +70,9 @@ namespace W {
         _renderList.nodePositions.insert(_renderList.nodePositions.end(),
             polyhedron->renderList.nodePositions.begin(),
             polyhedron->renderList.nodePositions.end());
+        _renderList.nodeColors.insert(_renderList.nodeColors.end(),
+            polyhedron->renderList.nodeColors.begin(),
+            polyhedron->renderList.nodeColors.end());
         _renderList.edges.insert(_renderList.edges.end(),
             polyhedron->renderList.edges.begin(),
             polyhedron->renderList.edges.end());
@@ -305,6 +308,7 @@ namespace W {
         _renderList.worldMat = _camArcball.GetWorldMatrix();
 		_renderList.jobs.clear();
         _renderList.nodePositions.clear();
+        _renderList.nodeColors.clear();
         _renderList.edges.clear();
 		std::for_each(_polyhedrons.begin(), _polyhedrons.end(),
 			std::bind(AddRenderJobs, std::placeholders::_1));

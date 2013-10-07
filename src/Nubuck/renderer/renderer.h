@@ -13,11 +13,6 @@
 #include "skin\skinmgr.h"
 #include "light\light.h"
 
-enum NodeRenderType {
-	R_NODETYPE_GEOMETRY		= 0,
-	R_NODETYPE_BILLBOARD	= 1
-};
-
 extern COM::Config::Variable<float>	cvar_r_nodeSize;
 extern COM::Config::Variable<float> cvar_r_edgeRadius;
 
@@ -53,6 +48,7 @@ struct RenderList {
     std::vector<Light>      lights;
     std::vector<RenderJob>  jobs;
     std::vector<M::Vector3> nodePositions;
+    std::vector<Color>      nodeColors;
     std::vector<Edge>       edges;
 };
 

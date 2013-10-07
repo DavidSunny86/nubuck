@@ -170,7 +170,8 @@ static void Uniforms_Update(
 
 
 struct BillboardHotVertex {
-    M::Vector3 position;
+    M::Vector3  position;
+    Color       color;
 };
 
 struct BillboardHot {
@@ -186,6 +187,7 @@ struct BillboardCold {
 };
 
 static std::vector<M::Vector3>      billboardPositions;
+static std::vector<Color>           billboardColors;
 static std::vector<Mesh::Index>     billboardIndices;
 static std::vector<BillboardHot>    billboardsHot;
 static std::vector<BillboardCold>   billboardsCold;
@@ -232,11 +234,12 @@ static void ReserveBillboards(unsigned numBillboards) {
     billboardIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &billboardIndices[0], sizeof(Mesh::Index) * numBillboardIndices));
 }
 
-static void InitBillboards(const std::vector<M::Vector3>& positions) {
+static void InitBillboards(const std::vector<M::Vector3>& positions, const std::vector<Color>& colors) {
     unsigned numBillboards = positions.size();
     unsigned numBillboardIndices = 5 * numBillboards - 1;
     if(numBillboards) {
         billboardPositions = positions;
+        billboardColors = colors;
         ReserveBillboards(numBillboards);
     }
 }
@@ -277,6 +280,7 @@ static void BuildBillboards(const M::Matrix4& worldMat) {
     for(unsigned i = 0; i < numBillboards; ++i) {
         for(unsigned k = 0; k < 4; ++k) {
             billboardsHot[i].verts[k].position = M::Transform(worldMat, billboardPositions[i]) + hotVertices[k].position;
+            billboardsHot[i].verts[k].color = billboardColors[i];
         }
     }
 }
@@ -286,6 +290,11 @@ static void BindHotBillboardVertices(void) {
         3, GL_FLOAT, GL_FALSE, sizeof(BillboardHotVertex),
         (void*)offsetof(BillboardHotVertex, position)));
     GL_CALL(glEnableVertexAttribArray(IN_POSITION));
+
+    GL_CALL(glVertexAttribPointer(IN_COLOR,
+        4, GL_FLOAT, GL_FALSE, sizeof(BillboardHotVertex),
+        (void*)offsetof(BillboardHotVertex, color)));
+    GL_CALL(glEnableVertexAttribArray(IN_COLOR));
 }
 
 static void BindColdBillboardVertices(void) {
@@ -662,7 +671,7 @@ void Renderer::Render(void) {
             std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
         DrawFrame(renderList, projectionMat, _time);
 
-        InitBillboards(renderList.nodePositions);
+        InitBillboards(renderList.nodePositions, renderList.nodeColors);
         BuildBillboards(renderList.worldMat);
         unsigned numBillboards = billboardPositions.size();
         if(numBillboards) {
