@@ -44,7 +44,18 @@ struct Phase0 : IPhase {
     }
 
     void OnNodesMoved(void) override {
-        Delaunay2D(g.grNodes, g.grDelaunay);
-        g.phDelaunay->Update();
+        leda::node n;
+        forall_nodes(n, g.grNodesProj) {
+            const point_t& p = g.grNodesProj[n];
+            scalar_t z = 5 + (p.xcoord() * p.xcoord() + p.ycoord() * p.ycoord()) / 100;
+            g.grNodes[g.nmap[n]] = point_t(p.xcoord(), p.ycoord(), z);
+        }
+        Delaunay2D(g.grNodesProj, g.grDelaunayProj);
+        ConvexHull(g.grNodesProj, g.grHullProj);
+        ConvexHull(g.grNodes, g.grHull);
+        g.phDelaunayProj->Update();
+        g.phHullProj->Update();
+        g.phNodes->Update();
+        g.phHull->Update();
     }
 };

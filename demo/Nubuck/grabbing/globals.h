@@ -11,10 +11,21 @@ typedef leda::GRAPH<point2_t, int> graph2_t;
 
 struct Globals {
     Nubuck  nb;
-    graph_t grNodes;
-    graph_t grDelaunay;
-    IPolyhedron* phNodes;
-    IPolyhedron* phDelaunay;
+
+    leda::node_map<leda::node> nmap;
+
+    graph_t         grNodes;
+    graph_t         grHull;
+    IPolyhedron*    phNodes;
+    IPolyhedron*    phHull;
+
+    graph_t         grNodesProj;
+    graph_t 		grDelaunayProj;
+    graph_t 		grHullProj;
+    IPolyhedron*    phNodesProj;
+    IPolyhedron* 	phDelaunayProj;
+    IPolyhedron* 	phHullProj;
 };
 
 void Delaunay2D(const graph_t& in, graph_t& out);
+void ConvexHull(const graph_t& in, graph_t& out);

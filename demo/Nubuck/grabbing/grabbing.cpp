@@ -5,31 +5,49 @@
 class Algorithm : public IAlgorithm {
 private:
     Globals _globals;
-
-    void Prepare(graph_t& G) {
-        leda::node n;
-
-        // project all nodes on xy-plane. scale, too
-        double s = 0.01;
-        _globals.nb.log->printf("Scaling points by factor %f.\n", s);
-        forall_nodes(n, G)
-            G[n] = point_t(s * G[n].xcoord(), s * G[n].ycoord(), 0);
-    }
 public:
     IPhase* Init(const Nubuck& nubuck, const graph_t& G) override {
         // we are expected to copy these parameters
         _globals.nb = nubuck;
-        _globals.grNodes  = G;
 
-        Prepare(_globals.grNodes);
-        Delaunay2D(_globals.grNodes, _globals.grDelaunay);
+
+        // project all nodes on xy-plane. scale, too
+        _globals.nb.log->printf("Scaling points by factor %f.\n", 1000);
+        _globals.nmap.init(_globals.grNodesProj);
+        leda::node n;
+        forall_nodes(n, G) {
+            const point_t& p = G[n];
+            scalar_t z = 5 + (p.xcoord() * p.xcoord() + p.ycoord() * p.ycoord()) / 100;
+            leda::node n0 = _globals.grNodesProj.new_node();
+            leda::node n1 = _globals.grNodes.new_node();
+            _globals.nmap[n0] = n1;
+            _globals.grNodesProj[n0] = point_t(p.xcoord(), p.ycoord(), 0);
+            _globals.grNodes[n1] = point_t(p.xcoord(), p.ycoord(), z);
+            float z2 = z.to_float();
+            printf("z2 = %f\n", z2);
+        }
+
+        Delaunay2D(_globals.grNodesProj, _globals.grDelaunayProj);
+        ConvexHull(_globals.grNodesProj, _globals.grHullProj);
+        ConvexHull(_globals.grNodes, _globals.grHull);
+
+        _globals.phNodesProj = _globals.nb.world->CreatePolyhedron(_globals.grNodesProj);
+        _globals.phNodesProj->SetRenderFlags(POLYHEDRON_RENDER_NODES);
+        _globals.phNodesProj->SetPickable(true);
+
+        _globals.phDelaunayProj = _globals.nb.world->CreatePolyhedron(_globals.grDelaunayProj);
+        _globals.phDelaunayProj->SetRenderFlags(POLYHEDRON_RENDER_EDGES);
+
+        _globals.phHullProj = _globals.nb.world->CreatePolyhedron(_globals.grHullProj);
+        _globals.phHullProj->SetRenderFlags(POLYHEDRON_RENDER_HULL);
+        _globals.phHullProj->Update();
 
         _globals.phNodes = _globals.nb.world->CreatePolyhedron(_globals.grNodes);
         _globals.phNodes->SetRenderFlags(POLYHEDRON_RENDER_NODES);
-        _globals.phNodes->SetPickable(true);
 
-        _globals.phDelaunay = _globals.nb.world->CreatePolyhedron(_globals.grDelaunay);
-        _globals.phDelaunay->SetRenderFlags(POLYHEDRON_RENDER_EDGES);
+        _globals.phHull = _globals.nb.world->CreatePolyhedron(_globals.grHull);
+        _globals.phHull->SetRenderFlags(POLYHEDRON_RENDER_EDGES | POLYHEDRON_RENDER_HULL);
+        _globals.phHull->Update();
 
         return new Phase0(_globals);
     }

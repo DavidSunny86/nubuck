@@ -75,7 +75,8 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
     forall_edges(e, *ph.G) {
         ph.hull.edges[e->id()].n0 = leda::source(e)->id();
         ph.hull.edges[e->id()].n1 = leda::target(e)->id();
-        if(false && !visitedEdge[e]) {
+        if(POLYHEDRON_RENDER_HULL & ph.renderFlags && !visitedEdge[e]) {
+            assert(ph.G->reversal(e));
 			leda::edge it = ph.G->face_cycle_succ(e);
 
             PolyhedronHullFaceList face;
@@ -112,12 +113,12 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
     } // forall_edges
 
 #ifdef PARANOID
-    /*
-    forall_edges(e, *ph.G) {
-        assert(visitedEdge[e]);
-		assert(PolyhedronHullEdge::INVALID_FACE_INDEX != ph.hull.edges[e->id()].faceIdx);
+    if(POLYHEDRON_RENDER_HULL & ph.renderFlags) {
+        forall_edges(e, *ph.G) {
+            assert(visitedEdge[e]);
+            assert(PolyhedronHullEdge::INVALID_FACE_INDEX != ph.hull.edges[e->id()].faceIdx);
+        }
     }
-    */
 #endif
 
     if(!ph.hull.indices.empty() /* ie. hull exists */) {
