@@ -93,5 +93,6 @@ void Polyhedron_UpdateCurve(PolyhedronFaceCurve& cv, float secsPassed);
 void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed);
 void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Color& color);
 bool Polyhedron_RaycastNodes(ENT_Polyhedron& ph, const M::Vector3& rayOrig, const M::Vector3& rayDir, leda::node& hitNode);
+bool Polyhedron_RaycastFaces(ENT_Polyhedron& ph, const M::Vector3& rayOrig, const M::Vector3& rayDir, leda::edge& hitFace);
 
 } // namespace W

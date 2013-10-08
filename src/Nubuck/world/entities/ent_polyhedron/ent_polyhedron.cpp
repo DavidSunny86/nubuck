@@ -368,13 +368,17 @@ struct Sphere {
     float       radius;
 };
 
+struct Triangle {
+    M::Vector3 p0, p1, p2;
+};
+
 struct Info {
     M::Vector3  where;
     M::Vector3  normal;
     float       distance;
 };
 
-bool RaycastSphere(const Ray& ray, const Sphere& sphere, Info* info) {
+static bool RaycastSphere(const Ray& ray, const Sphere& sphere, Info* info) {
     const float B = 2.0f *
         (ray.direction.x * (ray.origin.x - sphere.center.x) +
          ray.direction.y * (ray.origin.y - sphere.center.y) +
@@ -411,6 +415,28 @@ bool RaycastSphere(const Ray& ray, const Sphere& sphere, Info* info) {
     return false;
 }
 
+static bool RaycastTriangle(const Ray& ray, const Triangle& tri, Info* info) {
+    const M::Vector3 q1 = tri.p1 - tri.p0;
+    const M::Vector3 q2 = tri.p2 - tri.p0;
+    const M::Vector3 n = M::Cross(q1, q2);
+    const float d0 = M::Dot(n, ray.direction);
+    if(M::AlmostEqual(d0, 0.0f)) return false;
+    const float t = (M::Dot(n, tri.p0) - M::Dot(n, ray.origin)) / d0;
+    const M::Vector3 r = ray.origin + t * ray.direction - tri.p0;
+    const float q1Sq = M::Dot(q1, q1);
+    const float q2Sq = M::Dot(q2, q2);
+    const float q12 = M::Dot(q1, q2);
+    const float d1 = 1.0f / (q1Sq * q2Sq - q12 * q12);
+    const float x1 = M::Dot(r, q1);
+    const float x2 = M::Dot(r, q2);
+    const float w1 = d1 * (q2Sq * x1 - q12 * x2);
+    const float w2 = d1 * (q1Sq * x2 - q12 * x1);
+    const float w0 = 1.0f - w1 - w2;
+    if(info) {
+        info->distance = t;
+    }
+    return 0.0f <= w0 && 0.0f <= w1 && 0.0f <= w2;
+}
 
 bool Polyhedron_RaycastNodes(ENT_Polyhedron& ph, const M::Vector3& rayOrig, const M::Vector3& rayDir, leda::node& hitNode) {
     if(!ph.isPickable) return false;
@@ -438,6 +464,35 @@ bool Polyhedron_RaycastNodes(ENT_Polyhedron& ph, const M::Vector3& rayOrig, cons
     for(unsigned i = 1; i < dists.size(); ++i)
         if(dists[minIdx] > dists[i]) minIdx = i;
     hitNode = nodes[minIdx];
+    return true;
+}
+
+bool Polyhedron_RaycastFaces(ENT_Polyhedron& ph, const M::Vector3& rayOrig, const M::Vector3& rayDir, leda::edge& hitFace) {
+    if(!ph.isPickable) return false;
+
+    Ray ray = {rayOrig, rayDir };
+    Triangle tri;
+    Info info;
+    std::vector<PolyhedronHullFaceList> faces;
+    std::vector<float>                  dists;
+    bool hit = false;
+    for(unsigned i = 0; i < ph.hull.faceLists.size(); ++i) {
+        PolyhedronHullFaceList& fl = ph.hull.faceLists[i];
+        tri.p0 = ph.hull.vertices[fl.base].position;
+        for(unsigned j = 0; j < fl.size - 1; ++j) {
+            tri.p1 = ph.hull.vertices[fl.base + j + 0].position;
+            tri.p2 = ph.hull.vertices[fl.base + j + 1].position;
+            if(RaycastTriangle(ray, tri, &info)) {
+                faces.push_back(fl);
+                dists.push_back(info.distance);
+                hit = true;
+            }
+        }
+    }
+    if(!hit) return false;
+    unsigned minIdx = 0;
+    for(unsigned i = 1; i < dists.size(); ++i)
+        if(dists[minIdx] > dists[i]) minIdx = i;
     return true;
 }
 

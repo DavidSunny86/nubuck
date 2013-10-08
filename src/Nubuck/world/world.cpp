@@ -124,6 +124,17 @@ namespace W {
         EvArgs_Mouse* args = (EvArgs_Mouse*)event.args;
 
         if(EvArgs_Mouse::MOUSE_DOWN == args->type) {
+            M::Matrix4 projectionMat = M::Mat4::Perspective(45.0f, aspect, 0.1f, 1000.0f);
+            M::Matrix4 invWorldMat;
+            M::TryInvert(_camArcball.GetWorldMatrix(), invWorldMat);
+            M::Vector3 rayOrig = M::Transform(invWorldMat, M::Vector3::Zero);
+            mouseX = args->x;
+            mouseY = args->y;
+            M::Vector3 rayDir = UnprojectPoint(projectionMat, _camArcball.GetWorldMatrix(), screenWidth, screenHeight, M::Vector2(mouseX, mouseY));
+            rayDir.Normalize();
+            printf("orig = %f, %f, %f\n", rayOrig.x, rayOrig.y, rayOrig.z);
+            printf("dir = %f, %f, %f\n", rayDir.x, rayDir.y, rayDir.z);
+
             if(EvArgs_Mouse::BUTTON_LEFT == args->button) {
                 if(_isGrabbing) {
                     _isGrabbing = false;
@@ -144,6 +155,16 @@ namespace W {
                 if(EvArgs_Mouse::MODIFIER_SHIFT == args->mods)
                     _camArcball.StartZooming(args->x, args->y);
                 else _camArcball.StartDragging(args->x, args->y);
+
+                // pick faces
+                for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+                    ENT_Polyhedron& ph = *_polyhedrons[i];
+                    if(!ph.isPickable) continue;
+                    leda::edge hitFace = NULL;
+                    if(Polyhedron_RaycastFaces(ph, rayOrig, rayDir, hitFace)) {
+                        printf("hit face!\n");
+                    } else printf("no face hit\n");
+                }
             }
             if(EvArgs_Mouse::BUTTON_RIGHT == args->button) {
                 if(_isGrabbing) {
@@ -168,22 +189,10 @@ namespace W {
                 }
 
                 // _camArcball.StartPanning(args->x, args->y);
-
-                // picking
-                M::Matrix4 projectionMat = M::Mat4::Perspective(45.0f, aspect, 0.1f, 1000.0f);
-                M::Matrix4 invWorldMat;
-                M::TryInvert(_camArcball.GetWorldMatrix(), invWorldMat);
-                M::Vector3 rayOrig = M::Transform(invWorldMat, M::Vector3::Zero);
-                mouseX = args->x;
-                mouseY = args->y;
-                M::Vector3 rayDir = UnprojectPoint(projectionMat, _camArcball.GetWorldMatrix(), screenWidth, screenHeight, M::Vector2(mouseX, mouseY));
-                rayDir.Normalize();
-
-                printf("orig = %f, %f, %f\n", rayOrig.x, rayOrig.y, rayOrig.z);
-                printf("dir = %f, %f, %f\n", rayDir.x, rayDir.y, rayDir.z);
                 for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
                     leda::node hitNode = NULL;
                     ENT_Polyhedron& ph = *_polyhedrons[i];
+                    if(!ph.isPickable) continue;
                     if(Polyhedron_RaycastNodes(ph, rayOrig, rayDir, hitNode)) {
                         printf("Hit!\n");
                         ph.selection.nodes[hitNode->id()] = !ph.selection.nodes[hitNode->id()];
