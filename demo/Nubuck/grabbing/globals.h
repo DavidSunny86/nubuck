@@ -14,6 +14,8 @@ struct Globals {
 
     leda::node_map<leda::node> nmap;
 
+    bool showHull;
+
     graph_t         grNodes;
     graph_t         grHull;
     IPolyhedron*    phNodes;

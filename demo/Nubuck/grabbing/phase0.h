@@ -58,4 +58,20 @@ struct Phase0 : IPhase {
         g.phNodes->Update();
         g.phHull->Update();
     }
+
+    void OnKeyPressed(char c) override {
+        if('S' == c) {
+            if(g.showHull) {
+                g.phNodes->SetRenderFlags(0);
+                g.phHull->SetRenderFlags(0);
+                g.showHull = false;
+            } else {
+                g.phNodes->SetRenderFlags(POLYHEDRON_RENDER_NODES);
+                g.phHull->SetRenderFlags(POLYHEDRON_RENDER_EDGES | POLYHEDRON_RENDER_HULL);
+                g.phNodes->Update();
+                g.phHull->Update();
+                g.showHull = true;
+            }
+        }
+    }
 };

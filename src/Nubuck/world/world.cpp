@@ -369,6 +369,10 @@ namespace W {
                         }
                     } else _isGrabbing = false;
                 }
+
+                if(!args->autoRepeat) {
+                    ALG::gs_algorithm.GetPhase()->OnKeyPressed((char)args->keyCode);
+                }
             }
         } // while(!done)
 

@@ -97,6 +97,7 @@ namespace UI {
         W::EvArgs_Key* args =  (W::EvArgs_Key*)event.args;
         args->type = W::EvArgs_Key::KEY_DOWN;
         args->keyCode = qevent->key();
+        args->autoRepeat = qevent->isAutoRepeat();
         W::world.Send(event);
     }
 

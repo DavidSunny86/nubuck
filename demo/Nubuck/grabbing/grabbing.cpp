@@ -10,6 +10,8 @@ public:
         // we are expected to copy these parameters
         _globals.nb = nubuck;
 
+        _globals.showHull = false;
+
 
         // project all nodes on xy-plane. scale, too
         _globals.nb.log->printf("Scaling points by factor %f.\n", 1000);
@@ -43,10 +45,8 @@ public:
         _globals.phHullProj->Update();
 
         _globals.phNodes = _globals.nb.world->CreatePolyhedron(_globals.grNodes);
-        _globals.phNodes->SetRenderFlags(POLYHEDRON_RENDER_NODES);
 
         _globals.phHull = _globals.nb.world->CreatePolyhedron(_globals.grHull);
-        _globals.phHull->SetRenderFlags(POLYHEDRON_RENDER_EDGES | POLYHEDRON_RENDER_HULL);
         _globals.phHull->Update();
 
         return new Phase0(_globals);

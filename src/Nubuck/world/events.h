@@ -81,6 +81,7 @@ namespace W {
         enum Type { KEY_DOWN = 0, KEY_UP };
         int type;
         int keyCode;
+        bool autoRepeat;
     };
 
 } // namespace W

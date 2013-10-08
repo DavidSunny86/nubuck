@@ -67,6 +67,7 @@ struct IPhase {
     virtual IPhase*     NextPhase(void) = 0;
 
     virtual void        OnNodesMoved(void) = 0;
+    virtual void        OnKeyPressed(char c) = 0;
 };
 
 struct IAlgorithm {
