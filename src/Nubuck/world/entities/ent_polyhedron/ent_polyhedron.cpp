@@ -479,20 +479,31 @@ bool Polyhedron_RaycastFaces(ENT_Polyhedron& ph, const M::Vector3& rayOrig, cons
     for(unsigned i = 0; i < ph.hull.faceLists.size(); ++i) {
         PolyhedronHullFaceList& fl = ph.hull.faceLists[i];
         tri.p0 = ph.hull.vertices[fl.base].position;
-        for(unsigned j = 0; j < fl.size - 1; ++j) {
-            tri.p1 = ph.hull.vertices[fl.base + j + 0].position;
-            tri.p2 = ph.hull.vertices[fl.base + j + 1].position;
+        unsigned j = 0;
+        while(j + 2 < fl.size) {
+            tri.p1 = ph.hull.vertices[fl.base + j + 1].position;
+            tri.p2 = ph.hull.vertices[fl.base + j + 2].position;
             if(RaycastTriangle(ray, tri, &info)) {
                 faces.push_back(fl);
                 dists.push_back(info.distance);
                 hit = true;
             }
+            j += 2;
         }
     }
     if(!hit) return false;
     unsigned minIdx = 0;
     for(unsigned i = 1; i < dists.size(); ++i)
         if(dists[minIdx] > dists[i]) minIdx = i;
+    leda::edge e;
+    hitFace = NULL;
+    forall_edges(e, *ph.G) {
+        if(ph.hull.faceLists[ph.hull.edges[e->id()].faceIdx].base == faces[minIdx].base) {
+            hitFace = e;
+            break;
+        }
+    }
+    assert(NULL != hitFace);
     return true;
 }
 
