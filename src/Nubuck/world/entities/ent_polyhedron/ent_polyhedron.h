@@ -43,8 +43,9 @@ struct PolyhedronHullFaceTrans {
 struct PolyhedronHullEdge {
     // edge is valid iff INVALID_FACE_INDEX != faceIdx
 	enum { INVALID_FACE_INDEX = 0xFFFFFFFF };
-	unsigned faceIdx;
-    unsigned n0, n1;
+	unsigned    faceIdx;
+    unsigned    n0, n1;
+    bool        valid;
 };
 
 struct PolyhedronFaceCurve {

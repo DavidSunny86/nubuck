@@ -186,9 +186,8 @@ namespace W {
                     ALG::gs_algorithm.GetPhase()->OnNodesMoved();
 
                     _isGrabbing = false;
-                }
+                } else _camArcball.StartPanning(args->x, args->y);
 
-                // _camArcball.StartPanning(args->x, args->y);
                 for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
                     leda::node hitNode = NULL;
                     ENT_Polyhedron& ph = *_polyhedrons[i];
