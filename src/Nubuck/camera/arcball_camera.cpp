@@ -91,6 +91,17 @@ void ArcballCamera::Reset(void) {
     _zoomTrans  = M::Vector3::Zero;
 }
 
+void ArcballCamera::ResetRotation(void) {
+    _panning = false;
+    _dragging = false;
+
+    _transform.rot		= M::Quat::Identity();
+
+    _dragRot	= M::Quat::Identity();
+    _panTrans	= M::Vector3::Zero;
+    _zoomTrans  = M::Vector3::Zero;
+}
+
 void ArcballCamera::ZoomIn(void) {
     _transform.trans.z += zoomStep;
 }

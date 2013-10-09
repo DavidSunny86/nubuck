@@ -369,6 +369,9 @@ namespace W {
                     } else _isGrabbing = false;
                 }
 
+                if('R' == args->keyCode) _camArcball.ResetRotation();
+                if('E' == args->keyCode) _camArcball.Reset();
+
                 if(!args->autoRepeat) {
                     ALG::gs_algorithm.GetPhase()->OnKeyPressed((char)args->keyCode);
                 }

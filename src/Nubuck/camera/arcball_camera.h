@@ -25,6 +25,7 @@ public:
     ArcballCamera(int width, int height);
 
     void Reset(void);
+    void ResetRotation(void);
 
     void SetScreenSize(int width, int height);
 
