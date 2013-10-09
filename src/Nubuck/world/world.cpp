@@ -379,15 +379,31 @@ namespace W {
         if(_isGrabbing) {
             float dx = mouseX - _grabPivot.x;
             float dy = -mouseY + _grabPivot.y;
-            dx *= 0.05f;
-            dy *= 0.05f;
+            dx *= 0.1f;
+            dy *= 0.1f;
+
+            const M::Matrix3 M = M::Inverse(M::RotationOf(_camArcball.GetWorldMatrix()));
+            const M::Vector3 X = M::Transform(M, M::Vector3(1.0f, 0.0f, 0.0f));
+            const M::Vector3 Y = M::Transform(M, M::Vector3(0.0f, 1.0f, 0.0f));
+            M::Matrix4 invWorld;
+            M::TryInvert(_camArcball.GetWorldMatrix(), invWorld);
+            const M::Vector3 rayOrig = M::Transform(invWorld, M::Vector3::Zero);
+
             for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
                 ENT_Polyhedron& ph = *_polyhedrons[i];
                 unsigned numNodes = ph.nodes.positions.size();
                 for(unsigned j = 0; j < numNodes; ++j) {
                     if(ph.selection.nodes[j]) {
-                        ph.nodes.positions[j].x = ph.nodes.oldPositions[j].x + dx;
-                        ph.nodes.positions[j].y = ph.nodes.oldPositions[j].y + dy;
+                        const M::Vector3 p = ph.nodes.oldPositions[j] + X * dx + Y * dy;
+                        const M::Vector3 rayDir = p - rayOrig;
+                        assert(0.0f != rayOrig.z - p.z);
+                        float t = rayOrig.z / (rayOrig.z - p.z);
+                        M::Vector3 q = rayOrig + t * rayDir;
+                        q.z = 0.0f;
+                        // assert(M::AlmostEqual(q.z, 0.0f));
+                        ph.nodes.positions[j] = q;
+                        printf("q = (%f, %f, %f)\n", q.x, q.y, q.z);
+                        // ph.nodes.positions[j] = ph.nodes.oldPositions[j] + M::Vector3(1.0f, 0.0f, 0.0f) * dx + M::Vector3(0.0f, 1.0f, 0.0f) * dy;
                     }
                 }
             }
@@ -404,7 +420,7 @@ namespace W {
                 }
             }
             ALG::gs_algorithm.GetPhase()->OnNodesMoved();
-        }
+        } // if(isGrabbing)
 
         for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
             for(unsigned j = 0; j < _polyhedrons[i]->hull.curves.size(); ++j)
