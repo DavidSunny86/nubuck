@@ -44,3 +44,32 @@ void ConvexHull(const graph_t& in, graph_t& out) {
     out.clear();
     leda::CONVEX_HULL(L, out);
 }
+
+void Voronoi2D(const graph_t& in, graph_t& out) {
+    scalar_t inf = 10000;
+    leda::list<point2_t> L(ToPointList2(in));
+    L.push_back(point2_t( inf,  inf));
+    L.push_back(point2_t( inf, -inf));
+    L.push_back(point2_t(-inf,  inf));
+    L.push_back(point2_t(-inf, -inf));
+    leda::GRAPH<leda::rat_circle, point2_t> VD;
+    leda::VORONOI(L, VD);
+    out.clear();
+
+    leda::node_array<leda::node> nmap(VD, NULL);
+
+    leda::node n2;
+    forall_nodes(n2, VD) {
+        leda::node n3 = nmap[n2] = out.new_node();
+        leda::rat_circle c = VD[n2];
+        bool b = c.is_degenerate();
+        if(!b) out[n3] = point_t(VD[n2].center().xcoord(), VD[n2].center().ycoord(), 0);
+    }
+
+    leda::edge e2;
+    forall_edges(e2, VD) {
+        if(VD.outdeg(leda::source(e2)) > 1 && VD.outdeg(leda::target(e2)) > 1)
+            out.new_edge(nmap[leda::source(e2)], nmap[leda::target(e2)]); 
+    }
+    out.make_planar_map();
+}

@@ -23,11 +23,14 @@ struct Globals {
 
     graph_t         grNodesProj;
     graph_t 		grDelaunayProj;
+    graph_t         grVoronoiProj;
     graph_t 		grHullProj;
     IPolyhedron*    phNodesProj;
     IPolyhedron* 	phDelaunayProj;
+    IPolyhedron*    phVoronoiProj;
     IPolyhedron* 	phHullProj;
 };
 
 void Delaunay2D(const graph_t& in, graph_t& out);
 void ConvexHull(const graph_t& in, graph_t& out);
+void Voronoi2D(const graph_t& in, graph_t& out);
