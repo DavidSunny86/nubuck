@@ -16,24 +16,82 @@
 #include <camera\arcball_camera.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include <world\events\events.h>
-#include "events.h"
 
-BEGIN_EVENT_DECL(SpawnPolyhedron)
+#pragma region EventDefinitions
+
+BEGIN_EVENT_DEF(Apocalypse)
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(SpawnPolyhedron)
     unsigned    entId;
     graph_t*    G;
-END_EVENT_DECL
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(DestroyPolyhedron)
+    unsigned    entId;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(Rebuild)
+    unsigned    entId;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(SetRenderFlags)
+    unsigned    entId;
+    int         flags;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(SetPickable)
+    unsigned    entId;
+    bool        isPickable;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(SetNodeColor)
+    unsigned    entId;
+    leda::node  node;
+    R::Color    color;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(SetFaceColor)
+    unsigned    entId;
+    leda::edge  edge;
+    R::Color    color;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(Resize)
+    int         width;
+    int         height;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(Mouse)
+    enum Type { MOUSE_DOWN, MOUSE_UP, MOUSE_WHEEL, MOUSE_MOVE };
+    enum Button { 
+        BUTTON_LEFT     = 1, // == Qt::LeftButton
+        BUTTON_RIGHT    = 2, // == Qt::RightButton
+        BUTTON_MIDDLE 
+    };
+    enum Modifier {
+        MODIFIER_SHIFT = 0x02000000 // == Qt::ShiftModifier
+    };
+    int type, button, mods, delta, x, y;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(Key)
+    enum Type { KEY_DOWN = 0, KEY_UP };
+    int type;
+    int keyCode;
+    bool autoRepeat;
+END_EVENT_DEF
+
+// region EventDefintions
+#pragma endregion
 
 namespace W {
 
     extern SYS::Semaphore g_worldSem;
 
-    class World : public IWorld, public SYS::Thread, public EventHandler<World> {
-    private:
+    class World : public IWorld, public SYS::Thread, public EV::EventHandler<World> {
         DECLARE_EVENT_HANDLER(World)
-
-        std::queue<Event> _events;
-        SYS::SpinLock _eventsMtx;
-
+    private:
 		std::vector<ENT_Polyhedron*> _polyhedrons;
 
         SYS::Timer  _timer;
@@ -44,22 +102,27 @@ namespace W {
 
         ArcballCamera _camArcball;
 
-        void HandleMouseEvent(const Event& event);
-
         ENT_Polyhedron* FindByEntityID(unsigned entId);
 
         bool        _isGrabbing;
         M::Vector3  _grabPivot;
 
-        void Event_SpawnPolyhedron(const EV::Event& event) { 
-            const EV::Params_SpawnPolyhedron& pp = EV::def_SpawnPolyhedron.GetArgs(event);
-            printf("HANDLING EVENT SPAWN_POLYHEDRON!\n");
-        }
+#pragma region EventHandlers
+        void Event_Apocalypse(const EV::Event& event);
+        void Event_SpawnPolyhedron(const EV::Event& event);
+        void Event_DestroyPolyhedron(const EV::Event& event);
+        void Event_Rebuild(const EV::Event& event);
+        void Event_SetRenderFlags(const EV::Event& event);
+        void Event_SetPickable(const EV::Event& event);
+        void Event_SetNodeColor(const EV::Event& event);
+        void Event_SetFaceColor(const EV::Event& event);
+        void Event_Resize(const EV::Event& event);
+        void Event_Mouse(const EV::Event& event);
+        void Event_Key(const EV::Event& event);
+// region EventHandlers
+#pragma endregion
     public:
 		World(void);
-
-        // message passing
-        void Send(const Event& event);
 
 		unsigned SpawnPolyhedron(graph_t* const G);
 

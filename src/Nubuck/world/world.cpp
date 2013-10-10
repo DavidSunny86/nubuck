@@ -8,7 +8,21 @@
 #include "entity.h"
 #include "world.h"
 
-ALLOC_EVENT_DECL(SpawnPolyhedron)
+#pragma region EventDefinitions
+
+ALLOC_EVENT_DEF(Apocalypse)
+ALLOC_EVENT_DEF(SpawnPolyhedron)
+ALLOC_EVENT_DEF(DestroyPolyhedron)
+ALLOC_EVENT_DEF(Rebuild)
+ALLOC_EVENT_DEF(SetRenderFlags)
+ALLOC_EVENT_DEF(SetPickable)
+ALLOC_EVENT_DEF(SetNodeColor)
+ALLOC_EVENT_DEF(SetFaceColor)
+ALLOC_EVENT_DEF(Resize)
+ALLOC_EVENT_DEF(Mouse)
+ALLOC_EVENT_DEF(Key)
+
+#pragma endregion
 
 namespace W {
 
@@ -21,7 +35,16 @@ namespace W {
     World world;
 
     BEGIN_EVENT_HANDLER(World)
-        EVENT_HANDLER(EV::def_SpawnPolyhedron, &World::Event_SpawnPolyhedron)
+        EVENT_HANDLER(EV::def_SpawnPolyhedron,      &World::Event_SpawnPolyhedron)
+        EVENT_HANDLER(EV::def_DestroyPolyhedron,    &World::Event_DestroyPolyhedron)
+        EVENT_HANDLER(EV::def_Rebuild,              &World::Event_Rebuild)
+        EVENT_HANDLER(EV::def_SetRenderFlags,       &World::Event_SetRenderFlags)
+        EVENT_HANDLER(EV::def_SetPickable,          &World::Event_SetPickable)
+        EVENT_HANDLER(EV::def_SetNodeColor,         &World::Event_SetNodeColor)
+        EVENT_HANDLER(EV::def_SetFaceColor, 		&World::Event_SetFaceColor)
+        EVENT_HANDLER(EV::def_Resize,               &World::Event_Resize)
+        EVENT_HANDLER(EV::def_Mouse,                &World::Event_Mouse)
+        EVENT_HANDLER(EV::def_Key,                  &World::Event_Key)
     END_EVENT_HANDLER
 
     static M::Vector3 Transform(const M::Matrix4& mat, const M::Vector3& vec, float w) {
@@ -126,22 +149,22 @@ namespace W {
     static float screenWidth, screenHeight;
     static float aspect;
 
-    void World::HandleMouseEvent(const Event& event) {
-        EvArgs_Mouse* args = (EvArgs_Mouse*)event.args;
+    void World::Event_Mouse(const EV::Event& event) {
+        const EV::Params_Mouse& args = EV::def_Mouse.GetArgs(event);
 
-        if(EvArgs_Mouse::MOUSE_DOWN == args->type) {
+        if(EV::Params_Mouse::MOUSE_DOWN == args.type) {
             M::Matrix4 projectionMat = M::Mat4::Perspective(45.0f, aspect, 0.1f, 1000.0f);
             M::Matrix4 invWorldMat;
             M::TryInvert(_camArcball.GetWorldMatrix(), invWorldMat);
             M::Vector3 rayOrig = M::Transform(invWorldMat, M::Vector3::Zero);
-            mouseX = args->x;
-            mouseY = args->y;
+            mouseX = args.x;
+            mouseY = args.y;
             M::Vector3 rayDir = UnprojectPoint(projectionMat, _camArcball.GetWorldMatrix(), screenWidth, screenHeight, M::Vector2(mouseX, mouseY));
             rayDir.Normalize();
             printf("orig = %f, %f, %f\n", rayOrig.x, rayOrig.y, rayOrig.z);
             printf("dir = %f, %f, %f\n", rayDir.x, rayDir.y, rayDir.z);
 
-            if(EvArgs_Mouse::BUTTON_LEFT == args->button) {
+            if(EV::Params_Mouse::BUTTON_LEFT == args.button) {
                 if(_isGrabbing) {
                     _isGrabbing = false;
 
@@ -158,9 +181,9 @@ namespace W {
                     ALG::gs_algorithm.GetPhase()->OnNodesMoved();
                 }
 
-                if(EvArgs_Mouse::MODIFIER_SHIFT == args->mods)
-                    _camArcball.StartZooming(args->x, args->y);
-                else _camArcball.StartDragging(args->x, args->y);
+                if(EV::Params_Mouse::MODIFIER_SHIFT == args.mods)
+                    _camArcball.StartZooming(args.x, args.y);
+                else _camArcball.StartDragging(args.x, args.y);
 
                 // pick faces
                 for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
@@ -172,7 +195,7 @@ namespace W {
                     } else printf("no face hit\n");
                 }
             }
-            if(EvArgs_Mouse::BUTTON_RIGHT == args->button) {
+            if(EV::Params_Mouse::BUTTON_RIGHT == args.button) {
                 if(_isGrabbing) {
                     for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
                         ENT_Polyhedron& ph = *_polyhedrons[i];
@@ -192,7 +215,7 @@ namespace W {
                     ALG::gs_algorithm.GetPhase()->OnNodesMoved();
 
                     _isGrabbing = false;
-                } else _camArcball.StartPanning(args->x, args->y);
+                } else _camArcball.StartPanning(args.x, args.y);
 
                 for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
                     leda::node hitNode = NULL;
@@ -206,26 +229,26 @@ namespace W {
             }
         }
 
-        if(EvArgs_Mouse::MOUSE_UP == args->type) {
-            if(EvArgs_Mouse::BUTTON_LEFT  == args->button) {
+        if(EV::Params_Mouse::MOUSE_UP == args.type) {
+            if(EV::Params_Mouse::BUTTON_LEFT  == args.button) {
                 _camArcball.StopDragging();
                 _camArcball.StopZooming();
             }
-            if(EvArgs_Mouse::BUTTON_RIGHT == args->button)
+            if(EV::Params_Mouse::BUTTON_RIGHT == args.button)
                 _camArcball.StopPanning();
         }
 
-        if(EvArgs_Mouse::MOUSE_MOVE == args->type) {
-            _camArcball.Drag(args->x, args->y);
-            _camArcball.Pan(args->x, args->y);
-            _camArcball.Zoom(args->x, args->y);
-            mouseX = args->x;
-            mouseY = args->y;
+        if(EV::Params_Mouse::MOUSE_MOVE == args.type) {
+            _camArcball.Drag(args.x, args.y);
+            _camArcball.Pan(args.x, args.y);
+            _camArcball.Zoom(args.x, args.y);
+            mouseX = args.x;
+            mouseY = args.y;
         }
 
-        if(EvArgs_Mouse::MOUSE_WHEEL == args->type) {
-            if(args->delta > 0) _camArcball.ZoomIn();
-            if(args->delta < 0) _camArcball.ZoomOut();
+        if(EV::Params_Mouse::MOUSE_WHEEL == args.type) {
+            if(args.delta > 0) _camArcball.ZoomIn();
+            if(args.delta < 0) _camArcball.ZoomOut();
         }
     }
 
@@ -235,6 +258,104 @@ namespace W {
         }
         return NULL;
     }
+        
+    void World::Event_Apocalypse(const EV::Event& event) {
+    }
+
+    void World::Event_SpawnPolyhedron(const EV::Event& event) {
+        const EV::Params_SpawnPolyhedron& args = EV::def_SpawnPolyhedron.GetArgs(event);
+        ENT_Polyhedron* ph = new ENT_Polyhedron();
+        ph->entId = args.entId;
+        ph->G =     args.G;
+        Polyhedron_Init(*ph);
+        Polyhedron_Rebuild(*ph);
+        Polyhedron_Update(*ph);
+        _polyhedrons.push_back(ph);
+    }
+
+    void World::Event_DestroyPolyhedron(const EV::Event& event) {
+        const EV::Params_DestroyPolyhedron& args = EV::def_DestroyPolyhedron.GetArgs(event);
+        for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+            if(_polyhedrons[i]->entId == args.entId) {
+                std::swap(_polyhedrons[i], _polyhedrons.back());
+                _polyhedrons.erase(_polyhedrons.end() - 1);
+            }
+        }
+    }
+
+    void World::Event_Rebuild(const EV::Event& event) {
+        const EV::Params_Rebuild& args = EV::def_Rebuild.GetArgs(event);
+        ENT_Polyhedron* ph = FindByEntityID(args.entId);
+        if(ph) {
+            Polyhedron_Rebuild(*ph);
+            Polyhedron_Update(*ph);
+        }
+    }
+
+    void World::Event_SetRenderFlags(const EV::Event& event) {
+        const EV::Params_SetRenderFlags& args = EV::def_SetRenderFlags.GetArgs(event);
+        ENT_Polyhedron* ph = FindByEntityID(args.entId);
+        if(ph) ph->renderFlags = args.flags;
+    }
+
+    void World::Event_SetPickable(const EV::Event& event) {
+        const EV::Params_SetPickable& args = EV::def_SetPickable.GetArgs(event);
+        ENT_Polyhedron* ph = FindByEntityID(args.entId);
+        if(ph) ph->isPickable = args.isPickable;
+    }
+
+    void World::Event_SetNodeColor(const EV::Event& event) {
+        const EV::Params_SetNodeColor& args = EV::def_SetNodeColor.GetArgs(event);
+        ENT_Polyhedron* ph = FindByEntityID(args.entId);
+        if(ph) {
+            ph->nodes.colors[args.node->id()] = args.color;
+        }
+    }
+
+    void World::Event_SetFaceColor(const EV::Event& event) {
+        const EV::Params_SetFaceColor& args = EV::def_SetFaceColor.GetArgs(event);
+        ENT_Polyhedron* ph = FindByEntityID(args.entId);
+        /*
+        PolyhedronHullFaceList& face = ph.hull.faceLists[ph.hull.edges[args->edge->id()].faceIdx];
+        for(unsigned i = 0; i < face.size; ++i) {
+            ph.hull.vertices[face.base + i].color = args->color;
+        }
+        Polyhedron_Update(ph);
+        */
+        // Polyhedron_AddCurve(ph, args->edge, args->color);
+        Polyhedron_SetFaceColor(*ph, args.edge, args.color);
+    }
+
+    void World::Event_Resize(const EV::Event& event) {
+        const EV::Params_Resize& args = EV::def_Resize.GetArgs(event);
+        _camArcball.SetScreenSize(args.width, args.height);
+        aspect = (float)args.width / args.height;
+        screenWidth = args.width;
+        screenHeight = args.height;
+    }
+
+    void World::Event_Key(const EV::Event& event) {
+        const EV::Params_Key& args = EV::def_Key.GetArgs(event);
+        if(!_isGrabbing && 'G' == args.keyCode) {
+            if(EV::Params_Key::KEY_DOWN == args.type) {
+                _grabPivot.x = mouseX;
+                _grabPivot.y = mouseY;
+                _isGrabbing = true;
+
+                for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
+                    ENT_Polyhedron& ph = *_polyhedrons[i];
+                    ph.nodes.oldPositions = ph.nodes.positions;
+                }
+            } else _isGrabbing = false;
+        }
+
+        if('R' == args.keyCode) _camArcball.ResetRotation();
+        if('E' == args.keyCode) _camArcball.Reset();
+
+        if(!args.autoRepeat) {
+            ALG::gs_algorithm.GetPhase()->OnKeyPressed((char)args.keyCode);
+        }
+    }
 
 	World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
         _isGrabbing = false;
@@ -242,23 +363,15 @@ namespace W {
         SetupLights();
 	}
 
-    void World::Send(const Event& event) {
-        _eventsMtx.Lock();
-        _events.push(event);
-        _eventsMtx.Unlock();
-    }
-
 	unsigned World::SpawnPolyhedron(graph_t* const G) {
         entIdCntMtx.Lock();
         unsigned entId = entIdCnt++;
         entIdCntMtx.Unlock();
 
-        Event event;
-        event.type = EVENT_SPAWN_POLYHEDRON;
-        EvArgs_SpawnPolyhedron* args = (EvArgs_SpawnPolyhedron*)event.args;
-        args->h = entId;
-        args->G = G;
-        Send(event);
+        EV::Params_SpawnPolyhedron args;
+        args.entId  = entId;
+        args.G      = G;
+        Send(EV::def_SpawnPolyhedron.Create(args));
 
         return entId;
 	}
@@ -271,120 +384,6 @@ namespace W {
         SetupLights();
 
         HandleEvents();
-
-        bool done = false;
-        while(!done) {
-            Event event;
-            _eventsMtx.Lock();
-            if(_events.empty()) done = true;
-            else {
-                event = _events.front();
-                _events.pop();
-            }
-            _eventsMtx.Unlock();
-            if(done) break;
-
-            if(EVENT_APOCALYPSE == event.type) {
-                _polyhedrons.clear();
-            }
-
-            if(EVENT_SPAWN_POLYHEDRON == event.type) {
-                EvArgs_SpawnPolyhedron* args = (EvArgs_SpawnPolyhedron*)event.args;
-                ENT_Polyhedron* ph = new ENT_Polyhedron();
-                ph->entId = args->h;
-                ph->G = args->G;
-                Polyhedron_Init(*ph);
-                Polyhedron_Rebuild(*ph);
-                Polyhedron_Update(*ph);
-                _polyhedrons.push_back(ph);
-            }
-
-            if(EVENT_DESTROY_POLYHEDRON == event.type) {
-                EvArgs_DestroyPolyhedron* args = (EvArgs_DestroyPolyhedron*)event.args;
-                for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-                    if(_polyhedrons[i]->entId == args->entId) {
-                        std::swap(_polyhedrons[i], _polyhedrons.back());
-                        _polyhedrons.erase(_polyhedrons.end() - 1);
-                    }
-                }
-            }
-
-            if(EVENT_REBUILD == event.type) {
-                EvArgs_Rebuild* args = (EvArgs_Rebuild*)event.args;
-                ENT_Polyhedron* ph = FindByEntityID(args->entId);
-                if(ph) {
-                    Polyhedron_Rebuild(*ph);
-                    Polyhedron_Update(*ph);
-                }
-            }
-
-            if(EVENT_SET_RENDER_FLAGS == event.type) {
-                EvArgs_SetRenderFlags* args = (EvArgs_SetRenderFlags*)event.args;
-                ENT_Polyhedron* ph = FindByEntityID(args->entId);
-                if(ph) ph->renderFlags = args->flags;
-            }
-
-            if(EVENT_SET_PICKABLE == event.type) {
-                EvArgs_SetPickable* args = (EvArgs_SetPickable*)event.args;
-                ENT_Polyhedron* ph = FindByEntityID(args->entId);
-                if(ph) ph->isPickable = args->isPickable;
-            }
-
-            if(EVENT_SET_NODE_COLOR == event.type) {
-                EvArgs_SetNodeColor* args = (EvArgs_SetNodeColor*)event.args;
-                ENT_Polyhedron* ph = FindByEntityID(args->entId);
-                if(ph) {
-                    ph->nodes.colors[args->node->id()] = args->color;
-                }
-            }
-
-            if(EVENT_SET_FACE_COLOR == event.type) {
-                EvArgs_SetFaceColor* args = (EvArgs_SetFaceColor*)event.args;
-                ENT_Polyhedron* ph = FindByEntityID(args->entId);
-                /*
-                PolyhedronHullFaceList& face = ph.hull.faceLists[ph.hull.edges[args->edge->id()].faceIdx];
-                for(unsigned i = 0; i < face.size; ++i) {
-                    ph.hull.vertices[face.base + i].color = args->color;
-                }
-                Polyhedron_Update(ph);
-                */
-                // Polyhedron_AddCurve(ph, args->edge, args->color);
-                Polyhedron_SetFaceColor(*ph, args->edge, args->color);
-            }
-
-            if(EVENT_RESIZE == event.type) {
-                EvArgs_Resize* args = (EvArgs_Resize*)event.args;
-                _camArcball.SetScreenSize(args->width, args->height);
-                aspect = (float)args->width / args->height;
-                screenWidth = args->width;
-                screenHeight = args->height;
-            }
-
-            if(EVENT_MOUSE == event.type) HandleMouseEvent(event);
-
-            if(EVENT_KEY == event.type) {
-                EvArgs_Key* args = (EvArgs_Key*)event.args;
-                if(!_isGrabbing && 'G' == args->keyCode) {
-                    if(W::EvArgs_Key::KEY_DOWN == args->type) {
-                        _grabPivot.x = mouseX;
-                        _grabPivot.y = mouseY;
-                        _isGrabbing = true;
-
-                        for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-                            ENT_Polyhedron& ph = *_polyhedrons[i];
-                            ph.nodes.oldPositions = ph.nodes.positions;
-                        }
-                    } else _isGrabbing = false;
-                }
-
-                if('R' == args->keyCode) _camArcball.ResetRotation();
-                if('E' == args->keyCode) _camArcball.Reset();
-
-                if(!args->autoRepeat) {
-                    ALG::gs_algorithm.GetPhase()->OnKeyPressed((char)args->keyCode);
-                }
-            }
-        } // while(!done)
 
         if(_isGrabbing) {
             float dx = mouseX - _grabPivot.x;
@@ -463,13 +462,6 @@ namespace W {
     }
 
     DWORD World::Thread_Func(void) {
-        EV::Params_SpawnPolyhedron pp;
-        pp.entId = 0;
-        pp.G = NULL;
-        EV::Event ev = EV::def_SpawnPolyhedron.Create(pp);
-        _Send(ev);
-        _Send(ev);
-
         Polyhedron_InitResources();
         while(true) {
             Update();

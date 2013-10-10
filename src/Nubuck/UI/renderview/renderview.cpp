@@ -3,7 +3,7 @@
 
 #include <common\common.h>
 #include <world\world.h>
-#include <world\events.h>
+#include <world\events\events.h>
 #include <renderer\effects\effectmgr.h>
 #include "renderview.h"
 
@@ -14,12 +14,10 @@ namespace UI {
     }
 
     void RenderView::resizeGL(int width, int height) {
-        W::Event event;
-        event.type = W::EVENT_RESIZE;
-        W::EvArgs_Resize* args = (W::EvArgs_Resize*)event.args;
-        args->width = width;
-        args->height = height;
-        W::world.Send(event);
+        EV::Params_Resize args;
+        args.width = width;
+        args.height = height;
+        W::world.Send(EV::def_Resize.Create(args));
 
         _renderer.Resize(width, height);
         Update();
@@ -44,70 +42,58 @@ namespace UI {
     }
 
     void RenderView::mousePressEvent(QMouseEvent* qevent) {
-        W::Event wevent;
-        wevent.type = W::EVENT_MOUSE;
-        W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
-        args->type = W::EvArgs_Mouse::MOUSE_DOWN;
-        args->button = qevent->button();
-        args->mods = qevent->modifiers();
-        args->x = qevent->x();
-        args->y = qevent->y();
-        W::world.Send(wevent);
+        EV::Params_Mouse args;
+        args.type = EV::Params_Mouse::MOUSE_DOWN;
+        args.button = qevent->button();
+        args.mods = qevent->modifiers();
+        args.x = qevent->x();
+        args.y = qevent->y();
+        W::world.Send(EV::def_Mouse.Create(args));
     }
 
     void RenderView::mouseReleaseEvent(QMouseEvent* qevent) {
-        W::Event wevent;
-        wevent.type = W::EVENT_MOUSE;
-        W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
-        args->type = W::EvArgs_Mouse::MOUSE_UP;
-        args->button = qevent->button();
-        args->mods = qevent->modifiers();
-        args->x = qevent->x();
-        args->y = qevent->y();
-        W::world.Send(wevent);
+        EV::Params_Mouse args;
+        args.type = EV::Params_Mouse::MOUSE_UP;
+        args.button = qevent->button();
+        args.mods = qevent->modifiers();
+        args.x = qevent->x();
+        args.y = qevent->y();
+        W::world.Send(EV::def_Mouse.Create(args));
     }
 
     void RenderView::mouseMoveEvent(QMouseEvent* qevent) {
-        W::Event wevent;
-        wevent.type = W::EVENT_MOUSE;
-        W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
-        args->type = W::EvArgs_Mouse::MOUSE_MOVE;
-        args->button = qevent->button();
-        args->mods = qevent->modifiers();
-        args->x = qevent->x();
-        args->y = qevent->y();
-        W::world.Send(wevent);
+        EV::Params_Mouse args;
+        args.type = EV::Params_Mouse::MOUSE_MOVE;
+        args.button = qevent->button();
+        args.mods = qevent->modifiers();
+        args.x = qevent->x();
+        args.y = qevent->y();
+        W::world.Send(EV::def_Mouse.Create(args));
     }
 
     void RenderView::wheelEvent(QWheelEvent* qevent) {
-        W::Event wevent;
-        wevent.type = W::EVENT_MOUSE;
-        W::EvArgs_Mouse* args = (W::EvArgs_Mouse*)wevent.args;
-        args->type = W::EvArgs_Mouse::MOUSE_WHEEL;
-        args->mods = qevent->modifiers();
-        args->delta = qevent->delta();
-        args->x = qevent->x();
-        args->y = qevent->y();
-        W::world.Send(wevent);
+        EV::Params_Mouse args;
+        args.type = EV::Params_Mouse::MOUSE_WHEEL;
+        args.mods = qevent->modifiers();
+        args.delta = qevent->delta();
+        args.x = qevent->x();
+        args.y = qevent->y();
+        W::world.Send(EV::def_Mouse.Create(args));
     }
 
     void RenderView::keyPressEvent(QKeyEvent* qevent) {
-        W::Event event;
-        event.type = W::EVENT_KEY;
-        W::EvArgs_Key* args =  (W::EvArgs_Key*)event.args;
-        args->type = W::EvArgs_Key::KEY_DOWN;
-        args->keyCode = qevent->key();
-        args->autoRepeat = qevent->isAutoRepeat();
-        W::world.Send(event);
+        EV::Params_Key args;
+        args.type = EV::Params_Key::KEY_DOWN;
+        args.keyCode = qevent->key();
+        args.autoRepeat = qevent->isAutoRepeat();
+        W::world.Send(EV::def_Key.Create(args));
     }
 
     void RenderView::keyReleaseEvent(QKeyEvent* qevent) {
-        W::Event event;
-        event.type = W::EVENT_KEY;
-        W::EvArgs_Key* args =  (W::EvArgs_Key*)event.args;
-        args->type = W::EvArgs_Key::KEY_UP;
-        args->keyCode = qevent->key();
-        W::world.Send(event);
+        EV::Params_Key args;
+        args.type = EV::Params_Key::KEY_UP;
+        args.keyCode = qevent->key();
+        W::world.Send(EV::def_Key.Create(args));
     }
 
     RenderView::RenderView(QWidget* parent) : glWidget_t(parent), _fpsLabel(NULL) {        

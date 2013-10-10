@@ -317,9 +317,6 @@
     <ClInclude Include="..\..\src\Nubuck\world\entity.h">
       <Filter>Private\world</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\events.h">
-      <Filter>Private\world</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\material\material.h">
       <Filter>Private\renderer\material</Filter>
     </ClInclude>

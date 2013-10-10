@@ -1,5 +1,4 @@
 #include <algdriver\algdriver.h>
-#include <world\events.h>
 #include <world\world.h>
 #include "algorithmwidget.h"
 
@@ -18,9 +17,7 @@ namespace UI {
     }
 
     void AlgorithmWidget::OnReset(void) {
-        W::Event event;
-        event.type = W::EVENT_APOCALYPSE;
-        W::world.Send(event);
+        W::world.Send(EV::def_Apocalypse.Create(EV::Params_Apocalypse()));
 
         ALG::gs_algorithm.Reset();
     }
