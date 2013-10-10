@@ -4,7 +4,7 @@
 #include <common\common.h>
 #include <algdriver\algdriver.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
-#include "polyhedron.h"
+#include <world\proxies\proxy_polyhedron.h>
 #include "entity.h"
 #include "world.h"
 
@@ -35,6 +35,7 @@ namespace W {
     World world;
 
     BEGIN_EVENT_HANDLER(World)
+        EVENT_HANDLER(EV::def_Apocalypse,           &World::Event_Apocalypse)
         EVENT_HANDLER(EV::def_SpawnPolyhedron,      &World::Event_SpawnPolyhedron)
         EVENT_HANDLER(EV::def_DestroyPolyhedron,    &World::Event_DestroyPolyhedron)
         EVENT_HANDLER(EV::def_Rebuild,              &World::Event_Rebuild)
@@ -260,6 +261,7 @@ namespace W {
     }
         
     void World::Event_Apocalypse(const EV::Event& event) {
+        _polyhedrons.clear();
     }
 
     void World::Event_SpawnPolyhedron(const EV::Event& event) {
@@ -458,7 +460,7 @@ namespace W {
     }
 
     IPolyhedron* World::CreatePolyhedron(graph_t& G) {
-        return new Polyhedron(G);
+        return new Proxy::Polyhedron(G);
     }
 
     DWORD World::Thread_Func(void) {

@@ -171,6 +171,9 @@
     <Filter Include="Private\world\events">
       <UniqueIdentifier>{b19a5651-8744-4de5-9c53-07543750ee9e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\world\proxies">
+      <UniqueIdentifier>{977d2860-1bd1-446d-a49e-4e8940d9f5d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -341,9 +344,6 @@
     <ClInclude Include="GeneratedFiles\ui_logwidget.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\polyhedron.h">
-      <Filter>Private\world</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\world\world_inl.h">
       <Filter>Private\world</Filter>
     </ClInclude>
@@ -418,6 +418,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\world\events\events.h">
       <Filter>Private\world\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.h">
+      <Filter>Private\world\proxies</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -562,9 +565,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_logwidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\_polyhedron.cpp">
-      <Filter>Private\world</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\meshmgr.cpp">
       <Filter>Private\renderer\mesh</Filter>
     </ClCompile>
@@ -657,6 +657,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\world\events\events.cpp">
       <Filter>Private\world\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.cpp">
+      <Filter>Private\world\proxies</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

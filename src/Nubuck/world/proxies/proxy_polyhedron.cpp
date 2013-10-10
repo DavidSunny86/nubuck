@@ -1,5 +1,7 @@
 #include <world\world.h>
-#include "polyhedron.h"
+#include "proxy_polyhedron.h"
+
+namespace Proxy {
 
 Polyhedron::Polyhedron(graph_t& G) {
 	_entId = W::world.SpawnPolyhedron(&G);
@@ -47,3 +49,5 @@ void Polyhedron::Update(void) {
     args.entId = _entId;
     W::world.Send(EV::def_Rebuild.Create(args));
 }
+
+} // namespace Proxy

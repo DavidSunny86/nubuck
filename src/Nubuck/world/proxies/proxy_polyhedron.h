@@ -3,6 +3,8 @@
 #include <Nubuck\nubuck.h>
 #include <common\types.h>
 
+namespace Proxy {
+
 class Polyhedron : public IPolyhedron {
 private:
     unsigned _entId;
@@ -18,3 +20,5 @@ public:
 
     void Update(void) override;
 };
+
+} // namespace Proxy

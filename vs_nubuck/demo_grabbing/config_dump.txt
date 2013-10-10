@@ -1,0 +1,7 @@
+known variables:
+faceCurvature
+faceSpacing
+faceDecalSize
+faceSpeed
+r_edgeRadius
+r_nodeSize

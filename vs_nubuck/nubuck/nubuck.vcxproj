@@ -101,6 +101,7 @@
     </CustomBuild>
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.h" />
     <ClInclude Include="..\..\src\Nubuck\world\events\events.h" />
+    <ClInclude Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.h" />
     <ClInclude Include="GeneratedFiles\ui_renderconfig.h" />
     <ClInclude Include="GeneratedFiles\ui_rendermetrics.h" />
     <CustomBuild Include="..\..\src\Nubuck\UI\algorithmwidget\algorithmwidget.h">
@@ -126,7 +127,6 @@
     <ClInclude Include="..\..\src\Nubuck\UI\glwidget\glwidget.h" />
     <ClInclude Include="..\..\src\Nubuck\UI\logwidget\logwidget_inl.h" />
     <ClInclude Include="..\..\src\Nubuck\world\entity.h" />
-    <ClInclude Include="..\..\src\Nubuck\world\polyhedron.h" />
     <ClInclude Include="..\..\src\Nubuck\world\world_inl.h" />
     <ClInclude Include="GeneratedFiles\ui_algorithm.h" />
     <ClInclude Include="GeneratedFiles\ui_logwidget.h" />
@@ -228,7 +228,7 @@
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entity.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\events\events.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\world\_polyhedron.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\world.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_algorithmwidget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

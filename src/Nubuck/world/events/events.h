@@ -19,20 +19,34 @@ namespace EV {
 
     class DefinitionBase { 
     private:
-        unsigned _id;
+        unsigned            _id;
+        const char* 		_name;
+        DefinitionBase*     _next;
+
+        static DefinitionBase* defs;
     public:
-        DefinitionBase(void) : _id(0) {
+        DefinitionBase(const char* name) : _id(0), _name(name), _next(NULL) {
             extern unsigned evIdCnt;
             _id = evIdCnt++;
+            _next = defs;
+            defs = this;
         }
+
         unsigned GetID(void) const { return _id; }
+
+        static const char* NameFromID(unsigned id) {
+            DefinitionBase* it = defs;
+            while(it) {
+                if(id == it->_id) return it->_name;
+                it = it->_next;
+            }
+            return "<unkown event>";
+        }
     };
 
     template<typename PARAMS>
     struct Definition : DefinitionBase {
-        const char* name;
-
-        Definition(const char* name) : name(name) {
+        Definition(const char* name) : DefinitionBase(name) {
             assert(Event::ARGS_SIZE >= sizeof(PARAMS));
         }
 
@@ -111,8 +125,8 @@ protected:
                 assert(_ev_cache[event.id].func);
                 (instance->*(_ev_cache[event.id].func))(event);
             } else {
-                common.printf("WARNING - unhandled event with id = '%d' in class '%s'.\n",
-                    event.id, className);
+                common.printf("WARNING - unhandled event '%s' (id = '%d') in class '%s'.\n",
+                    DefinitionBase::NameFromID(event.id), event.id, className);
             }
         } /* while(!done) */                                
     }

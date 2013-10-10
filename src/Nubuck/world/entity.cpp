@@ -1,5 +1,4 @@
 #include <common\common.h>
-#include "events.h"
 #include "entity.h"
 
 static float IP_Pulse(float l) { return sinf(M::PI * l); }
