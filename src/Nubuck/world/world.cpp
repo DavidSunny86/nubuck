@@ -8,6 +8,8 @@
 #include "entity.h"
 #include "world.h"
 
+ALLOC_EVENT_DECL(SpawnPolyhedron)
+
 namespace W {
 
     static SYS::SpinLock entIdCntMtx;
@@ -17,6 +19,10 @@ namespace W {
     static int rlIdx = 1;
 
     World world;
+
+    BEGIN_EVENT_HANDLER(World)
+        EVENT_HANDLER(EV::def_SpawnPolyhedron, &World::Event_SpawnPolyhedron)
+    END_EVENT_HANDLER
 
     static M::Vector3 Transform(const M::Matrix4& mat, const M::Vector3& vec, float w) {
 		M::Vector3 ret;
@@ -264,6 +270,8 @@ namespace W {
 
         SetupLights();
 
+        HandleEvents();
+
         bool done = false;
         while(!done) {
             Event event;
@@ -455,6 +463,13 @@ namespace W {
     }
 
     DWORD World::Thread_Func(void) {
+        EV::Params_SpawnPolyhedron pp;
+        pp.entId = 0;
+        pp.G = NULL;
+        EV::Event ev = EV::def_SpawnPolyhedron.Create(pp);
+        _Send(ev);
+        _Send(ev);
+
         Polyhedron_InitResources();
         while(true) {
             Update();

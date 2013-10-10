@@ -15,14 +15,22 @@
 #include <renderer\renderer.h>
 #include <camera\arcball_camera.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
+#include <world\events\events.h>
 #include "events.h"
+
+BEGIN_EVENT_DECL(SpawnPolyhedron)
+    unsigned    entId;
+    graph_t*    G;
+END_EVENT_DECL
 
 namespace W {
 
     extern SYS::Semaphore g_worldSem;
 
-    class World : public IWorld, public SYS::Thread {
+    class World : public IWorld, public SYS::Thread, public EventHandler<World> {
     private:
+        DECLARE_EVENT_HANDLER(World)
+
         std::queue<Event> _events;
         SYS::SpinLock _eventsMtx;
 
@@ -42,6 +50,11 @@ namespace W {
 
         bool        _isGrabbing;
         M::Vector3  _grabPivot;
+
+        void Event_SpawnPolyhedron(const EV::Event& event) { 
+            const EV::Params_SpawnPolyhedron& pp = EV::def_SpawnPolyhedron.GetArgs(event);
+            printf("HANDLING EVENT SPAWN_POLYHEDRON!\n");
+        }
     public:
 		World(void);
 

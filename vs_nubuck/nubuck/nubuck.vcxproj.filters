@@ -168,6 +168,9 @@
     <Filter Include="Private\UI\renderconfig">
       <UniqueIdentifier>{d82575ec-0fda-4022-bed0-366025105d4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\world\events">
+      <UniqueIdentifier>{b19a5651-8744-4de5-9c53-07543750ee9e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -416,6 +419,9 @@
     <ClInclude Include="GeneratedFiles\ui_renderconfig.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\events\events.h">
+      <Filter>Private\world\events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -651,6 +657,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_renderconfig.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\events\events.cpp">
+      <Filter>Private\world\events</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
