@@ -49,6 +49,11 @@ static void Polyhedron_RebuildNodes(ENT_Polyhedron& ph) {
     ph.nodes.colors.resize(ph.G->max_node_index() + 1, R::Color::Black);
 }
 
+static void Polyhedron_RebuildEdges(ENT_Polyhedron& ph) {
+    ph.edges.mask.clear();
+    ph.edges.mask.resize(ph.G->max_edge_index() + 1, 1);
+}
+
 static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
 	ph.hull.faceLists.clear();
     ph.hull.faceColors.clear();
@@ -76,7 +81,7 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
         ph.hull.edges[e->id()].n0 = leda::source(e)->id();
         ph.hull.edges[e->id()].n1 = leda::target(e)->id();
         ph.hull.edges[e->id()].valid = true;
-        if(POLYHEDRON_RENDER_HULL & ph.renderFlags && !visitedEdge[e]) {
+        if(POLYHEDRON_RENDER_HULL & ph.renderFlags && !visitedEdge[e] && ph.edges.mask[e->id()]) {
             assert(ph.G->reversal(e));
 			leda::edge it = ph.G->face_cycle_succ(e);
 
@@ -115,10 +120,12 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
 
 #ifdef PARANOID
     if(POLYHEDRON_RENDER_HULL & ph.renderFlags) {
+        /*
         forall_edges(e, *ph.G) {
             assert(visitedEdge[e]);
             assert(PolyhedronHullEdge::INVALID_FACE_INDEX != ph.hull.edges[e->id()].faceIdx);
         }
+        */
     }
 #endif
 
@@ -138,12 +145,73 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
     }
 }
 
+static bool Polyhedron_IsPlanar(ENT_Polyhedron& ph) {
+    const graph_t& G = *ph.G;
+    const leda::list<leda::node>& L = G.all_nodes();
+    point_t S[] = { 
+        G[L[L.get_item(0)]],
+        G[L[L.get_item(1)]],
+        G[L[L.get_item(2)]]
+    };
+    for(unsigned i = 3; i < L.size(); ++i) {
+        if(leda::orientation(S[0], S[1], S[2], G[L[L.get_item(i)]]))
+            return false;
+    }
+    return true;
+}
+
+static leda::node MinXY(const graph_t& G, const leda::list<leda::node>& L) {
+    leda::node min = L.front();
+    for(unsigned i = 1; i < L.size(); ++i) {
+        leda::node other = L[L.get_item(i)];
+        if(G[other].xcoord() < G[min].xcoord() || (G[other].xcoord() == G[min].xcoord() && G[other].ycoord() < G[min].ycoord()))
+            min = other;
+    }
+    return min;
+}
+
+static leda::edge Polyhedron_FindOuterFace(ENT_Polyhedron& ph) {
+    const graph_t& G = *ph.G;
+    leda::list<leda::node> L = G.all_nodes();
+    leda::node n0 = MinXY(G, L);
+    leda::edge e0 = NULL;
+    leda::edge e;
+    forall_out_edges(e, n0) {
+        bool outerFace = true;
+        leda::node n;
+        forall_nodes(n, G) {
+            if(0 < G.outdeg(n) && 0 < G.indeg(n) && 0 > leda::orientation_xy(G[leda::source(e)], G[leda::target(e)], G[n]))
+                outerFace = false;
+        }
+        if(outerFace) {
+            e0 = e;
+            break;
+        }
+    }
+    assert(e0);
+    return e0;
+}
+
+static void Polyhedron_MaskFace(ENT_Polyhedron& ph, leda::edge e) {
+    leda::edge it = e;
+    do {
+        it = ph.G->face_cycle_succ(it);
+        ph.edges.mask[it->id()] = 0;
+    } while(e != it);
+}
+
 void Polyhedron_Rebuild(ENT_Polyhedron& ph) {
     common.printf("INFO - Polyhedron_Rebuild: rebuilding polyhedron with |V| = %d, |E| = %d.\n",
         ph.G->number_of_nodes(), ph.G->number_of_edges());
 
     Polyhedron_RebuildSelection(ph);
     Polyhedron_RebuildNodes(ph);
+    Polyhedron_RebuildEdges(ph);
+
+    if(Polyhedron_IsPlanar(ph) && 0 < ph.G->number_of_edges() && POLYHEDRON_RENDER_HULL & ph.renderFlags)  {
+        // Polyhedron_MaskFace(ph, Polyhedron_FindOuterFace(ph));
+    }
+
     Polyhedron_RebuildHull(ph);
 }
 

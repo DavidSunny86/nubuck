@@ -51,9 +51,11 @@ struct Phase0 : IPhase {
             g.grNodes[g.nmap[n]] = point_t(p.xcoord(), p.ycoord(), z);
         }
         Delaunay2D(g.grNodesProj, g.grDelaunayProj);
+        Voronoi2D(g.grNodesProj, g.grVoronoiProj);
         ConvexHull(g.grNodesProj, g.grHullProj);
         ConvexHull(g.grNodes, g.grHull);
         g.phDelaunayProj->Update();
+        g.phVoronoiProj->Update();
         g.phHullProj->Update();
         g.phNodes->Update();
         g.phHull->Update();

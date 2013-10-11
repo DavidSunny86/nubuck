@@ -23,6 +23,10 @@ struct PolyhedronNodes {
     std::vector<R::Color>   colors;
 };
 
+struct PolyhedronEdges {
+    std::vector<int>        mask;
+};
+
 struct PolyhedronHullFaceList {
 	unsigned base;
 	unsigned size;
@@ -79,6 +83,7 @@ struct ENT_Polyhedron {
     int                     renderFlags;
     bool                    isPickable;
     PolyhedronNodes         nodes;
+    PolyhedronEdges         edges;
 	PolyhedronHull          hull;
     PolyhedronSelection     selection;
     R::RenderList           renderList;

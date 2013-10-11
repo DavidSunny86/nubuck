@@ -36,6 +36,7 @@ public:
         }
 
         Delaunay2D(_globals.grNodesProj, _globals.grDelaunayProj);
+        Voronoi2D(_globals.grNodesProj, _globals.grVoronoiProj);
         ConvexHull(_globals.grNodesProj, _globals.grHullProj);
         ConvexHull(_globals.grNodes, _globals.grHull);
 
@@ -47,19 +48,23 @@ public:
         _globals.phDelaunayProj->SetRenderFlags(POLYHEDRON_RENDER_EDGES);
 
         _globals.phHullProj = _globals.nb.world->CreatePolyhedron(_globals.grHullProj);
-        _globals.phHullProj->SetRenderFlags(POLYHEDRON_RENDER_HULL);
+        // _globals.phHullProj->SetRenderFlags(POLYHEDRON_RENDER_HULL | POLYHEDRON_RENDER_EDGES);
         _globals.phHullProj->Update();
+        
+        _globals.phVoronoiProj = _globals.nb.world->CreatePolyhedron(_globals.grVoronoiProj);
+        _globals.phVoronoiProj->SetRenderFlags(POLYHEDRON_RENDER_HULL | POLYHEDRON_RENDER_EDGES);
+        _globals.phVoronoiProj->Update();
 
         leda::edge e;
         float f = 1.0f / 255.0f;
         float r2 = f * 176;
         float g2 = f * 196;
         float b2 = f * 222;
-        forall_edges(e, _globals.grHullProj) {
+        forall_edges(e, _globals.grVoronoiProj) {
             float r = (RandFloat(0.5f, 1.0f) + r2) * 0.5f;
             float g = (RandFloat(0.5f, 1.0f) + g2) * 0.5f;
             float b = (RandFloat(0.5f, 1.0f) + b2) * 0.5f;
-            _globals.phHullProj->SetFaceColor(e, r, g, b);
+            _globals.phVoronoiProj->SetFaceColor(e, r, g, b);
         }
 
         _globals.phNodes = _globals.nb.world->CreatePolyhedron(_globals.grNodes);
