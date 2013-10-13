@@ -1,4 +1,5 @@
 #include <Nubuck\nubuck.h>
+#include <LEDA\geo\geo_alg.h>
 #include "globals.h"
 
 struct Phase0 : IPhase {
@@ -51,14 +52,28 @@ struct Phase0 : IPhase {
             g.grNodes[g.nmap[n]] = point_t(p.xcoord(), p.ycoord(), z);
         }
         Delaunay2D(g.grNodesProj, g.grDelaunayProj);
-        Voronoi2D(g.grNodesProj, g.grVoronoiProj);
-        ConvexHull(g.grNodesProj, g.grHullProj);
         ConvexHull(g.grNodes, g.grHull);
         g.phDelaunayProj->Update();
-        g.phVoronoiProj->Update();
-        g.phHullProj->Update();
         g.phNodes->Update();
         g.phHull->Update();
+        if(g.showVoronoi) {
+            Voronoi2D(g.grNodesProj, g.grVoronoiTri, g.grVoronoiProj, g.emap);
+            g.phVoronoiProj->Update();
+            Colorize();
+        } else {
+            ConvexHull(g.grNodesProj, g.grHullProj);
+            g.phHullProj->Update();
+        }
+    }
+
+    void Colorize(void) {
+        leda::node n;
+        forall_nodes(n, g.grNodesProj) {
+            leda::edge ft = leda::LOCATE_IN_TRIANGULATION(g.grVoronoiTri, point2_t(g.grNodesProj[n].xcoord(), g.grNodesProj[n].ycoord()));
+            leda::edge f = g.emap[ft];
+            Color c = g.colors[n];
+            g.phVoronoiProj->SetFaceColor(f, c.r, c.g, c.b);
+        }
     }
 
     void OnKeyPressed(char c) override {
@@ -73,6 +88,31 @@ struct Phase0 : IPhase {
                 g.phNodes->Update();
                 g.phHull->Update();
                 g.showHull = true;
+            }
+        }
+        if('V' == c) {
+            if(g.showVoronoi) {
+                g.phHullProj->SetRenderFlags(POLYHEDRON_RENDER_HULL | POLYHEDRON_RENDER_EDGES);
+                g.phVoronoiProj->SetRenderFlags(0);
+                g.phHullProj->Update();
+            } else {
+                g.phHullProj->SetRenderFlags(0);
+                int flags = POLYHEDRON_RENDER_HULL;
+                if(g.showVoronoiEdges) flags |= POLYHEDRON_RENDER_EDGES;
+                g.phVoronoiProj->SetRenderFlags(flags);
+                g.phVoronoiProj->Update();
+                Colorize();
+            }
+            g.showVoronoi = !g.showVoronoi;
+        }
+        if('C' == c) {
+            g.showVoronoiEdges = !g.showVoronoiEdges;
+            if(g.showVoronoi) {
+                int flags = POLYHEDRON_RENDER_HULL;
+                if(g.showVoronoiEdges) flags |= POLYHEDRON_RENDER_EDGES;
+                g.phVoronoiProj->SetRenderFlags(flags);
+                g.phVoronoiProj->Update();
+                Colorize();
             }
         }
     }

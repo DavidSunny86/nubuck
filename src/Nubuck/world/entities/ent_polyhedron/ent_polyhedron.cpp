@@ -50,8 +50,16 @@ static void Polyhedron_RebuildNodes(ENT_Polyhedron& ph) {
 }
 
 static void Polyhedron_RebuildEdges(ENT_Polyhedron& ph) {
+    ph.edges.valid.clear();
     ph.edges.mask.clear();
-    ph.edges.mask.resize(ph.G->max_edge_index() + 1, 1);
+    ph.edges.valid.resize(ph.G->max_edge_index() + 1, 0);
+    ph.edges.mask.resize(ph.G->max_edge_index() + 1, 0);
+
+    leda::edge e;
+    forall_edges(e, *ph.G) {
+        ph.edges.valid[e->id()] = 1;
+        ph.edges.mask[e->id()] = 1;
+    }
 }
 
 static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
@@ -120,12 +128,12 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
 
 #ifdef PARANOID
     if(POLYHEDRON_RENDER_HULL & ph.renderFlags) {
-        /*
         forall_edges(e, *ph.G) {
-            assert(visitedEdge[e]);
-            assert(PolyhedronHullEdge::INVALID_FACE_INDEX != ph.hull.edges[e->id()].faceIdx);
+            if(ph.edges.mask[e->id()]) {
+                assert(visitedEdge[e]);
+                assert(PolyhedronHullEdge::INVALID_FACE_INDEX != ph.hull.edges[e->id()].faceIdx);
+            }
         }
-        */
     }
 #endif
 
@@ -180,7 +188,7 @@ static leda::edge Polyhedron_FindOuterFace(ENT_Polyhedron& ph) {
         bool outerFace = true;
         leda::node n;
         forall_nodes(n, G) {
-            if(0 < G.outdeg(n) && 0 < G.indeg(n) && 0 > leda::orientation_xy(G[leda::source(e)], G[leda::target(e)], G[n]))
+            if(0 < G.outdeg(n) && 0 < G.indeg(n) && 0 < leda::orientation_xy(G[leda::source(e)], G[leda::target(e)], G[n]))
                 outerFace = false;
         }
         if(outerFace) {
@@ -209,7 +217,7 @@ void Polyhedron_Rebuild(ENT_Polyhedron& ph) {
     Polyhedron_RebuildEdges(ph);
 
     if(Polyhedron_IsPlanar(ph) && 0 < ph.G->number_of_edges() && POLYHEDRON_RENDER_HULL & ph.renderFlags)  {
-        // Polyhedron_MaskFace(ph, Polyhedron_FindOuterFace(ph));
+        Polyhedron_MaskFace(ph, Polyhedron_FindOuterFace(ph));
     }
 
     Polyhedron_RebuildHull(ph);
@@ -419,11 +427,13 @@ void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed) {
 }
 
 void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Color& color) {
+    if(!ph.edges.valid[e->id()] || !ph.edges.mask[e->id()]) return;
     unsigned faceIdx = ph.hull.edges[e->id()].faceIdx;
     PolyhedronHullFaceColor& fc = ph.hull.faceColors[faceIdx];
     fc.v0 = fc.cur;
     fc.v1 = color;
-    fc.t = 0.0f;
+    // fc.t = 0.0f;
+    fc.t = 10.0f; // instant
     fc.ip = true;
 }
 

@@ -159,7 +159,7 @@ static void Uniforms_Update(
     uniformsLights.uLightDiffuseColor0 = dirLights[0].diffuseColor;
     uniformsLights.uLightDiffuseColor1 = dirLights[1].diffuseColor;
     uniformsLights.uLightDiffuseColor2 = dirLights[2].diffuseColor;
-    uniformsLights.uShininess = 50.0f;
+    uniformsLights.uShininess = 200.0f;
     uniformsLightsBuffer->Update_Mapped(0, sizeof(UniformsLights), &uniformsLights);
 
     uniformsSkeleton.uColor = Color(0.4f, 0.4f, 0.4f, 1.0f);
@@ -396,6 +396,17 @@ static void BindEdgeBBoxVertices(void) {
         1, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
         (void*)(offsetof(EdgeBBoxVertex, halfHeightSq))));
     GL_CALL(glEnableVertexAttribArray(IN_HALF_HEIGHT_SQ));
+}
+
+// remove edges with zero length
+static void RemoveDegeneratedEdges(std::vector<Edge>& edges) {
+    unsigned i = 0;
+    while(edges.size() > i) {
+        if(M::AlmostEqual(0.0f, M::Distance(edges[i].p0, edges[i].p1))) {
+            std::swap(edges[i], edges.back());
+            edges.pop_back();
+        } else ++i;
+    }
 }
 
 static void ReserveEdgeBBoxBuffers(unsigned numEdges) {
@@ -639,7 +650,7 @@ static M::Matrix4 ComputeProjectionMatrix(float aspect, const M::Matrix4& worldM
     }
     return M::Mat4::Perspective(45.0f, aspect, -zMax, -zMin);
     */
-    return M::Mat4::Perspective(45.0f, aspect, 0.1f, 1000.0f);
+    return M::Mat4::Perspective(45.0f, aspect, 0.1f, 5000.0f);
 }
 
 void Renderer::Render(void) {
@@ -662,13 +673,14 @@ void Renderer::Render(void) {
 
         metrics.frame.numDrawCalls = 0;
 
+        Link(renderList.jobs);
+        std::for_each(renderList.jobs.begin(), renderList.jobs.end(),
+            std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
+
         M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, renderList.jobs);
 
         Uniforms_Update(projectionMat, renderList.worldMat, renderList.dirLights);
 
-        Link(renderList.jobs);
-        std::for_each(renderList.jobs.begin(), renderList.jobs.end(),
-            std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
         DrawFrame(renderList, projectionMat, _time);
 
         InitBillboards(renderList.nodePositions, renderList.nodeColors);
@@ -681,6 +693,7 @@ void Renderer::Render(void) {
         }
 
         if(!renderList.edges.empty()) {
+            RemoveDegeneratedEdges(renderList.edges);
             ReserveEdgeBBoxBuffers(renderList.edges.size());
             CreateEdges(renderList.edges);
             DrawEdges(projectionMat, renderList.worldMat);

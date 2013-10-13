@@ -24,7 +24,8 @@ struct PolyhedronNodes {
 };
 
 struct PolyhedronEdges {
-    std::vector<int>        mask;
+    std::vector<int>    valid;
+    std::vector<int>	mask;
 };
 
 struct PolyhedronHullFaceList {
