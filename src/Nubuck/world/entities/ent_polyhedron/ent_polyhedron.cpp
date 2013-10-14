@@ -250,6 +250,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
     unsigned numEdges = ph.hull.edges.size();
     ph.renderList.edges.clear();
     if(POLYHEDRON_RENDER_EDGES & ph.renderFlags) {
+        // TODO: store reversal information to draw edges only once
         for(unsigned i = 0; i < numEdges; ++i) {
             const PolyhedronHullEdge& e = ph.hull.edges[i];
             if(e.valid)

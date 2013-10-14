@@ -242,7 +242,8 @@ void ConvexHull(const graph_t& in, graph_t& out) {
 }
 
 static void F(const leda::GRAPH<leda::rat_circle, point2_t>& VD, leda::GRAPH<leda::rat_point, int>& TRI, graph_t& G, leda::edge_map<leda::edge>& map) {
-    leda::list<leda::rat_segment> S;
+    leda::list<leda::rat_segment> S0;
+    leda::list<leda::rat_segment> S1;
 
     scalar_t inf = 500;
     leda::edge_array<bool> drawn(VD, false);
@@ -259,20 +260,20 @@ static void F(const leda::GRAPH<leda::rat_circle, point2_t>& VD, leda::GRAPH<led
           leda::rat_point  cw  = VD[w].center();
           leda::rat_vector vec = VD[v].point3() - VD[v].point1();
           leda::rat_point  cv  = cw + 10000 * inf * vec.rotate90();
-          S.push_back(leda::segment(cw.to_point(),cv.to_point()));
+          S0.push_back(leda::segment(cw.to_point(),cv.to_point()));
         }
           
         else if (VD.outdeg(w) == 1) { //w at infinity
           leda::rat_point  cv  = VD[v].center();
           leda::rat_vector vec = VD[w].point3() - VD[w].point1();
           leda::rat_point  cw  = cv + 10000 * inf * vec.rotate90();
-          S.push_back(leda::segment(cv.to_point(),cw.to_point()));
+          S0.push_back(leda::segment(cv.to_point(),cw.to_point()));
         }
            
         else  { //both v and w proper nodes
           leda::rat_point  cv  = VD[v].center();
           leda::rat_point  cw  = VD[w].center();
-          S.push_back(leda::segment(cv.to_point(),cw.to_point()));
+          S0.push_back(leda::segment(cv.to_point(),cw.to_point()));
         }  
     }
 
@@ -280,14 +281,13 @@ static void F(const leda::GRAPH<leda::rat_circle, point2_t>& VD, leda::GRAPH<led
     point2_t v1 = point2_t( inf, -inf);
     point2_t v2 = point2_t( inf,  inf);
     point2_t v3 = point2_t(-inf,  inf);
-    S.push_back(leda::rat_segment(v0, v1));
-    S.push_back(leda::rat_segment(v1, v2));
-    S.push_back(leda::rat_segment(v2, v3));
-    S.push_back(leda::rat_segment(v3, v0));
+    S1.push_back(leda::rat_segment(v0, v1));
+    S1.push_back(leda::rat_segment(v1, v2));
+    S1.push_back(leda::rat_segment(v2, v3));
+    S1.push_back(leda::rat_segment(v3, v0));
 
     leda::GRAPH<leda::rat_point, leda::rat_segment> G2;
-    // leda::SEGMENT_INTERSECTION(S, G2, true);
-    leda::SWEEP_SEGMENTS(S, G2, true);
+    leda::SEGMENT_INTERSECTION(S0, S1, G2, true);
 
     leda::list<leda::node> del;
     leda::node n;
