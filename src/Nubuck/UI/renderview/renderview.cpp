@@ -93,7 +93,7 @@ namespace UI {
         EV::Params_Key args;
         args.type = EV::Params_Key::KEY_UP;
         args.keyCode = qevent->key();
-        W::world.Send(EV::def_Key.Create(args));
+        if(!qevent->isAutoRepeat()) W::world.Send(EV::def_Key.Create(args));
     }
 
     RenderView::RenderView(QWidget* parent) : glWidget_t(parent), _fpsLabel(NULL) {        
