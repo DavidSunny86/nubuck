@@ -23,7 +23,7 @@ class   Mesh;
 
 struct RenderJob {
     std::string         fx;
-    meshPtr_t           mesh;
+    MeshMgr::meshPtr_t  mesh;
     GLenum              primType; // value != 0 overrides prim type of mesh
     Material	        material;
     SkinMgr::handle_t   skin;

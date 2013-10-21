@@ -174,6 +174,9 @@
     <Filter Include="Private\world\proxies">
       <UniqueIdentifier>{977d2860-1bd1-446d-a49e-4e8940d9f5d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\mesh\plane">
+      <UniqueIdentifier>{6ea6f262-5be1-4140-b052-34f618390db7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -422,6 +425,9 @@
     <ClInclude Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.h">
       <Filter>Private\world\proxies</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\plane\plane.h">
+      <Filter>Private\renderer\mesh\plane</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -660,6 +666,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.cpp">
       <Filter>Private\world\proxies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\plane\plane.cpp">
+      <Filter>Private\renderer\mesh\plane</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

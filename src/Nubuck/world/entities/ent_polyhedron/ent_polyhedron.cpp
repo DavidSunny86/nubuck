@@ -18,8 +18,8 @@ static M::Vector3 ToVector(const leda::d3_rat_point& p) {
 
 namespace W {
 
-static R::meshPtr_t         g_faceCurveDecalMesh;
-static R::SkinMgr::handle_t g_faceCurveDecalSkin;
+static R::MeshMgr::meshPtr_t    g_faceCurveDecalMesh;
+static R::SkinMgr::handle_t     g_faceCurveDecalSkin;
 
 void Polyhedron_InitResources(void) {
     g_faceCurveDecalMesh = R::meshMgr.Create(R::CreateQuadDesc(cvar_faceCurveDecalSize));
@@ -309,7 +309,10 @@ void Polyhedron_Update(ENT_Polyhedron& ph) {
 			ph.hull.vertices[ph.hull.faceLists[i].base + j].normal = normal;
 	}
 
-    if(!ph.hull.indices.empty()) ph.hull.mesh->Invalidate(&ph.hull.vertices[0]);
+    if(!ph.hull.indices.empty()) {
+        R::Mesh& mesh = R::meshMgr.GetMesh(ph.hull.mesh);
+        mesh.Invalidate(&ph.hull.vertices[0]);
+    }
 }
 
 static inline M::Vector2 ProjXY(const M::Vector3& v) {
@@ -424,7 +427,7 @@ void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed) {
         }
     }
 
-    if(!ph.hull.indices.empty()) ph.hull.mesh->Invalidate(&ph.hull.vertices[0]);
+    if(!ph.hull.indices.empty()) R::meshMgr.GetMesh(ph.hull.mesh).Invalidate(&ph.hull.vertices[0]);
 }
 
 void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Color& color) {

@@ -13,6 +13,7 @@
 #include <renderer\effects\effectmgr.h>
 #include <renderer\effects\pass.h>
 #include <renderer\mesh\mesh.h>
+#include <renderer\mesh\meshmgr.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\material\material.h>
 #include <renderer\metrics\metrics.h>
@@ -73,7 +74,7 @@ RenderList g_renderLists[2];
 SYS::Semaphore g_rendererSem(0);
 static int rlIdx = 0;
 
-static meshPtr_t nodeMesh;
+static MeshMgr::meshPtr_t nodeMesh;
 
 static State curState;
 
@@ -557,7 +558,7 @@ void Renderer::Init(void) {
     glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
     glClearDepth(1.0f);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
     
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);
@@ -575,11 +576,12 @@ void Renderer::Resize(int width, int height) {
 static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const M::Matrix4& worldMat, RenderJob* first) {
     RenderJob* meshJob = first;
     while(meshJob && meshJob->fx == first->fx) {
-        meshJob->mesh->R_Bind();
+        Mesh& mesh = meshMgr.GetMesh(meshJob->mesh);
+        mesh.R_Bind();
         BindVertices();
-        unsigned numIndices = meshJob->mesh->NumIndices();
+        unsigned numIndices = mesh.NumIndices();
         GLenum primType = meshJob->primType;
-        if(!primType) primType = meshJob->mesh->PrimitiveType();
+        if(!primType) primType = mesh.PrimitiveType();
         metrics.frame.numDrawCalls++;
         GL_CALL(glDrawElements(primType, numIndices, ToGLEnum<Mesh::Index>::ENUM, NULL));
         meshJob = meshJob->next;
@@ -625,7 +627,7 @@ static void Link(std::vector<R::RenderJob>& renderJobs) {
 
 static void Compile(R::RenderJob& rjob) {
     effectMgr.GetEffect(rjob.fx)->Compile();
-    rjob.mesh->R_Compile();
+    meshMgr.GetMesh(rjob.mesh).R_Compile();
 }
 
 static void Transform(const M::Matrix4& worldMat, R::RenderJob& rjob) {

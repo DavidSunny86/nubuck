@@ -6,50 +6,30 @@
 
 namespace R {
 
-    class MeshMgr {
-    private:
-        Mesh* _meshes;
-
-        SYS::SpinLock _mtx; // locks mesh list
-    public:
-        class MeshPtr {
-        private:
-            Mesh* _mesh;
-
-            void IncRef(void);
-            void DecRef(void);
-        public:
-            MeshPtr(void) : _mesh(NULL) { }
-            MeshPtr(Mesh* const mesh) : _mesh(mesh) { IncRef(); }
-            MeshPtr(const MeshPtr& other) : _mesh(other._mesh) { IncRef(); }
-            ~MeshPtr(void) { DecRef(); }
-
-            MeshPtr& operator=(const MeshPtr& other) {
-                if(&other != this) {
-                    DecRef();
-                    _mesh = other._mesh;
-                    IncRef();
-                }
-                return *this;
-            }
-
-            bool IsValid(void) const { return _mesh; }
-
-            Mesh*       operator->(void) { return _mesh; }
-            const Mesh* operator->(void) const { return _mesh; }
-
-        }; // class MeshPtr
-
-        MeshMgr(void) : _meshes(NULL) { }
-
-        MeshPtr Create(const Mesh::Desc& desc); // deep copy
-
-        void R_Update(void);
+class MeshMgr {
+private:
+    struct MeshLink {
+        MeshLink *prev, *next;
+        Mesh* mesh;
+        MeshLink(Mesh* const mesh) : prev(NULL), next(NULL), mesh(mesh) { }
     };
+    MeshLink*       _meshes;
+    SYS::SpinLock   _meshesMtx;
+public:
+    typedef MeshLink* meshPtr_t;
 
-    typedef MeshMgr::MeshPtr meshPtr_t;
+    MeshMgr(void) : _meshes(NULL) { }
 
-    extern MeshMgr meshMgr;
+    meshPtr_t Create(const Mesh::Desc& desc); // deep copy
+
+    const Mesh& GetMesh(meshPtr_t meshPtr) const { return *meshPtr->mesh; }
+    Mesh& GetMesh(meshPtr_t meshPtr) { return *meshPtr->mesh; }
+
+    // methods prefixed with R_ should only be called by the renderer
+    void R_Update(void) { }
+};
+
+extern MeshMgr meshMgr;
 
 } // namespace R
 

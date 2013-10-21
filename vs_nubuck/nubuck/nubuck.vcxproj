@@ -55,6 +55,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\mesh.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr_inl.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\plane\plane.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon_inl.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polyhedron\polyhedron.h" />
@@ -194,6 +195,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\cylinder\cylinder.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\mesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\meshmgr.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\plane\plane.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\polyhedron\polyhedron.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\quad\quad.cpp" />

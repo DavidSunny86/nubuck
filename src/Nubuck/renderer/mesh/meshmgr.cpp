@@ -3,39 +3,17 @@
 
 namespace R {
 
-    MeshMgr meshMgr;
+MeshMgr meshMgr;
 
-    MeshMgr::MeshPtr MeshMgr::Create(const Mesh::Desc& desc) {
-        Mesh* mesh = new Mesh(desc);
-        Mesh::MgrLink& link = mesh->mgrLink;
-        link.refCount = 0;
-
-        _mtx.Lock();
-        link.next = _meshes;
-        link.prev = NULL;
-        if(link.next) link.next->mgrLink.prev = mesh;
-        _meshes = mesh;
-        _mtx.Unlock();
-
-        return MeshPtr(mesh);
-    }
-
-    void MeshMgr::R_Update(void) {
-        _mtx.Lock();
-        Mesh *next, *it = _meshes;
-        while(it) {
-            Mesh::MgrLink& link = it->mgrLink;
-            next = link.next;
-            if(0 >= link.refCount) {
-                if(link.next) link.next->mgrLink.prev = link.prev;
-                if(link.prev) link.prev->mgrLink.next = link.next;
-                if(_meshes == it) _meshes = next;
-				it->R_Destroy();
-                delete it;
-            }
-            it = next;
-        }
-        _mtx.Unlock();
-    }
+MeshMgr::meshPtr_t MeshMgr::Create(const Mesh::Desc& desc) {
+    Mesh* mesh = new Mesh(desc);
+    MeshLink* link = new MeshLink(mesh);
+    _meshesMtx.Lock();
+    link->next = _meshes;
+    if(_meshes) _meshes->prev = link;
+    _meshes = link;
+    _meshesMtx.Unlock();
+    return link;
+}
 
 } // namespace R
