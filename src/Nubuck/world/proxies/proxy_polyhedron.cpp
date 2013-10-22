@@ -8,9 +8,9 @@ Polyhedron::Polyhedron(graph_t& G) {
 }
 
 void Polyhedron::Destroy(void) {
-    EV::Params_DestroyPolyhedron args;
+    EV::Params_DestroyEntity args;
     args.entId = _entId;
-    W::world.Send(EV::def_DestroyPolyhedron.Create(args));
+    W::world.Send(EV::def_DestroyEntity.Create(args));
     _entId = 0;
 }
 

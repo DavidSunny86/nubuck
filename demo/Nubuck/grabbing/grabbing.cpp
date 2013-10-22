@@ -2,6 +2,13 @@
 #include "globals.h"
 #include "phase0.h"
 
+static float ParaboloidHeightFunc(float x, float y) {
+    scalar_t rat_x(x);
+    scalar_t rat_y(y);
+    scalar_t z = 5 + (rat_x * rat_x + rat_y * rat_y) / 100 - scalar_t(1, 10);
+    return z.to_float();
+}
+
 class Algorithm : public IAlgorithm {
 private:
     Globals _globals;
@@ -16,10 +23,13 @@ public:
         // we are expected to copy these parameters
         _globals.nb = nubuck;
 
+        _globals.showParaboloid = false;
         _globals.showHull = false;
         _globals.showVoronoi = false;
         _globals.showVoronoiEdges = false;
 
+        _globals.paraboloid = _globals.nb.world->CreatePlaneMesh(8, 200.0f, ParaboloidHeightFunc, true);
+        _globals.paraboloid->SetVisible(_globals.showParaboloid);
 
         // project all nodes on xy-plane. scale, too
         _globals.nb.log->printf("Scaling points by factor %f.\n", 1000);

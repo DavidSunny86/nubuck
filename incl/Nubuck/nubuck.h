@@ -33,8 +33,17 @@ struct IPolyhedron {
     virtual void Update(void) = 0;
 };
 
+struct IMesh {
+    virtual ~IMesh(void) { }
+
+    virtual void SetVisible(bool isVisible) = 0;
+};
+
 struct IWorld {
-    virtual IPolyhedron* CreatePolyhedron(leda::GRAPH<leda::d3_rat_point, int>& G) = 0;
+    typedef float (*planeHeightFunc_t)(float x, float y);
+
+    virtual IPolyhedron*    CreatePolyhedron(leda::GRAPH<leda::d3_rat_point, int>& G) = 0;
+    virtual IMesh*          CreatePlaneMesh(int subdiv, float size, planeHeightFunc_t heightFunc, bool flip) = 0; 
 };
 
 struct ILog {

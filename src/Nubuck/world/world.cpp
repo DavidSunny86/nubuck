@@ -3,8 +3,10 @@
 
 #include <common\common.h>
 #include <algdriver\algdriver.h>
+#include <renderer\mesh\plane\plane.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include <world\proxies\proxy_polyhedron.h>
+#include <world\proxies\proxy_mesh.h>
 #include "entity.h"
 #include "world.h"
 
@@ -12,8 +14,10 @@
 
 ALLOC_EVENT_DEF(Apocalypse)
 ALLOC_EVENT_DEF(SpawnPolyhedron)
-ALLOC_EVENT_DEF(DestroyPolyhedron)
+ALLOC_EVENT_DEF(SpawnMesh)
+ALLOC_EVENT_DEF(DestroyEntity)
 ALLOC_EVENT_DEF(Rebuild)
+ALLOC_EVENT_DEF(SetVisible)
 ALLOC_EVENT_DEF(SetRenderFlags)
 ALLOC_EVENT_DEF(SetPickable)
 ALLOC_EVENT_DEF(SetNodeColor)
@@ -37,8 +41,10 @@ namespace W {
     BEGIN_EVENT_HANDLER(World)
         EVENT_HANDLER(EV::def_Apocalypse,           &World::Event_Apocalypse)
         EVENT_HANDLER(EV::def_SpawnPolyhedron,      &World::Event_SpawnPolyhedron)
-        EVENT_HANDLER(EV::def_DestroyPolyhedron,    &World::Event_DestroyPolyhedron)
+        EVENT_HANDLER(EV::def_SpawnMesh,            &World::Event_SpawnMesh)
+        EVENT_HANDLER(EV::def_DestroyEntity,        &World::Event_DestroyEntity)
         EVENT_HANDLER(EV::def_Rebuild,              &World::Event_Rebuild)
+        EVENT_HANDLER(EV::def_SetVisible,           &World::Event_SetVisible)
         EVENT_HANDLER(EV::def_SetRenderFlags,       &World::Event_SetRenderFlags)
         EVENT_HANDLER(EV::def_SetPickable,          &World::Event_SetPickable)
         EVENT_HANDLER(EV::def_SetNodeColor,         &World::Event_SetNodeColor)
@@ -92,22 +98,6 @@ namespace W {
         M::Matrix3 normalMat = M::Inverse(M::RotationOf(worldMat));
         return Transform(normalMat, t);
     }
-
-	static void AddRenderJobs(const ENT_Polyhedron* polyhedron) {
-        R::RenderList& _renderList = R::g_renderLists[rlIdx];
-		_renderList.jobs.insert(_renderList.jobs.end(),
-			polyhedron->renderList.jobs.begin(),
-			polyhedron->renderList.jobs.end());
-        _renderList.nodePositions.insert(_renderList.nodePositions.end(),
-            polyhedron->renderList.nodePositions.begin(),
-            polyhedron->renderList.nodePositions.end());
-        _renderList.nodeColors.insert(_renderList.nodeColors.end(),
-            polyhedron->renderList.nodeColors.begin(),
-            polyhedron->renderList.nodeColors.end());
-        _renderList.edges.insert(_renderList.edges.end(),
-            polyhedron->renderList.edges.begin(),
-            polyhedron->renderList.edges.end());
-	}
 
     void World::SetupLights(void) {
         R::Light light;
@@ -169,13 +159,15 @@ namespace W {
                 if(_isGrabbing) {
                     _isGrabbing = false;
 
-                    for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-                        ENT_Polyhedron& ph = *_polyhedrons[i];
-                        leda::node n;
-                        forall_nodes(n, *ph.G) {
-                            if(ph.selection.nodes[n->id()]) {
-                                const M::Vector3& p = ph.nodes.positions[n->id()];
-                                (*ph.G)[n] = point_t(leda::rational(p.x), leda::rational(p.y), leda::rational(p.z));
+                    for(unsigned i = 0; i < _entities.size(); ++i) {
+                        if(ENT_POLYHEDRON == _entities[i]->type) {
+                            ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                            leda::node n;
+                            forall_nodes(n, *ph.G) {
+                                if(ph.selection.nodes[n->id()]) {
+                                    const M::Vector3& p = ph.nodes.positions[n->id()];
+                                    (*ph.G)[n] = point_t(leda::rational(p.x), leda::rational(p.y), leda::rational(p.z));
+                                }
                             }
                         }
                     }
@@ -187,29 +179,35 @@ namespace W {
                 else _camArcball.StartDragging(args.x, args.y);
 
                 // pick faces
-                for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-                    ENT_Polyhedron& ph = *_polyhedrons[i];
-                    if(!ph.isPickable) continue;
-                    leda::edge hitFace = NULL;
-                    if(Polyhedron_RaycastFaces(ph, rayOrig, rayDir, hitFace)) {
-                        printf("hit face!\n");
-                    } else printf("no face hit\n");
+                for(unsigned i = 0; i < _entities.size(); ++i) {
+                    if(ENT_POLYHEDRON == _entities[i]->type) {
+                        ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                        if(!ph.isPickable) continue;
+                        leda::edge hitFace = NULL;
+                        if(Polyhedron_RaycastFaces(ph, rayOrig, rayDir, hitFace)) {
+                            printf("hit face!\n");
+                        } else printf("no face hit\n");
+                    }
                 }
             }
             if(EV::Params_Mouse::BUTTON_RIGHT == args.button) {
                 if(_isGrabbing) {
-                    for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-                        ENT_Polyhedron& ph = *_polyhedrons[i];
-                        ph.nodes.positions = ph.nodes.oldPositions;
+                    for(unsigned i = 0; i < _entities.size(); ++i) {
+                        if(ENT_POLYHEDRON == _entities[i]->type) {
+                            ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                            ph.nodes.positions = ph.nodes.oldPositions;
+                        }
                     }
                     // update
-                    for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-                        ENT_Polyhedron& ph = *_polyhedrons[i];
-                        leda::node n;
-                        forall_nodes(n, *ph.G) {
-                            if(ph.selection.nodes[n->id()]) {
-                                const M::Vector3& p = ph.nodes.positions[n->id()];
-                                (*ph.G)[n] = point_t(leda::rational(p.x), leda::rational(p.y), leda::rational(p.z));
+                    for(unsigned i = 0; i < _entities.size(); ++i) {
+                        if(ENT_POLYHEDRON == _entities[i]->type) {
+                            ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                            leda::node n;
+                            forall_nodes(n, *ph.G) {
+                                if(ph.selection.nodes[n->id()]) {
+                                    const M::Vector3& p = ph.nodes.positions[n->id()];
+                                    (*ph.G)[n] = point_t(leda::rational(p.x), leda::rational(p.y), leda::rational(p.z));
+                                }
                             }
                         }
                     }
@@ -218,14 +216,16 @@ namespace W {
                     _isGrabbing = false;
                 } else _camArcball.StartPanning(args.x, args.y);
 
-                for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-                    leda::node hitNode = NULL;
-                    ENT_Polyhedron& ph = *_polyhedrons[i];
-                    if(!ph.isPickable) continue;
-                    if(Polyhedron_RaycastNodes(ph, rayOrig, rayDir, hitNode)) {
-                        printf("Hit!\n");
-                        ph.selection.nodes[hitNode->id()] = !ph.selection.nodes[hitNode->id()];
-                    } else printf("No hit...\n");
+                for(unsigned i = 0; i < _entities.size(); ++i) {
+                    if(ENT_POLYHEDRON == _entities[i]->type) {
+                        ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                        leda::node hitNode = NULL;
+                        if(!ph.isPickable) continue;
+                        if(Polyhedron_RaycastNodes(ph, rayOrig, rayDir, hitNode)) {
+                            printf("Hit!\n");
+                            ph.selection.nodes[hitNode->id()] = !ph.selection.nodes[hitNode->id()];
+                        } else printf("No hit...\n");
+                    }
                 }
             }
         }
@@ -253,79 +253,113 @@ namespace W {
         }
     }
 
-    ENT_Polyhedron* World::FindByEntityID(unsigned entId) {
-        for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-            if(_polyhedrons[i]->entId == entId) return _polyhedrons[i];
+    GEN::Pointer<World::Entity> World::FindByEntityID(unsigned entId) {
+        for(unsigned i = 0; i < _entities.size(); ++i) {
+            if(_entities[i]->entId == entId) return _entities[i];
         }
-        return NULL;
+        return GEN::Pointer<World::Entity>();
     }
         
     void World::Event_Apocalypse(const EV::Event& event) {
-        _polyhedrons.clear();
+        _entities.clear();
     }
 
     void World::Event_SpawnPolyhedron(const EV::Event& event) {
         const EV::Params_SpawnPolyhedron& args = EV::def_SpawnPolyhedron.GetArgs(event);
+        GEN::Pointer<Entity> entity(new Entity());
+        entity->type = ENT_POLYHEDRON;
+        entity->entId = args.entId;
         ENT_Polyhedron* ph = new ENT_Polyhedron();
-        ph->entId = args.entId;
-        ph->G =     args.G;
+        ph->G = args.G;
         Polyhedron_Init(*ph);
         Polyhedron_Rebuild(*ph);
         Polyhedron_Update(*ph);
-        _polyhedrons.push_back(ph);
+        entity->polyhedron = ph;
+        _entities.push_back(entity);
     }
 
-    void World::Event_DestroyPolyhedron(const EV::Event& event) {
-        const EV::Params_DestroyPolyhedron& args = EV::def_DestroyPolyhedron.GetArgs(event);
-        for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-            if(_polyhedrons[i]->entId == args.entId) {
-                std::swap(_polyhedrons[i], _polyhedrons.back());
-                _polyhedrons.erase(_polyhedrons.end() - 1);
+    void World::Event_SpawnMesh(const EV::Event& event) {
+        const EV::Params_SpawnMesh& args = EV::def_SpawnMesh.GetArgs(event);
+        GEN::Pointer<Entity> entity(new Entity());
+        entity->type = ENT_MESH;
+        entity->entId = args.entId;
+        ENT_Mesh* mesh = new ENT_Mesh();
+        Mesh_Init(*mesh, args.meshPtr);
+        entity->mesh = mesh;
+        _entities.push_back(entity);
+    }
+
+    void World::Event_DestroyEntity(const EV::Event& event) {
+        const EV::Params_DestroyEntity& args = EV::def_DestroyEntity.GetArgs(event);
+        for(unsigned i = 0; i < _entities.size(); ++i) {
+            if(_entities[i]->entId == args.entId && ENT_POLYHEDRON == _entities[i]->type) {
+                std::swap(_entities[i], _entities.back());
+                _entities.erase(_entities.end() - 1);
             }
         }
     }
 
     void World::Event_Rebuild(const EV::Event& event) {
         const EV::Params_Rebuild& args = EV::def_Rebuild.GetArgs(event);
-        ENT_Polyhedron* ph = FindByEntityID(args.entId);
-        if(ph) {
-            Polyhedron_Rebuild(*ph);
-            Polyhedron_Update(*ph);
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
+            ENT_Polyhedron& ph = *entity->polyhedron;
+            Polyhedron_Rebuild(ph);
+            Polyhedron_Update(ph);
+        }
+    }
+
+    void World::Event_SetVisible(const EV::Event& event) {
+        const EV::Params_SetVisible& args = EV::def_SetVisible.GetArgs(event);
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        if(entity.IsValid() && ENT_MESH == entity->type) {
+            ENT_Mesh& mesh = *entity->mesh;
+            mesh.isVisible = args.isVisible;
         }
     }
 
     void World::Event_SetRenderFlags(const EV::Event& event) {
         const EV::Params_SetRenderFlags& args = EV::def_SetRenderFlags.GetArgs(event);
-        ENT_Polyhedron* ph = FindByEntityID(args.entId);
-        if(ph) ph->renderFlags = args.flags;
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
+            ENT_Polyhedron& ph = *entity->polyhedron;
+            ph.renderFlags = args.flags;
+        }
     }
 
     void World::Event_SetPickable(const EV::Event& event) {
         const EV::Params_SetPickable& args = EV::def_SetPickable.GetArgs(event);
-        ENT_Polyhedron* ph = FindByEntityID(args.entId);
-        if(ph) ph->isPickable = args.isPickable;
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
+            ENT_Polyhedron& ph = *entity->polyhedron;
+            ph.isPickable = args.isPickable;
+        }
     }
 
     void World::Event_SetNodeColor(const EV::Event& event) {
         const EV::Params_SetNodeColor& args = EV::def_SetNodeColor.GetArgs(event);
-        ENT_Polyhedron* ph = FindByEntityID(args.entId);
-        if(ph) {
-            ph->nodes.colors[args.node->id()] = args.color;
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
+            ENT_Polyhedron& ph = *entity->polyhedron;
+            ph.nodes.colors[args.node->id()] = args.color;
         }
     }
 
     void World::Event_SetFaceColor(const EV::Event& event) {
         const EV::Params_SetFaceColor& args = EV::def_SetFaceColor.GetArgs(event);
-        ENT_Polyhedron* ph = FindByEntityID(args.entId);
-        /*
-        PolyhedronHullFaceList& face = ph.hull.faceLists[ph.hull.edges[args->edge->id()].faceIdx];
-        for(unsigned i = 0; i < face.size; ++i) {
-            ph.hull.vertices[face.base + i].color = args->color;
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
+            /*
+            PolyhedronHullFaceList& face = ph.hull.faceLists[ph.hull.edges[args->edge->id()].faceIdx];
+            for(unsigned i = 0; i < face.size; ++i) {
+                ph.hull.vertices[face.base + i].color = args->color;
+            }
+            Polyhedron_Update(ph);
+            */
+            // Polyhedron_AddCurve(ph, args->edge, args->color);
+            ENT_Polyhedron& ph = *entity->polyhedron;
+            Polyhedron_SetFaceColor(ph, args.edge, args.color);
         }
-        Polyhedron_Update(ph);
-        */
-        // Polyhedron_AddCurve(ph, args->edge, args->color);
-        Polyhedron_SetFaceColor(*ph, args.edge, args.color);
     }
 
     void World::Event_Resize(const EV::Event& event) {
@@ -344,9 +378,12 @@ namespace W {
                 _grabPivot.y = mouseY;
                 _isGrabbing = true;
 
-                for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-                    ENT_Polyhedron& ph = *_polyhedrons[i];
-                    ph.nodes.oldPositions = ph.nodes.positions;
+
+                for(unsigned i = 0; i < _entities.size(); ++i) {
+                    if(ENT_POLYHEDRON == _entities[i]->type) {
+                        ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                        ph.nodes.oldPositions = ph.nodes.positions;
+                    }
                 }
             } else _isGrabbing = false;
         }
@@ -378,6 +415,19 @@ namespace W {
         return entId;
 	}
 
+    unsigned World::SpawnMesh(R::MeshMgr::meshPtr_t meshPtr) {
+        entIdCntMtx.Lock();
+        unsigned entId = entIdCnt++;
+        entIdCntMtx.Unlock();
+
+        EV::Params_SpawnMesh args;
+        args.entId      = entId;
+        args.meshPtr    = meshPtr;
+        Send(EV::def_SpawnMesh.Create(args));
+
+        return entId;
+    }
+
     void World::Update(void) {
         _secsPassed = _timer.Stop();
         _timePassed += _secsPassed;
@@ -400,50 +450,68 @@ namespace W {
             M::TryInvert(_camArcball.GetWorldMatrix(), invWorld);
             const M::Vector3 rayOrig = M::Transform(invWorld, M::Vector3::Zero);
 
-            for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-                ENT_Polyhedron& ph = *_polyhedrons[i];
-                unsigned numNodes = ph.nodes.positions.size();
-                for(unsigned j = 0; j < numNodes; ++j) {
-                    if(ph.selection.nodes[j]) {
-                        const M::Vector3 p = ph.nodes.oldPositions[j] + X * dx + Y * dy;
-                        const M::Vector3 rayDir = p - rayOrig;
-                        assert(0.0f != rayOrig.z - p.z);
-                        float t = rayOrig.z / (rayOrig.z - p.z);
-                        M::Vector3 q = rayOrig + t * rayDir;
-                        q.z = 0.0f;
-                        // assert(M::AlmostEqual(q.z, 0.0f));
-                        ph.nodes.positions[j] = q;
-                        printf("q = (%f, %f, %f)\n", q.x, q.y, q.z);
-                        // ph.nodes.positions[j] = ph.nodes.oldPositions[j] + M::Vector3(1.0f, 0.0f, 0.0f) * dx + M::Vector3(0.0f, 1.0f, 0.0f) * dy;
+            for(unsigned i = 0; i < _entities.size(); ++i) {
+                if(ENT_POLYHEDRON == _entities[i]->type) {
+                    ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                    unsigned numNodes = ph.nodes.positions.size();
+                    for(unsigned j = 0; j < numNodes; ++j) {
+                        if(ph.selection.nodes[j]) {
+                            const M::Vector3 p = ph.nodes.oldPositions[j] + X * dx + Y * dy;
+                            const M::Vector3 rayDir = p - rayOrig;
+                            assert(0.0f != rayOrig.z - p.z);
+                            float t = rayOrig.z / (rayOrig.z - p.z);
+                            M::Vector3 q = rayOrig + t * rayDir;
+                            q.z = 0.0f;
+                            // assert(M::AlmostEqual(q.z, 0.0f));
+                            ph.nodes.positions[j] = q;
+                            printf("q = (%f, %f, %f)\n", q.x, q.y, q.z);
+                            // ph.nodes.positions[j] = ph.nodes.oldPositions[j] + M::Vector3(1.0f, 0.0f, 0.0f) * dx + M::Vector3(0.0f, 1.0f, 0.0f) * dy;
+                        }
                     }
                 }
             }
 
             // update
-            for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-                ENT_Polyhedron& ph = *_polyhedrons[i];
-                leda::node n;
-                forall_nodes(n, *ph.G) {
-                    if(ph.selection.nodes[n->id()]) {
-                        const M::Vector3& p = ph.nodes.positions[n->id()];
-                        (*ph.G)[n] = point_t(leda::rational(p.x), leda::rational(p.y), leda::rational(p.z));
+            for(unsigned i = 0; i < _entities.size(); ++i) {
+                if(ENT_POLYHEDRON == _entities[i]->type) {
+                    ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                    leda::node n;
+                    forall_nodes(n, *ph.G) {
+                        if(ph.selection.nodes[n->id()]) {
+                            const M::Vector3& p = ph.nodes.positions[n->id()];
+                            (*ph.G)[n] = point_t(leda::rational(p.x), leda::rational(p.y), leda::rational(p.z));
+                        }
                     }
                 }
             }
             ALG::gs_algorithm.GetPhase()->OnNodesMoved();
         } // if(isGrabbing)
 
-        for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-            for(unsigned j = 0; j < _polyhedrons[i]->hull.curves.size(); ++j)
-                Polyhedron_UpdateCurve(_polyhedrons[i]->hull.curves[j], _secsPassed);
+        for(unsigned i = 0; i < _entities.size(); ++i) {
+            if(ENT_POLYHEDRON == _entities[i]->type) {
+                ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                for(unsigned j = 0; j < ph.hull.curves.size(); ++j)
+                    Polyhedron_UpdateCurve(ph.hull.curves[j], _secsPassed);
+            }
         }
 
-        for(unsigned i = 0; i < _polyhedrons.size(); ++i) {
-            Polyhedron_UpdateFaceColors(*_polyhedrons[i], _secsPassed);
+        for(unsigned i = 0; i < _entities.size(); ++i) {
+            if(ENT_POLYHEDRON == _entities[i]->type) {
+                ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                Polyhedron_UpdateFaceColors(ph, _secsPassed);
+            }
         }
 
-        for(unsigned i = 0; i < _polyhedrons.size(); ++i)
-            Polyhedron_BuildRenderList(*_polyhedrons[i]);
+        for(unsigned i = 0; i < _entities.size(); ++i) {
+            if(ENT_POLYHEDRON == _entities[i]->type) {
+                ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                Polyhedron_BuildRenderList(ph);
+            }
+            if(ENT_MESH == _entities[i]->type) {
+                ENT_Mesh& mesh = *_entities[i]->mesh;
+                Mesh_BuildRenderList(mesh);
+            }
+        }
 
         R::RenderList& _renderList = R::g_renderLists[rlIdx];
         _renderList.worldMat = _camArcball.GetWorldMatrix();
@@ -451,8 +519,30 @@ namespace W {
         _renderList.nodePositions.clear();
         _renderList.nodeColors.clear();
         _renderList.edges.clear();
-		std::for_each(_polyhedrons.begin(), _polyhedrons.end(),
-			std::bind(AddRenderJobs, std::placeholders::_1));
+
+        for(unsigned i = 0; i < _entities.size(); ++i) {
+            if(ENT_POLYHEDRON == _entities[i]->type) {
+                ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                _renderList.jobs.insert(_renderList.jobs.end(),
+                    ph.renderList.jobs.begin(),
+                    ph.renderList.jobs.end());
+                _renderList.nodePositions.insert(_renderList.nodePositions.end(),
+                    ph.renderList.nodePositions.begin(),
+                    ph.renderList.nodePositions.end());
+                _renderList.nodeColors.insert(_renderList.nodeColors.end(),
+                    ph.renderList.nodeColors.begin(),
+                    ph.renderList.nodeColors.end());
+                _renderList.edges.insert(_renderList.edges.end(),
+                    ph.renderList.edges.begin(),
+                    ph.renderList.edges.end());
+            }
+            if(ENT_MESH == _entities[i]->type) {
+                ENT_Mesh& mesh = *_entities[i]->mesh;
+                _renderList.jobs.insert(_renderList.jobs.end(),
+                    mesh.renderList.jobs.begin(),
+                    mesh.renderList.jobs.end());
+            }
+        }
 
         g_worldSem.Signal();
         R::g_rendererSem.Wait();
@@ -461,6 +551,12 @@ namespace W {
 
     IPolyhedron* World::CreatePolyhedron(graph_t& G) {
         return new Proxy::Polyhedron(G);
+    }
+
+    IMesh* World::CreatePlaneMesh(int subdiv, float size, planeHeightFunc_t heightFunc, bool flip) {
+        R::Plane plane(subdiv, size, heightFunc, flip);
+        unsigned entId = SpawnMesh(R::meshMgr.Create(plane.GetDesc()));
+        return new Proxy::Mesh(entId);
     }
 
     DWORD World::Thread_Func(void) {

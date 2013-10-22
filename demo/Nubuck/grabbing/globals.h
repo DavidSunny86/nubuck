@@ -16,6 +16,7 @@ struct Globals {
 
     leda::node_map<leda::node> nmap;
 
+    bool showParaboloid;
     bool showHull;
     bool showVoronoi;
     bool showVoronoiEdges;
@@ -23,6 +24,8 @@ struct Globals {
     leda::GRAPH<leda::rat_point, int> grVoronoiTri;
     leda::node_array<Color> colors;
     leda::edge_map<leda::edge> emap;
+
+    IMesh*          paraboloid;
 
     graph_t         grNodes;
     graph_t         grHull;

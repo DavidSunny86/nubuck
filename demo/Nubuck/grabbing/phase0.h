@@ -115,5 +115,9 @@ struct Phase0 : IPhase {
                 Colorize();
             }
         }
+        if('P' == c) {
+            g.showParaboloid = !g.showParaboloid;
+            g.paraboloid->SetVisible(g.showParaboloid);
+        }
     }
 };

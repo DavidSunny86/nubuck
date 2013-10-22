@@ -15,6 +15,7 @@
 #include <renderer\renderer.h>
 #include <camera\arcball_camera.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
+#include <world\entities\ent_mesh\ent_mesh.h>
 #include <world\events\events.h>
 
 #pragma region EventDefinitions
@@ -27,12 +28,22 @@ BEGIN_EVENT_DEF(SpawnPolyhedron)
     graph_t*    G;
 END_EVENT_DEF
 
-BEGIN_EVENT_DEF(DestroyPolyhedron)
+BEGIN_EVENT_DEF(SpawnMesh)
+    unsigned                entId;
+    R::MeshMgr::meshPtr_t   meshPtr;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(DestroyEntity)
     unsigned    entId;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(Rebuild)
     unsigned    entId;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(SetVisible)
+    unsigned    entId;
+    bool        isVisible;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(SetRenderFlags)
@@ -92,7 +103,20 @@ namespace W {
     class World : public IWorld, public SYS::Thread, public EV::EventHandler<World> {
         DECLARE_EVENT_HANDLER(World)
     private:
-		std::vector<ENT_Polyhedron*> _polyhedrons;
+        enum EntityType {
+            ENT_POLYHEDRON  = 0,
+            ENT_MESH
+        };
+
+        struct Entity {
+            EntityType      type;
+            unsigned        entId;
+
+            ENT_Polyhedron* polyhedron;
+            ENT_Mesh*       mesh;
+        };
+
+        std::vector<GEN::Pointer<Entity> > _entities;
 
         SYS::Timer  _timer;
         float       _secsPassed;
@@ -102,7 +126,7 @@ namespace W {
 
         ArcballCamera _camArcball;
 
-        ENT_Polyhedron* FindByEntityID(unsigned entId);
+        GEN::Pointer<Entity> FindByEntityID(unsigned entId);
 
         bool        _isGrabbing;
         M::Vector3  _grabPivot;
@@ -110,8 +134,10 @@ namespace W {
 #pragma region EventHandlers
         void Event_Apocalypse(const EV::Event& event);
         void Event_SpawnPolyhedron(const EV::Event& event);
-        void Event_DestroyPolyhedron(const EV::Event& event);
+        void Event_SpawnMesh(const EV::Event& event);
+        void Event_DestroyEntity(const EV::Event& event);
         void Event_Rebuild(const EV::Event& event);
+        void Event_SetVisible(const EV::Event& event);
         void Event_SetRenderFlags(const EV::Event& event);
         void Event_SetPickable(const EV::Event& event);
         void Event_SetNodeColor(const EV::Event& event);
@@ -125,11 +151,13 @@ namespace W {
 		World(void);
 
 		unsigned SpawnPolyhedron(graph_t* const G);
+        unsigned SpawnMesh(R::MeshMgr::meshPtr_t meshPtr);
 
         void Update(void);
 
         // exported to client
         IPolyhedron* CreatePolyhedron(graph_t& G) override;
+        IMesh* CreatePlaneMesh(int subdiv, float size, planeHeightFunc_t heightFunc, bool flip) override;
 
         // thread interface
         DWORD Thread_Func(void);
