@@ -15,7 +15,7 @@ void Mesh_BuildRenderList(ENT_Mesh& mesh) {
     mesh.renderList.jobs.clear();
     if(mesh.isVisible) {
         R::RenderJob rjob;
-        rjob.fx         = "LitDirectional";
+        rjob.fx         = "LitDirectionalTransparent";
         rjob.material   = R::Material::White;
         rjob.mesh       = mesh.meshPtr;
         rjob.primType   = 0;

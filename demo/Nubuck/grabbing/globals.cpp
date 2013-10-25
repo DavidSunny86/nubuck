@@ -190,7 +190,7 @@ void Triangulate(const leda::GRAPH<leda::rat_point, leda::rat_segment>& in, leda
     forall_edges(e, out) {
         bool outerFace = true;
         forall_nodes(n, out) {
-            if(0 < leda::left_turn(out[leda::source(e)], out[leda::target(e)], out[n]))
+            if(leda::left_turn(out[leda::source(e)], out[leda::target(e)], out[n]))
                 outerFace = false;
         }
         if(outerFace && !visited[e]) num++;

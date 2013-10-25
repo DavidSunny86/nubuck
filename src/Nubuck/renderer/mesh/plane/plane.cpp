@@ -10,6 +10,8 @@ static bool IsValidGridPos(int i, int j, int N) {
 Plane::Plane(int subdiv, float size, heightFunc_t heightFunc, bool flip) {
     int N = 1 + (1 << subdiv);
 
+    common.printf("INFO - creating plane mesh with %d vertices.\n", N * N);
+
     Mesh::Vertex defaultVert;
     defaultVert.color = Color::White;
     defaultVert.normal = M::Vector3::Zero;

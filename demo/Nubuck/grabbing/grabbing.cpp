@@ -28,7 +28,7 @@ public:
         _globals.showVoronoi = false;
         _globals.showVoronoiEdges = false;
 
-        _globals.paraboloid = _globals.nb.world->CreatePlaneMesh(8, 200.0f, ParaboloidHeightFunc, true);
+        _globals.paraboloid = _globals.nb.world->CreatePlaneMesh(5, 200.0f, ParaboloidHeightFunc, true);
         _globals.paraboloid->SetVisible(_globals.showParaboloid);
 
         // project all nodes on xy-plane. scale, too

@@ -16,4 +16,20 @@ MeshMgr::meshPtr_t MeshMgr::Create(const Mesh::Desc& desc) {
     return link;
 }
 
+void MeshMgr::R_Update(void) {
+    MeshLink *next, *it = _meshes;
+    while(it) {
+        next = it->next;
+        if(it->destroy) {
+            if(it->next) it->next->prev = it->prev;
+            if(it->prev) it->prev->next = it->next;
+            if(_meshes == it) _meshes = it->next;
+            assert(it->mesh);
+            delete it->mesh;
+            delete it;
+        }
+        it = next;
+    }
+}
+
 } // namespace R

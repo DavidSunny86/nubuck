@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <common\common.h>
 
 #include <generic\pointer.h>
@@ -8,6 +10,7 @@
 #include <renderer\glew\glew.h>
 #include <math\vector3.h>
 #include <math\vector2.h>
+#include <math\matrix4.h>
 #include <renderer\color\color.h>
 #include <renderer\mesh\staticbuffer.h>
 #include <system\locks\spinlock.h>
@@ -42,32 +45,36 @@ public:
 
         Desc(void) : vertices(NULL), numVertices(0), indices(NULL), numIndices(0), primType(0) { }
     };
+
+    struct TriIndices {
+        Mesh::Index indices[3];
+    };
+
+    struct Triangle {
+        float dist;
+        TriIndices bufIndices;
+    };
 private:
     SYS::SpinLock _mtx;
 
     Desc _desc;
-
-    GEN::Pointer<StaticBuffer> _vertexBuffer;
-    GEN::Pointer<StaticBuffer> _indexBuffer;
     bool _compiled;
 
-    float _radius; // of bounding sphere
+    std::vector<TriIndices> _triangleIndices;
+
+    unsigned _gbHandle;
 public:
     Mesh(const Desc& desc); // deep copy
     ~Mesh(void);
 
-    unsigned NumIndices(void) const { return _desc.numIndices; }
-    GLenum PrimitiveType(void) const { return _desc.primType; }
-
-    float Radius(void) const { COM_assert(_compiled); return _radius; }
+    void AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye, const M::Matrix4& worldMat); // eye in mesh local space
 
     // assumes number of vertices and indices is constant
-    void Invalidate(const Mesh::Vertex* const vertices);
+    void Invalidate(Mesh::Vertex* const vertices);
 
     // methods prefixed with R_ should only be called by the renderer
+    void R_Touch(void);
     void R_Compile(void);
-    void R_Bind(void);
-    void R_Destroy(void); // destroys gpu buffers
 };
 
 } // namespace R

@@ -44,6 +44,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\effect.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\effectmgr.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\pass.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\glcall.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glxew.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\effect.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\effectmgr.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\pass.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c" />
     <ClCompile Include="..\..\src\Nubuck\renderer\material\material.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\bezier\bezier.cpp" />

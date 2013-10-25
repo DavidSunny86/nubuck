@@ -19,6 +19,7 @@ namespace R {
         pass0.flags = 0;
 
         fx.name = "Default";
+        fx.sortKey = 0;
         fx.passes.push_back(pass0);
 		effectMgr.Register(fx);
         fx.passes.clear();
@@ -35,6 +36,7 @@ namespace R {
         pass0.flags = 0;
 
         fx.name = "NodeBillboard";
+        fx.sortKey = 0;
         fx.passes.push_back(pass0);
 		effectMgr.Register(fx);
         fx.passes.clear();
@@ -51,6 +53,7 @@ namespace R {
         pass0.flags = 0;
 
         fx.name = "EdgeBillboard";
+        fx.sortKey = 0;
         fx.passes.push_back(pass0);
 		effectMgr.Register(fx);
         fx.passes.clear();
@@ -68,6 +71,7 @@ namespace R {
         pass0.flags = USE_MATERIAL;
 
         fx.name = "Wireframe";
+        fx.sortKey = 0;
         fx.passes.push_back(pass0);
         effectMgr.Register(fx);
         fx.passes.clear();
@@ -85,6 +89,7 @@ namespace R {
         pass0.flags = 0;
 
         fx.name = "GenericWireframe";
+        fx.sortKey = 0;
         fx.passes.push_back(pass0);
         effectMgr.Register(fx);
         fx.passes.clear();
@@ -103,6 +108,7 @@ namespace R {
         pass0.flags = USE_TEX_DIFFUSE | USE_MATERIAL;
 
         fx.name = "TexDiffuse";
+        fx.sortKey = 0;
         fx.passes.push_back(pass0);
         effectMgr.Register(fx);
         fx.passes.clear();
@@ -121,6 +127,7 @@ namespace R {
         pass0.flags = USE_TEX_DIFFUSE | USE_TIME | USE_MATERIAL;
 
         fx.name = "FaceRing";
+        fx.sortKey = 0;
         fx.passes.push_back(pass0);
         effectMgr.Register(fx);
         fx.passes.clear();
@@ -137,6 +144,28 @@ namespace R {
         pass0.flags = 0;
 
         fx.name = "LitDirectional";
+        fx.sortKey = 0;
+        fx.passes.push_back(pass0);
+		effectMgr.Register(fx);
+        fx.passes.clear();
+
+        // LitDirectionalTransparent Effect
+        // uses renderList.dirLights only, transparency
+
+        pass0.name = "Pass0";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\lit_directional.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\lit_directional.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.state.blend.enabled = true;
+        pass0.state.blend.srcFactor = GL_SRC_ALPHA;
+        pass0.state.blend.dstFactor = GL_ONE_MINUS_SRC_ALPHA;
+        // pass0.state.depth.maskEnabled = GL_FALSE;
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "LitDirectionalTransparent";
+        fx.sortKey = 1;
         fx.passes.push_back(pass0);
 		effectMgr.Register(fx);
         fx.passes.clear();
@@ -164,8 +193,8 @@ namespace R {
         pass1.state.blend.enabled = GL_TRUE;
         pass1.state.blend.srcFactor = GL_SRC_ALPHA;
         pass1.state.blend.dstFactor = GL_ONE_MINUS_SRC_ALPHA;
-        pass1.state.depth.maskEnabled = GL_FALSE;
-        pass1.state.depth.func = GL_EQUAL;
+        pass2.state.depth.maskEnabled = GL_FALSE;
+        pass2.state.depth.func = GL_EQUAL;
         pass1.type = FIRST_LIGHT_PASS;
         pass1.flags = 0;
 
@@ -183,6 +212,7 @@ namespace R {
         pass2.flags = 0;
 
         fx.name = "Lit";
+        fx.sortKey = 0;
         fx.passes.push_back(pass0);
         fx.passes.push_back(pass1);
         fx.passes.push_back(pass2);

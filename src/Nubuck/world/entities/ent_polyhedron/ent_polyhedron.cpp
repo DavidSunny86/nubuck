@@ -29,8 +29,9 @@ void Polyhedron_InitResources(void) {
 }
 
 void Polyhedron_Init(ENT_Polyhedron& ph) { 
-    ph.renderFlags = 0;
-    ph.isPickable = false;
+    ph.renderFlags  = 0;
+    ph.isPickable   = false;
+    ph.hull.mesh    = NULL;
 }
 
 static void Polyhedron_RebuildSelection(ENT_Polyhedron& ph) {
@@ -137,18 +138,23 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
     }
 #endif
 
+    if(ph.hull.mesh) R::meshMgr.Destroy(ph.hull.mesh);
+    ph.hull.mesh = NULL;
+
     if(!ph.hull.indices.empty() /* ie. hull exists */) {
         R::Mesh::Vertex vert;
         vert.position = M::Vector3::Zero;
         vert.color = defaultFaceColor;
         ph.hull.vertices.resize(ph.hull.indices.size(), vert);
+        for(unsigned i = 0; i < ph.hull.vnmap.size() /* ie. number of vertices */; ++i)
+            ph.hull.vertices[i].position = ph.nodes.positions[ph.hull.vnmap[i]];
 
         R::Mesh::Desc desc;
         desc.vertices = &ph.hull.vertices[0];
         desc.numVertices = ph.hull.vertices.size();
         desc.indices = &ph.hull.indices[0];
         desc.numIndices = ph.hull.indices.size();
-        desc.primType = 0;
+        desc.primType = GL_TRIANGLE_FAN;
         ph.hull.mesh = R::meshMgr.Create(desc);
     }
 }
@@ -266,7 +272,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
         if(!ph.hull.indices.empty() /* ie. hull exists */) {
             renderJob.material = R::Material::White;
             renderJob.mesh = ph.hull.mesh;
-            renderJob.primType = GL_TRIANGLE_FAN;
+            renderJob.primType = 0;
             renderJob.transform = M::Mat4::Identity();
             ph.renderList.jobs.push_back(renderJob);
         }

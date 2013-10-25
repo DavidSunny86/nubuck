@@ -17,6 +17,7 @@
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\material\material.h>
 #include <renderer\metrics\metrics.h>
+#include <renderer\giantbuffer\giant_buffer.h>
 #include "renderer.h"
 #include <world\world.h>
 
@@ -558,7 +559,7 @@ void Renderer::Init(void) {
     glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
     glClearDepth(1.0f);
     glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);
@@ -573,24 +574,43 @@ void Renderer::Resize(int width, int height) {
     _aspect = (float)width / height;
 }
 
+static bool Cmp_Dist(const Mesh::Triangle& lhp, const Mesh::Triangle& rhp) {
+    return lhp.dist > rhp.dist;
+}
+
 static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const M::Matrix4& worldMat, RenderJob* first) {
+    M::Matrix4 invWorld;
+    M::TryInvert(worldMat, invWorld);
+    M::Vector3 localEye = M::Transform(invWorld, M::Vector3::Zero);
+    std::vector<Mesh::Triangle> tris;
+    std::vector<Mesh::Index> indices;
     RenderJob* meshJob = first;
     while(meshJob && meshJob->fx == first->fx) {
         Mesh& mesh = meshMgr.GetMesh(meshJob->mesh);
-        mesh.R_Bind();
-        BindVertices();
-        unsigned numIndices = mesh.NumIndices();
-        GLenum primType = meshJob->primType;
-        if(!primType) primType = mesh.PrimitiveType();
-        metrics.frame.numDrawCalls++;
-        GL_CALL(glDrawElements(primType, numIndices, ToGLEnum<Mesh::Index>::ENUM, NULL));
+        mesh.AppendTriangles(tris, localEye, worldMat);
         meshJob = meshJob->next;
     }
+    std::sort(tris.begin(), tris.end(), Cmp_Dist);    
+    for(unsigned i = 0; i < tris.size(); ++i) {
+        indices.push_back(tris[i].bufIndices.indices[0]);
+        indices.push_back(tris[i].bufIndices.indices[1]);
+        indices.push_back(tris[i].bufIndices.indices[2]);
+    }
+    BindVertices();
+    glCullFace(GL_FRONT);
+    GL_CALL(glDrawElements(GL_TRIANGLES, indices.size(), ToGLEnum<Mesh::Index>::ENUM, &indices[0]));
+    metrics.frame.numDrawCalls++;
+    glCullFace(GL_BACK);
+    GL_CALL(glDrawElements(GL_TRIANGLES, indices.size(), ToGLEnum<Mesh::Index>::ENUM, &indices[0]));
+    metrics.frame.numDrawCalls++;
     return meshJob;
 }
 
 static void DrawFrame(RenderList& renderList, const M::Matrix4& projectionMat, float time) {
     if(renderList.jobs.empty()) return;
+
+    GB_Bind();
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     RenderJob* cur = &renderList.jobs[0];
     RenderJob* next = NULL;
@@ -614,6 +634,10 @@ static void DrawFrame(RenderList& renderList, const M::Matrix4& projectionMat, f
     }
 }
 
+static bool CompareJobs(const R::RenderJob& lhp, const R::RenderJob& rhp) {
+    return effectMgr.GetEffect(lhp.fx)->SortKey() < effectMgr.GetEffect(rhp.fx)->SortKey();
+}
+
 static void Link(std::vector<R::RenderJob>& renderJobs) {
     unsigned numJobs = renderJobs.size();
 	if(0 < numJobs) {
@@ -628,6 +652,7 @@ static void Link(std::vector<R::RenderJob>& renderJobs) {
 static void Compile(R::RenderJob& rjob) {
     effectMgr.GetEffect(rjob.fx)->Compile();
     meshMgr.GetMesh(rjob.mesh).R_Compile();
+    meshMgr.GetMesh(rjob.mesh).R_Touch();
 }
 
 static void Transform(const M::Matrix4& worldMat, R::RenderJob& rjob) {
@@ -675,15 +700,10 @@ void Renderer::Render(void) {
 
         metrics.frame.numDrawCalls = 0;
 
-        Link(renderList.jobs);
-        std::for_each(renderList.jobs.begin(), renderList.jobs.end(),
-            std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
 
         M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, renderList.jobs);
 
         Uniforms_Update(projectionMat, renderList.worldMat, renderList.dirLights);
-
-        DrawFrame(renderList, projectionMat, _time);
 
         InitBillboards(renderList.nodePositions, renderList.nodeColors);
         BuildBillboards(renderList.worldMat);
@@ -700,6 +720,14 @@ void Renderer::Render(void) {
             CreateEdges(renderList.edges);
             DrawEdges(projectionMat, renderList.worldMat);
         }
+
+        std::sort(renderList.jobs.begin(), renderList.jobs.end(), CompareJobs);
+        Link(renderList.jobs);
+        GB_Bind();
+        std::for_each(renderList.jobs.begin(), renderList.jobs.end(),
+            std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
+        GB_CacheAll();
+        DrawFrame(renderList, projectionMat, _time);
 
         meshMgr.R_Update();
 

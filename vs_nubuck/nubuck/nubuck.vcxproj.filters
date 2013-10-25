@@ -180,6 +180,9 @@
     <Filter Include="Private\world\entities\ent_mesh">
       <UniqueIdentifier>{b6d8a54c-fd70-495e-a38a-91bd9a91a9df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\giantbuffer">
+      <UniqueIdentifier>{df709011-cfb4-4d42-b27a-fd4821ea76d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -437,6 +440,9 @@
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_mesh\ent_mesh.h">
       <Filter>Private\world\entities\ent_mesh</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.h">
+      <Filter>Private\renderer\giantbuffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -684,6 +690,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_mesh\ent_mesh.cpp">
       <Filter>Private\world\entities\ent_mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.cpp">
+      <Filter>Private\renderer\giantbuffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

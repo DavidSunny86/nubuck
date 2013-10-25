@@ -27,4 +27,5 @@ void main() {
     // vec4 spec = h0 * uLightDiffuseColor0 + h1 * uLightDiffuseColor1 + h2 * uLightDiffuseColor2;
     vec4 spec = vec4(0.0, 0.0, 0.0, 0.0);
     fragColor = vColor * (diff + spec);
+    fragColor.a = 0.8;
 }

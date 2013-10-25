@@ -11,7 +11,8 @@ private:
     struct MeshLink {
         MeshLink *prev, *next;
         Mesh* mesh;
-        MeshLink(Mesh* const mesh) : prev(NULL), next(NULL), mesh(mesh) { }
+        bool  destroy;
+        MeshLink(Mesh* const mesh) : prev(NULL), next(NULL), mesh(mesh), destroy(false) { }
     };
     MeshLink*       _meshes;
     SYS::SpinLock   _meshesMtx;
@@ -20,13 +21,14 @@ public:
 
     MeshMgr(void) : _meshes(NULL) { }
 
-    meshPtr_t Create(const Mesh::Desc& desc); // deep copy
+    meshPtr_t   Create(const Mesh::Desc& desc); // deep copy
+    void        Destroy(meshPtr_t meshPtr) { meshPtr->destroy = true; }
 
     const Mesh& GetMesh(meshPtr_t meshPtr) const { return *meshPtr->mesh; }
     Mesh& GetMesh(meshPtr_t meshPtr) { return *meshPtr->mesh; }
 
     // methods prefixed with R_ should only be called by the renderer
-    void R_Update(void) { }
+    void R_Update(void);
 };
 
 extern MeshMgr meshMgr;
