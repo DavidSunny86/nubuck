@@ -40,10 +40,20 @@ struct IMesh {
 };
 
 struct IWorld {
-    typedef float (*planeHeightFunc_t)(float x, float y);
+    struct PlaneDesc {
+        struct Sample2 { float x, y; };
+        typedef float (*heightFunc_t)(float x, float y);
+
+        heightFunc_t    heightFunc;
+        bool            flip;
+        float           size;
+        int             subdiv;
+        Sample2*        addSamples;
+        unsigned        numAddSamples;
+    };
 
     virtual IPolyhedron*    CreatePolyhedron(leda::GRAPH<leda::d3_rat_point, int>& G) = 0;
-    virtual IMesh*          CreatePlaneMesh(int subdiv, float size, planeHeightFunc_t heightFunc, bool flip) = 0; 
+    virtual IMesh*          CreatePlaneMesh(const PlaneDesc& desc) = 0;
 };
 
 struct ILog {

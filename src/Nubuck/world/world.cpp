@@ -553,8 +553,9 @@ namespace W {
         return new Proxy::Polyhedron(G);
     }
 
-    IMesh* World::CreatePlaneMesh(int subdiv, float size, planeHeightFunc_t heightFunc, bool flip) {
-        R::Plane plane(subdiv, size, heightFunc, flip);
+    IMesh* World::CreatePlaneMesh(const PlaneDesc& desc) 
+    {
+        R::Plane plane(desc);
         unsigned entId = SpawnMesh(R::meshMgr.Create(plane.GetDesc()));
         return new Proxy::Mesh(entId);
     }

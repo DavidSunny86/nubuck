@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "plane.h"
 
 namespace R {
@@ -7,8 +8,25 @@ static bool IsValidGridPos(int i, int j, int N) {
 }
 
 // the planes faces the positive z axis. set flip=true to face the negative z axis.
-Plane::Plane(int subdiv, float size, heightFunc_t heightFunc, bool flip) {
-    int N = 1 + (1 << subdiv);
+Plane::Plane(const IWorld::PlaneDesc& desc)
+{
+    int regN = 1 + (1 << desc.subdiv);
+
+    std::vector<float> samples;
+    const float halfSize = 0.5f * desc.size;
+    const float segSize = desc.size / (regN - 1);
+    for(unsigned i = 0; i < regN; ++i) {
+        samples.push_back(segSize * i);
+    }
+    for(unsigned i = 0; i < desc.numAddSamples; ++i) {
+        samples.push_back(desc.addSamples[i].x + halfSize);
+        samples.push_back(desc.addSamples[i].y + halfSize);
+    }
+    std::sort(samples.begin(), samples.end());    
+    auto nend = std::unique(samples.begin(), samples.end());
+    samples.resize(std::distance(samples.begin(), nend));
+
+    int N = samples.size();
 
     common.printf("INFO - creating plane mesh with %d vertices.\n", N * N);
 
@@ -21,14 +39,12 @@ Plane::Plane(int subdiv, float size, heightFunc_t heightFunc, bool flip) {
     // arranges vertices on NxN grid, centered around it's origin
     _vertices.resize(N * N, defaultVert);
     std::vector<int> numTris(N * N, 0);
-    const float halfSize = 0.5f * size;
-    const float segSize = size / (N - 1);
     for(unsigned i = 0; i < N; ++i) {
         for(unsigned j = 0; j < N; ++j) {
             Mesh::Vertex& vert = _vertices[i * N + j];
-            vert.position.x = segSize * j - halfSize;
-            vert.position.y = segSize * i - halfSize;
-            vert.position.z = heightFunc(vert.position.x, vert.position.y);
+            vert.position.x = samples[j] - halfSize;
+            vert.position.y = samples[i] - halfSize;
+            vert.position.z = desc.heightFunc(vert.position.x, vert.position.y);
         }
     }
 
@@ -59,7 +75,7 @@ Plane::Plane(int subdiv, float size, heightFunc_t heightFunc, bool flip) {
         for(unsigned j = 0; j < N; ++j) {
             Mesh::Vertex& vert = _vertices[i * N + j];
             vert.normal = M::Normalize(vert.normal / numTris[i * N + j]);
-            if(flip) vert.normal *= -1.0f;
+            if(desc.flip) vert.normal *= -1.0f;
         }
     }
 
@@ -67,7 +83,7 @@ Plane::Plane(int subdiv, float size, heightFunc_t heightFunc, bool flip) {
 
     for(unsigned j = 0; j < N - 1; ++j) {
         for(unsigned i = 0; i < N; ++i) {
-            if(flip) {
+            if(desc.flip) {
                 _indices.push_back(i * N + j + 1);
                 _indices.push_back(i * N + j);
             }

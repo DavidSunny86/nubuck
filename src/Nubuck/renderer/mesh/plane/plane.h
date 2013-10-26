@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+
+#include <Nubuck\nubuck.h>
 #include <renderer\mesh\mesh.h>
 
 namespace R {
@@ -14,7 +16,7 @@ private:
 public:
     typedef float (*heightFunc_t)(float x, float y);
 
-    Plane(int subdiv, float size, heightFunc_t heightFunc, bool flip = false);
+    Plane(const IWorld::PlaneDesc& desc);
 
     Mesh::Desc GetDesc(void);
 };

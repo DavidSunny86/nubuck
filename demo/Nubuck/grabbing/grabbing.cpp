@@ -1,3 +1,5 @@
+#include <vector>
+
 #include <Nubuck\nubuck.h>
 #include "globals.h"
 #include "phase0.h"
@@ -5,8 +7,8 @@
 static float ParaboloidHeightFunc(float x, float y) {
     scalar_t rat_x(x);
     scalar_t rat_y(y);
-    scalar_t z = 5 + (rat_x * rat_x + rat_y * rat_y) / 100 - 1;
-    return z.to_float();
+    scalar_t z = 5 + (rat_x * rat_x + rat_y * rat_y) / 100;
+    return static_cast<float>(z.to_float());
 }
 
 class Algorithm : public IAlgorithm {
@@ -28,8 +30,7 @@ public:
         _globals.showVoronoi = false;
         _globals.showVoronoiEdges = false;
 
-        _globals.paraboloid = _globals.nb.world->CreatePlaneMesh(5, 200.0f, ParaboloidHeightFunc, true);
-        _globals.paraboloid->SetVisible(_globals.showParaboloid);
+        std::vector<IWorld::PlaneDesc::Sample2>* paraboloidSamples = new std::vector<IWorld::PlaneDesc::Sample2>();
 
         // project all nodes on xy-plane. scale, too
         _globals.nb.log->printf("Scaling points by factor %f.\n", 1000);
@@ -43,9 +44,25 @@ public:
             _globals.nmap[n0] = n1;
             _globals.grNodesProj[n0] = point_t(p.xcoord(), p.ycoord(), 0);
             _globals.grNodes[n1] = point_t(p.xcoord(), p.ycoord(), z);
-            float z2 = z.to_float();
+            float z2 = static_cast<float>(z.to_float());
             printf("z2 = %f\n", z2);
+
+            IWorld::PlaneDesc::Sample2 s;
+            s.x = static_cast<float>(_globals.grNodesProj[n0].xcoord().to_float());
+            s.y = static_cast<float>(_globals.grNodesProj[n0].ycoord().to_float());
+            paraboloidSamples->push_back(s);
         }
+
+        IWorld::PlaneDesc desc;
+        desc.heightFunc = ParaboloidHeightFunc;
+        desc.addSamples = &(*paraboloidSamples)[0];
+        desc.numAddSamples = paraboloidSamples->size();
+        desc.size = 200.0f;
+        desc.subdiv = 2;
+        desc.flip = true;
+
+        _globals.paraboloid = _globals.nb.world->CreatePlaneMesh(desc);
+        _globals.paraboloid->SetVisible(_globals.showParaboloid);
 
         Delaunay2D(_globals.grNodesProj, _globals.grDelaunayProj);
         Voronoi2D(_globals.grNodesProj, _globals.grVoronoiTri, _globals.grVoronoiProj, _globals.emap);

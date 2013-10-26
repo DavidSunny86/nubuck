@@ -157,7 +157,7 @@ namespace W {
 
         // exported to client
         IPolyhedron* CreatePolyhedron(graph_t& G) override;
-        IMesh* CreatePlaneMesh(int subdiv, float size, planeHeightFunc_t heightFunc, bool flip) override;
+        IMesh* CreatePlaneMesh(const PlaneDesc& desc) override;
 
         // thread interface
         DWORD Thread_Func(void);
