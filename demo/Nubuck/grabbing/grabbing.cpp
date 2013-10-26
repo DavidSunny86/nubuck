@@ -5,7 +5,7 @@
 static float ParaboloidHeightFunc(float x, float y) {
     scalar_t rat_x(x);
     scalar_t rat_y(y);
-    scalar_t z = 5 + (rat_x * rat_x + rat_y * rat_y) / 100 - scalar_t(1, 10);
+    scalar_t z = 5 + (rat_x * rat_x + rat_y * rat_y) / 100 - 1;
     return z.to_float();
 }
 
