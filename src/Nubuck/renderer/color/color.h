@@ -2,6 +2,9 @@
 
 namespace R {
 
+    struct Color4ub { unsigned char r, g, b, a; };
+    struct Color3ub { unsigned char r, g, b; };
+
     struct Color {
         float r, g, b, a;
 
@@ -22,6 +25,9 @@ namespace R {
 	Color operator*(float f, const Color& color);
 
     Color Lerp(const Color& source, const Color& target, float l);
+
+    Color4ub ColorTo4ub(const Color& col4f);
+    Color3ub ColorTo3ub(const Color& col4f);
 
 } // namespace R
 

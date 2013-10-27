@@ -1,4 +1,6 @@
 #include <stdlib.h>
+
+#include <math\math.h>
 #include "color.h"
 
 static float RandomIn01(void) {
@@ -31,6 +33,27 @@ namespace R {
             (1.0f - l) * source.g + l * target.g,
             (1.0f - l) * source.b + l * target.b,
             (1.0f - l) * source.a + l * target.a);
+    }
+
+    Color4ub ColorTo4ub(const Color& col4f) {
+        const unsigned char min = 0;
+        const unsigned char max = 255;
+        Color4ub col4ub;
+        col4ub.r = M::Clamp(min, (unsigned char)(255 * col4f.r), max);
+        col4ub.g = M::Clamp(min, (unsigned char)(255 * col4f.g), max);
+        col4ub.b = M::Clamp(min, (unsigned char)(255 * col4f.b), max);
+        col4ub.a = M::Clamp(min, (unsigned char)(255 * col4f.a), max);
+        return col4ub;
+    }
+
+    Color3ub ColorTo3ub(const Color& col4f) {
+        const unsigned char min = 0;
+        const unsigned char max = 255;
+        Color3ub col3ub;
+        col3ub.r = M::Clamp(min, (unsigned char)(255 * col4f.r), max);
+        col3ub.g = M::Clamp(min, (unsigned char)(255 * col4f.g), max);
+        col3ub.b = M::Clamp(min, (unsigned char)(255 * col4f.b), max);
+        return col3ub;
     }
 
 } // namespace R
