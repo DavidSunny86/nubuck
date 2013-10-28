@@ -18,16 +18,17 @@ layout(std140) uniform UniformsLights {
 layout(std140) uniform UniformsSkeleton {
     vec4    uColor;
     float   uNodeSize;
-    float   uEdgeRadiusSq;
 };
 
 out vec4 fragColor;
 
 // in edge's local space
+in vec4     vColor;
 in mat4     vObjectToEye;
 in mat4     vObjectToClip; 
 in vec4     vPosition;
 in float    vHalfHeightSq;
+in float    vRadiusSq;
 in vec4     vEyePos;
 in vec3     vLightDir;
 
@@ -35,7 +36,7 @@ void main() {
     vec4 s = vEyePos;
     vec4 v = normalize(vPosition - s);
     float f = (s.x * v.x + s.y * v.y) / (v.x * v.x + v.y * v.y);
-    float d = sqrt((uEdgeRadiusSq - (s.x * s.x + s.y * s.y)) / (v.x * v.x + v.y * v.y) + f * f);
+    float d = sqrt((vRadiusSq - (s.x * s.x + s.y * s.y)) / (v.x * v.x + v.y * v.y) + f * f);
     if(0 <= d) {
         vec4 p = s + (-d - f) * v;
         if(p.z * p.z > vHalfHeightSq) p = s + ( d - f) * v;
@@ -55,7 +56,7 @@ void main() {
         float h2 = pow(clamp(dot(normal, normalize(view + uLightVec2)), 0.0, 1.0), uShininess);
 		vec4 spec = h0 * uLightDiffuseColor0 + h1 * uLightDiffuseColor1 + h2 * uLightDiffuseColor2;
 
-        fragColor = uColor * (diff + spec);
+        fragColor = vColor * (diff + spec);
 
 		vec4 proj = uProjection * tp;
 		gl_FragDepth = 0.5 * (1.0 + proj.z / proj.w);

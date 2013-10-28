@@ -34,7 +34,9 @@ struct RenderJob {
 };
 
 struct Edge {
-    M::Vector3 p0, p1;
+    M::Vector3  p0, p1;
+    R::Color    color;
+    float       radius;
 };
 
 struct DirectionalLight {

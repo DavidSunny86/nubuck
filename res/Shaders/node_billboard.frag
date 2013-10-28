@@ -17,7 +17,6 @@ layout(std140) uniform UniformsLights {
 layout(std140) uniform UniformsSkeleton {
     vec4    uColor;
     float   uNodeSize;
-    float   uEdgeRadiusSq;
 };
 
 in vec3 vPosition;

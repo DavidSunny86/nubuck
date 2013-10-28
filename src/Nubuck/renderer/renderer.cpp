@@ -35,7 +35,8 @@ enum {
     IN_A2           = 6,
     IN_A3           = 7,
 
-    IN_HALF_HEIGHT_SQ  = 8
+    IN_HALF_HEIGHT_SQ   = 8,
+    IN_RADIUS_SQ        = 9
 };
 
 void BindVertices(void) {
@@ -108,7 +109,6 @@ struct UniformsLights {
 struct UniformsSkeleton {
     Color       uColor;
     float       uNodeSize;
-    float       uEdgeRadiusSq;
 };
 
 static UniformsHot                  uniformsHot;
@@ -166,7 +166,6 @@ static void Uniforms_Update(
 
     uniformsSkeleton.uColor = Color(0.4f, 0.4f, 0.4f, 1.0f);
     uniformsSkeleton.uNodeSize = cvar_r_nodeSize;
-    uniformsSkeleton.uEdgeRadiusSq = cvar_r_edgeRadius * cvar_r_edgeRadius;
     uniformsSkeletonBuffer->Update_Mapped(0, sizeof(UniformsSkeleton), &uniformsSkeleton);
 }
 
@@ -359,8 +358,10 @@ static M::Matrix4 AlignZ(const M::Vector3& d) {
 
 struct EdgeBBoxVertex {
     M::Vector3  position;
+    Color4ub    color;
     M::Vector3  A[4];
     float       halfHeightSq;
+    float       radiusSq;
 };
 
 static std::vector<EdgeBBoxVertex>  edgeBBoxVertices;
@@ -373,6 +374,11 @@ static void BindEdgeBBoxVertices(void) {
         3, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
         (void*)offsetof(EdgeBBoxVertex, position)));
     GL_CALL(glEnableVertexAttribArray(IN_POSITION));
+
+    GL_CALL(glVertexAttribPointer(IN_COLOR,
+        4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(EdgeBBoxVertex),
+        (void*)offsetof(EdgeBBoxVertex, color)));
+    GL_CALL(glEnableVertexAttribArray(IN_COLOR));
 
     GL_CALL(glVertexAttribPointer(IN_A0,
         3, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
@@ -398,6 +404,11 @@ static void BindEdgeBBoxVertices(void) {
         1, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
         (void*)(offsetof(EdgeBBoxVertex, halfHeightSq))));
     GL_CALL(glEnableVertexAttribArray(IN_HALF_HEIGHT_SQ));
+
+    GL_CALL(glVertexAttribPointer(IN_RADIUS_SQ,
+        1, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
+        (void*)(offsetof(EdgeBBoxVertex, radiusSq))));
+    GL_CALL(glEnableVertexAttribArray(IN_RADIUS_SQ));
 }
 
 // remove edges with zero length
@@ -455,11 +466,13 @@ static void CreateEdges(const std::vector<Edge>& edges) {
         Mesh::Index bboxIndices[] = { 3, 2, 6, 7, 4, 2, 0, 3, 1, 6, 5, 4, 1, 0 };
         const unsigned numIndices = 14;
         EdgeBBoxVertex vertex;
+        vertex.color = ColorTo4ub(edge.color);
         vertex.A[0] = M::Vector3(objectToWorld.m00, objectToWorld.m10, objectToWorld.m20);
         vertex.A[1] = M::Vector3(objectToWorld.m01, objectToWorld.m11, objectToWorld.m21);
         vertex.A[2] = M::Vector3(objectToWorld.m02, objectToWorld.m12, objectToWorld.m22);
         vertex.A[3] = M::Vector3(objectToWorld.m03, objectToWorld.m13, objectToWorld.m23);
         vertex.halfHeightSq = h * h;
+        vertex.radiusSq = edge.radius * edge.radius;
         for(unsigned i = 0; i < numVertices; ++i) {
             vertex.position = M::Transform(objectToWorld, bboxVertexPositions[i]);
             edgeBBoxVertices.push_back(vertex);

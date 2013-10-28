@@ -26,6 +26,9 @@ struct PolyhedronNodes {
 struct PolyhedronEdges {
     std::vector<int>    valid;
     std::vector<int>	mask;
+
+    R::Color            color;
+    float               radius;
 };
 
 struct PolyhedronHullFaceList {

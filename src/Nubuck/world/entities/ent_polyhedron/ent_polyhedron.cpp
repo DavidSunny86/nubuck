@@ -31,6 +31,10 @@ void Polyhedron_InitResources(void) {
 void Polyhedron_Init(ENT_Polyhedron& ph) { 
     ph.renderFlags  = 0;
     ph.isPickable   = false;
+
+    ph.edges.color  = R::Color(0.4f, 0.4f, 0.4f);
+    ph.edges.radius = 0.1f;
+
     ph.hull.mesh    = NULL;
 }
 
@@ -253,6 +257,8 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
     } // if(renderNodes)
 
     R::Edge re;
+    re.color    = ph.edges.color;
+    re.radius   = ph.edges.radius;
     unsigned numEdges = ph.hull.edges.size();
     ph.renderList.edges.clear();
     if(POLYHEDRON_RENDER_EDGES & ph.renderFlags) {
