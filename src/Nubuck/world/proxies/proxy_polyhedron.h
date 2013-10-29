@@ -7,12 +7,14 @@ namespace Proxy {
 
 class Polyhedron : public IPolyhedron {
 private:
-    unsigned _entId;
+    unsigned    _entId;
+    std::string _name;
 public:
     Polyhedron(graph_t& G);
 
     void Destroy(void) override;
 
+    void SetName(const std::string& name) override;
     void SetRenderFlags(int flags) override;
     void SetPickable(bool isPickable) override;
     void SetNodeColor(leda::node node, float r, float g, float b) override;

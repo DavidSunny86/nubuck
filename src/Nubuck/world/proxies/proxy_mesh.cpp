@@ -1,3 +1,4 @@
+#include <events\event_defs.h>
 #include <world\world.h>
 #include "proxy_mesh.h"
 

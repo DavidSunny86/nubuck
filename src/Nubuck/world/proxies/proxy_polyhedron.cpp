@@ -1,3 +1,4 @@
+#include <events\event_defs.h>
 #include <world\world.h>
 #include "proxy_polyhedron.h"
 
@@ -12,6 +13,14 @@ void Polyhedron::Destroy(void) {
     args.entId = _entId;
     W::world.Send(EV::def_DestroyEntity.Create(args));
     _entId = 0;
+}
+
+void Polyhedron::SetName(const std::string& name) {
+    _name = name;
+    EV::Params_SetName args;
+    args.entId  = _entId;
+    args.name   = _name.c_str();
+    W::world.Send(EV::def_SetName.Create(args));
 }
 
 void Polyhedron::SetRenderFlags(int flags) {

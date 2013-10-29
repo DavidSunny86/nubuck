@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <Windows.h> // defines MAX_INT
 #include <LEDA/geo/d3_rat_point.h>
 #include <LEDA/graph/graph.h>
@@ -25,6 +27,7 @@ struct IPolyhedron {
 
     virtual void Destroy(void) = 0;
 
+    virtual void SetName(const std::string& name) = 0;
     virtual void SetRenderFlags(int flags) = 0;
     virtual void SetPickable(bool isPickable) = 0;
     virtual void SetNodeColor(leda::node node, float r, float g, float b) = 0;

@@ -70,17 +70,21 @@ public:
         ConvexHull(_globals.grNodes, _globals.grHull);
 
         _globals.phNodesProj = _globals.nb.world->CreatePolyhedron(_globals.grNodesProj);
+        _globals.phNodesProj->SetName("Nodes (Projection)");
         _globals.phNodesProj->SetRenderFlags(POLYHEDRON_RENDER_NODES);
         _globals.phNodesProj->SetPickable(true);
 
         _globals.phDelaunayProj = _globals.nb.world->CreatePolyhedron(_globals.grDelaunayProj);
+        _globals.phDelaunayProj->SetName("Delaunay Triangulation");
         _globals.phDelaunayProj->SetRenderFlags(POLYHEDRON_RENDER_EDGES);
 
         _globals.phHullProj = _globals.nb.world->CreatePolyhedron(_globals.grHullProj);
+        _globals.phHullProj->SetName("Convex Hull (Projection)");
         _globals.phHullProj->SetRenderFlags(POLYHEDRON_RENDER_HULL | POLYHEDRON_RENDER_EDGES);
         _globals.phHullProj->Update();
         
         _globals.phVoronoiProj = _globals.nb.world->CreatePolyhedron(_globals.grVoronoiProj);
+        _globals.phVoronoiProj->SetName("Voronoi Diagram");
         // _globals.phVoronoiProj->SetRenderFlags(POLYHEDRON_RENDER_HULL);
         // _globals.phVoronoiProj->Update();
 
@@ -101,8 +105,10 @@ public:
         }
 
         _globals.phNodes = _globals.nb.world->CreatePolyhedron(_globals.grNodes);
+        _globals.phNodes->SetName("Nodes");
 
         _globals.phHull = _globals.nb.world->CreatePolyhedron(_globals.grHull);
+        _globals.phHull->SetName("Convex Hull");
         _globals.phHull->Update();
 
         return new Phase0(_globals);

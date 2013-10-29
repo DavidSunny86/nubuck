@@ -168,9 +168,6 @@
     <Filter Include="Private\UI\renderconfig">
       <UniqueIdentifier>{d82575ec-0fda-4022-bed0-366025105d4e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\world\events">
-      <UniqueIdentifier>{b19a5651-8744-4de5-9c53-07543750ee9e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\world\proxies">
       <UniqueIdentifier>{977d2860-1bd1-446d-a49e-4e8940d9f5d7}</UniqueIdentifier>
     </Filter>
@@ -182,6 +179,12 @@
     </Filter>
     <Filter Include="Private\renderer\giantbuffer">
       <UniqueIdentifier>{df709011-cfb4-4d42-b27a-fd4821ea76d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\UI\outliner">
+      <UniqueIdentifier>{d2c0fc38-27fa-430c-aad7-98374bcad8cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\events">
+      <UniqueIdentifier>{dea5b76f-1b3d-482f-99c6-75b5c393aff1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -425,9 +428,6 @@
     <ClInclude Include="GeneratedFiles\ui_renderconfig.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\events\events.h">
-      <Filter>Private\world\events</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.h">
       <Filter>Private\world\proxies</Filter>
     </ClInclude>
@@ -442,6 +442,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.h">
       <Filter>Private\renderer\giantbuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\events\events.h">
+      <Filter>Private\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\events\event_defs.h">
+      <Filter>Private\events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -676,9 +682,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_renderconfig.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\events\events.cpp">
-      <Filter>Private\world\events</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.cpp">
       <Filter>Private\world\proxies</Filter>
     </ClCompile>
@@ -693,6 +696,21 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.cpp">
       <Filter>Private\renderer\giantbuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\outliner\outliner.cpp">
+      <Filter>Private\UI\outliner</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\events\events.cpp">
+      <Filter>Private\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\events\event_defs.cpp">
+      <Filter>Private\events</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_outliner.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_outliner.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -734,6 +752,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\renderconfig\renderconfig.h">
       <Filter>Private\UI\renderconfig</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\outliner\outliner.h">
+      <Filter>Private\UI\outliner</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

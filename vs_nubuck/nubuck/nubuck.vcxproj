@@ -18,6 +18,8 @@
     <ClInclude Include="..\..\src\Nubuck\common\config\config.h" />
     <ClInclude Include="..\..\src\Nubuck\common\filesystem\filesystem.h" />
     <ClInclude Include="..\..\src\Nubuck\common\types.h" />
+    <ClInclude Include="..\..\src\Nubuck\events\events.h" />
+    <ClInclude Include="..\..\src\Nubuck\events\event_defs.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\pointer.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\singleton.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\uncopyable.h" />
@@ -101,9 +103,18 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
     </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\outliner\outliner.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing outliner.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing outliner.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
+    </CustomBuild>
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_mesh\ent_mesh.h" />
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.h" />
-    <ClInclude Include="..\..\src\Nubuck\world\events\events.h" />
     <ClInclude Include="..\..\src\Nubuck\world\proxies\proxy_mesh.h" />
     <ClInclude Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.h" />
     <ClInclude Include="GeneratedFiles\ui_renderconfig.h" />
@@ -174,6 +185,8 @@
     <ClCompile Include="..\..\src\Nubuck\common\common.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\config\config.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\filesystem\filesystem.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\events\events.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\events\event_defs.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\line2.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\line3.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\math.cpp" />
@@ -227,6 +240,7 @@
     <ClCompile Include="..\..\src\Nubuck\UI\glwidget\glwidget.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\logwidget\logwidget.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\UI\outliner\outliner.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\randompoints\randompoints.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\renderconfig\renderconfig.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\rendermetrics\rendermetrics.cpp" />
@@ -234,7 +248,6 @@
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_mesh\ent_mesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entity.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\world\events\events.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\proxies\proxy_mesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\world.cpp" />
@@ -245,6 +258,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_mainwindow.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_outliner.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_randompoints.cpp">
@@ -266,6 +282,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_mainwindow.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_outliner.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_randompoints.cpp">

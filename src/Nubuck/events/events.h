@@ -1,6 +1,8 @@
 #pragma once
 
+#include <assert.h>
 #include <queue>
+#include <common\common.h>
 #include <system\locks\spinlock.h>
 
 // events are sent and received between threads. a thread queues it's received events

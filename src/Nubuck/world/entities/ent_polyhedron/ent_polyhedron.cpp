@@ -602,4 +602,9 @@ bool Polyhedron_RaycastFaces(ENT_Polyhedron& ph, const M::Vector3& rayOrig, cons
     return true;
 }
 
+void Polyhedron_GetInfo(const ENT_Polyhedron& ph, INF_Polyhedron& inf) {
+    inf.edgeColor   = ph.edges.color;
+    inf.edgeRadius  = ph.edges.radius;
+}
+
 } // namespace W

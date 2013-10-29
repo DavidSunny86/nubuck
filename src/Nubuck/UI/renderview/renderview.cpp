@@ -2,8 +2,9 @@
 #include <QKeyEvent>
 
 #include <common\common.h>
+#include <events\event_defs.h>
+#include <UI\outliner\outliner.h>
 #include <world\world.h>
-#include <world\events\events.h>
 #include <renderer\effects\effectmgr.h>
 #include "renderview.h"
 
@@ -112,6 +113,7 @@ namespace UI {
 #ifndef NUBUCK_MT
         W::world.Update();
 #endif
+        Outliner::Instance()->Update();
     }
 
     QLabel* RenderView::FpsLabel(void) {

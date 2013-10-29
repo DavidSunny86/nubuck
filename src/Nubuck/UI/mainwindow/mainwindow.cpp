@@ -3,11 +3,13 @@
 
 #include <nubuck_private.h>
 #include <algdriver\algdriver.h>
+#include <events\event_defs.h>
 #include <UI\renderview\renderview.h>
 #include <UI\rendermetrics\rendermetrics.h>
 #include <UI\randompoints\randompoints.h>
 #include <UI\algorithmwidget\algorithmwidget.h>
 #include <UI\logwidget\logwidget.h>
+#include <UI\outliner\outliner.h>
 #include "mainwindow.h"
 
 namespace {
@@ -64,6 +66,9 @@ namespace UI {
         _renderConfig = new RenderConfig(this);
         _renderConfig->setFloating(true);
         _renderConfig->hide();
+
+        _outlinerDock = ScrollableDockWidget("Outliner", Outliner::Instance());
+        addDockWidget(Qt::RightDockWidgetArea, _outlinerDock);
     }
 
 } // namespace UI

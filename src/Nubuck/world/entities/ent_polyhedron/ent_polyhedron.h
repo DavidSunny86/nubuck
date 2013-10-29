@@ -93,6 +93,11 @@ struct ENT_Polyhedron {
     R::RenderList           renderList;
 };
 
+struct INF_Polyhedron {
+    float           edgeRadius;
+    R::Color        edgeColor;
+};
+
 void Polyhedron_InitResources(void);
 void Polyhedron_Init(ENT_Polyhedron& ph);
 void Polyhedron_Rebuild(ENT_Polyhedron& ph);
@@ -104,5 +109,6 @@ void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed);
 void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Color& color);
 bool Polyhedron_RaycastNodes(ENT_Polyhedron& ph, const M::Vector3& rayOrig, const M::Vector3& rayDir, leda::node& hitNode);
 bool Polyhedron_RaycastFaces(ENT_Polyhedron& ph, const M::Vector3& rayOrig, const M::Vector3& rayDir, leda::edge& hitFace);
+void Polyhedron_GetInfo(const ENT_Polyhedron& ph, INF_Polyhedron& inf);
 
 } // namespace W

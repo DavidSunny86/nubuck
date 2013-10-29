@@ -4,29 +4,13 @@
 #include <common\common.h>
 #include <algdriver\algdriver.h>
 #include <renderer\mesh\plane\plane.h>
+#include <events\event_defs.h>
+#include <UI\outliner\outliner.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include <world\proxies\proxy_polyhedron.h>
 #include <world\proxies\proxy_mesh.h>
 #include "entity.h"
 #include "world.h"
-
-#pragma region EventDefinitions
-
-ALLOC_EVENT_DEF(Apocalypse)
-ALLOC_EVENT_DEF(SpawnPolyhedron)
-ALLOC_EVENT_DEF(SpawnMesh)
-ALLOC_EVENT_DEF(DestroyEntity)
-ALLOC_EVENT_DEF(Rebuild)
-ALLOC_EVENT_DEF(SetVisible)
-ALLOC_EVENT_DEF(SetRenderFlags)
-ALLOC_EVENT_DEF(SetPickable)
-ALLOC_EVENT_DEF(SetNodeColor)
-ALLOC_EVENT_DEF(SetFaceColor)
-ALLOC_EVENT_DEF(Resize)
-ALLOC_EVENT_DEF(Mouse)
-ALLOC_EVENT_DEF(Key)
-
-#pragma endregion
 
 namespace W {
 
@@ -45,10 +29,12 @@ namespace W {
         EVENT_HANDLER(EV::def_DestroyEntity,        &World::Event_DestroyEntity)
         EVENT_HANDLER(EV::def_Rebuild,              &World::Event_Rebuild)
         EVENT_HANDLER(EV::def_SetVisible,           &World::Event_SetVisible)
+        EVENT_HANDLER(EV::def_SetName,              &World::Event_SetName)
         EVENT_HANDLER(EV::def_SetRenderFlags,       &World::Event_SetRenderFlags)
         EVENT_HANDLER(EV::def_SetPickable,          &World::Event_SetPickable)
         EVENT_HANDLER(EV::def_SetNodeColor,         &World::Event_SetNodeColor)
         EVENT_HANDLER(EV::def_SetFaceColor, 		&World::Event_SetFaceColor)
+        EVENT_HANDLER(EV::def_SetEdgeRadius,        &World::Event_SetEdgeRadius)
         EVENT_HANDLER(EV::def_Resize,               &World::Event_Resize)
         EVENT_HANDLER(EV::def_Mouse,                &World::Event_Mouse)
         EVENT_HANDLER(EV::def_Key,                  &World::Event_Key)
@@ -259,6 +245,17 @@ namespace W {
         }
         return GEN::Pointer<World::Entity>();
     }
+
+    void World::GetInfo(Entity& ent, EntityInf& inf) {
+        inf.entId   = ent.entId;
+        inf.name    = ent.name;
+        
+        if(ENT_POLYHEDRON == ent.type) {
+            INF_Polyhedron* phInf = new INF_Polyhedron;
+            Polyhedron_GetInfo(*ent.polyhedron, *phInf);
+            inf.inf = phInf;
+        }
+    }
         
     void World::Event_Apocalypse(const EV::Event& event) {
         _entities.clear();
@@ -276,6 +273,15 @@ namespace W {
         Polyhedron_Update(*ph);
         entity->polyhedron = ph;
         _entities.push_back(entity);
+
+        UI::Outliner::Instance()->Send(event);
+
+        EntityInf* inf = new EntityInf;
+        GetInfo(*entity, *inf);
+        EV::Params_EntityInfo infArgs;
+        infArgs.entType = ENT_POLYHEDRON;
+        infArgs.inf = inf;
+        UI::Outliner::Instance()->Send(EV::def_EntityInfo.Create(infArgs));
     }
 
     void World::Event_SpawnMesh(const EV::Event& event) {
@@ -316,6 +322,15 @@ namespace W {
             ENT_Mesh& mesh = *entity->mesh;
             mesh.isVisible = args.isVisible;
         }
+    }
+
+    void World::Event_SetName(const EV::Event& event) {
+        const EV::Params_SetName& args = EV::def_SetName.GetArgs(event);
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        assert(entity.IsValid());
+        entity->name = args.name;
+
+        UI::Outliner::Instance()->Send(event);
     }
 
     void World::Event_SetRenderFlags(const EV::Event& event) {
@@ -360,6 +375,14 @@ namespace W {
             ENT_Polyhedron& ph = *entity->polyhedron;
             Polyhedron_SetFaceColor(ph, args.edge, args.color);
         }
+    }
+
+    void World::Event_SetEdgeRadius(const EV::Event& event) {
+        const EV::Params_SetEdgeRadius& args = EV::def_SetEdgeRadius.GetArgs(event);
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        assert(entity.IsValid());
+        assert(ENT_POLYHEDRON == entity->type);
+        entity->polyhedron->edges.radius = args.radius;
     }
 
     void World::Event_Resize(const EV::Event& event) {

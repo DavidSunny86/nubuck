@@ -451,7 +451,7 @@ static void CreateEdges(const std::vector<Edge>& edges) {
         M::Matrix4 objectToWorld = M::Mat4::Translate(center) * M::Transpose(R);
 
         const float h = 0.5f * M::Length(edge.p1 - edge.p0);
-        const float r = cvar_r_edgeRadius;
+        const float r = edge.radius;
         M::Vector3 bboxVertexPositions[] = {
             M::Vector3( r,  r, -h),
             M::Vector3(-r,  r, -h),
