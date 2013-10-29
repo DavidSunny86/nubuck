@@ -28,4 +28,11 @@ void ColorButton::OnColorChanged(const QColor& color) {
 
 ColorButton::ColorButton(QWidget* parent) : QWidget(parent), _color(Qt::black) { }
 
+void ColorButton::SetColor(float r, float g, float b) {
+    _color.setRedF(r);
+    _color.setGreenF(g);
+    _color.setBlueF(b);
+    repaint();
+}
+
 } // namespace UI

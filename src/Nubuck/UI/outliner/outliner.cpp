@@ -62,6 +62,7 @@ void Outliner::PolyhedronOutline_Init(EntityOutline& outln) {
 
     outln.polyhedron->entId = outln.entId;
     outln.polyhedron->sbEdgeRadius = sbEdgeRadius;
+    outln.polyhedron->btnEdgeColor = btnEdgeColor;
 
     connect(btnEdgeColor, SIGNAL(SigColorChanged(float, float, float)), outln.polyhedron, SLOT(OnEdgeColorChanged(float, float, float)));
     connect(sbEdgeRadius, SIGNAL(valueChanged(double)), outln.polyhedron, SLOT(OnEdgeRadiusChanged(double)));
@@ -121,6 +122,7 @@ void Outliner::Event_EntityInfo(const EV::Event& event) {
     if(W::World::ENT_POLYHEDRON == args.entType) {
         W::INF_Polyhedron* phInf = (W::INF_Polyhedron*)inf->inf;
         outln->polyhedron->sbEdgeRadius->setValue(phInf->edgeRadius);
+        outln->polyhedron->btnEdgeColor->SetColor(phInf->edgeColor.r, phInf->edgeColor.g, phInf->edgeColor.b);
     }
 }
 

@@ -58,7 +58,13 @@ namespace UI {
         setCentralWidget(renderView);
 
         AlgorithmWidget* algorithmWidget = new AlgorithmWidget();
-        addDockWidget(Qt::RightDockWidgetArea, ScrollableDockWidget("Algorithm", algorithmWidget));
+        QDockWidget* algorithmDock = ScrollableDockWidget("Algorithm", algorithmWidget);
+        addDockWidget(Qt::RightDockWidgetArea, algorithmDock);
+
+        _outlinerDock = ScrollableDockWidget("Outliner", Outliner::Instance());
+        addDockWidget(Qt::RightDockWidgetArea, _outlinerDock);
+
+        tabifyDockWidget(_outlinerDock, algorithmDock);
 
         UI::LogWidget* logWidget = UI::LogWidget::Instance();
         addDockWidget(Qt::RightDockWidgetArea, ScrollableDockWidget("LogWidget", logWidget));
@@ -66,9 +72,6 @@ namespace UI {
         _renderConfig = new RenderConfig(this);
         _renderConfig->setFloating(true);
         _renderConfig->hide();
-
-        _outlinerDock = ScrollableDockWidget("Outliner", Outliner::Instance());
-        addDockWidget(Qt::RightDockWidgetArea, _outlinerDock);
     }
 
 } // namespace UI

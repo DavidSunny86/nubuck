@@ -33,7 +33,8 @@ public:
         std::vector<IWorld::PlaneDesc::Sample2>* paraboloidSamples = new std::vector<IWorld::PlaneDesc::Sample2>();
 
         // project all nodes on xy-plane. scale, too
-        _globals.nb.log->printf("Scaling points by factor %f.\n", 1000);
+        float scale = 1000.0f;
+        _globals.nb.log->printf("Scaling points by factor %f.\n", scale);
         _globals.nmap.init(_globals.grNodesProj);
         leda::node n;
         forall_nodes(n, G) {

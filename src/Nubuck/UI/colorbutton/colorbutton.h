@@ -18,6 +18,8 @@ signals:
     void SigColorChanged(float r, float g, float b);
 public:
     ColorButton(QWidget* parent = NULL);
+
+    void SetColor(float r, float g, float b);
 };
 
 } // namespace UI
