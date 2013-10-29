@@ -58,6 +58,11 @@ BEGIN_EVENT_DEF(SetFaceColor)
     R::Color    color;
 END_EVENT_DEF
 
+BEGIN_EVENT_DEF(SetEdgeColor)
+    unsigned    entId;
+    R::Color    color;
+END_EVENT_DEF
+
 BEGIN_EVENT_DEF(SetEdgeRadius)
     unsigned    entId;
     float       radius;

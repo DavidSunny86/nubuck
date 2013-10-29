@@ -10,6 +10,7 @@
 #include <QDoubleSpinBox>
 #include <QVBoxLayout>
 
+#include <UI\colorbutton\colorbutton.h>
 #include <events\events.h>
 #include <world\world.h>
 
@@ -18,10 +19,12 @@ namespace UI {
 struct PolyhedronOutline : QObject {
     Q_OBJECT
 public slots:
+    void OnEdgeColorChanged(float r, float g, float b);
     void OnEdgeRadiusChanged(double value);
 public:
     unsigned            entId;
     QDoubleSpinBox*     sbEdgeRadius;
+    ColorButton*        btnEdgeColor;
 };
 
 class Outliner : public QWidget, public EV::EventHandler<Outliner> {

@@ -34,6 +34,7 @@ namespace W {
         EVENT_HANDLER(EV::def_SetPickable,          &World::Event_SetPickable)
         EVENT_HANDLER(EV::def_SetNodeColor,         &World::Event_SetNodeColor)
         EVENT_HANDLER(EV::def_SetFaceColor, 		&World::Event_SetFaceColor)
+        EVENT_HANDLER(EV::def_SetEdgeColor, 		&World::Event_SetEdgeColor)
         EVENT_HANDLER(EV::def_SetEdgeRadius,        &World::Event_SetEdgeRadius)
         EVENT_HANDLER(EV::def_Resize,               &World::Event_Resize)
         EVENT_HANDLER(EV::def_Mouse,                &World::Event_Mouse)
@@ -375,6 +376,14 @@ namespace W {
             ENT_Polyhedron& ph = *entity->polyhedron;
             Polyhedron_SetFaceColor(ph, args.edge, args.color);
         }
+    }
+
+    void World::Event_SetEdgeColor(const EV::Event& event) {
+        const EV::Params_SetEdgeColor& args = EV::def_SetEdgeColor.GetArgs(event);
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        assert(entity.IsValid());
+        assert(ENT_POLYHEDRON == entity->type);
+        entity->polyhedron->edges.color = args.color;
     }
 
     void World::Event_SetEdgeRadius(const EV::Event& event) {

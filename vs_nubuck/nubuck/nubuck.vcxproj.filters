@@ -186,6 +186,9 @@
     <Filter Include="Private\events">
       <UniqueIdentifier>{dea5b76f-1b3d-482f-99c6-75b5c393aff1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\UI\colorbutton">
+      <UniqueIdentifier>{bb899979-99a9-4fea-9231-1b9df1cc3fe7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -712,6 +715,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_outliner.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\colorbutton\colorbutton.cpp">
+      <Filter>Private\UI\colorbutton</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_colorbutton.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_colorbutton.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -755,6 +767,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\outliner\outliner.h">
       <Filter>Private\UI\outliner</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\colorbutton\colorbutton.h">
+      <Filter>Private\UI\colorbutton</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

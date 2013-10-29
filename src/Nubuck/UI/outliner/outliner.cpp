@@ -10,6 +10,13 @@ void Outliner::EntityOutline_Init(EntityOutline& outln) {
     outln.widget->setLayout(outln.layout);
 }
 
+void PolyhedronOutline::OnEdgeColorChanged(float r, float g, float b) {
+    EV::Params_SetEdgeColor args;
+    args.entId  = entId;
+    args.color  = R::Color(r, g, b);
+    W::world.Send(EV::def_SetEdgeColor.Create(args));
+}
+
 void PolyhedronOutline::OnEdgeRadiusChanged(double value) {
     EV::Params_SetEdgeRadius args;
     args.entId  = entId;
@@ -19,18 +26,26 @@ void PolyhedronOutline::OnEdgeRadiusChanged(double value) {
 
 void Outliner::PolyhedronOutline_Init(EntityOutline& outln) {
     outln.polyhedron = new PolyhedronOutline;
+
     QLabel* lblEdgeRadius = new QLabel("edge radius:");
     QDoubleSpinBox* sbEdgeRadius = new QDoubleSpinBox;
     sbEdgeRadius->setMinimum(0.05f);
     sbEdgeRadius->setMaximum(5.00f);
     sbEdgeRadius->setSingleStep(0.1f);
 
+    QLabel* lblEdgeColor = new QLabel("edge color:");
+    ColorButton* btnEdgeColor = new ColorButton;
+
     outln.layout->addWidget(lblEdgeRadius, 0, 0, 1, 1);
     outln.layout->addWidget(sbEdgeRadius, 0, 1, 1, 1);
+
+    outln.layout->addWidget(lblEdgeColor, 1, 0, 1, 1);
+    outln.layout->addWidget(btnEdgeColor, 1, 1, 1, 1);
 
     outln.polyhedron->entId = outln.entId;
     outln.polyhedron->sbEdgeRadius = sbEdgeRadius;
 
+    connect(btnEdgeColor, SIGNAL(SigColorChanged(float, float, float)), outln.polyhedron, SLOT(OnEdgeColorChanged(float, float, float)));
     connect(sbEdgeRadius, SIGNAL(valueChanged(double)), outln.polyhedron, SLOT(OnEdgeRadiusChanged(double)));
 }
 
