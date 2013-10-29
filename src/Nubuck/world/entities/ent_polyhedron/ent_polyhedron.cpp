@@ -36,6 +36,7 @@ void Polyhedron_Init(ENT_Polyhedron& ph) {
     ph.edges.radius = 0.1f;
 
     ph.hull.mesh    = NULL;
+    ph.hull.alpha   = 1.0f;
 }
 
 static void Polyhedron_RebuildSelection(ENT_Polyhedron& ph) {
@@ -149,6 +150,7 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
         R::Mesh::Vertex vert;
         vert.position = M::Vector3::Zero;
         vert.color = defaultFaceColor;
+        vert.color.a = ph.hull.alpha;
         ph.hull.vertices.resize(ph.hull.indices.size(), vert);
         for(unsigned i = 0; i < ph.hull.vnmap.size() /* ie. number of vertices */; ++i)
             ph.hull.vertices[i].position = ph.nodes.positions[ph.hull.vnmap[i]];
@@ -276,6 +278,10 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
 
     if(POLYHEDRON_RENDER_HULL & ph.renderFlags) {
         if(!ph.hull.indices.empty() /* ie. hull exists */) {
+            float alpha = ph.hull.vertices[0].color.a; // constant for all verts
+            if(1.0f > alpha) renderJob.fx = "LitDirectionalTransparent";
+            else renderJob.fx = "LitDirectional";
+
             renderJob.material = R::Material::White;
             renderJob.mesh = ph.hull.mesh;
             renderJob.primType = 0;
@@ -436,6 +442,7 @@ void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed) {
         PolyhedronHullFaceColor& fc = ph.hull.faceColors[i];
         for(unsigned j = 0; j < fl.size; ++j) {
             ph.hull.vertices[fl.base + j].color = fc.cur;
+            ph.hull.vertices[fl.base + j].color.a = ph.hull.alpha;
         }
     }
 
@@ -451,6 +458,14 @@ void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Co
     // fc.t = 0.0f;
     fc.t = 10.0f; // instant
     fc.ip = true;
+}
+
+void Polyhedron_SetHullAlpha(ENT_Polyhedron& ph, float alpha) {
+    assert(0.0f <= alpha && alpha <= 1.0f);
+    for(unsigned i = 0; i < ph.hull.vertices.size(); ++i)
+        ph.hull.vertices[i].color.a = alpha;
+    ph.hull.alpha = alpha;
+    if(!ph.hull.indices.empty()) R::meshMgr.GetMesh(ph.hull.mesh).Invalidate(&ph.hull.vertices[0]);
 }
 
 struct Ray {

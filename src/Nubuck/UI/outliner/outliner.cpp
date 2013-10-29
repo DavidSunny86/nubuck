@@ -24,6 +24,14 @@ void PolyhedronOutline::OnEdgeRadiusChanged(double value) {
     W::world.Send(EV::def_SetEdgeRadius.Create(args));
 }
 
+void PolyhedronOutline::OnHullAlphaChanged(int value) {
+    float alpha = value / 100.0f;
+    EV::Params_SetHullAlpha args;
+    args.entId  = entId;
+    args.alpha  = alpha;
+    W::world.Send(EV::def_SetHullAlpha.Create(args));
+}
+
 void Outliner::PolyhedronOutline_Init(EntityOutline& outln) {
     outln.polyhedron = new PolyhedronOutline;
 
@@ -36,17 +44,28 @@ void Outliner::PolyhedronOutline_Init(EntityOutline& outln) {
     QLabel* lblEdgeColor = new QLabel("edge color:");
     ColorButton* btnEdgeColor = new ColorButton;
 
+    QLabel* lblHullAlpha = new QLabel("hull alpha:");
+    QSlider* sldHullAlpha = new QSlider(Qt::Horizontal);
+    sldHullAlpha->setTracking(true);
+    sldHullAlpha->setMinimum(0);
+    sldHullAlpha->setMaximum(100);
+    sldHullAlpha->setValue(100);
+
     outln.layout->addWidget(lblEdgeRadius, 0, 0, 1, 1);
     outln.layout->addWidget(sbEdgeRadius, 0, 1, 1, 1);
 
     outln.layout->addWidget(lblEdgeColor, 1, 0, 1, 1);
     outln.layout->addWidget(btnEdgeColor, 1, 1, 1, 1);
 
+    outln.layout->addWidget(lblHullAlpha, 2, 0, 1, 1);
+    outln.layout->addWidget(sldHullAlpha, 2, 1, 1, 1);
+
     outln.polyhedron->entId = outln.entId;
     outln.polyhedron->sbEdgeRadius = sbEdgeRadius;
 
     connect(btnEdgeColor, SIGNAL(SigColorChanged(float, float, float)), outln.polyhedron, SLOT(OnEdgeColorChanged(float, float, float)));
     connect(sbEdgeRadius, SIGNAL(valueChanged(double)), outln.polyhedron, SLOT(OnEdgeRadiusChanged(double)));
+    connect(sldHullAlpha, SIGNAL(valueChanged(int)), outln.polyhedron, SLOT(OnHullAlphaChanged(int)));
 }
 
 Outliner::EntityOutline* Outliner::FindByEntityID(unsigned entId) {

@@ -31,7 +31,7 @@ Plane::Plane(const IWorld::PlaneDesc& desc)
     common.printf("INFO - creating plane mesh with %d vertices.\n", N * N);
 
     Mesh::Vertex defaultVert;
-    defaultVert.color = Color::White;
+    defaultVert.color = Color(1.0f, 1.0f, 1.0f, 0.5f);
     defaultVert.normal = M::Vector3::Zero;
 
     // compute vertex positions

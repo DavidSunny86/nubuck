@@ -75,6 +75,7 @@ struct PolyhedronHull {
 	std::vector<R::Mesh::Index>             indices; // hull exists iff indices not empty
     std::vector<PolyhedronFaceCurve>        curves;
     R::MeshMgr::meshPtr_t                   mesh;
+    float                                   alpha;
 };
 
 struct PolyhedronSelection {
@@ -107,6 +108,7 @@ void Polyhedron_AddCurve(ENT_Polyhedron& ph, leda::edge edge, const R::Color& co
 void Polyhedron_UpdateCurve(PolyhedronFaceCurve& cv, float secsPassed);
 void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed);
 void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Color& color);
+void Polyhedron_SetHullAlpha(ENT_Polyhedron& ph, float alpha);
 bool Polyhedron_RaycastNodes(ENT_Polyhedron& ph, const M::Vector3& rayOrig, const M::Vector3& rayDir, leda::node& hitNode);
 bool Polyhedron_RaycastFaces(ENT_Polyhedron& ph, const M::Vector3& rayOrig, const M::Vector3& rayDir, leda::edge& hitFace);
 void Polyhedron_GetInfo(const ENT_Polyhedron& ph, INF_Polyhedron& inf);

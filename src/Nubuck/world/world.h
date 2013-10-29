@@ -74,6 +74,7 @@ namespace W {
         void Event_SetPickable(const EV::Event& event);
         void Event_SetNodeColor(const EV::Event& event);
         void Event_SetFaceColor(const EV::Event& event);
+        void Event_SetHullAlpha(const EV::Event& event);
         void Event_SetEdgeColor(const EV::Event& event);
         void Event_SetEdgeRadius(const EV::Event& event);
         void Event_Resize(const EV::Event& event);

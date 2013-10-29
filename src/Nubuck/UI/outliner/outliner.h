@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QDoubleSpinBox>
+#include <QSlider>
 #include <QVBoxLayout>
 
 #include <UI\colorbutton\colorbutton.h>
@@ -21,6 +22,7 @@ struct PolyhedronOutline : QObject {
 public slots:
     void OnEdgeColorChanged(float r, float g, float b);
     void OnEdgeRadiusChanged(double value);
+    void OnHullAlphaChanged(int value);
 public:
     unsigned            entId;
     QDoubleSpinBox*     sbEdgeRadius;
