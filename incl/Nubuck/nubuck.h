@@ -27,6 +27,8 @@ struct IPolyhedron {
 
     virtual void Destroy(void) = 0;
 
+    virtual leda::GRAPH<leda::d3_rat_point, int>& GetGraph(void) = 0;
+
     virtual void SetName(const std::string& name) = 0;
     virtual void SetRenderFlags(int flags) = 0;
     virtual void SetPickable(bool isPickable) = 0;
@@ -55,7 +57,7 @@ struct IWorld {
         unsigned        numAddSamples;
     };
 
-    virtual IPolyhedron*    CreatePolyhedron(leda::GRAPH<leda::d3_rat_point, int>& G) = 0;
+    virtual IPolyhedron*    CreatePolyhedron(void) = 0;
     virtual IMesh*          CreatePlaneMesh(const PlaneDesc& desc) = 0;
 };
 

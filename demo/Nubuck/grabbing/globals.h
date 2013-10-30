@@ -27,15 +27,9 @@ struct Globals {
 
     IMesh*          paraboloid;
 
-    graph_t         grNodes;
-    graph_t         grHull;
     IPolyhedron*    phNodes;
     IPolyhedron*    phHull;
 
-    graph_t         grNodesProj;
-    graph_t 		grDelaunayProj;
-    graph_t         grVoronoiProj;
-    graph_t 		grHullProj;
     IPolyhedron*    phNodesProj;
     IPolyhedron* 	phDelaunayProj;
     IPolyhedron*    phVoronoiProj;

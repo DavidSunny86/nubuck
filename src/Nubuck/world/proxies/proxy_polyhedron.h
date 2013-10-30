@@ -7,12 +7,15 @@ namespace Proxy {
 
 class Polyhedron : public IPolyhedron {
 private:
+    graph_t     _G;
     unsigned    _entId;
     std::string _name;
 public:
-    Polyhedron(graph_t& G);
+    Polyhedron(const graph_t& G);
 
     void Destroy(void) override;
+
+    graph_t& GetGraph(void) { return _G; }
 
     void SetName(const std::string& name) override;
     void SetRenderFlags(int flags) override;

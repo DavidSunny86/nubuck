@@ -91,7 +91,7 @@ namespace W {
         void Update(void);
 
         // exported to client
-        IPolyhedron* CreatePolyhedron(graph_t& G) override;
+        IPolyhedron* CreatePolyhedron(void) override;
         IMesh* CreatePlaneMesh(const PlaneDesc& desc) override;
 
         // thread interface

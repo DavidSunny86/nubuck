@@ -46,30 +46,30 @@ struct Phase0 : IPhase {
 
     void OnNodesMoved(void) override {
         leda::node n;
-        forall_nodes(n, g.grNodesProj) {
-            const point_t& p = g.grNodesProj[n];
+        forall_nodes(n, g.phNodesProj->GetGraph()) {
+            const point_t& p = g.phNodesProj->GetGraph()[n];
             scalar_t z = 5 + (p.xcoord() * p.xcoord() + p.ycoord() * p.ycoord()) / 100;
-            g.grNodes[g.nmap[n]] = point_t(p.xcoord(), p.ycoord(), z);
+            g.phNodes->GetGraph()[g.nmap[n]] = point_t(p.xcoord(), p.ycoord(), z);
         }
-        Delaunay2D(g.grNodesProj, g.grDelaunayProj);
-        ConvexHull(g.grNodes, g.grHull);
+        Delaunay2D(g.phNodesProj->GetGraph(), g.phDelaunayProj->GetGraph());
+        ConvexHull(g.phNodes->GetGraph(), g.phHull->GetGraph());
         g.phDelaunayProj->Update();
         g.phNodes->Update();
         g.phHull->Update();
         if(g.showVoronoi) {
-            Voronoi2D(g.grNodesProj, g.grVoronoiTri, g.grVoronoiProj, g.emap);
+            Voronoi2D(g.phNodesProj->GetGraph(), g.grVoronoiTri, g.phVoronoiProj->GetGraph(), g.emap);
             g.phVoronoiProj->Update();
             Colorize();
         } else {
-            ConvexHull(g.grNodesProj, g.grHullProj);
+            ConvexHull(g.phNodesProj->GetGraph(), g.phHullProj->GetGraph());
             g.phHullProj->Update();
         }
     }
 
     void Colorize(void) {
         leda::node n;
-        forall_nodes(n, g.grNodesProj) {
-            leda::edge ft = leda::LOCATE_IN_TRIANGULATION(g.grVoronoiTri, point2_t(g.grNodesProj[n].xcoord(), g.grNodesProj[n].ycoord()));
+        forall_nodes(n, g.phNodesProj->GetGraph()) {
+            leda::edge ft = leda::LOCATE_IN_TRIANGULATION(g.grVoronoiTri, point2_t(g.phNodesProj->GetGraph()[n].xcoord(), g.phNodesProj->GetGraph()[n].ycoord()));
             leda::edge f = g.emap[ft];
             Color c = g.colors[n];
             g.phVoronoiProj->SetFaceColor(f, c.r, c.g, c.b);

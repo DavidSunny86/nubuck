@@ -591,8 +591,8 @@ namespace W {
         rlIdx = 1 - rlIdx;
     }
 
-    IPolyhedron* World::CreatePolyhedron(graph_t& G) {
-        return new Proxy::Polyhedron(G);
+    IPolyhedron* World::CreatePolyhedron(void) {
+        return new Proxy::Polyhedron(graph_t());
     }
 
     IMesh* World::CreatePlaneMesh(const PlaneDesc& desc) 

@@ -22,35 +22,44 @@ private:
     }
 public:
     IPhase* Init(const Nubuck& nubuck, const graph_t& G) override {
-        // we are expected to copy these parameters
-        _globals.nb = nubuck;
+        Globals& g = _globals;
 
-        _globals.showParaboloid = false;
-        _globals.showHull = false;
-        _globals.showVoronoi = false;
-        _globals.showVoronoiEdges = false;
+        // we are expected to copy these parameters
+        g.nb = nubuck;
+
+        g.showParaboloid = false;
+        g.showHull = false;
+        g.showVoronoi = false;
+        g.showVoronoiEdges = false;
 
         std::vector<IWorld::PlaneDesc::Sample2>* paraboloidSamples = new std::vector<IWorld::PlaneDesc::Sample2>();
 
+        g.phNodes           = g.nb.world->CreatePolyhedron();
+        g.phHull            = g.nb.world->CreatePolyhedron();
+        g.phNodesProj       = g.nb.world->CreatePolyhedron();
+        g.phDelaunayProj    = g.nb.world->CreatePolyhedron();
+        g.phVoronoiProj     = g.nb.world->CreatePolyhedron();
+        g.phHullProj        = g.nb.world->CreatePolyhedron();
+
         // project all nodes on xy-plane. scale, too
         float scale = 1000.0f;
-        _globals.nb.log->printf("Scaling points by factor %f.\n", scale);
-        _globals.nmap.init(_globals.grNodesProj);
+        g.nb.log->printf("Scaling points by factor %f.\n", scale);
+        g.nmap.init(g.phNodesProj->GetGraph());
         leda::node n;
         forall_nodes(n, G) {
             const point_t& p = G[n];
             scalar_t z = 5 + (p.xcoord() * p.xcoord() + p.ycoord() * p.ycoord()) / 100;
-            leda::node n0 = _globals.grNodesProj.new_node();
-            leda::node n1 = _globals.grNodes.new_node();
-            _globals.nmap[n0] = n1;
-            _globals.grNodesProj[n0] = point_t(p.xcoord(), p.ycoord(), 0);
-            _globals.grNodes[n1] = point_t(p.xcoord(), p.ycoord(), z);
+            leda::node n0 = g.phNodesProj->GetGraph().new_node();
+            leda::node n1 = g.phNodes->GetGraph().new_node();
+            g.nmap[n0] = n1;
+            g.phNodesProj->GetGraph()[n0] = point_t(p.xcoord(), p.ycoord(), 0);
+            g.phNodes->GetGraph()[n1] = point_t(p.xcoord(), p.ycoord(), z);
             float z2 = static_cast<float>(z.to_float());
             printf("z2 = %f\n", z2);
 
             IWorld::PlaneDesc::Sample2 s;
-            s.x = static_cast<float>(_globals.grNodesProj[n0].xcoord().to_float());
-            s.y = static_cast<float>(_globals.grNodesProj[n0].ycoord().to_float());
+            s.x = static_cast<float>(g.phNodesProj->GetGraph()[n0].xcoord().to_float());
+            s.y = static_cast<float>(g.phNodesProj->GetGraph()[n0].ycoord().to_float());
             paraboloidSamples->push_back(s);
         }
 
@@ -62,57 +71,57 @@ public:
         desc.subdiv = 2;
         desc.flip = true;
 
-        _globals.paraboloid = _globals.nb.world->CreatePlaneMesh(desc);
-        _globals.paraboloid->SetVisible(_globals.showParaboloid);
+        g.paraboloid = g.nb.world->CreatePlaneMesh(desc);
+        g.paraboloid->SetVisible(g.showParaboloid);
 
-        Delaunay2D(_globals.grNodesProj, _globals.grDelaunayProj);
-        Voronoi2D(_globals.grNodesProj, _globals.grVoronoiTri, _globals.grVoronoiProj, _globals.emap);
-        ConvexHull(_globals.grNodesProj, _globals.grHullProj);
-        ConvexHull(_globals.grNodes, _globals.grHull);
+        Delaunay2D(g.phNodesProj->GetGraph(), g.phDelaunayProj->GetGraph());
+        Voronoi2D(g.phNodesProj->GetGraph(), g.grVoronoiTri, g.phVoronoiProj->GetGraph(), g.emap);
+        ConvexHull(g.phNodesProj->GetGraph(), g.phHullProj->GetGraph());
+        ConvexHull(g.phNodes->GetGraph(), g.phHull->GetGraph());
 
-        _globals.phNodesProj = _globals.nb.world->CreatePolyhedron(_globals.grNodesProj);
-        _globals.phNodesProj->SetName("Nodes (Projection)");
-        _globals.phNodesProj->SetRenderFlags(POLYHEDRON_RENDER_NODES);
-        _globals.phNodesProj->SetPickable(true);
+        g.phNodesProj->SetName("Nodes (Projection)");
+        g.phNodesProj->SetRenderFlags(POLYHEDRON_RENDER_NODES);
+        g.phNodesProj->SetPickable(true);
 
-        _globals.phDelaunayProj = _globals.nb.world->CreatePolyhedron(_globals.grDelaunayProj);
-        _globals.phDelaunayProj->SetName("Delaunay Triangulation");
-        _globals.phDelaunayProj->SetRenderFlags(POLYHEDRON_RENDER_EDGES);
+        g.phDelaunayProj->SetName("Delaunay Triangulation");
+        g.phDelaunayProj->SetRenderFlags(POLYHEDRON_RENDER_EDGES);
 
-        _globals.phHullProj = _globals.nb.world->CreatePolyhedron(_globals.grHullProj);
-        _globals.phHullProj->SetName("Convex Hull (Projection)");
-        _globals.phHullProj->SetRenderFlags(POLYHEDRON_RENDER_HULL | POLYHEDRON_RENDER_EDGES);
-        _globals.phHullProj->Update();
+        g.phHullProj->SetName("Convex Hull (Projection)");
+        g.phHullProj->SetRenderFlags(POLYHEDRON_RENDER_HULL | POLYHEDRON_RENDER_EDGES);
+        g.phHullProj->Update();
         
-        _globals.phVoronoiProj = _globals.nb.world->CreatePolyhedron(_globals.grVoronoiProj);
-        _globals.phVoronoiProj->SetName("Voronoi Diagram");
-        // _globals.phVoronoiProj->SetRenderFlags(POLYHEDRON_RENDER_HULL);
-        // _globals.phVoronoiProj->Update();
+        g.phVoronoiProj->SetName("Voronoi Diagram");
+        // g.phVoronoiProj->SetRenderFlags(POLYHEDRON_RENDER_HULL);
+        // g.phVoronoiProj->Update();
 
         float f = 1.0f / 255.0f;
         float r2 = f * 176;
         float g2 = f * 196;
         float b2 = f * 222;
-        _globals.colors.init(_globals.grNodesProj);
-        forall_nodes(n, _globals.grNodesProj) {
-            float r = (RandFloat(0.5f, 1.0f) + r2) * 0.5f;
-            float g = (RandFloat(0.5f, 1.0f) + g2) * 0.5f;
-            float b = (RandFloat(0.5f, 1.0f) + b2) * 0.5f;
+        g.colors.init(g.phNodesProj->GetGraph());
+        forall_nodes(n, g.phNodesProj->GetGraph()) {
+            float cr = (RandFloat(0.5f, 1.0f) + r2) * 0.5f;
+            float cg = (RandFloat(0.5f, 1.0f) + g2) * 0.5f;
+            float cb = (RandFloat(0.5f, 1.0f) + b2) * 0.5f;
             Color c;
-            c.r = r;
-            c.g = g;
-            c.b = b;
-            _globals.colors[n] = c;
+            c.r = cr;
+            c.g = cg;
+            c.b = cb;
+            g.colors[n] = c;
         }
 
-        _globals.phNodes = _globals.nb.world->CreatePolyhedron(_globals.grNodes);
-        _globals.phNodes->SetName("Nodes");
+        g.phNodes->SetName("Nodes");
 
-        _globals.phHull = _globals.nb.world->CreatePolyhedron(_globals.grHull);
-        _globals.phHull->SetName("Convex Hull");
-        _globals.phHull->Update();
+        g.phHull->SetName("Convex Hull");
 
-        return new Phase0(_globals);
+        g.phNodes->Update();
+        g.phHull->Update();
+        g.phNodesProj->Update();
+        g.phDelaunayProj->Update();
+        g.phVoronoiProj ->Update();
+        g.phHull->Update();
+
+        return new Phase0(g);
     }
 
     bool Run(void) override { return false; /* do nothing special */ }

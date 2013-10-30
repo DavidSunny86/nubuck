@@ -4,8 +4,8 @@
 
 namespace Proxy {
 
-Polyhedron::Polyhedron(graph_t& G) {
-	_entId = W::world.SpawnPolyhedron(&G);
+Polyhedron::Polyhedron(const graph_t& G) : _G(G) {
+	_entId = W::world.SpawnPolyhedron(&_G);
 }
 
 void Polyhedron::Destroy(void) {
