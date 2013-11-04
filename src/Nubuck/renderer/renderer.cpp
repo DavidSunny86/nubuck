@@ -15,6 +15,7 @@
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>
 #include <renderer\mesh\sphere\sphere.h>
+#include <renderer\mesh\cylinder\cylinder.h>
 #include <renderer\material\material.h>
 #include <renderer\metrics\metrics.h>
 #include <renderer\giantbuffer\giant_buffer.h>
@@ -534,6 +535,36 @@ void SetState(const State& state) {
         curState.depth.func = state.depth.func;
     }
 
+    // SetEnabled(GL_STENCIL_TEST, state.stencil.enabled);
+    bool c0, c1, c2;
+    c0 = curState.stencil.func.func != state.stencil.func.func;
+    c1 = curState.stencil.func.ref  != state.stencil.func.ref;
+    c2 = curState.stencil.func.mask != state.stencil.func.mask;
+    if(c0 || c1 || c2) {
+        GL_CALL(glStencilFunc(state.stencil.func.func, state.stencil.func.ref, state.stencil.func.mask));
+        curState.stencil.func.func  = state.stencil.func.func;
+        curState.stencil.func.ref   = state.stencil.func.ref;
+        curState.stencil.func.mask  = state.stencil.func.mask;
+    }
+    c0 = curState.stencil.op.front.fail   != state.stencil.op.front.fail;
+    c1 = curState.stencil.op.front.zfail  != state.stencil.op.front.zfail;
+    c2 = curState.stencil.op.front.zpass  != state.stencil.op.front.zpass;
+    if(c0 || c1 || c2) {
+        GL_CALL(glStencilOpSeparate(GL_FRONT, state.stencil.op.front.fail, state.stencil.op.front.zfail, state.stencil.op.front.zpass));
+        curState.stencil.op.front.fail    = state.stencil.op.front.fail;
+        curState.stencil.op.front.zfail   = state.stencil.op.front.zfail;
+        curState.stencil.op.front.zpass   = state.stencil.op.front.zpass;
+    }
+    c0 = curState.stencil.op.back.fail   != state.stencil.op.back.fail;
+    c1 = curState.stencil.op.back.zfail  != state.stencil.op.back.zfail;
+    c2 = curState.stencil.op.back.zpass  != state.stencil.op.back.zpass;
+    if(c0 || c1 || c2) {
+        GL_CALL(glStencilOpSeparate(GL_BACK, state.stencil.op.back.fail, state.stencil.op.back.zfail, state.stencil.op.back.zpass));
+        curState.stencil.op.back.fail    = state.stencil.op.back.fail;
+        curState.stencil.op.back.zfail   = state.stencil.op.back.zfail;
+        curState.stencil.op.back.zpass   = state.stencil.op.back.zpass;
+    }
+
     if(curState.raster.lineWidth != state.raster.lineWidth) {
         GL_CALL(glLineWidth(state.raster.lineWidth));
         curState.raster.lineWidth = state.raster.lineWidth;
@@ -561,6 +592,10 @@ void Renderer::Init(void) {
     common.printf("INFO - supported GL version: '%s'.\n", glVersion);
     */
 
+    GLint stencilBits = 0;
+    glGetIntegerv(GL_STENCIL_BITS, &stencilBits);
+    assert(0 < stencilBits);
+
     curState.SetDefault();
 
     GL_CALL(glEnable(GL_PRIMITIVE_RESTART));
@@ -571,7 +606,9 @@ void Renderer::Init(void) {
     // glClearColor(f * 70, f * 130, f * 180, 1.0f); // steel blue
     glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
     glClearDepth(1.0f);
+    glClearStencil(0);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
     glEnable(GL_CULL_FACE);
     
     glEnable(GL_POLYGON_OFFSET_FILL);
@@ -702,7 +739,7 @@ void Renderer::Render(void) {
         GL_CALL(glDepthMask(GL_TRUE));
         curState.depth.maskEnabled = GL_TRUE;
     }
-    GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
     RenderList& renderList = g_renderLists[rlIdx];
 

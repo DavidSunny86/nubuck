@@ -76,7 +76,7 @@ namespace R {
         // mantle
 		for(unsigned i = 0; i <= numSlices; ++i) {
             const unsigned idx = i % numSlices;
-			const M::Vector3 n = M::Vector3(cosf(dSl * idx), sinf(dSl * idx), 0.0f);
+			const M::Vector3 n = M::Vector3(cosf(-dSl * idx), sinf(-dSl * idx), 0.0f);
             vert.normal = n;
             vert.position = lowerCenter + radius * n;
             _vertices.push_back(vert);

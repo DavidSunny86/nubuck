@@ -78,7 +78,7 @@ namespace SYS {
             WGL_ACCELERATION_ARB,	WGL_FULL_ACCELERATION_ARB,
             WGL_COLOR_BITS_ARB,		32,
             WGL_DEPTH_BITS_ARB,		24,
-            WGL_STENCIL_BITS_ARB,   0,
+            WGL_STENCIL_BITS_ARB,   8,
             WGL_DOUBLE_BUFFER_ARB,	GL_TRUE,
             WGL_SAMPLE_BUFFERS_ARB,	GL_TRUE,
             WGL_SAMPLES_ARB,		2,

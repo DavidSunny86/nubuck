@@ -6,6 +6,19 @@
 
 namespace R {
 
+static void GenerateTrianglesFromTriangles(const Mesh::Desc& desc, std::vector<Mesh::TriIndices>& tris) {
+    unsigned i = 0;
+    while(i < desc.numIndices) {
+        assert(i + 2 < desc.numIndices);
+        Mesh::TriIndices tri;
+        tri.indices[0] = desc.indices[i + 0];
+        tri.indices[1] = desc.indices[i + 1];
+        tri.indices[2] = desc.indices[i + 2];
+        tris.push_back(tri);
+        i += 3;
+    }
+}
+
 static void GenerateTrianglesFromTriangleStrips(const Mesh::Desc& desc, std::vector<Mesh::TriIndices>& tris) {
     if(desc.numIndices < 3) return;
     unsigned i = 0;
@@ -61,6 +74,7 @@ static void GenerateTrianglesFromTriangleFan(const Mesh::Desc& desc, std::vector
 static void GenerateTriangles(const Mesh::Desc& desc, std::vector<Mesh::TriIndices>& tris) {
     tris.clear();
     switch(desc.primType) {
+    case GL_TRIANGLES: GenerateTrianglesFromTriangles(desc, tris); break;
     case GL_TRIANGLE_STRIP: GenerateTrianglesFromTriangleStrips(desc, tris); break;
     case GL_TRIANGLE_FAN: GenerateTrianglesFromTriangleFan(desc, tris); break;
     default:

@@ -24,6 +24,22 @@ namespace R {
         } depth;
 
         struct {
+            GLboolean   enabled;
+            struct {
+                GLenum  func;
+                GLint   ref;
+                GLuint  mask;
+            } func;
+            struct {
+                struct {
+                    GLenum  fail;
+                    GLenum  zfail;
+                    GLenum  zpass;
+                } front, back;
+            } op;
+        } stencil;
+
+        struct {
             float       lineWidth;
         } raster;
 
@@ -37,6 +53,17 @@ namespace R {
             depth.enabled       = GL_TRUE;
             depth.maskEnabled   = GL_TRUE;
             depth.func          = GL_LESS;
+
+            stencil.enabled             = GL_FALSE;
+            stencil.func.func   		= GL_ALWAYS;
+            stencil.func.ref    		= 0;
+            stencil.func.mask   		= 0xFFFFFFFF;
+            stencil.op.front.fail       = GL_KEEP;
+            stencil.op.front.zfail    	= GL_KEEP;
+            stencil.op.front.zpass    	= GL_KEEP;
+            stencil.op.back.fail        = GL_KEEP;
+            stencil.op.back.zfail    	= GL_KEEP;
+            stencil.op.back.zpass    	= GL_KEEP;
 
             raster.lineWidth    = 1.0f;
 
