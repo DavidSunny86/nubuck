@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://plainoldcj.github.io//github/sitemap.xml 
