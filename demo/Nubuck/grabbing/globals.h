@@ -26,6 +26,8 @@ struct Globals {
     leda::edge_map<leda::edge> emap;
 
     IMesh*          paraboloid;
+    IMesh*          decal;
+    IMesh*          overlay;
 
     IPolyhedron*    phNodes;
     IPolyhedron*    phHull;

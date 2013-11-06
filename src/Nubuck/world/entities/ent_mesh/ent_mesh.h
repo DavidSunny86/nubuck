@@ -13,6 +13,6 @@ struct ENT_Mesh {
 
 void Mesh_Init(ENT_Mesh& mesh, R::MeshMgr::meshPtr_t meshPtr);
 void Mesh_SetVisible(bool isVisible);
-void Mesh_BuildRenderList(ENT_Mesh& mesh);
+void Mesh_BuildRenderList(ENT_Mesh& mesh, const std::string& fxName);
 
 } // namespace W

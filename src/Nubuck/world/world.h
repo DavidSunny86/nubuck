@@ -40,6 +40,7 @@ namespace W {
             EntityType      type;
             unsigned        entId;
             std::string     name;
+            std::string     fxName;
 
             ENT_Polyhedron* polyhedron;
             ENT_Mesh*       mesh;
@@ -77,6 +78,7 @@ namespace W {
         void Event_SetHullAlpha(const EV::Event& event);
         void Event_SetEdgeColor(const EV::Event& event);
         void Event_SetEdgeRadius(const EV::Event& event);
+        void Event_SetEffect(const EV::Event& event);
         void Event_Resize(const EV::Event& event);
         void Event_Mouse(const EV::Event& event);
         void Event_Key(const EV::Event& event);
@@ -93,6 +95,7 @@ namespace W {
         // exported to client
         IPolyhedron* CreatePolyhedron(void) override;
         IMesh* CreatePlaneMesh(const PlaneDesc& desc) override;
+        IMesh* CreateSphereMesh(const SphereDesc& desc) override;
 
         // thread interface
         DWORD Thread_Func(void);

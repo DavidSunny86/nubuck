@@ -170,6 +170,69 @@ namespace R {
 		effectMgr.Register(fx);
         fx.passes.clear();
 
+        // LitDirectionalStencilFill Effect
+        // uses renderList.dirLights only, fills stencil buffer with ref=1
+
+        pass0.name = "Pass0";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\lit_directional.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\lit_directional.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.state.stencil.func.ref        = 1;
+        pass0.state.stencil.op.front.zpass  = GL_REPLACE;
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "LitDirectionalStencilFill";
+        fx.sortKey = 1;
+        fx.passes.push_back(pass0);
+        effectMgr.Register(fx);
+        fx.passes.clear();
+
+        // StencilDecal Effect
+        // stencil buffer intersection
+
+        pass0.name = "Pass0";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\overlay.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\overlay.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.state.blend.enabled               = GL_TRUE;
+        pass0.state.blend.srcFactor             = GL_ZERO;
+        pass0.state.blend.dstFactor             = GL_ONE;
+        pass0.state.depth.maskEnabled           = GL_FALSE;
+        pass0.state.stencil.op.front.zpass      = GL_INCR;
+        pass0.state.stencil.op.back.zpass       = GL_DECR;
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "StencilDecal";
+        fx.sortKey = 3;
+        fx.passes.push_back(pass0);
+        effectMgr.Register(fx);
+        fx.passes.clear();
+
+        // StencilOverlay Effect
+
+        pass0.name = "Pass0";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\overlay.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\overlay.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.state.blend.enabled       = GL_TRUE;
+        pass0.state.blend.srcFactor     = GL_DST_COLOR;
+        pass0.state.blend.dstFactor     = GL_ZERO;
+        pass0.state.stencil.func.func   = GL_LESS;
+        pass0.state.stencil.func.ref    = 1;
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "StencilOverlay";
+        fx.sortKey = 4;
+        fx.passes.push_back(pass0);
+        effectMgr.Register(fx);
+        fx.passes.clear();
+
         // DefaultLit Effect
         // lit
 

@@ -72,7 +72,16 @@ public:
         desc.flip = true;
 
         g.paraboloid = g.nb.world->CreatePlaneMesh(desc);
+        g.paraboloid->SetEffect("LitDirectionalTransparent");
         g.paraboloid->SetVisible(g.showParaboloid);
+
+        IWorld::SphereDesc sphereDesc;
+        sphereDesc.numSubdiv = 4;
+        sphereDesc.smooth = true;
+        g.decal = g.nb.world->CreateSphereMesh(sphereDesc);
+        g.decal->SetEffect("StencilDecal");
+        g.overlay = g.nb.world->CreateSphereMesh(sphereDesc);
+        g.overlay->SetEffect("StencilOverlay");
 
         Delaunay2D(g.phNodesProj->GetGraph(), g.phDelaunayProj->GetGraph());
         Voronoi2D(g.phNodesProj->GetGraph(), g.grVoronoiTri, g.phVoronoiProj->GetGraph(), g.emap);
@@ -88,6 +97,7 @@ public:
 
         g.phHullProj->SetName("Convex Hull (Projection)");
         g.phHullProj->SetRenderFlags(POLYHEDRON_RENDER_HULL | POLYHEDRON_RENDER_EDGES);
+        g.phHullProj->SetEffect("LitDirectionalStencilFill");
         g.phHullProj->Update();
         
         g.phVoronoiProj->SetName("Voronoi Diagram");

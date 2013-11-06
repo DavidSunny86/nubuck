@@ -18,6 +18,7 @@ public:
     graph_t& GetGraph(void) { return _G; }
 
     void SetName(const std::string& name) override;
+    void SetEffect(const char* fxName) override;
     void SetRenderFlags(int flags) override;
     void SetPickable(bool isPickable) override;
     void SetNodeColor(leda::node node, float r, float g, float b) override;

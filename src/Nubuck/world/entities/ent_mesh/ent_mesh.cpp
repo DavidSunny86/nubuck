@@ -11,11 +11,12 @@ void Mesh_SetVisible(ENT_Mesh& mesh, bool isVisible) {
     mesh.isVisible = isVisible;
 }
 
-void Mesh_BuildRenderList(ENT_Mesh& mesh) {
+void Mesh_BuildRenderList(ENT_Mesh& mesh, const std::string& fxName) {
     mesh.renderList.jobs.clear();
     if(mesh.isVisible) {
         R::RenderJob rjob;
-        rjob.fx         = "LitDirectionalTransparent";
+        // rjob.fx         = "LitDirectionalTransparent";
+        rjob.fx         = fxName;
         rjob.material   = R::Material::White;
         rjob.mesh       = mesh.meshPtr;
         rjob.primType   = 0;

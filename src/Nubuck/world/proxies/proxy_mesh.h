@@ -11,6 +11,7 @@ private:
 public:
     Mesh(unsigned entId) : _entId(entId) { }
 
+    void SetEffect(const char* fxName) override;
     void SetVisible(bool isVisible) override;
 };
 

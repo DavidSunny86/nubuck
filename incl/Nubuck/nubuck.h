@@ -30,6 +30,7 @@ struct IPolyhedron {
     virtual leda::GRAPH<leda::d3_rat_point, int>& GetGraph(void) = 0;
 
     virtual void SetName(const std::string& name) = 0;
+    virtual void SetEffect(const char* fxName) = 0;
     virtual void SetRenderFlags(int flags) = 0;
     virtual void SetPickable(bool isPickable) = 0;
     virtual void SetNodeColor(leda::node node, float r, float g, float b) = 0;
@@ -41,6 +42,7 @@ struct IPolyhedron {
 struct IMesh {
     virtual ~IMesh(void) { }
 
+    virtual void SetEffect(const char* fxName) = 0;
     virtual void SetVisible(bool isVisible) = 0;
 };
 
@@ -57,8 +59,14 @@ struct IWorld {
         unsigned        numAddSamples;
     };
 
+    struct SphereDesc {
+        int     numSubdiv;
+        bool    smooth;
+    };
+
     virtual IPolyhedron*    CreatePolyhedron(void) = 0;
     virtual IMesh*          CreatePlaneMesh(const PlaneDesc& desc) = 0;
+    virtual IMesh*          CreateSphereMesh(const SphereDesc& desc) = 0;
 };
 
 struct ILog {

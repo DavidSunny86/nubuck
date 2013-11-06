@@ -4,6 +4,7 @@
 #include <common\common.h>
 #include <algdriver\algdriver.h>
 #include <renderer\mesh\plane\plane.h>
+#include <renderer\mesh\sphere\sphere.h>
 #include <events\event_defs.h>
 #include <UI\outliner\outliner.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
@@ -37,6 +38,7 @@ namespace W {
         EVENT_HANDLER(EV::def_SetHullAlpha,         &World::Event_SetHullAlpha)
         EVENT_HANDLER(EV::def_SetEdgeColor, 		&World::Event_SetEdgeColor)
         EVENT_HANDLER(EV::def_SetEdgeRadius,        &World::Event_SetEdgeRadius)
+        EVENT_HANDLER(EV::def_SetEffect,            &World::Event_SetEffect)
         EVENT_HANDLER(EV::def_Resize,               &World::Event_Resize)
         EVENT_HANDLER(EV::def_Mouse,                &World::Event_Mouse)
         EVENT_HANDLER(EV::def_Key,                  &World::Event_Key)
@@ -270,6 +272,7 @@ namespace W {
         GEN::Pointer<Entity> entity(new Entity());
         entity->type = ENT_POLYHEDRON;
         entity->entId = args.entId;
+        entity->fxName = "LitDirectional";
         ENT_Polyhedron* ph = new ENT_Polyhedron();
         ph->G = args.G;
         Polyhedron_Init(*ph);
@@ -293,6 +296,7 @@ namespace W {
         GEN::Pointer<Entity> entity(new Entity());
         entity->type = ENT_MESH;
         entity->entId = args.entId;
+        entity->fxName = "LitDirectional";
         ENT_Mesh* mesh = new ENT_Mesh();
         Mesh_Init(*mesh, args.meshPtr);
         entity->mesh = mesh;
@@ -404,6 +408,13 @@ namespace W {
         assert(entity.IsValid());
         assert(ENT_POLYHEDRON == entity->type);
         entity->polyhedron->edges.radius = args.radius;
+    }
+
+    void World::Event_SetEffect(const EV::Event& event) {
+        const EV::Params_SetEffect& args = EV::def_SetEffect.GetArgs(event);
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        assert(entity.IsValid());
+        entity->fxName = args.fxName;
     }
 
     void World::Event_Resize(const EV::Event& event) {
@@ -549,13 +560,14 @@ namespace W {
         }
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
-            if(ENT_POLYHEDRON == _entities[i]->type) {
-                ENT_Polyhedron& ph = *_entities[i]->polyhedron;
-                Polyhedron_BuildRenderList(ph);
+            GEN::Pointer<Entity> entity = _entities[i];
+            if(ENT_POLYHEDRON == entity->type) {
+                ENT_Polyhedron& ph = *entity->polyhedron;
+                Polyhedron_BuildRenderList(ph, entity->fxName);
             }
-            if(ENT_MESH == _entities[i]->type) {
-                ENT_Mesh& mesh = *_entities[i]->mesh;
-                Mesh_BuildRenderList(mesh);
+            if(ENT_MESH == entity->type) {
+                ENT_Mesh& mesh = *entity->mesh;
+                Mesh_BuildRenderList(mesh, entity->fxName);
             }
         }
 
@@ -603,6 +615,12 @@ namespace W {
     {
         R::Plane plane(desc);
         unsigned entId = SpawnMesh(R::meshMgr.Create(plane.GetDesc()));
+        return new Proxy::Mesh(entId);
+    }
+
+    IMesh* World::CreateSphereMesh(const SphereDesc& desc) {
+        R::Sphere sphere(desc.numSubdiv, desc.smooth);
+        unsigned entId = SpawnMesh(R::meshMgr.Create(sphere.GetDesc()));
         return new Proxy::Mesh(entId);
     }
 

@@ -73,6 +73,11 @@ BEGIN_EVENT_DEF(SetEdgeRadius)
     float       radius;
 END_EVENT_DEF
 
+BEGIN_EVENT_DEF(SetEffect)
+    unsigned    entId;
+    const char* fxName;
+END_EVENT_DEF
+
 BEGIN_EVENT_DEF(Resize)
     int         width;
     int         height;

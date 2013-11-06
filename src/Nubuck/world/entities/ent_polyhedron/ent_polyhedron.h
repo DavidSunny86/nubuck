@@ -102,7 +102,7 @@ struct INF_Polyhedron {
 void Polyhedron_InitResources(void);
 void Polyhedron_Init(ENT_Polyhedron& ph);
 void Polyhedron_Rebuild(ENT_Polyhedron& ph);
-void Polyhedron_BuildRenderList(ENT_Polyhedron& ph);
+void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx);
 void Polyhedron_Update(ENT_Polyhedron& ph);
 void Polyhedron_AddCurve(ENT_Polyhedron& ph, leda::edge edge, const R::Color& color);
 void Polyhedron_UpdateCurve(PolyhedronFaceCurve& cv, float secsPassed);

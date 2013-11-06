@@ -234,7 +234,7 @@ void Polyhedron_Rebuild(ENT_Polyhedron& ph) {
 
 // the renderlist of a polyhedron ph can be build even though
 // it's graph ph.G is no longer valid.
-void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
+void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
     ph.renderList.jobs.clear();
 
 	R::RenderJob renderJob;
@@ -278,6 +278,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph) {
             float alpha = ph.hull.vertices[0].color.a; // constant for all verts
             if(1.0f > alpha) renderJob.fx = "LitDirectionalTransparent";
             else renderJob.fx = "LitDirectional";
+            renderJob.fx = hullFx;
 
             renderJob.material = R::Material::White;
             renderJob.mesh = ph.hull.mesh;
