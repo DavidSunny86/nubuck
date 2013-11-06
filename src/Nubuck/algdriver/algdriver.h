@@ -39,6 +39,7 @@ namespace ALG {
 
     class Algorithm {
     private:
+        bool        _init; // true iff Init() has been called at least once
         algAlloc_t  _algAlloc;
         graph_t     _G;
         Driver*     _driver;
@@ -54,7 +55,7 @@ namespace ALG {
         void Next(void);
         void Run(void);
 
-        GEN::Pointer<IPhase> GetPhase(void) { return _driver->GetPhase(); }
+        GEN::Pointer<IPhase> GetPhase(void);
     };
 
     // global interface to client algorithm

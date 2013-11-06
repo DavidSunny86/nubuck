@@ -159,7 +159,8 @@ namespace W {
                             }
                         }
                     }
-                    ALG::gs_algorithm.GetPhase()->OnNodesMoved();
+                    GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
+                    if(phase.IsValid()) phase->OnNodesMoved();
                 }
 
                 if(EV::Params_Mouse::MODIFIER_SHIFT == args.mods)
@@ -199,7 +200,8 @@ namespace W {
                             }
                         }
                     }
-                    ALG::gs_algorithm.GetPhase()->OnNodesMoved();
+                    GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
+                    if(phase.IsValid()) phase->OnNodesMoved();
 
                     _isGrabbing = false;
                 } else _camArcball.StartPanning(args.x, args.y);
@@ -434,7 +436,8 @@ namespace W {
         if('E' == args.keyCode) _camArcball.Reset();
 
         if(EV::Params_Key::KEY_DOWN == args.type && !args.autoRepeat) {
-            ALG::gs_algorithm.GetPhase()->OnKeyPressed((char)args.keyCode);
+            GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
+            if(phase.IsValid()) phase->OnKeyPressed((char)args.keyCode);
         }
     }
 
@@ -526,7 +529,8 @@ namespace W {
                     }
                 }
             }
-            ALG::gs_algorithm.GetPhase()->OnNodesMoved();
+            GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
+            if(phase.IsValid()) phase->OnNodesMoved();
         } // if(isGrabbing)
 
         for(unsigned i = 0; i < _entities.size(); ++i) {

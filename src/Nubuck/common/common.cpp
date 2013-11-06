@@ -4,6 +4,7 @@
 
 #include <string>
 
+#include <system\winerror.h>
 #include "common.h"
 
 int COM_Tokenize(ctoken_t** tokens, const char* string) {
@@ -78,7 +79,21 @@ Common::~Common(void) {
     if(_logfile) fclose(_logfile);
 }
 
+std::string CurrentDirectory(void) {
+    DWORD bufferLength = 0;
+    bufferLength = GetCurrentDirectoryA(0, NULL);
+    CHECK_WIN_ERROR;
+    assert(bufferLength);
+    std::string buffer(bufferLength, '0');
+    bufferLength = GetCurrentDirectoryA(bufferLength, &buffer[0]);
+    CHECK_WIN_ERROR;
+    assert(bufferLength);
+    return buffer;
+}
+
 void Common::Init(int argc, char* argv[]) {
+    unsigned i = 0;
+
     _logfile = fopen("logfile.txt", "w");
 
     char delim = 0;
@@ -87,22 +102,33 @@ void Common::Init(int argc, char* argv[]) {
 #endif
     assert(0 != delim);
 
+    _baseDir = CurrentDirectory();
+
+    bool ignoreLedaDir = false;
+    i = 0;
+    while(i < argc && !ignoreLedaDir) {
+        if(!strcmp("--ignoreledadir", argv[i]))
+            ignoreLedaDir = true;
+        i++;
+    }
+
     const char* s;
     if(s = getenv("LEDA_DIR")) {
-        _baseDir = s;
-        if(delim != _baseDir.back()) _baseDir += delim;
+        if(!ignoreLedaDir) _baseDir = s;
+        common.printf("INFO - environment variable 'LEDA_DIR' set to '%s'\n", s);
     }
-    else {
-        common.printf("INFO - environment variable 'LEDA_DIR' not set.\n");
-        _baseDir = DirOf(argv[0]);
+    else common.printf("INFO - environment variable 'LEDA_DIR' not set.\n");
+
+    i = 0;
+    while(i < argc - 1) {
+        if(!strcmp("--basedir", argv[i]))
+            _baseDir = DirOf(argv[i + 1]);
+        i++;
     }
 
-#ifdef NSIGHT_BUILD
-    _baseDir = "C:\\Users\\cj\\AppData\\Roaming\\NVIDIA Corporation\\Nsight\\Monitor\\Mirror\\cj-desktop\\c\\libraries\\leda\\leda-6.4\\";
-#endif
-
+    if(delim != _baseDir.back()) _baseDir += delim;
     _baseDir += std::string("res") + delim;
-    printf("base directory is '%s'.\n", _baseDir.c_str());
+    printf("INFO - base directory is '%s'.\n", _baseDir.c_str());
 }
 
 float Common::RandomFloat(float min, float max) const {

@@ -24,7 +24,7 @@ static R::SkinMgr::handle_t     g_faceCurveDecalSkin;
 void Polyhedron_InitResources(void) {
     g_faceCurveDecalMesh = R::meshMgr.Create(R::CreateQuadDesc(cvar_faceCurveDecalSize));
     R::SkinDesc skinDesc;
-    skinDesc.diffuseTexture = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\Textures\\circle.tga";
+    skinDesc.diffuseTexture = common.BaseDir() + "Textures\\circle.tga";
     g_faceCurveDecalSkin = R::skinMgr.Create(skinDesc);
 }
 
@@ -221,9 +221,6 @@ static void Polyhedron_MaskFace(ENT_Polyhedron& ph, leda::edge e) {
 }
 
 void Polyhedron_Rebuild(ENT_Polyhedron& ph) {
-    common.printf("INFO - Polyhedron_Rebuild: rebuilding polyhedron with |V| = %d, |E| = %d.\n",
-        ph.G->number_of_nodes(), ph.G->number_of_edges());
-
     Polyhedron_RebuildSelection(ph);
     Polyhedron_RebuildNodes(ph);
     Polyhedron_RebuildEdges(ph);

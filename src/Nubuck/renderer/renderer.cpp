@@ -573,8 +573,19 @@ void SetState(const State& state) {
 
 Renderer::Renderer(void) : _time(0.0f) { }
 
+static void PrintGLInfo(void) {
+    common.printf("INFO - GL strings {\n");
+    common.printf("\tGL_VENDOR                   = '%s'\n", glGetString(GL_VENDOR));
+    common.printf("\tGL_RENDERER                 = '%s'\n", glGetString(GL_RENDERER));
+    common.printf("\tGL_VERSION                  = '%s'\n", glGetString(GL_VERSION));
+    common.printf("\tGL_SHADING_LANGUAGE_VERSION = '%s'\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    common.printf("} // GL strings\n");
+}
+
 void Renderer::Init(void) {
     GL_CHECK_ERROR;
+
+    PrintGLInfo();
 
     InitDebugOutput();
 

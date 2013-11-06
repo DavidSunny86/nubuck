@@ -724,6 +724,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_colorbutton.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_nubuck.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -770,6 +773,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\colorbutton\colorbutton.h">
       <Filter>Private\UI\colorbutton</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\res\nubuck.qrc">
+      <Filter>Resource Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

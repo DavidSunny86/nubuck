@@ -65,7 +65,7 @@ namespace ALG {
         return 0;
     }
 
-    Algorithm::Algorithm(void) : _algAlloc(NULL), _driver(NULL) { }
+    Algorithm::Algorithm(void) : _init(false), _algAlloc(NULL), _driver(NULL) { }
 
     void Algorithm::SetAlloc(algAlloc_t algAlloc) {
         _algAlloc = algAlloc;
@@ -74,6 +74,7 @@ namespace ALG {
     void Algorithm::Init(const graph_t& G) {
         assert(NULL != _algAlloc);
         _G = G;
+        _init = true;
         Reset();
     }
 
@@ -83,14 +84,22 @@ namespace ALG {
             delete _driver;
             _driver = NULL;
         }
-        GEN::Pointer<IAlgorithm> algorithm(_algAlloc());
-        GEN::Pointer<IPhase> phase(algorithm->Init(nubuck, _G));
-        _driver = new Driver(algorithm, phase);
-        _driver->Thread_StartAsync();
+
+        if(_init) {
+            GEN::Pointer<IAlgorithm> algorithm(_algAlloc());
+            GEN::Pointer<IPhase> phase(algorithm->Init(nubuck, _G));
+            _driver = new Driver(algorithm, phase);
+            _driver->Thread_StartAsync();
+        }
     }
 
     void Algorithm::Step(void) { if(_driver) _driver->AddCommand(Driver::CMD_STEP); }
     void Algorithm::Next(void) { if(_driver) _driver->AddCommand(Driver::CMD_NEXT); }
     void Algorithm::Run(void) { if(_driver) _driver->AddCommand(Driver::CMD_RUN); }
+
+    GEN::Pointer<IPhase> Algorithm::GetPhase(void) {
+        if(_driver) return _driver->GetPhase();
+        return GEN::Pointer<IPhase>();
+    }
 
 } // namespace ALG

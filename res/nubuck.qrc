@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/ui">
+        <file>Images/arrow-up.png</file>
+        <file>Images/arrow-down.png</file>
+        <file>Images/arrow-down-hover.png</file>
+        <file>Images/arrow-up-hover.png</file>
+    </qresource>
+</RCC>
