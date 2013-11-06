@@ -36,6 +36,16 @@ BEGIN_EVENT_DEF(SetName)
     const char* name;
 END_EVENT_DEF
 
+BEGIN_EVENT_DEF(SetPosition)
+    unsigned    entId;
+    M::Vector3  pos;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(SetScale)
+    unsigned    entId;
+    float       sx, sy, sz;
+END_EVENT_DEF
+
 BEGIN_EVENT_DEF(SetRenderFlags)
     unsigned    entId;
     int         flags;

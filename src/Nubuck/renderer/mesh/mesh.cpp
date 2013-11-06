@@ -104,9 +104,10 @@ public:
     }
 };
 
-Mesh::Mesh(const Desc& desc) : _gbHandle(GB_INVALID_HANDLE), _compiled(false) {
-    ArrayPtr<Vertex> vertexArray(desc.vertices, desc.numVertices);
-    ArrayPtr<Index> indexArray(desc.indices, desc.numIndices);
+Mesh::Mesh(const Desc& desc) : _gbHandle(GB_INVALID_HANDLE), _tfverts(NULL), _compiled(false) {
+    ArrayPtr<Vertex>    vertexArray(desc.vertices, desc.numVertices);
+    ArrayPtr<Index>     indexArray(desc.indices, desc.numIndices);
+    ArrayPtr<Vertex>    tfvertArray(desc.vertices, desc.numVertices);
 
     _desc.vertices = vertexArray.Release();
     _desc.numVertices = desc.numVertices;
@@ -115,11 +116,15 @@ Mesh::Mesh(const Desc& desc) : _gbHandle(GB_INVALID_HANDLE), _compiled(false) {
     _desc.numIndices = desc.numIndices;
 
     _desc.primType = desc.primType;
+
+    _transform = M::Mat4::Identity();
+    _tfverts = tfvertArray.Release();
 }
 
 Mesh::~Mesh(void) {
     if(_desc.vertices) delete[] _desc.vertices;
     if(_desc.indices) delete[] _desc.indices;
+    if(_tfverts) delete[] _tfverts;
     if(GB_INVALID_HANDLE != _gbHandle) GB_FreeMemItem(_gbHandle);
 }
 
@@ -141,10 +146,19 @@ void Mesh::AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye, c
 void Mesh::Invalidate(Mesh::Vertex* vertices) {
     _mtx.Lock();
     memcpy(_desc.vertices, vertices, sizeof(Mesh::Vertex) * _desc.numVertices);
+    memcpy(_tfverts, vertices, sizeof(Mesh::Vertex) * _desc.numVertices);
+    Transform(_transform);
     _compiled = false;
     if(GB_INVALID_HANDLE != _gbHandle)
         GB_Invalidate(_gbHandle);
     _mtx.Unlock();
+}
+
+void Mesh::Transform(const M::Matrix4& mat) {
+    for(unsigned i = 0; i < _desc.numVertices; ++i)
+        _tfverts[i].position = M::Transform(mat, _desc.vertices[i].position);
+    if(GB_INVALID_HANDLE != _gbHandle)
+        GB_Invalidate(_gbHandle);
 }
 
 void Mesh::R_Touch(void) { GB_Touch(_gbHandle); }
@@ -157,7 +171,7 @@ void Mesh::R_Compile(void) {
     GenerateTriangles(_desc, _triangleIndices);
 
     if(GB_INVALID_HANDLE == _gbHandle) {
-        _gbHandle = GB_AllocMemItem(_desc.vertices, _desc.numVertices);
+        _gbHandle = GB_AllocMemItem(_tfverts, _desc.numVertices);
     }
     _compiled = true;
 

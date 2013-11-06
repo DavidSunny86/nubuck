@@ -273,6 +273,13 @@ namespace M {
                     0.0f, 0.0f, 0.0f, 1.0f);
         }
 
+        Matrix4 Scale(float fx, float fy, float fz) {
+            return Matrix4(fx, 0.0f, 0.0f, 0.0f,
+                    0.0f, fy, 0.0f, 0.0f,
+                    0.0f, 0.0, fz, 0.0f,
+                    0.0f, 0.0f, 0.0f, 1.0f);
+        }
+
 		Matrix4 RotateX(float angle) {
 			const float rad = Deg2Rad(angle);
 			const float sina = sinf(rad);

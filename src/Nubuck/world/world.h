@@ -36,11 +36,17 @@ namespace W {
             ENT_MESH
         };
     private:
+        struct Transform {
+            M::Vector3  position;
+            M::Vector3  scale;
+        };
+
         struct Entity {
             EntityType      type;
             unsigned        entId;
             std::string     name;
             std::string     fxName;
+            Transform       transform;
 
             ENT_Polyhedron* polyhedron;
             ENT_Mesh*       mesh;
@@ -71,6 +77,8 @@ namespace W {
         void Event_Rebuild(const EV::Event& event);
         void Event_SetVisible(const EV::Event& event);
         void Event_SetName(const EV::Event& event);
+        void Event_SetPosition(const EV::Event& event);
+        void Event_SetScale(const EV::Event& event);
         void Event_SetRenderFlags(const EV::Event& event);
         void Event_SetPickable(const EV::Event& event);
         void Event_SetNodeColor(const EV::Event& event);
@@ -96,6 +104,7 @@ namespace W {
         IPolyhedron* CreatePolyhedron(void) override;
         IMesh* CreatePlaneMesh(const PlaneDesc& desc) override;
         IMesh* CreateSphereMesh(const SphereDesc& desc) override;
+        IMesh* CreateCylinderMesh(const CylinderDesc& desc) override;
 
         // thread interface
         DWORD Thread_Func(void);

@@ -57,8 +57,11 @@ public:
 private:
     SYS::SpinLock _mtx;
 
-    Desc _desc;
-    bool _compiled;
+    Desc    _desc;
+    bool    _compiled;
+
+    M::Matrix4  _transform;
+    Vertex*     _tfverts;   // transformed vertices
 
     std::vector<TriIndices> _triangleIndices;
 
@@ -71,6 +74,7 @@ public:
 
     // assumes number of vertices and indices is constant
     void Invalidate(Mesh::Vertex* const vertices);
+    void Transform(const M::Matrix4& mat);
 
     // methods prefixed with R_ should only be called by the renderer
     void R_Touch(void);

@@ -50,6 +50,7 @@ namespace M {
 		Matrix4 Translate(float x, float y, float z);
 		Matrix4 Translate(const M::Vector3& translation);
         Matrix4 Scale(float f);
+        Matrix4 Scale(float fx, float fy, float fz);
 		Matrix4 RotateX(float angle);
 		Matrix4 RotateY(float angle);
 		Matrix4 RotateZ(float angle);

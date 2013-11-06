@@ -11,6 +11,8 @@ private:
 public:
     Mesh(unsigned entId) : _entId(entId) { }
 
+    void SetPosition(float x, float y, float z) override;
+    void SetScale(float sx, float sy, float sz) override;
     void SetEffect(const char* fxName) override;
     void SetVisible(bool isVisible) override;
 };

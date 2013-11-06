@@ -22,6 +22,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo_grabbing", "demo_grabb
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo_helloworld", "demo_helloworld\demo_helloworld.vcxproj", "{62586E45-15A9-4E77-81BE-E754E4C5AF94}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo_incircle", "demo_incircle\demo_incircle.vcxproj", "{EA6DC0BA-15DA-4CB0-A280-D486F2663CBE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{41FA7EED-25F5-4CD7-8656-42AB6FD66983} = {41FA7EED-25F5-4CD7-8656-42AB6FD66983}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -48,6 +53,10 @@ Global
 		{62586E45-15A9-4E77-81BE-E754E4C5AF94}.Debug|Win32.Build.0 = Debug|Win32
 		{62586E45-15A9-4E77-81BE-E754E4C5AF94}.Release|Win32.ActiveCfg = Release|Win32
 		{62586E45-15A9-4E77-81BE-E754E4C5AF94}.Release|Win32.Build.0 = Release|Win32
+		{EA6DC0BA-15DA-4CB0-A280-D486F2663CBE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EA6DC0BA-15DA-4CB0-A280-D486F2663CBE}.Debug|Win32.Build.0 = Debug|Win32
+		{EA6DC0BA-15DA-4CB0-A280-D486F2663CBE}.Release|Win32.ActiveCfg = Release|Win32
+		{EA6DC0BA-15DA-4CB0-A280-D486F2663CBE}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -42,6 +42,8 @@ struct IPolyhedron {
 struct IMesh {
     virtual ~IMesh(void) { }
 
+    virtual void SetPosition(float x, float y, float z) = 0;
+    virtual void SetScale(float sx, float sy, float sz) = 0;
     virtual void SetEffect(const char* fxName) = 0;
     virtual void SetVisible(bool isVisible) = 0;
 };
@@ -64,9 +66,17 @@ struct IWorld {
         bool    smooth;
     };
 
+    struct CylinderDesc {
+        float       radius;
+        float   	height;
+        unsigned    numSlices;
+        bool        caps;
+    };
+
     virtual IPolyhedron*    CreatePolyhedron(void) = 0;
     virtual IMesh*          CreatePlaneMesh(const PlaneDesc& desc) = 0;
     virtual IMesh*          CreateSphereMesh(const SphereDesc& desc) = 0;
+    virtual IMesh*          CreateCylinderMesh(const CylinderDesc& desc) = 0;
 };
 
 struct ILog {

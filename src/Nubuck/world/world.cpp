@@ -5,6 +5,7 @@
 #include <algdriver\algdriver.h>
 #include <renderer\mesh\plane\plane.h>
 #include <renderer\mesh\sphere\sphere.h>
+#include <renderer\mesh\cylinder\cylinder.h>
 #include <events\event_defs.h>
 #include <UI\outliner\outliner.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
@@ -31,6 +32,8 @@ namespace W {
         EVENT_HANDLER(EV::def_Rebuild,              &World::Event_Rebuild)
         EVENT_HANDLER(EV::def_SetVisible,           &World::Event_SetVisible)
         EVENT_HANDLER(EV::def_SetName,              &World::Event_SetName)
+        EVENT_HANDLER(EV::def_SetPosition,          &World::Event_SetPosition)
+        EVENT_HANDLER(EV::def_SetScale,             &World::Event_SetScale)
         EVENT_HANDLER(EV::def_SetRenderFlags,       &World::Event_SetRenderFlags)
         EVENT_HANDLER(EV::def_SetPickable,          &World::Event_SetPickable)
         EVENT_HANDLER(EV::def_SetNodeColor,         &World::Event_SetNodeColor)
@@ -273,6 +276,8 @@ namespace W {
         entity->type = ENT_POLYHEDRON;
         entity->entId = args.entId;
         entity->fxName = "LitDirectional";
+        entity->transform.position = M::Vector3::Zero;
+        entity->transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
         ENT_Polyhedron* ph = new ENT_Polyhedron();
         ph->G = args.G;
         Polyhedron_Init(*ph);
@@ -297,6 +302,8 @@ namespace W {
         entity->type = ENT_MESH;
         entity->entId = args.entId;
         entity->fxName = "LitDirectional";
+        entity->transform.position = M::Vector3::Zero;
+        entity->transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
         ENT_Mesh* mesh = new ENT_Mesh();
         Mesh_Init(*mesh, args.meshPtr);
         entity->mesh = mesh;
@@ -339,6 +346,18 @@ namespace W {
         entity->name = args.name;
 
         UI::Outliner::Instance()->Send(event);
+    }
+
+    void World::Event_SetPosition(const EV::Event& event) {
+        const EV::Params_SetPosition& args = EV::def_SetPosition.GetArgs(event);
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        if(entity.IsValid()) entity->transform.position = args.pos;
+    }
+
+    void World::Event_SetScale(const EV::Event& event) {
+        const EV::Params_SetScale& args = EV::def_SetScale.GetArgs(event);
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        if(entity.IsValid()) entity->transform.scale = M::Vector3(args.sx, args.sy, args.sz);
     }
 
     void World::Event_SetRenderFlags(const EV::Event& event) {
@@ -567,7 +586,9 @@ namespace W {
             }
             if(ENT_MESH == entity->type) {
                 ENT_Mesh& mesh = *entity->mesh;
-                Mesh_BuildRenderList(mesh, entity->fxName);
+                const Transform& tf = entity->transform;
+                M::Matrix4 transform = M::Mat4::Translate(tf.position) * M::Mat4::Scale(tf.scale.x, tf.scale.y, tf.scale.z);
+                Mesh_BuildRenderList(mesh, entity->fxName, transform);
             }
         }
 
@@ -621,6 +642,12 @@ namespace W {
     IMesh* World::CreateSphereMesh(const SphereDesc& desc) {
         R::Sphere sphere(desc.numSubdiv, desc.smooth);
         unsigned entId = SpawnMesh(R::meshMgr.Create(sphere.GetDesc()));
+        return new Proxy::Mesh(entId);
+    }
+
+    IMesh* World::CreateCylinderMesh(const CylinderDesc& desc) {
+        R::Cylinder cylinder(desc.radius, desc.height, desc.numSlices, desc.caps);
+        unsigned entId = SpawnMesh(R::meshMgr.Create(cylinder.GetDesc()));
         return new Proxy::Mesh(entId);
     }
 

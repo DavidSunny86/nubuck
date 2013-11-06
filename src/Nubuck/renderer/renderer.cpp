@@ -717,7 +717,8 @@ static void Compile(R::RenderJob& rjob) {
 }
 
 static void Transform(const M::Matrix4& worldMat, R::RenderJob& rjob) {
-    rjob.transform = worldMat * rjob.transform;
+    Mesh& mesh = meshMgr.GetMesh(rjob.mesh);
+    mesh.Transform(rjob.transform);
 }
 
 static void CompileAndTransform(const M::Matrix4& worldMat, R::RenderJob& rjob) {
