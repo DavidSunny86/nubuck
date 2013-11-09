@@ -34,6 +34,7 @@ namespace W {
         EVENT_HANDLER(EV::def_SetName,              &World::Event_SetName)
         EVENT_HANDLER(EV::def_SetPosition,          &World::Event_SetPosition)
         EVENT_HANDLER(EV::def_SetScale,             &World::Event_SetScale)
+        EVENT_HANDLER(EV::def_SetRotation,          &World::Event_SetRotation)
         EVENT_HANDLER(EV::def_SetRenderFlags,       &World::Event_SetRenderFlags)
         EVENT_HANDLER(EV::def_SetPickable,          &World::Event_SetPickable)
         EVENT_HANDLER(EV::def_SetNodeColor,         &World::Event_SetNodeColor)
@@ -278,6 +279,7 @@ namespace W {
         entity->fxName = "LitDirectional";
         entity->transform.position = M::Vector3::Zero;
         entity->transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
+        entity->transform.rotation = M::Mat4::Identity();
         ENT_Polyhedron* ph = new ENT_Polyhedron();
         ph->G = args.G;
         Polyhedron_Init(*ph);
@@ -304,6 +306,7 @@ namespace W {
         entity->fxName = "LitDirectional";
         entity->transform.position = M::Vector3::Zero;
         entity->transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
+        entity->transform.rotation = M::Mat4::Identity();
         ENT_Mesh* mesh = new ENT_Mesh();
         Mesh_Init(*mesh, args.meshPtr);
         entity->mesh = mesh;
@@ -358,6 +361,12 @@ namespace W {
         const EV::Params_SetScale& args = EV::def_SetScale.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
         if(entity.IsValid()) entity->transform.scale = M::Vector3(args.sx, args.sy, args.sz);
+    }
+
+    void World::Event_SetRotation(const EV::Event& event) {
+        const EV::Params_SetRotation& args = EV::def_SetRotation.GetArgs(event);
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        if(entity.IsValid()) entity->transform.rotation = args.mat;
     }
 
     void World::Event_SetRenderFlags(const EV::Event& event) {
@@ -587,7 +596,7 @@ namespace W {
             if(ENT_MESH == entity->type) {
                 ENT_Mesh& mesh = *entity->mesh;
                 const Transform& tf = entity->transform;
-                M::Matrix4 transform = M::Mat4::Translate(tf.position) * M::Mat4::Scale(tf.scale.x, tf.scale.y, tf.scale.z);
+                M::Matrix4 transform = M::Mat4::Translate(tf.position) * tf.rotation * M::Mat4::Scale(tf.scale.x, tf.scale.y, tf.scale.z);
                 Mesh_BuildRenderList(mesh, entity->fxName, transform);
             }
         }

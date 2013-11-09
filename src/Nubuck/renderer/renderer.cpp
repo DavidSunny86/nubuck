@@ -617,10 +617,10 @@ void Renderer::Init(void) {
     // glClearColor(f * 70, f * 130, f * 180, 1.0f); // steel blue
     glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
     glClearDepth(1.0f);
-    glClearStencil(0);
+    glClearStencil(8);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
     
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);
@@ -651,7 +651,7 @@ static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const
         mesh.AppendTriangles(tris, localEye, worldMat);
         meshJob = meshJob->next;
     }
-    std::sort(tris.begin(), tris.end(), Cmp_Dist);    
+    std::sort(tris.begin(), tris.end(), Cmp_Dist);
     for(unsigned i = 0; i < tris.size(); ++i) {
         indices.push_back(tris[i].bufIndices.indices[0]);
         indices.push_back(tris[i].bufIndices.indices[1]);
@@ -739,7 +739,7 @@ static M::Matrix4 ComputeProjectionMatrix(float aspect, const M::Matrix4& worldM
     }
     return M::Mat4::Perspective(45.0f, aspect, -zMax, -zMin);
     */
-    return M::Mat4::Perspective(45.0f, aspect, 0.1f, 5000.0f);
+    return M::Mat4::Perspective(45.0f, aspect, 0.1f, 100.0f);
 }
 
 void Renderer::Render(void) {

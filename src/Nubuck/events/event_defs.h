@@ -46,6 +46,11 @@ BEGIN_EVENT_DEF(SetScale)
     float       sx, sy, sz;
 END_EVENT_DEF
 
+BEGIN_EVENT_DEF(SetRotation)
+    unsigned    entId;
+    M::Matrix4  mat;
+END_EVENT_DEF
+
 BEGIN_EVENT_DEF(SetRenderFlags)
     unsigned    entId;
     int         flags;

@@ -39,6 +39,7 @@ namespace W {
         struct Transform {
             M::Vector3  position;
             M::Vector3  scale;
+            M::Matrix4  rotation;
         };
 
         struct Entity {
@@ -79,6 +80,7 @@ namespace W {
         void Event_SetName(const EV::Event& event);
         void Event_SetPosition(const EV::Event& event);
         void Event_SetScale(const EV::Event& event);
+        void Event_SetRotation(const EV::Event& event);
         void Event_SetRenderFlags(const EV::Event& event);
         void Event_SetPickable(const EV::Event& event);
         void Event_SetNodeColor(const EV::Event& event);

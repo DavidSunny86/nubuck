@@ -52,6 +52,7 @@ public:
 
     struct Triangle {
         float dist;
+        bool visible;
         TriIndices bufIndices;
     };
 private:

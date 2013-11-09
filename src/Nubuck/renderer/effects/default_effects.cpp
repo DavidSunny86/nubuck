@@ -202,7 +202,7 @@ namespace R {
         pass0.state.blend.dstFactor             = GL_ONE;
         pass0.state.depth.maskEnabled           = GL_FALSE;
         pass0.state.stencil.op.front.zpass      = GL_INCR;
-        pass0.state.stencil.op.back.zpass       = GL_DECR;
+        pass0.state.stencil.op.back.zpass       = GL_DECR_WRAP;
         pass0.type = DEFAULT;
         pass0.flags = 0;
 
@@ -228,6 +228,27 @@ namespace R {
         pass0.flags = 0;
 
         fx.name = "StencilOverlay";
+        fx.sortKey = 4;
+        fx.passes.push_back(pass0);
+        effectMgr.Register(fx);
+        fx.passes.clear();
+
+        // StencilOverlayFS Effect
+
+        pass0.name = "Pass0";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\fs_overlay.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\overlay.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.state.blend.enabled       = GL_TRUE;
+        pass0.state.blend.srcFactor     = GL_DST_COLOR;
+        pass0.state.blend.dstFactor     = GL_ZERO;
+        pass0.state.stencil.func.func   = GL_LESS;
+        pass0.state.stencil.func.ref    = 8;
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "StencilOverlayFS";
         fx.sortKey = 4;
         fx.passes.push_back(pass0);
         effectMgr.Register(fx);

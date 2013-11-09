@@ -14,7 +14,7 @@
 namespace EV {
 
     struct Event {
-        enum { ARGS_SIZE = 64 };
+        enum { ARGS_SIZE = 68 };
         unsigned    id;
         char        args[ARGS_SIZE]; 
     };

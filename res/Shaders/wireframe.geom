@@ -2,8 +2,12 @@ layout(triangles) in;
 layout(line_strip) out;
 layout(max_vertices = 4) out;
 
-uniform mat4 uProjection;
-uniform mat4 uTransform;
+layout(std140) uniform UniformsHot {
+    mat4 uProjection;
+    mat4 uTransform;
+    mat4 uInvTransform;
+    mat4 uNormalMat;
+};
 
 void main() {
 	mat4 mvp = uProjection * uTransform;

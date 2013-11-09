@@ -44,6 +44,8 @@ struct IMesh {
 
     virtual void SetPosition(float x, float y, float z) = 0;
     virtual void SetScale(float sx, float sy, float sz) = 0;
+    virtual void AlignZ(float x, float y, float z) = 0;
+    virtual void SetOrient(float x0, float y0, float z0, float x1, float y1, float z1) = 0;
     virtual void SetEffect(const char* fxName) = 0;
     virtual void SetVisible(bool isVisible) = 0;
 };
