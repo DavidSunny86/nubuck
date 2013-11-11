@@ -27,6 +27,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo_incircle", "demo_incir
 		{41FA7EED-25F5-4CD7-8656-42AB6FD66983} = {41FA7EED-25F5-4CD7-8656-42AB6FD66983}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo_flipclip0", "demo_flipclip0\demo_flipclip0.vcxproj", "{CAACA3BB-25C1-49AE-AF9D-BA96234EB9C2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{41FA7EED-25F5-4CD7-8656-42AB6FD66983} = {41FA7EED-25F5-4CD7-8656-42AB6FD66983}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -57,6 +62,10 @@ Global
 		{EA6DC0BA-15DA-4CB0-A280-D486F2663CBE}.Debug|Win32.Build.0 = Debug|Win32
 		{EA6DC0BA-15DA-4CB0-A280-D486F2663CBE}.Release|Win32.ActiveCfg = Release|Win32
 		{EA6DC0BA-15DA-4CB0-A280-D486F2663CBE}.Release|Win32.Build.0 = Release|Win32
+		{CAACA3BB-25C1-49AE-AF9D-BA96234EB9C2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CAACA3BB-25C1-49AE-AF9D-BA96234EB9C2}.Debug|Win32.Build.0 = Debug|Win32
+		{CAACA3BB-25C1-49AE-AF9D-BA96234EB9C2}.Release|Win32.ActiveCfg = Release|Win32
+		{CAACA3BB-25C1-49AE-AF9D-BA96234EB9C2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,6 +12,16 @@ void RandomPoints::OnRandomRadius(void) {
     sbRadius->setValue(r);
 }
 
+static void RandomPointsInHemiball(int n, int R, leda::list<point_t>& L) {
+    leda::random_d3_rat_points_in_ball(n, R, L);
+    leda::list_item it;
+    forall_items(it, L) {
+        point_t& p = L[it];
+        scalar_t z = p.zcoord();
+        if(0 > z) p = p.translate(0, 0, -2 * z);
+    }
+}
+
 RandomPoints::RandomPoints(QWidget* parent) : QDialog(parent) {
     setupUi(this);
 
@@ -26,6 +36,9 @@ RandomPoints::RandomPoints(QWidget* parent) : QDialog(parent) {
 
     _pointGens[PARABOLOID] = leda::random_d3_rat_points_on_paraboloid;
     cbShapes->insertItem(PARABOLOID, "Paraboloid");
+
+    _pointGens[HEMISPHERE] = RandomPointsInHemiball;
+    cbShapes->insertItem(HEMISPHERE, "Hemisphere");
 
     sbSize->setMinimum(MIN_SIZE);
     sbSize->setMaximum(MAX_SIZE);

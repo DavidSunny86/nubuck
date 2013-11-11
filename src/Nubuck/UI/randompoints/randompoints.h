@@ -27,6 +27,7 @@ private:
         SPHERE = 0,
         CUBE,
         PARABOLOID,
+        HEMISPHERE,
 
         NUM_SHAPES
     };
