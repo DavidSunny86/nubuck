@@ -128,17 +128,22 @@ Mesh::~Mesh(void) {
     if(GB_INVALID_HANDLE != _gbHandle) GB_FreeMemItem(_gbHandle);
 }
 
-void Mesh::AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye, const M::Matrix4& worldMat) {
+void Mesh::AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye) {
     unsigned idxOff = GB_GetOffset(_gbHandle) / sizeof(Mesh::Vertex);
     for(unsigned i = 0; i < _triangleIndices.size(); ++i) {
         Triangle tri;
         M::Vector3 center = M::Vector3::Zero;
+        M::Vector3 p[3];
         for(unsigned j = 0; j < 3; ++j) {
             tri.bufIndices.indices[j] = _triangleIndices[i].indices[j] + idxOff; 
-            center += M::Transform(worldMat, _desc.vertices[_triangleIndices[i].indices[j]].position);
+            p[j] = _tfverts[_triangleIndices[i].indices[j]].position;
+            center += p[j];
         }
+        const M::Vector3 normal = M::Normalize(M::Cross(p[1] - p[0], p[2] - p[0]));
+        const M::Vector3 view   = M::Normalize(eye - p[0]);
+        tri.viewAngle = M::Dot(view, normal);
         center /= 3.0f;
-        tri.dist = M::Distance(M::Vector3::Zero, center);
+        tri.dist = M::Distance(eye, center);
         tris.push_back(tri);
     }
 }

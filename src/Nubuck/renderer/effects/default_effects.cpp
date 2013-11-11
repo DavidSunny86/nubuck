@@ -197,12 +197,13 @@ namespace R {
         pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\overlay.frag";
         pass0.filenames[R::Shader::GEOMETRY]    = "";
         pass0.state.SetDefault();
-        pass0.state.blend.enabled               = GL_TRUE;
-        pass0.state.blend.srcFactor             = GL_ZERO;
-        pass0.state.blend.dstFactor             = GL_ONE;
+        pass0.state.color.maskEnabled.red       = GL_FALSE;
+        pass0.state.color.maskEnabled.green     = GL_FALSE;
+        pass0.state.color.maskEnabled.blue      = GL_FALSE;
+        pass0.state.color.maskEnabled.alpha     = GL_FALSE;
         pass0.state.depth.maskEnabled           = GL_FALSE;
-        pass0.state.stencil.op.front.zpass      = GL_INCR;
-        pass0.state.stencil.op.back.zpass       = GL_DECR_WRAP;
+        pass0.state.stencil.op.front.zpass      = GL_INVERT;
+        pass0.state.stencil.op.back.zpass       = GL_INVERT;
         pass0.type = DEFAULT;
         pass0.flags = 0;
 
@@ -219,11 +220,12 @@ namespace R {
         pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\overlay.frag";
         pass0.filenames[R::Shader::GEOMETRY]    = "";
         pass0.state.SetDefault();
+        pass0.state.depth.func          = GL_ALWAYS;
         pass0.state.blend.enabled       = GL_TRUE;
         pass0.state.blend.srcFactor     = GL_DST_COLOR;
         pass0.state.blend.dstFactor     = GL_ZERO;
         pass0.state.stencil.func.func   = GL_LESS;
-        pass0.state.stencil.func.ref    = 1;
+        pass0.state.stencil.func.ref    = 0;
         pass0.type = DEFAULT;
         pass0.flags = 0;
 
@@ -244,7 +246,7 @@ namespace R {
         pass0.state.blend.srcFactor     = GL_DST_COLOR;
         pass0.state.blend.dstFactor     = GL_ZERO;
         pass0.state.stencil.func.func   = GL_LESS;
-        pass0.state.stencil.func.ref    = 8;
+        pass0.state.stencil.func.ref    = 0;
         pass0.type = DEFAULT;
         pass0.flags = 0;
 
@@ -265,7 +267,7 @@ namespace R {
         pass0.state.blend.enabled = GL_TRUE;
         pass0.state.blend.srcFactor = GL_SRC_ALPHA;
         pass0.state.blend.dstFactor = GL_ONE_MINUS_SRC_ALPHA;
-        pass0.state.color = Color(0.0f, 0.0f, 0.0f, 0.0f);
+        // pass0.state.color = Color(0.0f, 0.0f, 0.0f, 0.0f);
         pass0.type = DEFAULT;
         pass0.flags = USE_COLOR;
 

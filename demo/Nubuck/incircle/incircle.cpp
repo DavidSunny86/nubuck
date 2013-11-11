@@ -52,7 +52,6 @@ public:
             _g.cylinder->SetVisible(false);
         }
         else {
-            _g.cylinder->SetVisible(true); // !!!
             leda::point center = circle.center();
             // _g.cylinder->SetPosition((float)center.xcoord(), (float)center.ycoord(), 2.5f);
             // _g.cylinder->SetScale((float)circle.radius(), (float)circle.radius(), 1.0f);
@@ -133,11 +132,6 @@ public:
         _g.wireframe = _g.nb.world->CreateSphereMesh(sphereDesc);
         _g.wireframe->SetEffect("GenericWireframe");
 
-        leda::circle circle = CircleXY(G2[_g.c2[0]], G2[_g.c2[1]], G2[_g.c2[2]]);
-        leda::point center = circle.center();
-        _g.cylinder->SetPosition((float)center.xcoord(), (float)center.ycoord(), 2.5f);
-        _g.cylinder->SetScale((float)circle.radius(), (float)circle.radius(), 1.0f);
-
         IWorld::PlaneDesc planeDesc;
         planeDesc.size = 100;
         planeDesc.subdiv = 0;
@@ -149,7 +143,7 @@ public:
         _g.plane->SetEffect("LitDirectional");
 
         _g.ground = _g.nb.world->CreatePlaneMesh(planeDesc);
-        _g.ground->SetEffect("StencilOverlayFS");
+        _g.ground->SetEffect("StencilOverlay");
 
         return new Phase0(_g);
     }

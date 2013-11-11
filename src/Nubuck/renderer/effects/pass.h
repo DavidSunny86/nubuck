@@ -12,6 +12,18 @@ namespace R {
 
     struct State {
         struct {
+            struct {
+                GLboolean   enabled;
+                GLenum      cullFace;
+            } hw;
+            struct {
+                GLboolean   enabled;
+                GLenum      cullFace;
+                float       alpha;
+            } sw;
+        } culling;
+
+        struct {
             GLboolean   enabled;
             GLenum      srcFactor;
             GLenum      dstFactor;
@@ -43,21 +55,34 @@ namespace R {
             float       lineWidth;
         } raster;
 
-        Color color;
+        struct {
+            struct {
+                GLboolean red;
+                GLboolean green;
+                GLboolean blue;
+                GLboolean alpha;
+            } maskEnabled;
+        } color;
 
         void SetDefault(void) {
-            blend.enabled       = GL_FALSE;
-            blend.srcFactor     = GL_ONE;
-            blend.dstFactor     = GL_ZERO;
+            culling.hw.enabled          = GL_FALSE;
+            culling.hw.cullFace 		= GL_BACK;
+            culling.sw.enabled  		= GL_FALSE;
+            culling.sw.cullFace 		= GL_BACK;
+            culling.sw.alpha    		= 0.0f;
 
-            depth.enabled       = GL_TRUE;
-            depth.maskEnabled   = GL_TRUE;
-            depth.func          = GL_LESS;
+            blend.enabled       		= GL_FALSE;
+            blend.srcFactor     		= GL_ONE;
+            blend.dstFactor     		= GL_ZERO;
+
+            depth.enabled       		= GL_TRUE;
+            depth.maskEnabled   		= GL_TRUE;
+            depth.func          		= GL_LESS;
 
             stencil.enabled             = GL_FALSE;
             stencil.func.func   		= GL_ALWAYS;
             stencil.func.ref    		= 0;
-            stencil.func.mask   		= 0xFFFFFFFF;
+            stencil.func.mask   		= ~0;
             stencil.op.front.fail       = GL_KEEP;
             stencil.op.front.zfail    	= GL_KEEP;
             stencil.op.front.zpass    	= GL_KEEP;
@@ -65,9 +90,12 @@ namespace R {
             stencil.op.back.zfail    	= GL_KEEP;
             stencil.op.back.zpass    	= GL_KEEP;
 
-            raster.lineWidth    = 1.0f;
+            raster.lineWidth            = 1.0f;
 
-            color               = Color::White;
+            color.maskEnabled.red       = GL_TRUE;
+            color.maskEnabled.green     = GL_TRUE;
+            color.maskEnabled.blue      = GL_TRUE;
+            color.maskEnabled.alpha     = GL_TRUE;
         }
     };
 

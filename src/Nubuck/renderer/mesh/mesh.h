@@ -51,9 +51,9 @@ public:
     };
 
     struct Triangle {
-        float dist;
-        bool visible;
-        TriIndices bufIndices;
+        float       dist;
+        float       viewAngle;
+        TriIndices  bufIndices;
     };
 private:
     SYS::SpinLock _mtx;
@@ -71,7 +71,7 @@ public:
     Mesh(const Desc& desc); // deep copy
     ~Mesh(void);
 
-    void AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye, const M::Matrix4& worldMat); // eye in mesh local space
+    void AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye); // eye in mesh local space
 
     // assumes number of vertices and indices is constant
     void Invalidate(Mesh::Vertex* const vertices);

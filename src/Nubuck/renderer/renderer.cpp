@@ -515,6 +515,18 @@ void SetEnabled(GLenum state, GLboolean enabled) {
 }
 
 void SetState(const State& state) {
+    bool c0, c1, c2, c3;
+
+    if(curState.culling.hw.enabled != state.culling.hw.enabled) {
+        SetEnabled(GL_CULL_FACE, state.culling.hw.enabled);
+        curState.culling.hw.enabled = state.culling.hw.enabled;
+    }
+    if(curState.culling.hw.enabled && curState.culling.hw.cullFace != state.culling.hw.cullFace) {
+        GL_CALL(glCullFace(state.culling.hw.cullFace));
+        curState.culling.hw.cullFace = state.culling.hw.cullFace;
+    }
+    curState.culling.sw = state.culling.sw;
+
     if(curState.blend.enabled != state.blend.enabled) {
         SetEnabled(GL_BLEND, state.blend.enabled);
         curState.blend.enabled = state.blend.enabled;
@@ -536,7 +548,6 @@ void SetState(const State& state) {
     }
 
     // SetEnabled(GL_STENCIL_TEST, state.stencil.enabled);
-    bool c0, c1, c2;
     c0 = curState.stencil.func.func != state.stencil.func.func;
     c1 = curState.stencil.func.ref  != state.stencil.func.ref;
     c2 = curState.stencil.func.mask != state.stencil.func.mask;
@@ -568,6 +579,15 @@ void SetState(const State& state) {
     if(curState.raster.lineWidth != state.raster.lineWidth) {
         GL_CALL(glLineWidth(state.raster.lineWidth));
         curState.raster.lineWidth = state.raster.lineWidth;
+    }
+
+    c0 = curState.color.maskEnabled.red != state.color.maskEnabled.red;
+    c1 = curState.color.maskEnabled.green != state.color.maskEnabled.green;
+    c2 = curState.color.maskEnabled.blue != state.color.maskEnabled.blue;
+    c3 = curState.color.maskEnabled.alpha != state.color.maskEnabled.alpha;
+    if(c0 || c1 || c2 || c3) {
+        GL_CALL(glColorMask(state.color.maskEnabled.red, state.color.maskEnabled.green, state.color.maskEnabled.blue, state.color.maskEnabled.alpha));
+        curState.color.maskEnabled = state.color.maskEnabled;
     }
 }
 
@@ -617,7 +637,7 @@ void Renderer::Init(void) {
     // glClearColor(f * 70, f * 130, f * 180, 1.0f); // steel blue
     glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
     glClearDepth(1.0f);
-    glClearStencil(8);
+    glClearStencil(0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
     // glEnable(GL_CULL_FACE);
@@ -639,31 +659,58 @@ static bool Cmp_Dist(const Mesh::Triangle& lhp, const Mesh::Triangle& rhp) {
     return lhp.dist > rhp.dist;
 }
 
-static RenderJob* DrawMeshList(Program& prog, int passType, int passFlags, const M::Matrix4& worldMat, RenderJob* first) {
+namespace {
+
+    struct IsBackFace {
+        float alpha;
+        IsBackFace(float alpha) : alpha(alpha) { }
+        bool operator()(const Mesh::Triangle& tri) const { return alpha > tri.viewAngle; }
+    };
+
+    struct IsFrontFace {
+        float alpha;
+        IsFrontFace(float alpha) : alpha(alpha) { }
+        bool operator()(const Mesh::Triangle& tri) const { return alpha < tri.viewAngle; }
+    };
+
+    struct IsViewedEdgeOn {
+        bool operator()(const Mesh::Triangle& tri) const { return 0.0f <= tri.viewAngle && tri.viewAngle < 0.01f; }
+    };
+
+} // unnamed namespace
+
+static RenderJob* DrawMeshList(Program& prog, const State& state, int passType, int passFlags, const M::Matrix4& worldMat, RenderJob* first) {
+    typedef std::vector<Mesh::Triangle>::iterator triIt_t;
     M::Matrix4 invWorld;
     M::TryInvert(worldMat, invWorld);
     M::Vector3 localEye = M::Transform(invWorld, M::Vector3::Zero);
     std::vector<Mesh::Triangle> tris;
-    std::vector<Mesh::Index> indices;
     RenderJob* meshJob = first;
     while(meshJob && meshJob->fx == first->fx) {
         Mesh& mesh = meshMgr.GetMesh(meshJob->mesh);
-        mesh.AppendTriangles(tris, localEye, worldMat);
+        mesh.AppendTriangles(tris, localEye);
         meshJob = meshJob->next;
     }
-    std::sort(tris.begin(), tris.end(), Cmp_Dist);
-    for(unsigned i = 0; i < tris.size(); ++i) {
-        indices.push_back(tris[i].bufIndices.indices[0]);
-        indices.push_back(tris[i].bufIndices.indices[1]);
-        indices.push_back(tris[i].bufIndices.indices[2]);
+    triIt_t trisEnd = tris.end();
+    if(state.culling.sw.enabled) {
+        switch(state.culling.sw.cullFace) {
+        case GL_FRONT: trisEnd = std::remove_if(tris.begin(), tris.end(), IsFrontFace(state.culling.sw.alpha)); break;
+        case GL_BACK: trisEnd = std::remove_if(tris.begin(), tris.end(), IsBackFace(state.culling.sw.alpha)); break;
+        default: assert(false);
+        };
     }
-    BindVertices();
-    glCullFace(GL_FRONT);
-    GL_CALL(glDrawElements(GL_TRIANGLES, indices.size(), ToGLEnum<Mesh::Index>::ENUM, &indices[0]));
-    metrics.frame.numDrawCalls++;
-    glCullFace(GL_BACK);
-    GL_CALL(glDrawElements(GL_TRIANGLES, indices.size(), ToGLEnum<Mesh::Index>::ENUM, &indices[0]));
-    metrics.frame.numDrawCalls++;
+    std::sort(tris.begin(), trisEnd, Cmp_Dist);
+    std::vector<Mesh::Index> indices;
+    for(triIt_t triIt(tris.begin()); trisEnd != triIt; ++triIt) {
+        indices.push_back(triIt->bufIndices.indices[0]);
+        indices.push_back(triIt->bufIndices.indices[1]);
+        indices.push_back(triIt->bufIndices.indices[2]);
+    }
+    if(!indices.empty()) {
+        BindVertices();
+        GL_CALL(glDrawElements(GL_TRIANGLES, indices.size(), ToGLEnum<Mesh::Index>::ENUM, &indices[0]));
+        metrics.frame.numDrawCalls++;
+    }
     return meshJob;
 }
 
@@ -689,7 +736,7 @@ static void DrawFrame(RenderList& renderList, const M::Matrix4& projectionMat, f
             Uniforms_BindBuffers();
             SetState(desc.state);
 
-            next = DrawMeshList(prog, desc.type, desc.flags, renderList.worldMat, cur);
+            next = DrawMeshList(prog, desc.state, desc.type, desc.flags, renderList.worldMat, cur);
         }
         cur = next;
     }
