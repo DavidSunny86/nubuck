@@ -119,23 +119,152 @@ static leda::edge Triangulate(graph3_t& G) {
   	return G.last_edge();
 }
 
+// Phase1: flipping
+struct Phase1 : IPhase {
+    enum State {
+        STATE_SELECT = 0,
+        STATE_FLIP
+    };
+
+    Globals&                g;
+    leda::list<leda::edge>  S;
+    State                   state;
+    leda::edge              selEdge;
+
+    Phase1(Globals& g) : g(g) { 
+        state = STATE_SELECT;
+    }
+
+    void Enter(void) override { 
+        g.nb.log->printf("--- Entering Phase1 (Flipping) \n"); 
+    
+        const graph3_t& G = g.ph->GetGraph();
+        leda::edge e;
+        forall_edges(e, G)
+            if(G[e] == RED) S.append(e);
+        g.nb.log->printf("collected red edges, |S| = %d\n", S.size());
+    }
+
+    void Leave(void) override { g.nb.log->printf("--- Leaving Phase1\n"); }
+
+    bool IsWall(void) const override { return true; }
+    bool IsDone(void) const override { return true; }
+
+    StepRet StepSelect(void) {
+        graph3_t& G = g.ph->GetGraph();
+        if(!S.empty()) {
+            selEdge = S.pop();
+
+            // highlight adjacent faces
+            leda::edge f;
+            forall_edges(f, G) {
+                g.ph->SetFaceColor(f, 0.1f, 0.1f, 0.1f);
+            }
+            leda::edge e = selEdge;
+            leda::edge r = G.reversal(e);
+            if(G[e] != BLUE && G[r] != BLUE) {
+                g.ph->SetFaceColor(e, 1.0f, 1.0f, 0.0f);
+                g.ph->SetFaceColor(r, 1.0f, 1.0f, 0.0f);
+            }
+
+            state = STATE_FLIP;
+            return CONTINUE;
+        }
+        else {
+            g.nb.log->printf("S is empty => done flipping\n");
+            return DONE;
+        }
+    }
+
+    StepRet StepFlip(void) {
+        state = STATE_SELECT;
+        graph3_t& G = g.ph->GetGraph();
+        // leda::edge e = S.pop();
+        leda::edge e = selEdge;
+        leda::edge r = G.reversal(e);
+
+        if (G[e] == BLUE) return CONTINUE;
+
+        leda::edge e1 = G.face_cycle_succ(r);
+        leda::edge e3 = G.face_cycle_succ(e);
+
+        point3_t a = G[source(e1)];
+        point3_t b = G[target(e1)];
+        point3_t c = G[source(e3)];
+        point3_t d = G[target(e3)];
+
+
+        if (orientation(a,b,c,d) <= 0) 
+          G[e] = G[r] = BLACK;
+        else
+          { G[e] = G[r] = RED;
+            int orient_bda = orientation_xy(b,d,a);
+            int orient_bdc = orientation_xy(b,d,c);
+            if (orient_bda != orient_bdc
+            && (orient_bda != 0 || G.outdeg(source(e1)) == 4 || G[e1] == BLUE)
+            && (orient_bdc != 0 || G.outdeg(source(e3)) == 4 || G[e3] == BLUE))
+              { 
+                leda::edge e2 = G.face_cycle_succ(e1);
+                leda::edge e4 = G.face_cycle_succ(e3);
+          
+                S.push(e1); 
+                S.push(e2); 
+                S.push(e3); 
+                S.push(e4); 
+            
+                // flip
+                G.move_edge(e,e2,source(e4));
+                G.move_edge(r,e4,source(e2));
+                if ((orient_bda==0 && G[e1]==BLUE)||(orient_bdc==0 && G[e3]==BLUE))
+                   G[e] = G[r] = BLUE;
+                else
+                   G[e] = G[r] = BLACK;
+                // flip_count++;
+              }
+          }
+        g.ph->Update();
+        ApplyColors(g.ph);
+        return CONTINUE;
+    }
+
+    StepRet Step(void) override {
+        g.nb.log->printf("flipping\n");
+        if(STATE_SELECT == state) return StepSelect();
+        else return StepFlip();
+    }
+
+    IPhase* NextPhase(void) override { return NULL; }
+
+    void OnNodesMoved(void) override { }
+    void OnKeyPressed(char) override { }
+};
+
+// Phase0: initial triangulation
 struct Phase0 : IPhase {
     Globals& g;
 
     Phase0(Globals& g) : g(g) { }
 
-    void Enter(void) override { }
-    void Leave(void) override { }
+    void Enter(void) override { g.nb.log->printf("--- Entering Phase0 (Triangulation)\n"); }
+    void Leave(void) override { g.nb.log->printf("--- Leaving Phase0\n"); }
 
     bool IsWall(void) const override { return true; }
     bool IsDone(void) const override { return true; }
 
     StepRet Step(void) override {
-        return CONTINUE;
+        g.nb.log->printf("compute arbitrary triangulation\n");
+
+        leda::edge hullEdge = Triangulate(g.ph->GetGraph());
+        g.ph->Update();
+        g.ph->HideFace(hullEdge);
+        g.ph->Update();
+        ApplyColors(g.ph);
+
+        return DONE;
     }
 
     IPhase* NextPhase(void) override {
-        return NULL;
+        return new Phase1(g);
     }
 
     void OnNodesMoved(void) override { }
@@ -147,13 +276,12 @@ struct Algorithm : IAlgorithm {
 
     IPhase* Init(const Nubuck& nb, const graph3_t& G) {
         g.nb = nb;
+
         g.ph = nb.world->CreatePolyhedron();
         g.ph->SetRenderFlags(POLYHEDRON_RENDER_NODES | POLYHEDRON_RENDER_EDGES | POLYHEDRON_RENDER_HULL);
         g.ph->GetGraph() = G;
-        leda::edge hullEdge = Triangulate(g.ph->GetGraph());
-        g.ph->HideFace(hullEdge);
         g.ph->Update();
-        ApplyColors(g.ph);
+
         return new Phase0(g);
     }
 

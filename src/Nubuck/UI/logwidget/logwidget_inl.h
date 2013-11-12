@@ -26,14 +26,18 @@ namespace UI {
     inline void LogWidget::printf(const char* format, ...) {
         static char buffer[1024];
         if(_enabled) {
+            memset(buffer, 0, sizeof(buffer));
             va_list args;
             va_start(args, format);
             vsprintf(buffer, format, args);
             va_end(args);
 
+            /*
             QString str(buffer);
             _ui.textBrowser->insertPlainText(str);
             _ui.textBrowser->ensureCursorVisible();
+            */
+            ::printf("%s", buffer);
         }
     }
 
