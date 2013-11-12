@@ -288,7 +288,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
             float alpha = ph.hull.vertices[0].color.a; // constant for all verts
             if(1.0f > alpha) renderJob.fx = "LitDirectionalTransparent";
             else renderJob.fx = "LitDirectional";
-            renderJob.fx = hullFx;
+            // renderJob.fx = hullFx;
 
             renderJob.material = R::Material::White;
             renderJob.mesh = ph.hull.mesh;
