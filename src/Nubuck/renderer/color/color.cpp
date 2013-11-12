@@ -38,6 +38,10 @@ namespace R {
         return Color(lhp.r * rhp.r, lhp.g * rhp.g, lhp.b * rhp.b);
     }
 
+    Color BlendMulRGBA(const Color& lhp, const Color& rhp) {
+        return Color(lhp.r * rhp.r, lhp.g * rhp.g, lhp.b * rhp.b, lhp.a * rhp.a);
+    }
+
     Color Lerp(const Color& source, const Color& target, float l) {
         return R::Color(
             (1.0f - l) * source.r + l * target.r,

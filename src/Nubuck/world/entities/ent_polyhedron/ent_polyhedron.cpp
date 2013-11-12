@@ -40,8 +40,8 @@ void Polyhedron_Init(ENT_Polyhedron& ph) {
     ph.edges.color  = R::Color(0.4f, 0.4f, 0.4f);
     ph.edges.radius = 0.1f;
 
-    ph.hull.mesh    = NULL;
-    ph.hull.alpha   = 1.0f;
+    ph.hull.mesh        = NULL;
+    ph.hull.baseColor   = R::Color::White;
 
     Polyhedron_ClearEdgeMasks(ph);
 }
@@ -159,8 +159,7 @@ static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
     if(!ph.hull.indices.empty() /* ie. hull exists */) {
         R::Mesh::Vertex vert;
         vert.position = M::Vector3::Zero;
-        vert.color = defaultFaceColor;
-        vert.color.a = ph.hull.alpha;
+        vert.color = ph.hull.baseColor;
         ph.hull.vertices.resize(ph.hull.indices.size(), vert);
         for(unsigned i = 0; i < ph.hull.vnmap.size() /* ie. number of vertices */; ++i)
             ph.hull.vertices[i].position = ph.nodes.positions[ph.hull.vnmap[i]];
@@ -289,6 +288,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
             if(1.0f > alpha) renderJob.fx = "LitDirectionalTransparent";
             else renderJob.fx = "LitDirectional";
             // renderJob.fx = hullFx;
+            renderJob.fx = "LitDirectionalTransparent";
 
             renderJob.material = R::Material::White;
             renderJob.mesh = ph.hull.mesh;
@@ -430,12 +430,12 @@ void Polyhedron_UpdateCurve(PolyhedronFaceCurve& cv, float secsPassed) {
 }
 
 void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed) {
-    const float IP_DUR = 2.0f;
+    const float IP_DUR = 0.5f;
     for(unsigned i = 0; i < ph.hull.faceColors.size(); ++i) {
         PolyhedronHullFaceColor& fc = ph.hull.faceColors[i];
         if(fc.ip) {
             const float l = M::Min(1.0f, fc.t / IP_DUR);
-            fc.cur = (1.0f - l) * fc.v0 + l * fc.v1;
+            fc.cur = R::Lerp(fc.v0, fc.v1, l);
             fc.t += secsPassed;
             if(IP_DUR < fc.t) {
                 fc.t = 0.0f;
@@ -449,8 +449,7 @@ void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed) {
         PolyhedronHullFaceList& fl = ph.hull.faceLists[i];
         PolyhedronHullFaceColor& fc = ph.hull.faceColors[i];
         for(unsigned j = 0; j < fl.size; ++j) {
-            ph.hull.vertices[fl.base + j].color = fc.cur;
-            ph.hull.vertices[fl.base + j].color.a = ph.hull.alpha;
+            ph.hull.vertices[fl.base + j].color = R::BlendMulRGBA(fc.cur, ph.hull.baseColor);
         }
     }
 
@@ -463,8 +462,8 @@ void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Co
     PolyhedronHullFaceColor& fc = ph.hull.faceColors[faceIdx];
     fc.v0 = fc.cur;
     fc.v1 = color;
-    // fc.t = 0.0f;
-    fc.t = 10.0f; // instant
+    fc.t = 0.0f;
+    // fc.t = 10.0f; // instant
     fc.ip = true;
 }
 
@@ -477,7 +476,7 @@ void Polyhedron_SetHullAlpha(ENT_Polyhedron& ph, float alpha) {
     assert(0.0f <= alpha && alpha <= 1.0f);
     for(unsigned i = 0; i < ph.hull.vertices.size(); ++i)
         ph.hull.vertices[i].color.a = alpha;
-    ph.hull.alpha = alpha;
+    ph.hull.baseColor.a = alpha;
     if(!ph.hull.indices.empty()) R::meshMgr.GetMesh(ph.hull.mesh).Invalidate(&ph.hull.vertices[0]);
 }
 

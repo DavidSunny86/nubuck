@@ -158,13 +158,13 @@ struct Phase1 : IPhase {
             // highlight adjacent faces
             leda::edge f;
             forall_edges(f, G) {
-                g.ph->SetFaceColor(f, 0.1f, 0.1f, 0.1f);
+                g.ph->SetFaceColor(f, 1.0f, 1.0f, 1.0f, 0.0f);
             }
             leda::edge e = selEdge;
             leda::edge r = G.reversal(e);
             if(G[e] != BLUE && G[r] != BLUE) {
-                g.ph->SetFaceColor(e, 1.0f, 1.0f, 0.0f);
-                g.ph->SetFaceColor(r, 1.0f, 1.0f, 0.0f);
+                g.ph->SetFaceColor(e, 1.0f, 1.0f, 1.0f);
+                g.ph->SetFaceColor(r, 1.0f, 1.0f, 1.0f);
             }
 
             state = STATE_FLIP;

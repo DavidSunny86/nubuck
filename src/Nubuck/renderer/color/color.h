@@ -26,6 +26,7 @@ namespace R {
 
     Color BlendAddRGB(const Color& lhp, const Color& rhp);
     Color BlendMulRGB(const Color& lhp, const Color& rhp);
+    Color BlendMulRGBA(const Color& lhp, const Color& rhp);
 
     Color Lerp(const Color& source, const Color& target, float l);
 

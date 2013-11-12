@@ -81,7 +81,7 @@ struct PolyhedronHull {
 	std::vector<R::Mesh::Index>             indices; // hull exists iff indices not empty
     std::vector<PolyhedronFaceCurve>        curves;
     R::MeshMgr::meshPtr_t                   mesh;
-    float                                   alpha;
+    R::Color                                baseColor;
 };
 
 struct PolyhedronSelection {
