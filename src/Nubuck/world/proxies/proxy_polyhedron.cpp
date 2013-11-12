@@ -60,6 +60,13 @@ void Polyhedron::SetFaceColor(leda::edge edge, float r, float g, float b) {
     W::world.Send(EV::def_SetFaceColor.Create(args));
 }
 
+void Polyhedron::HideFace(leda::edge edge) {
+    EV::Params_HideFace args;
+    args.entId = _entId;
+    args.edge = edge;
+    W::world.Send(EV::def_HideFace.Create(args));
+}
+
 void Polyhedron::Update(void) {
     EV::Params_Rebuild args;
     args.entId = _entId;

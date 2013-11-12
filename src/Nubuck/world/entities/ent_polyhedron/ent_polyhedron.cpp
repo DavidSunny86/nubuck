@@ -21,6 +21,11 @@ namespace W {
 static R::MeshMgr::meshPtr_t    g_faceCurveDecalMesh;
 static R::SkinMgr::handle_t     g_faceCurveDecalSkin;
 
+static void Polyhedron_ClearEdgeMasks(ENT_Polyhedron& ph) {
+    ph.edges.mask.clear();
+    ph.edges.mask.resize(ph.G->max_edge_index() + 1, 1);
+}
+
 void Polyhedron_InitResources(void) {
     g_faceCurveDecalMesh = R::meshMgr.Create(R::CreateQuadDesc(cvar_faceCurveDecalSize));
     R::SkinDesc skinDesc;
@@ -37,6 +42,8 @@ void Polyhedron_Init(ENT_Polyhedron& ph) {
 
     ph.hull.mesh    = NULL;
     ph.hull.alpha   = 1.0f;
+
+    Polyhedron_ClearEdgeMasks(ph);
 }
 
 static void Polyhedron_RebuildSelection(ENT_Polyhedron& ph) {
@@ -57,14 +64,11 @@ static void Polyhedron_RebuildNodes(ENT_Polyhedron& ph) {
 
 static void Polyhedron_RebuildEdges(ENT_Polyhedron& ph) {
     ph.edges.valid.clear();
-    ph.edges.mask.clear();
     ph.edges.valid.resize(ph.G->max_edge_index() + 1, 0);
-    ph.edges.mask.resize(ph.G->max_edge_index() + 1, 0);
-
+    ph.edges.mask.resize(ph.G->max_edge_index() + 1, 1);
     leda::edge e;
     forall_edges(e, *ph.G) {
         ph.edges.valid[e->id()] = 1;
-        ph.edges.mask[e->id()] = 1;
     }
 }
 
@@ -456,6 +460,11 @@ void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Co
     // fc.t = 0.0f;
     fc.t = 10.0f; // instant
     fc.ip = true;
+}
+
+void Polyhedron_HideFace(ENT_Polyhedron& ph, const leda::edge e) {
+    Polyhedron_MaskFace(ph, e);
+    Polyhedron_RebuildHull(ph);
 }
 
 void Polyhedron_SetHullAlpha(ENT_Polyhedron& ph, float alpha) {

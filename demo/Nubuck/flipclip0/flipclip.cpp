@@ -21,11 +21,12 @@ struct CmpNodes : leda::leda_cmp_base<leda::node> {
 inline bool equal_xy(const point3_t& p, const point3_t& q)
 { return point3_t::cmp_x(p,q) == 0 && point3_t::cmp_y(p,q) == 0; }
 
-static void Triangulate(graph3_t& G) {
+// triangulates nodes of graph G. returns an edge of the projected hull
+static leda::edge Triangulate(graph3_t& G) {
     assert(0 == G.number_of_edges());
 
     leda::list<leda::node> L(G.all_nodes());
-    if(L.empty()) return;
+    if(L.empty()) return NULL;
     L.sort(CmpNodes(G));
 
     leda::node          last_v = L.pop();
@@ -84,7 +85,7 @@ static void Triangulate(graph3_t& G) {
   	      e = G.face_cycle_succ(e);
   	 } while (e != e_hull);
 
-  	// return G.last_edge();
+  	return G.last_edge();
 }
 
 struct Phase0 : IPhase {
@@ -118,7 +119,8 @@ struct Algorithm : IAlgorithm {
         g.ph = nb.world->CreatePolyhedron();
         g.ph->SetRenderFlags(POLYHEDRON_RENDER_NODES | POLYHEDRON_RENDER_EDGES | POLYHEDRON_RENDER_HULL);
         g.ph->GetGraph() = G;
-        Triangulate(g.ph->GetGraph());
+        leda::edge hullEdge = Triangulate(g.ph->GetGraph());
+        g.ph->HideFace(hullEdge);
         g.ph->Update();
         return new Phase0(g);
     }

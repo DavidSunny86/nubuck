@@ -23,6 +23,7 @@ public:
     void SetPickable(bool isPickable) override;
     void SetNodeColor(leda::node node, float r, float g, float b) override;
     void SetFaceColor(leda::edge edge, float r, float g, float b) override;
+    void HideFace(leda::edge edge) override;
 
     void Update(void) override;
 };
