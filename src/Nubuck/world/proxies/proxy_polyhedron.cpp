@@ -52,6 +52,14 @@ void Polyhedron::SetNodeColor(leda::node node, float r, float g, float b) {
     W::world.Send(EV::def_SetNodeColor.Create(args));
 }
 
+void Polyhedron::SetEdgeColor(leda::edge edge, float r, float g, float b) {
+    EV::Params_SetEdgeColor args;
+    args.entId = _entId;
+    args.edge = edge;
+    args.color = R::Color(r, g, b, 1.0f);
+    W::world.Send(EV::def_SetEdgeColor.Create(args));
+}
+
 void Polyhedron::SetFaceColor(leda::edge edge, float r, float g, float b) {
     EV::Params_SetFaceColor args;
     args.entId = _entId;

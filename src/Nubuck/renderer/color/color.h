@@ -24,6 +24,9 @@ namespace R {
 	Color operator+(const Color& lhp, const Color& rhp);
 	Color operator*(float f, const Color& color);
 
+    Color BlendAddRGB(const Color& lhp, const Color& rhp);
+    Color BlendMulRGB(const Color& lhp, const Color& rhp);
+
     Color Lerp(const Color& source, const Color& target, float l);
 
     Color4ub ColorTo4ub(const Color& col4f);

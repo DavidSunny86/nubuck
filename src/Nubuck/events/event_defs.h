@@ -67,6 +67,12 @@ BEGIN_EVENT_DEF(SetNodeColor)
     R::Color    color;
 END_EVENT_DEF
 
+BEGIN_EVENT_DEF(SetEdgeColor)
+    unsigned    entId;
+    leda::edge  edge;
+    R::Color    color;
+END_EVENT_DEF
+
 BEGIN_EVENT_DEF(SetFaceColor)
     unsigned    entId;
     leda::edge  edge;
@@ -83,7 +89,7 @@ BEGIN_EVENT_DEF(SetHullAlpha)
     float       alpha;
 END_EVENT_DEF
 
-BEGIN_EVENT_DEF(SetEdgeColor)
+BEGIN_EVENT_DEF(SetEdgeBaseColor)
     unsigned    entId;
     R::Color    color;
 END_EVENT_DEF

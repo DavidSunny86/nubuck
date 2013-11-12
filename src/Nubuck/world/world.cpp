@@ -38,10 +38,11 @@ namespace W {
         EVENT_HANDLER(EV::def_SetRenderFlags,       &World::Event_SetRenderFlags)
         EVENT_HANDLER(EV::def_SetPickable,          &World::Event_SetPickable)
         EVENT_HANDLER(EV::def_SetNodeColor,         &World::Event_SetNodeColor)
+        EVENT_HANDLER(EV::def_SetEdgeColor, 		&World::Event_SetEdgeColor)
         EVENT_HANDLER(EV::def_SetFaceColor, 		&World::Event_SetFaceColor)
         EVENT_HANDLER(EV::def_HideFace, 		    &World::Event_HideFace)
         EVENT_HANDLER(EV::def_SetHullAlpha,         &World::Event_SetHullAlpha)
-        EVENT_HANDLER(EV::def_SetEdgeColor, 		&World::Event_SetEdgeColor)
+        EVENT_HANDLER(EV::def_SetEdgeBaseColor, 	&World::Event_SetEdgeBaseColor)
         EVENT_HANDLER(EV::def_SetEdgeRadius,        &World::Event_SetEdgeRadius)
         EVENT_HANDLER(EV::def_SetEffect,            &World::Event_SetEffect)
         EVENT_HANDLER(EV::def_Resize,               &World::Event_Resize)
@@ -397,6 +398,15 @@ namespace W {
         }
     }
 
+    void World::Event_SetEdgeColor(const EV::Event& event) {
+        const EV::Params_SetEdgeColor& args = EV::def_SetEdgeColor.GetArgs(event);
+        GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
+        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
+            ENT_Polyhedron& ph = *entity->polyhedron;
+            ph.edges.colors[args.edge->id()].cur = args.color;
+        }
+    }
+
     void World::Event_SetFaceColor(const EV::Event& event) {
         const EV::Params_SetFaceColor& args = EV::def_SetFaceColor.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
@@ -433,8 +443,8 @@ namespace W {
         }
     }
 
-    void World::Event_SetEdgeColor(const EV::Event& event) {
-        const EV::Params_SetEdgeColor& args = EV::def_SetEdgeColor.GetArgs(event);
+    void World::Event_SetEdgeBaseColor(const EV::Event& event) {
+        const EV::Params_SetEdgeBaseColor& args = EV::def_SetEdgeBaseColor.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
         assert(entity.IsValid());
         assert(ENT_POLYHEDRON == entity->type);

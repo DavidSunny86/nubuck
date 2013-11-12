@@ -27,6 +27,17 @@ namespace R {
     Color Color::Green	= Color(0.0f, 1.0f, 0.0f);
     Color Color::Blue	= Color(0.0f, 0.0f, 1.0f);
 
+    Color BlendAddRGB(const Color& lhp, const Color& rhp) {
+        return Color(
+            M::Min(1.0f, lhp.r + rhp.r), 
+            M::Min(1.0f, lhp.g + rhp.g), 
+            M::Min(1.0f, lhp.b + rhp.b));
+    }
+
+    Color BlendMulRGB(const Color& lhp, const Color& rhp) {
+        return Color(lhp.r * rhp.r, lhp.g * rhp.g, lhp.b * rhp.b);
+    }
+
     Color Lerp(const Color& source, const Color& target, float l) {
         return R::Color(
             (1.0f - l) * source.r + l * target.r,

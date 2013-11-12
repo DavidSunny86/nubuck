@@ -34,6 +34,7 @@ struct IPolyhedron {
     virtual void SetRenderFlags(int flags) = 0;
     virtual void SetPickable(bool isPickable) = 0;
     virtual void SetNodeColor(leda::node node, float r, float g, float b) = 0;
+    virtual void SetEdgeColor(leda::edge edge, float r, float g, float b) = 0;
     virtual void SetFaceColor(leda::edge edge, float r, float g, float b) = 0;
     virtual void HideFace(leda::edge edge) = 0;
 

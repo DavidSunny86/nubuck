@@ -5,9 +5,40 @@ typedef leda::rational              scalar_t;
 typedef leda::d3_rat_point          point3_t;
 typedef leda::GRAPH<point3_t, int>  graph3_t;
 
+enum EdgeColorName { BLUE = 0, RED, BLACK };
+
+struct Color { 
+    float r, g, b; 
+
+    Color(void) { }
+    Color(const Color& other) : r(other.r), g(other.g), b(other.b) { }
+    Color(float r, float g, float b) : r(r), g(g), b(b) { }
+};
+
+static Color ColorFromName(EdgeColorName name) {
+    switch(name) {
+    case BLUE:  return Color(0.0f, 0.0f, 1.0f);
+    case RED:   return Color(1.0f, 0.0f, 0.0f);
+    case BLACK: return Color(0.0f, 0.0f, 0.0f);
+    default:    assert(0);
+    };
+    assert(0);
+    return Color();
+}
+
+static void ApplyColors(IPolyhedron* ph) {
+    graph3_t& G = ph->GetGraph();
+    leda::edge e;
+    forall_edges(e, G) {
+        Color c = ColorFromName(EdgeColorName(G[e]));
+        ph->SetEdgeColor(e, c.r, c.g, c.b);
+    }
+}
+
 struct Globals {
     Nubuck nb;
     IPolyhedron* ph;
+    leda::edge_array<Color> edgeColors;
 };
 
 struct CmpNodes : leda::leda_cmp_base<leda::node> {
@@ -42,7 +73,7 @@ static leda::edge Triangulate(graph3_t& G) {
   	  last_p = G[v];
   	  leda::edge x = G.new_edge(last_v,v,0);
   	  leda::edge y = G.new_edge(v,last_v,0);
-  	  // G[x] = G[y] = black;
+  	  G[x] = G[y] = BLACK;
   	  G.set_reversal(x,y);
   	  last_v = v;
   	 }
@@ -70,7 +101,7 @@ static leda::edge Triangulate(graph3_t& G) {
   	  do { leda::edge succ_e = G.succ_face_edge(e);
   	       leda::edge x = G.new_edge(succ_e,v,0, LEDA::after);
   	       leda::edge y = G.new_edge(v,source(succ_e),0);
-  	       // G[x] = G[y] = red;
+  	       G[x] = G[y] = RED;
   	       G.set_reversal(x,y);
   	       e = succ_e;
   	     } while (orientation_xy(p,G[source(e)],G[target(e)]) == orient);
@@ -81,7 +112,7 @@ static leda::edge Triangulate(graph3_t& G) {
   	 leda::edge e_hull = G.last_edge();
   	 leda::edge e = e_hull;
   	 do { leda::edge r = G.reversal(e);
-  	      // G[e] = G[r] = blue;
+  	      G[e] = G[r] = BLUE;
   	      e = G.face_cycle_succ(e);
   	 } while (e != e_hull);
 
@@ -122,6 +153,7 @@ struct Algorithm : IAlgorithm {
         leda::edge hullEdge = Triangulate(g.ph->GetGraph());
         g.ph->HideFace(hullEdge);
         g.ph->Update();
+        ApplyColors(g.ph);
         return new Phase0(g);
     }
 

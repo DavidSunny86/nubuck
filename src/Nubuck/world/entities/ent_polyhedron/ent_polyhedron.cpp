@@ -70,6 +70,12 @@ static void Polyhedron_RebuildEdges(ENT_Polyhedron& ph) {
     forall_edges(e, *ph.G) {
         ph.edges.valid[e->id()] = 1;
     }
+    PolyhedronEdgeColor edgeColor;
+    edgeColor.cur = R::Color::White;
+    edgeColor.t = 0.0f;
+    edgeColor.ip = false;
+    ph.edges.colors.clear();
+    ph.edges.colors.resize(ph.G->max_edge_index() + 1, edgeColor);
 }
 
 static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
@@ -260,7 +266,6 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
     } // if(renderNodes)
 
     R::Edge re;
-    re.color    = ph.edges.color;
     re.radius   = ph.edges.radius;
     unsigned numEdges = ph.hull.edges.size();
     ph.renderList.edges.clear();
@@ -270,6 +275,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
             const PolyhedronHullEdge& e = ph.hull.edges[i];
             if(e.valid)
             {
+                re.color = R::BlendMulRGB(ph.edges.colors[i].cur, ph.edges.color);
                 re.p0 = ph.nodes.positions[e.n0];
                 re.p1 = ph.nodes.positions[e.n1];
                 ph.renderList.edges.push_back(re);

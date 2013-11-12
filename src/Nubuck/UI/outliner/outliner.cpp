@@ -11,10 +11,10 @@ void Outliner::EntityOutline_Init(EntityOutline& outln) {
 }
 
 void PolyhedronOutline::OnEdgeColorChanged(float r, float g, float b) {
-    EV::Params_SetEdgeColor args;
+    EV::Params_SetEdgeBaseColor args;
     args.entId  = entId;
     args.color  = R::Color(r, g, b);
-    W::world.Send(EV::def_SetEdgeColor.Create(args));
+    W::world.Send(EV::def_SetEdgeBaseColor.Create(args));
 }
 
 void PolyhedronOutline::OnEdgeRadiusChanged(double value) {

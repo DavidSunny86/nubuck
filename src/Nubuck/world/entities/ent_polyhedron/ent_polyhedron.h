@@ -23,12 +23,18 @@ struct PolyhedronNodes {
     std::vector<R::Color>   colors;
 };
 
-struct PolyhedronEdges {
-    std::vector<int>    valid;
-    std::vector<int>	mask;
+struct PolyhedronEdgeColor {
+    R::Color    v0, v1, cur;
+    float       t;
+    bool        ip;
+};
 
-    R::Color            color;
-    float               radius;
+struct PolyhedronEdges {
+    std::vector<int>                    valid;
+    std::vector<int>					mask;
+    std::vector<PolyhedronEdgeColor>    colors;
+    R::Color                            color;
+    float               				radius;
 };
 
 struct PolyhedronHullFaceList {
