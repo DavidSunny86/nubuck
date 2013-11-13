@@ -162,7 +162,6 @@ namespace R {
         pass0.state.blend.enabled       = GL_TRUE;
         pass0.state.blend.srcFactor     = GL_SRC_ALPHA;
         pass0.state.blend.dstFactor 	= GL_ONE_MINUS_SRC_ALPHA;
-        pass0.state.depth.maskEnabled   = GL_FALSE;
         pass0.type = DEFAULT;
         pass0.flags = 0;
 

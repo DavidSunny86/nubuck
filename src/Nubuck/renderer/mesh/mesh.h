@@ -58,11 +58,13 @@ public:
 private:
     SYS::SpinLock _mtx;
 
-    Desc    _desc;
-    bool    _compiled;
-
-    M::Matrix4  _transform;
-    Vertex*     _tfverts;   // transformed vertices
+    std::vector<Vertex> _vertices;
+    std::vector<Vertex> _tfverts;
+    std::vector<Index>  _indices;
+    GLenum              _primType;
+    bool                _compiled;
+    M::Matrix4          _transform;
+    unsigned            _numVerts;
 
     std::vector<TriIndices> _triangleIndices;
 

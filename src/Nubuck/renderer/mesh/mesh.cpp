@@ -6,29 +6,29 @@
 
 namespace R {
 
-static void GenerateTrianglesFromTriangles(const Mesh::Desc& desc, std::vector<Mesh::TriIndices>& tris) {
+static void GenerateTrianglesFromTriangles(const std::vector<Mesh::Index>& indices, std::vector<Mesh::TriIndices>& tris) {
     unsigned i = 0;
-    while(i < desc.numIndices) {
-        assert(i + 2 < desc.numIndices);
+    while(i < indices.size()) {
+        assert(i + 2 < indices.size());
         Mesh::TriIndices tri;
-        tri.indices[0] = desc.indices[i + 0];
-        tri.indices[1] = desc.indices[i + 1];
-        tri.indices[2] = desc.indices[i + 2];
+        tri.indices[0] = indices[i + 0];
+        tri.indices[1] = indices[i + 1];
+        tri.indices[2] = indices[i + 2];
         tris.push_back(tri);
         i += 3;
     }
 }
 
-static void GenerateTrianglesFromTriangleStrips(const Mesh::Desc& desc, std::vector<Mesh::TriIndices>& tris) {
-    if(desc.numIndices < 3) return;
+static void GenerateTrianglesFromTriangleStrips(const std::vector<Mesh::Index>& indices, std::vector<Mesh::TriIndices>& tris) {
+    if(indices.size() < 3) return;
     unsigned i = 0;
-    while(i < desc.numIndices) {
-        assert(i + 1 < desc.numIndices);
-        Mesh::Index lastEdgeIdx[2] = { desc.indices[i], desc.indices[i + 1] };
+    while(i < indices.size()) {
+        assert(i + 1 < indices.size());
+        Mesh::Index lastEdgeIdx[2] = { indices[i], indices[i + 1] };
         i += 2;
         unsigned j = 0;
-        while(i < desc.numIndices) {
-            Mesh::Index idx = desc.indices[i];
+        while(i < indices.size()) {
+            Mesh::Index idx = indices[i];
             if(Mesh::RESTART_INDEX == idx) break;
             Mesh::TriIndices tri;
             if(j % 2) {
@@ -49,15 +49,15 @@ static void GenerateTrianglesFromTriangleStrips(const Mesh::Desc& desc, std::vec
     }
 }
 
-static void GenerateTrianglesFromTriangleFan(const Mesh::Desc& desc, std::vector<Mesh::TriIndices>& tris) {
-    if(desc.numIndices < 3) return;
+static void GenerateTrianglesFromTriangleFan(const std::vector<Mesh::Index>& indices, std::vector<Mesh::TriIndices>& tris) {
+    if(indices.size() < 3) return;
     unsigned i = 0;
-    while(i < desc.numIndices) {
-        assert(i + 1 < desc.numIndices);
-        Mesh::Index base = desc.indices[i++];
-        Mesh::Index lastEdgeIdx = desc.indices[i++];
-        while(i < desc.numIndices) {
-            Mesh::Index idx = desc.indices[i];
+    while(i < indices.size()) {
+        assert(i + 1 < indices.size());
+        Mesh::Index base = indices[i++];
+        Mesh::Index lastEdgeIdx = indices[i++];
+        while(i < indices.size()) {
+            Mesh::Index idx = indices[i];
             if(Mesh::RESTART_INDEX == idx) break;
             Mesh::TriIndices tri;
             tri.indices[0] = base;
@@ -71,60 +71,72 @@ static void GenerateTrianglesFromTriangleFan(const Mesh::Desc& desc, std::vector
     }
 }
 
-static void GenerateTriangles(const Mesh::Desc& desc, std::vector<Mesh::TriIndices>& tris) {
+static void GenerateTriangles(const std::vector<Mesh::Index>& indices, const GLenum primType, std::vector<Mesh::TriIndices>& tris) {
     tris.clear();
-    switch(desc.primType) {
-    case GL_TRIANGLES: GenerateTrianglesFromTriangles(desc, tris); break;
-    case GL_TRIANGLE_STRIP: GenerateTrianglesFromTriangleStrips(desc, tris); break;
-    case GL_TRIANGLE_FAN: GenerateTrianglesFromTriangleFan(desc, tris); break;
+    switch(primType) {
+    case GL_TRIANGLES: GenerateTrianglesFromTriangles(indices, tris); break;
+    case GL_TRIANGLE_STRIP: GenerateTrianglesFromTriangleStrips(indices, tris); break;
+    case GL_TRIANGLE_FAN: GenerateTrianglesFromTriangleFan(indices, tris); break;
     default:
-        common.printf("ERROR - GenerateTriangles: unkown primitive type desc.primType = %d.\n", desc.primType);
+        common.printf("ERROR - GenerateTriangles: unkown primitive type desc.primType = %d.\n", primType);
         Crash();
     }
 }
 
-template<typename TYPE>
-class ArrayPtr {
-private:
-    TYPE* _mem;
-public:
-    // deep copy
-    ArrayPtr(const TYPE* const mem, unsigned numElements) {
-        _mem = new TYPE[numElements];
-        memcpy(_mem, mem, sizeof(TYPE) * numElements);
+static void Subdiv(unsigned subdiv, std::vector<Mesh::Vertex>& vertices, std::vector<Mesh::TriIndices>& triIndices) {
+    typedef std::vector<Mesh::TriIndices>::iterator triIt_t;
+    std::vector<Mesh::TriIndices> T(triIndices);
+    triIndices.clear();
+    for(triIt_t triIt(T.begin()); T.end() != triIt; ++triIt) {
+        M::Vector3 center = M::Vector3::Zero;
+        for(unsigned i = 0; i < 3; ++i) center += vertices[triIt->indices[i]].position;
+        center /= 3.0f;
+        unsigned idx = vertices.size();
+        Mesh::Vertex vert;
+        vert.position = center;
+        vert.color = vertices[triIt->indices[0]].color;
+        vert.normal = vertices[triIt->indices[0]].normal;
+        vertices.push_back(vert);
+
+        Mesh::Index id[] = {
+            triIt->indices[0],
+            triIt->indices[1],
+            triIt->indices[2],
+            idx
+        };
+
+        Mesh::TriIndices t[3];
+        t[0].indices[0] = id[0];
+        t[0].indices[1] = id[1];
+        t[0].indices[2] = id[3];
+        t[1].indices[0] = id[1];
+        t[1].indices[1] = id[2];
+        t[1].indices[2] = id[3];
+        t[2].indices[0] = id[2];
+        t[2].indices[1] = id[0];
+        t[2].indices[2] = id[3];
+        triIndices.push_back(t[0]);
+        triIndices.push_back(t[1]);
+        triIndices.push_back(t[2]);
     }
-    ~ArrayPtr() {
-        if(_mem) delete[] _mem;
-    }
+}
 
-    TYPE* Release(void) {
-        TYPE* res = _mem;
-        _mem = NULL;
-        return res;
-    }
-};
+Mesh::Mesh(const Desc& desc) : _gbHandle(GB_INVALID_HANDLE), _compiled(false), _numVerts(0) {
+    _vertices.resize(desc.numVertices);
+    _indices.resize(desc.numIndices);
 
-Mesh::Mesh(const Desc& desc) : _gbHandle(GB_INVALID_HANDLE), _tfverts(NULL), _compiled(false) {
-    ArrayPtr<Vertex>    vertexArray(desc.vertices, desc.numVertices);
-    ArrayPtr<Index>     indexArray(desc.indices, desc.numIndices);
-    ArrayPtr<Vertex>    tfvertArray(desc.vertices, desc.numVertices);
+    memcpy(&_vertices[0], desc.vertices, sizeof(Vertex) * desc.numVertices);
+    memcpy(&_indices[0], desc.indices, sizeof(Index) * desc.numIndices);
 
-    _desc.vertices = vertexArray.Release();
-    _desc.numVertices = desc.numVertices;
-
-    _desc.indices = indexArray.Release();
-    _desc.numIndices = desc.numIndices;
-
-    _desc.primType = desc.primType;
-
+    _primType = desc.primType;
     _transform = M::Mat4::Identity();
-    _tfverts = tfvertArray.Release();
+
+    _numVerts = desc.numVertices;
+    GenerateTriangles(_indices, _primType, _triangleIndices);
+    _tfverts = _vertices;
 }
 
 Mesh::~Mesh(void) {
-    if(_desc.vertices) delete[] _desc.vertices;
-    if(_desc.indices) delete[] _desc.indices;
-    if(_tfverts) delete[] _tfverts;
     if(GB_INVALID_HANDLE != _gbHandle) GB_FreeMemItem(_gbHandle);
 }
 
@@ -150,8 +162,13 @@ void Mesh::AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye) {
 
 void Mesh::Invalidate(Mesh::Vertex* vertices) {
     _mtx.Lock();
-    memcpy(_desc.vertices, vertices, sizeof(Mesh::Vertex) * _desc.numVertices);
-    memcpy(_tfverts, vertices, sizeof(Mesh::Vertex) * _desc.numVertices);
+    assert(_tfverts.size() == _vertices.size());
+    _vertices.clear();
+    _vertices.resize(_numVerts);
+    memcpy(&_vertices[0], vertices, sizeof(Mesh::Vertex) * _vertices.size());
+    _triangleIndices.clear();
+    GenerateTriangles(_indices, _primType, _triangleIndices);
+    _tfverts = _vertices;
     Transform(_transform);
     _compiled = false;
     if(GB_INVALID_HANDLE != _gbHandle)
@@ -160,8 +177,9 @@ void Mesh::Invalidate(Mesh::Vertex* vertices) {
 }
 
 void Mesh::Transform(const M::Matrix4& mat) {
-    for(unsigned i = 0; i < _desc.numVertices; ++i)
-        _tfverts[i].position = M::Transform(mat, _desc.vertices[i].position);
+    assert(_tfverts.size() == _vertices.size());
+    for(unsigned i = 0; i < _vertices.size(); ++i)
+        _tfverts[i].position = M::Transform(mat, _vertices[i].position);
     if(GB_INVALID_HANDLE != _gbHandle)
         GB_Invalidate(_gbHandle);
 }
@@ -173,10 +191,8 @@ void Mesh::R_Compile(void) {
 
     _mtx.Lock();
 
-    GenerateTriangles(_desc, _triangleIndices);
-
     if(GB_INVALID_HANDLE == _gbHandle) {
-        _gbHandle = GB_AllocMemItem(_tfverts, _desc.numVertices);
+        _gbHandle = GB_AllocMemItem(&_tfverts[0], _tfverts.size());
     }
     _compiled = true;
 
