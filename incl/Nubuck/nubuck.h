@@ -38,6 +38,7 @@ struct IPolyhedron {
     virtual void SetFaceColor(leda::edge edge, float r, float g, float b) = 0;
     virtual void SetFaceColor(leda::edge edge, float r, float g, float b, float a) = 0;
     virtual void HideFace(leda::edge edge) = 0;
+    virtual void ShowFace(leda::edge edge) = 0;
 
     virtual void Update(void) = 0;
 };

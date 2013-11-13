@@ -73,10 +73,19 @@ void Polyhedron::SetFaceColor(leda::edge edge, float r, float g, float b, float 
 }
 
 void Polyhedron::HideFace(leda::edge edge) {
-    EV::Params_HideFace args;
+    EV::Params_SetFaceVisibility args;
     args.entId = _entId;
     args.edge = edge;
-    W::world.Send(EV::def_HideFace.Create(args));
+    args.visible = false;
+    W::world.Send(EV::def_SetFaceVisibility.Create(args));
+}
+
+void Polyhedron::ShowFace(leda::edge edge) {
+    EV::Params_SetFaceVisibility args;
+    args.entId = _entId;
+    args.edge = edge;
+    args.visible = true;
+    W::world.Send(EV::def_SetFaceVisibility.Create(args));
 }
 
 void Polyhedron::Update(void) {

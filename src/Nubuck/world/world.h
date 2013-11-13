@@ -86,7 +86,7 @@ namespace W {
         void Event_SetNodeColor(const EV::Event& event);
         void Event_SetEdgeColor(const EV::Event& event);
         void Event_SetFaceColor(const EV::Event& event);
-        void Event_HideFace(const EV::Event& event);
+        void Event_SetFaceVisibility(const EV::Event& event);
         void Event_SetHullAlpha(const EV::Event& event);
         void Event_SetEdgeBaseColor(const EV::Event& event);
         void Event_SetEdgeRadius(const EV::Event& event);

@@ -40,7 +40,7 @@ namespace W {
         EVENT_HANDLER(EV::def_SetNodeColor,         &World::Event_SetNodeColor)
         EVENT_HANDLER(EV::def_SetEdgeColor, 		&World::Event_SetEdgeColor)
         EVENT_HANDLER(EV::def_SetFaceColor, 		&World::Event_SetFaceColor)
-        EVENT_HANDLER(EV::def_HideFace, 		    &World::Event_HideFace)
+        EVENT_HANDLER(EV::def_SetFaceVisibility, 	&World::Event_SetFaceVisibility)
         EVENT_HANDLER(EV::def_SetHullAlpha,         &World::Event_SetHullAlpha)
         EVENT_HANDLER(EV::def_SetEdgeBaseColor, 	&World::Event_SetEdgeBaseColor)
         EVENT_HANDLER(EV::def_SetEdgeRadius,        &World::Event_SetEdgeRadius)
@@ -424,12 +424,12 @@ namespace W {
         }
     }
 
-    void World::Event_HideFace(const EV::Event& event) {
-        const EV::Params_HideFace& args = EV::def_HideFace.GetArgs(event);
+    void World::Event_SetFaceVisibility(const EV::Event& event) {
+        const EV::Params_SetFaceVisibility& args = EV::def_SetFaceVisibility.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
         if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
             ENT_Polyhedron& ph = *entity->polyhedron;
-            Polyhedron_HideFace(ph, args.edge);
+            Polyhedron_SetFaceVisibility(ph, args.edge, args.visible);
             Polyhedron_Update(ph);
         }
     }

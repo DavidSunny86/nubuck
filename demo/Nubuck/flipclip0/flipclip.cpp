@@ -36,8 +36,9 @@ static void ApplyColors(IPolyhedron* ph) {
 }
 
 struct Globals {
-    Nubuck nb;
-    IPolyhedron* ph;
+    Nubuck                  nb;
+    IPolyhedron*            ph;
+    leda::edge              hullEdge;
     leda::edge_array<Color> edgeColors;
 };
 
@@ -158,20 +159,32 @@ struct Phase1 : IPhase {
             // highlight adjacent faces
             leda::edge f;
             forall_edges(f, G) {
-                g.ph->SetFaceColor(f, 1.0f, 1.0f, 1.0f, 0.0f);
+                g.ph->HideFace(f);
             }
             leda::edge e = selEdge;
             leda::edge r = G.reversal(e);
             if(G[e] != BLUE && G[r] != BLUE) {
-                g.ph->SetFaceColor(e, 1.0f, 1.0f, 1.0f);
-                g.ph->SetFaceColor(r, 1.0f, 1.0f, 1.0f);
+                g.ph->ShowFace(e);
+                g.ph->ShowFace(r);
             }
+            leda::node n;
+            forall_nodes(n, g.ph->GetGraph()) {
+                g.ph->SetNodeColor(n, 0.0f, 0.0f, 0.0f);
+            }
+            g.ph->SetNodeColor(G.source(e), 1.0f, 1.0f, 1.0f);
+            g.ph->SetNodeColor(G.target(e), 1.0f, 1.0f, 1.0f);
 
             state = STATE_FLIP;
             return CONTINUE;
         }
         else {
             g.nb.log->printf("S is empty => done flipping\n");
+
+            leda::edge e;
+            forall_edges(e, g.ph->GetGraph())
+                g.ph->ShowFace(e);
+            g.ph->HideFace(g.hullEdge);
+
             return DONE;
         }
     }
@@ -183,7 +196,10 @@ struct Phase1 : IPhase {
         leda::edge e = selEdge;
         leda::edge r = G.reversal(e);
 
-        if (G[e] == BLUE) return CONTINUE;
+        if (G[e] == BLUE) {
+            g.nb.log->printf("skipping blue edge\n");
+            return CONTINUE;
+        }
 
         leda::edge e1 = G.face_cycle_succ(r);
         leda::edge e3 = G.face_cycle_succ(e);
@@ -254,9 +270,9 @@ struct Phase0 : IPhase {
     StepRet Step(void) override {
         g.nb.log->printf("compute arbitrary triangulation\n");
 
-        leda::edge hullEdge = Triangulate(g.ph->GetGraph());
+        g.hullEdge = Triangulate(g.ph->GetGraph());
         g.ph->Update();
-        g.ph->HideFace(hullEdge);
+        g.ph->HideFace(g.hullEdge);
         g.ph->Update();
         ApplyColors(g.ph);
 

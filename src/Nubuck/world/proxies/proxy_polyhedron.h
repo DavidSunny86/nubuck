@@ -26,6 +26,7 @@ public:
     void SetFaceColor(leda::edge edge, float r, float g, float b) override;
     void SetFaceColor(leda::edge edge, float r, float g, float b, float a) override;
     void HideFace(leda::edge edge) override;
+    void ShowFace(leda::edge edge) override;
 
     void Update(void) override;
 };

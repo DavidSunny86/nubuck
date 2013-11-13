@@ -229,6 +229,14 @@ static void Polyhedron_MaskFace(ENT_Polyhedron& ph, leda::edge e) {
     } while(e != it);
 }
 
+static void Polyhedron_UnmaskFace(ENT_Polyhedron& ph, leda::edge e) {
+    leda::edge it = e;
+    do {
+        it = ph.G->face_cycle_succ(it);
+        ph.edges.mask[it->id()] = 1;
+    } while(e != it);
+}
+
 void Polyhedron_Rebuild(ENT_Polyhedron& ph) {
     Polyhedron_RebuildSelection(ph);
     Polyhedron_RebuildNodes(ph);
@@ -259,7 +267,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
                 ph.renderList.nodePositions.push_back(ph.nodes.positions[i]);
 
                 if(ph.selection.nodes[i]) ph.renderList.nodeColors.push_back(R::Color(1.0f, 1.0f, 0.0f, 1.0f));
-                else ph.renderList.nodeColors.push_back(R::Color(0.4f, 0.4f, 0.4f, 1.0f)); 
+                else ph.renderList.nodeColors.push_back(ph.nodes.colors[i]);
             }
         }
     } // if(renderNodes)
@@ -288,7 +296,6 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
             if(1.0f > alpha) renderJob.fx = "LitDirectionalTransparent";
             else renderJob.fx = "LitDirectional";
             // renderJob.fx = hullFx;
-            renderJob.fx = "LitDirectionalTransparent";
 
             renderJob.material = R::Material::White;
             renderJob.mesh = ph.hull.mesh;
@@ -467,8 +474,9 @@ void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Co
     fc.ip = true;
 }
 
-void Polyhedron_HideFace(ENT_Polyhedron& ph, const leda::edge e) {
-    Polyhedron_MaskFace(ph, e);
+void Polyhedron_SetFaceVisibility(ENT_Polyhedron& ph, const leda::edge e, bool visible) {
+    if(visible) Polyhedron_UnmaskFace(ph, e);
+    else Polyhedron_MaskFace(ph, e);
     Polyhedron_RebuildHull(ph);
 }
 

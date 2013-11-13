@@ -79,9 +79,10 @@ BEGIN_EVENT_DEF(SetFaceColor)
     R::Color    color;
 END_EVENT_DEF
 
-BEGIN_EVENT_DEF(HideFace)
+BEGIN_EVENT_DEF(SetFaceVisibility)
     unsigned    entId;
     leda::edge  edge;
+    bool        visible;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(SetHullAlpha)
