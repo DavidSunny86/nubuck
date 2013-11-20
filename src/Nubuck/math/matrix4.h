@@ -57,6 +57,7 @@ namespace M {
 		Matrix4 RotateAxis(const Vector3& axis, float angle);
 
         Matrix4 Perspective(float fovy, float aspect, float zNear, float zFar);
+        Matrix4 Perspective(float fovy, float aspect, float zNear, float zFar, float zOff);
         Matrix4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar);
 
 	} // namespace Mat4

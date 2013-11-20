@@ -343,6 +343,16 @@ namespace M {
                            0.0f, 0.0f, -1.0f, 0.0f);
         }
 
+        Matrix4 Perspective(float fovy, float aspect, float zNear, float zFar, float zOff) {
+            const float f = 1.0f / tan(0.5f * Deg2Rad(fovy));
+            const float d = 1.0f / (zNear - zFar);
+
+            return Matrix4(f / aspect, 0.0f, 0.0f, 0.0f,
+                           0.0f, f, 0.0f, 0.0f,
+                           0.0f, 0.0f, (1.0f + zOff) * d * (zFar + zNear), d * (2 * zFar * zNear),
+                           0.0f, 0.0f, -1.0f, 0.0f);
+        }
+
         Matrix4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
             return Matrix4(2.0f / (right - left), 0.0f, 0.0f, -(right + left) / (right - left),
                     0.0f, 2.0f / (top - bottom), 0.0f, -(top + bottom) / (top - bottom),

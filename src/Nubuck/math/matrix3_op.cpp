@@ -123,6 +123,12 @@ namespace M {
                     0.0f, 0.0, f);
         }
 
+        Matrix3 Scale(float fx, float fy, float fz) {
+            return Matrix3(fx, 0.0f, 0.0f,
+                           0.0f, fy, 0.0f,
+                		   0.0f, 0.0f, fz);
+        }
+
 		Matrix3 RotateY(float angle) {
 			const float rad = Deg2Rad(angle);
 			const float sina = sinf(rad);

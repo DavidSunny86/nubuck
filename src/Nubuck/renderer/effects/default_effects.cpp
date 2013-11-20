@@ -7,6 +7,45 @@ namespace R {
         PassDesc pass0, pass1, pass2;
         EffectDesc fx;
 
+        // EdgeLineBillboard Effect
+        // pitch black billboards!
+
+        pass0.name = "Pass0";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\edge_line_billboard_off.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\edge_line_billboard.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.state.depth.func = GL_LEQUAL;
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "EdgeLineBillboard";
+        fx.sortKey = 0;
+        fx.passes.push_back(pass0);
+		effectMgr.Register(fx);
+        fx.passes.clear();
+
+        // EdgeLineDepthBillboard Effect
+        // pitch black billboards! depth only!
+
+        pass0.name = "Pass0";
+        pass0.filenames[R::Shader::VERTEX]      = "Shaders\\edge_line_billboard.vert";
+        pass0.filenames[R::Shader::FRAGMENT]    = "Shaders\\edge_line_billboard.frag";
+        pass0.filenames[R::Shader::GEOMETRY]    = "";
+        pass0.state.SetDefault();
+        pass0.state.color.maskEnabled.red       = GL_FALSE;
+        pass0.state.color.maskEnabled.green     = GL_FALSE;
+        pass0.state.color.maskEnabled.blue      = GL_FALSE;
+        pass0.state.color.maskEnabled.alpha     = GL_FALSE;
+        pass0.type = DEFAULT;
+        pass0.flags = 0;
+
+        fx.name = "EdgeLineDepthBillboard";
+        fx.sortKey = 0;
+        fx.passes.push_back(pass0);
+		effectMgr.Register(fx);
+        fx.passes.clear();
+
         // Default Effect
         // unlit, constant color
 

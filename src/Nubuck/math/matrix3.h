@@ -47,6 +47,7 @@ namespace M {
 
 		Matrix3 Identity(void);
         Matrix3 Scale(float f);
+        Matrix3 Scale(float fx, float fy, float fz);
 		Matrix3 RotateY(float angle);
 		Matrix3 RotateAxis(const Vector3& axis, float angle);
 
