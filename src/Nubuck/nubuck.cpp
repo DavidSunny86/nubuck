@@ -13,6 +13,9 @@
 #include <UI\logwidget\logwidget.h>
 #include "nubuck_private.h"
 
+// removeme !!!
+#include <renderer\effects\nfx_loader\nfx_loader.h>
+
 Nubuck nubuck;
 
 namespace {
@@ -74,6 +77,17 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     nubuck.log      = UI::LogWidget::Instance();
 
     ALG::gs_algorithm.SetAlloc(algAlloc);
+
+    // removeme !!!
+    R::EffectDesc desc;
+    std::string filename = common.BaseDir() + "nfx_test.nfx";
+    if(!NFX_Parse(filename.c_str(), desc)) {
+        printf("=> parsing failed\n");
+    }
+    GLboolean b = desc.passes.front().state.culling.hw.enabled;
+    if(GL_TRUE == b) printf("culling is ENABLED\n");
+    else if(GL_FALSE == b) printf("culling is DISABLED\n");
+    else printf("WTF is culling?\n");
 
     UI::MainWindow mainWindow;
     mainWindow.show();

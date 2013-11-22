@@ -189,6 +189,9 @@
     <Filter Include="Private\UI\colorbutton">
       <UniqueIdentifier>{bb899979-99a9-4fea-9231-1b9df1cc3fe7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\effects\nfx_loader">
+      <UniqueIdentifier>{7f6cade1-f742-49f4-9839-732b7a86a91f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -451,6 +454,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\events\event_defs.h">
       <Filter>Private\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\nfx_loader\nfx_loader.h">
+      <Filter>Private\renderer\effects\nfx_loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\nfx_loader\nfx_local.h">
+      <Filter>Private\renderer\effects\nfx_loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -726,6 +735,12 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_nubuck.cpp">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\nfx_loader\nfx_loader.cpp">
+      <Filter>Private\renderer\effects\nfx_loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\nfx_loader\lex.yy.cpp">
+      <Filter>Private\renderer\effects\nfx_loader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

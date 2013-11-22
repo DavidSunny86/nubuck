@@ -1,0 +1,7 @@
+flex --never-interactive -o lex.yy.cpp nfx_rules.flex
+
+NOTES:
+Option --never-interactive: avoid call to (undefined) function isatty()
+Make sure to compile the scanner as a C++ file (.cpp ending in VS)!
+
+tested with flex 2.5.35 (cygwin)

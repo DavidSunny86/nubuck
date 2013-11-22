@@ -11,12 +11,12 @@
 namespace R {
 
     struct State {
-        struct {
-            struct {
+        struct Culling {
+            struct Hardware {
                 GLboolean   enabled;
                 GLenum      cullFace;
             } hw;
-            struct {
+            struct Software {
                 GLboolean   enabled;
                 GLenum      cullFace;
                 float       alpha;
