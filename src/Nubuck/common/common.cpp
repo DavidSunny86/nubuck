@@ -7,7 +7,7 @@
 #include <system\winerror.h>
 #include "common.h"
 
-int COM_Tokenize(ctoken_t** tokens, const char* string) {
+int COM_Tokenize(ctoken_t** tokens, const char* string, char term) {
 	ctoken_t* token;
 	ctoken_t* head = NULL;
 	ctoken_t* tail = NULL;
@@ -19,7 +19,7 @@ int COM_Tokenize(ctoken_t** tokens, const char* string) {
 
 	COM_assert(NULL != tokens);
 
-	while('\0' != *strPtr) {
+	while(term != *strPtr) {
 		if(' ' == *strPtr || '\t' == *strPtr) {
 			if(reading) reading = false;
 			strPtr++;
@@ -140,6 +140,10 @@ float Common::RandomFloat(float min, float max) const {
 
 const std::string& Common::BaseDir(void) const {
     return _baseDir;
+}
+
+const char* Common::GetEnvVar(const std::string& name) const {
+    return getenv(name.c_str());
 }
 
 void Common::printf(const char* format, ...) {

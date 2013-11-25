@@ -12,7 +12,7 @@ namespace {
         std::ifstream file(filename.c_str());
 
         if(!file.is_open()) {
-            common.printf("unable to open file '%s'.\n", filename.c_str());
+            common.printf("ReadFile: unable to open file '%s'.\n", filename.c_str());
             Crash();
         }
 
@@ -25,6 +25,42 @@ namespace {
         return text;
     }
 
+    std::string PreprocessShaderSource(const std::string& source) {
+        if(source.empty()) return std::string();
+        std::string out;
+        unsigned i = 0;
+        while(i < source.length()) {
+            std::string line;
+            while(i < source.length() && '\n' != source[i]) 
+                line += source[i++];
+            line += source[i++];
+            ctoken_t* tokens = NULL;
+            COM_Tokenize(&tokens, line.c_str(), '\0');
+            ctoken_t* tok = tokens;
+            if(tok && '#' == tok->string[0]) {
+                if(!strncmp("#include", tok->string, MAX_TOKEN)) {
+                    tok = tok->next;
+                    unsigned tokLen = strnlen(tok->string, MAX_TOKEN);
+                    if('<' != tok->string[0] || 1 > tokLen || '>' != tok->string[tokLen - 1]) {
+                        common.printf("PreprocessShaderSource: invalid syntax for include path. expected '<PATH>', got '%s'\n", tok->string);
+                        Crash();
+                    }
+                    if(tok->next) {
+                        common.printf("PreprocessShaderSource: expected end of line after '#include <...>', got '%s'\n", tok->string);
+                        Crash();
+                    }
+                    std::string incl(tok->string + 1, tokLen - 2);
+                    out += PreprocessShaderSource(ReadFile(common.BaseDir() + incl));
+                } else {
+                    printf("PreprocessShaderSource: unknown directive '%s'\n", tok->string);
+                    Crash();
+                }
+            } else out += line;
+            COM_FreeTokens(tokens);
+        }
+        return out;
+    }
+
 } // unnamed namespace
 
 namespace R {
@@ -35,7 +71,7 @@ namespace R {
         for(int i = 0; i < Shader::NUM_TYPES; ++i) {
             const std::string& filename = _desc.filenames[i];
             if(!filename.empty()) {
-                std::string source = ReadFile(common.BaseDir() + filename);
+                std::string source = PreprocessShaderSource(filename);
                 _program.Attach(Shader::Type(i), source.c_str());
             }
         }

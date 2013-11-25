@@ -192,6 +192,9 @@
     <Filter Include="Private\renderer\effects\nfx_loader">
       <UniqueIdentifier>{7f6cade1-f742-49f4-9839-732b7a86a91f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\effects\statedesc_gen">
+      <UniqueIdentifier>{fda313cb-9753-4784-81a5-2b6c77f8f9ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -460,6 +463,18 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\nfx_loader\nfx_local.h">
       <Filter>Private\renderer\effects\nfx_loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\statedesc_gen.h">
+      <Filter>Private\renderer\effects\statedesc_gen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\state.h">
+      <Filter>Private\renderer\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\statedesc_gen_local.h">
+      <Filter>Private\renderer\effects\statedesc_gen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\statedesc.h">
+      <Filter>Private\renderer\effects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -739,8 +754,20 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\nfx_loader\nfx_loader.cpp">
       <Filter>Private\renderer\effects\nfx_loader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\renderer\effects\nfx_loader\lex.yy.cpp">
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\statedesc_gen.cpp">
+      <Filter>Private\renderer\effects\statedesc_gen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\nfx_loader\lex.yynfx.cpp">
       <Filter>Private\renderer\effects\nfx_loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\lex.yystg.cpp">
+      <Filter>Private\renderer\effects\statedesc_gen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\state.cpp">
+      <Filter>Private\renderer\effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\statedesc.cpp">
+      <Filter>Private\renderer\effects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

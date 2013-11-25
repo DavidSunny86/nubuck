@@ -34,7 +34,7 @@ typedef struct ctoken_s {
 	int i;
 } ctoken_t;
 
-int COM_Tokenize(ctoken_t** tokens, const char* string);
+int COM_Tokenize(ctoken_t** tokens, const char* string, char term);
 void COM_FreeTokens(ctoken_t* tokens);
 
 class Common : public ICommon {
@@ -53,6 +53,8 @@ public:
     // contains trailing delimiter, eg.
     // C:\Libraries\LEDA\ 
     const std::string& BaseDir(void) const;
+
+    const char* GetEnvVar(const std::string& name) const;
 
     void printf(const char* format, ...) override;
 };

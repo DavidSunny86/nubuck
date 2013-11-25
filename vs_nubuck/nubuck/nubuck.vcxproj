@@ -48,6 +48,10 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\nfx_loader\nfx_loader.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\nfx_loader\nfx_local.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\pass.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\state.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\statedesc.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\statedesc_gen.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\statedesc_gen_local.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\glcall.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h" />
@@ -216,9 +220,13 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\default_effects.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\effect.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\effectmgr.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\renderer\effects\nfx_loader\lex.yy.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\nfx_loader\lex.yynfx.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\nfx_loader\nfx_loader.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\pass.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\state.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\statedesc.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\lex.yystg.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\statedesc_gen.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c" />
     <ClCompile Include="..\..\src\Nubuck\renderer\material\material.cpp" />

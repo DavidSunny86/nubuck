@@ -14,7 +14,9 @@
 #include "nubuck_private.h"
 
 // removeme !!!
+#include <renderer\effects\statedesc_gen\statedesc_gen.h>
 #include <renderer\effects\nfx_loader\nfx_loader.h>
+#include <renderer\effects\effectmgr.h>
 
 Nubuck nubuck;
 
@@ -79,15 +81,21 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     ALG::gs_algorithm.SetAlloc(algAlloc);
 
     // removeme !!!
+    const char* inname = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\stategen_test\\state.h";
+    const char* outname = "C:\\Libraries\\LEDA\\LEDA-6.4\\res\\stategen_test\\statedesc.cpp";
+    if(!STG_Parse(inname, outname)) {
+        printf("=> STG parsing failed\n");
+    } else printf("=> STG parsing SUCCESSFUL\n");
+
+    // removeme !!!
+    /*
     R::EffectDesc desc;
     std::string filename = common.BaseDir() + "nfx_test.nfx";
     if(!NFX_Parse(filename.c_str(), desc)) {
         printf("=> parsing failed\n");
     }
-    GLboolean b = desc.passes.front().state.culling.hw.enabled;
-    if(GL_TRUE == b) printf("culling is ENABLED\n");
-    else if(GL_FALSE == b) printf("culling is DISABLED\n");
-    else printf("WTF is culling?\n");
+    R::effectMgr.Register(desc);
+    */
 
     UI::MainWindow mainWindow;
     mainWindow.show();

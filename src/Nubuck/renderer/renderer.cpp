@@ -727,7 +727,7 @@ void Renderer::Init(void) {
     glGetIntegerv(GL_STENCIL_BITS, &stencilBits);
     assert(0 < stencilBits);
 
-    curState.SetDefault();
+    SetDefaultState(curState);
 
     GL_CALL(glEnable(GL_PRIMITIVE_RESTART));
     GL_CALL(glPrimitiveRestartIndex(Mesh::RESTART_INDEX));
