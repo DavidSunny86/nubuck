@@ -20,7 +20,6 @@ enum {
     NFX_TOK_SORTKEY,
 
     NFX_TOK_VAL_BOOL,
-    NFX_TOK_VAL_UINT,
     NFX_TOK_VAL_INT,
     NFX_TOK_VAL_FLOAT,
     NFX_TOK_VAL_ENUM,
@@ -33,7 +32,6 @@ extern int      yynfxlineno;
 int             yynfxlex(void);
 
 extern GLboolean    nfx_val_bool;
-extern GLuint       nfx_val_uint;
 extern GLint        nfx_val_int;
 extern GLfloat      nfx_val_float;
 extern GLenum       nfx_val_enum;

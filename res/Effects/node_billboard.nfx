@@ -1,6 +1,6 @@
 fx NodeBillboard {
   pass Pass0 {
-    vs = "#include <Shaders\\node_billboard.vert>";
-    fs = "#include <Shaders\\node_billboard.frag>";
+    vs = "#include <Shaders\node_billboard.vert>";
+    fs = "#include <Shaders\node_billboard.frag>";
   }
 }

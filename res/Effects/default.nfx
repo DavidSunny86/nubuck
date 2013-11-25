@@ -1,0 +1,7 @@
+// unlit, constant color
+fx Default {
+  pass Pass0 {
+    vs = "#include <Shaders\default.vert>";
+    fs = "#include <Shaders\default.frag>";
+  }
+}

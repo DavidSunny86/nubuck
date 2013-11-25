@@ -1,0 +1,11 @@
+fx Wireframe {
+  pass Wireframe {
+    // TODO: flags = USE_MATERIAL
+    state {
+      depth.func        = GL_LEQUAL;
+      raster.lineWidth  = 3.0;
+    }
+    vs = "#include <Shaders\default.vert>";
+    fs = "#include <Shaders\default.frag>";
+  }
+}

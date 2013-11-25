@@ -1,0 +1,42 @@
+fx Lit {
+
+  pass Ambient {
+    // TODO: flags = USE_COLOR
+    state.blend {
+      enabled   = GL_TRUE;
+      srcFactor = GL_SRC_ALPHA;
+      dstFactor = GL_ONE_MINUS_SRC_ALPHA;
+    }
+    vs = "#include <Shaders\lit_pass0.vert>";
+    fs = "#include <Shaders\lit_pass0.frag>";
+  }
+
+  pass Light0 {
+    // TODO: type = FIRST_LIGHT_PASS
+    state.blend {
+      enabled   = GL_TRUE;
+      srcFactor = GL_SRC_ALPHA;
+      dstFactor = GL_ONE_MINUS_SRC_ALPHA;
+    }
+    vs = "#include <Shaders\lit_pass1.vert>";
+    fs = "#include <Shaders\lit_pass1.frag>";
+  }
+
+  pass LightN {
+    // TODO: type = LIGHT_PASS
+    state.blend {
+      enabled   = GL_TRUE;
+      srcFactor = GL_SRC_ALPHA;
+      dstFactor = GL_ONE;
+    }
+    /*
+    state.deph {
+      maskEnabled = GL_FALSE;
+      func        = GL_EQUAL;
+    }
+    */
+    vs = "#include <Shaders\lit_pass1.vert>";
+    fs = "#include <Shaders\lit_pass1.frag>";
+  }
+
+}

@@ -6,7 +6,6 @@ static const char*  g_filename;
 static int          g_nextToken;
 
 GLboolean    nfx_val_bool;
-GLuint       nfx_val_uint;
 GLint        nfx_val_int;
 GLfloat      nfx_val_float;
 GLenum       nfx_val_enum;
@@ -29,7 +28,6 @@ static const char* TokToString(int tok) {
 	TOKTOSTRING_CASE(NFX_TOK_GS_SRC);
 	TOKTOSTRING_CASE(NFX_TOK_SORTKEY);
     TOKTOSTRING_CASE(NFX_TOK_VAL_BOOL);
-    TOKTOSTRING_CASE(NFX_TOK_VAL_UINT);
     TOKTOSTRING_CASE(NFX_TOK_VAL_INT);
     TOKTOSTRING_CASE(NFX_TOK_VAL_FLOAT);
     TOKTOSTRING_CASE(NFX_TOK_VAL_ENUM);
@@ -46,7 +44,7 @@ static void NextToken(void) {
 static bool ExpectToken(int tok) {
     if(tok != g_nextToken) {
         const char* tokName = TokToString(tok);
-        printf("%s:%d: expected '%s', got '%s'\n", g_filename, yynfxlineno, tokName, yynfxtext);
+        common.printf("%s:%d: expected '%s', got '%s'\n", g_filename, yynfxlineno, tokName, yynfxtext);
         return false;
     }
     return true;
@@ -69,14 +67,17 @@ static int FieldIndex(int fidx, const char* name) {
 static bool ParseValueAssignment(R::PassDesc& desc, int fidx) {
     NextToken();
     unsigned off = g_stateDesc[fidx].offset;
+    unsigned uint = 0;
     switch(g_stateDesc[fidx].type) {
     case SFT_BOOL:
         if(!ExpectToken(NFX_TOK_VAL_BOOL)) return false;
         memcpy((char*)&desc.state + off, &nfx_val_bool, sizeof(GLboolean));
         break;
     case SFT_UINT:
-        if(!ExpectToken(NFX_TOK_VAL_UINT)) return false;
-        memcpy((char*)&desc.state + off, &nfx_val_uint, sizeof(GLuint));
+        if(!ExpectToken(NFX_TOK_VAL_INT)) return false;
+        if(0 > nfx_val_int) common.printf("%s:%d: WARNIGN, assigning int to unsigned int\n", g_filename, yynfxlineno);
+        uint = (unsigned)nfx_val_int;
+        memcpy((char*)&desc.state + off, &uint, sizeof(GLuint));
         break;
     case SFT_INT:
         if(!ExpectToken(NFX_TOK_VAL_INT)) return false;
@@ -91,7 +92,7 @@ static bool ParseValueAssignment(R::PassDesc& desc, int fidx) {
         memcpy((char*)&desc.state + off, &nfx_val_enum, sizeof(GLenum));
         break;
     case SFT_STRUCT:
-        printf("%s:%d: assigning value to struct\n", g_filename, yynfxlineno);
+        common.printf("%s:%d: assigning value to struct\n", g_filename, yynfxlineno);
         return false;
     default:
         assert(0);
@@ -112,7 +113,7 @@ static bool ParseBlock(R::PassDesc& desc, int fidx) {
         } else if(NFX_TOK_RBRACE == g_nextToken) {
             done = true;
         } else {
-            printf("%s:%d: expected '%s' or '%s', got '%s'\n",
+            common.printf("%s:%d: expected '%s' or '%s', got '%s'\n",
                 g_filename, yynfxlineno, 
                 TokToString(NFX_TOK_IDENT), TokToString(NFX_TOK_RBRACE), 
                 yynfxtext);
@@ -125,7 +126,7 @@ static bool ParseBlock(R::PassDesc& desc, int fidx) {
 static bool ParseField(R::PassDesc& desc, int fidx) {
     fidx = FieldIndex(fidx, yynfxtext);
     if(0 > fidx) {
-        printf("%s:%d: unknown state '%s'\n", g_filename, yynfxlineno, yynfxtext);
+        common.printf("%s:%d: unknown state '%s'\n", g_filename, yynfxlineno, yynfxtext);
         return false;
     }
     bool done = false;
@@ -136,7 +137,7 @@ static bool ParseField(R::PassDesc& desc, int fidx) {
             if(!ExpectToken(NFX_TOK_IDENT)) return false;
             fidx = FieldIndex(fidx, yynfxtext);
             if(0 > fidx) {
-                printf("%s:%d: unknown state '%s'\n", g_filename, yynfxlineno, yynfxtext);
+                common.printf("%s:%d: unknown state '%s'\n", g_filename, yynfxlineno, yynfxtext);
                 return false;
             }
         } else if(NFX_TOK_LBRACE == g_nextToken) { // field block
@@ -146,7 +147,7 @@ static bool ParseField(R::PassDesc& desc, int fidx) {
             if(!ParseValueAssignment(desc, fidx)) return false;
             done = true;
         } else {
-            printf("%s:%d: expected '%s' or '%s', got '%s'\n",
+            common.printf("%s:%d: expected '%s' or '%s', got '%s'\n",
                 g_filename, yynfxlineno, 
                 TokToString(NFX_TOK_DOT), TokToString(NFX_TOK_EQUALS), 
                 yynfxtext);
@@ -168,7 +169,7 @@ static bool ParseShaderSource(R::PassDesc& desc, R::Shader::Type type) {
         NextToken();
         if(!ExpectToken(NFX_TOK_SEMICOL)) return false;
     } else {
-        printf("%s:%d: expected '%s', got '%s'\n",
+        common.printf("%s:%d: expected '%s', got '%s'\n",
             g_filename, yynfxlineno,
             TokToString(NFX_TOK_STRING),
             yynfxtext);
@@ -199,7 +200,7 @@ static bool ParsePass(R::PassDesc& desc) {
         } else if(NFX_TOK_RBRACE == g_nextToken) {
             done = true;
         } else {
-            printf("%s:%d: expected '%s' or '%s', got '%s'\n",
+            common.printf("%s:%d: expected '%s' or '%s', got '%s'\n",
                 g_filename, yynfxlineno, 
                 TokToString(NFX_TOK_IDENT), TokToString(NFX_TOK_RBRACE), 
                 yynfxtext);
@@ -220,8 +221,6 @@ static void ClearPassDesc(R::PassDesc& desc) {
 }
 
 bool NFX_StartParsing(const char* filename, R::EffectDesc& desc) {
-    printf("NFX_StartParsing\n");
-
     g_filename  = filename;
     g_nextToken = 0;
 
@@ -251,14 +250,15 @@ bool NFX_StartParsing(const char* filename, R::EffectDesc& desc) {
             NextToken();
             if(!ExpectToken(NFX_TOK_EQUALS)) return false;
             NextToken();
-            if(!ExpectToken(NFX_TOK_VAL_UINT)) return false;
-            desc.sortKey = nfx_val_uint;
+            if(!ExpectToken(NFX_TOK_VAL_INT)) return false;
+            if(0 > nfx_val_int) common.printf("%s:%d: WARNING, assigning int to unsigned int as sortkey\n");
+            desc.sortKey = (unsigned)nfx_val_int;
             NextToken();
             if(!ExpectToken(NFX_TOK_SEMICOL)) return false;
         } else if(NFX_TOK_RBRACE == g_nextToken) {
             done = true;
         } else {
-            printf("%s:%d: expected { '%s', '%s', '%s' }, got '%s'\n",
+            common.printf("%s:%d: expected { '%s', '%s', '%s' }, got '%s'\n",
                 g_filename, yynfxlineno, 
                 TokToString(NFX_TOK_PASS), TokToString(NFX_TOK_SORTKEY), TokToString(NFX_TOK_RBRACE), 
                 yynfxtext);

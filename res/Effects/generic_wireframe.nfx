@@ -1,0 +1,11 @@
+fx GenericWireframe {
+  pass Wireframe {
+    state {
+      depth.func        = GL_LEQUAL;
+      raster.lineWidth  = 2.0;
+    }
+    vs = "#include <Shaders\wireframe.vert>";
+    fs = "#include <Shaders\wireframe.frag>";
+    gs = "#include <Shaders\wireframe.geom>";
+  }
+}

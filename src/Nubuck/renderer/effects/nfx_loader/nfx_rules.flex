@@ -15,8 +15,7 @@
 %}
 
 IDENT   [a-zA-Z][a-zA-Z0-9]*
-UINT    [0-9]+
-INT     -?[0-9]+
+INT     "-"?[0-9]+
 FLOAT   [0-9]+"."[0-9]+
 STRING  "\"".*"\""
 
@@ -52,7 +51,6 @@ STRING  "\"".*"\""
 "GL_TRUE"   { nfx_val_bool = GL_TRUE; return NFX_TOK_VAL_BOOL; }
 "GL_FALSE"  { nfx_val_bool = GL_FALSE; return NFX_TOK_VAL_BOOL; }
 
-{UINT}      { nfx_val_uint = (unsigned)atoi(yynfxtext); return NFX_TOK_VAL_UINT; }
 {INT}       { nfx_val_int = atoi(yynfxtext); return NFX_TOK_VAL_INT; }
 {FLOAT}     { nfx_val_float = atof(yynfxtext); return NFX_TOK_VAL_FLOAT; }
 

@@ -395,8 +395,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 44
-#define YY_END_OF_BUFFER 45
+#define YY_NUM_RULES 43
+#define YY_END_OF_BUFFER 44
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -406,15 +406,15 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[329] =
     {   0,
-        0,    0,    2,    2,   45,   26,    6,    6,   10,   26,
-       11,   26,   22,    7,   12,   19,   19,   19,   19,   19,
+        0,    0,    2,    2,   44,   25,    6,    6,   10,   25,
+       11,   25,   22,    7,   12,   19,   19,   19,   19,   19,
        19,   19,    8,    9,    2,    2,    2,    3,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    2,    6,    0,   25,   23,    1,    0,    0,
+        2,    2,    2,    6,    0,   24,   22,    1,    0,    0,
        22,   19,   19,   16,   13,   17,   19,   19,   15,    2,
         2,    2,    2,    3,    3,    4,    2,    2,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    2,    0,    5,
-       24,    0,   19,   19,    2,    2,    2,    2,    2,    0,
+       23,    0,   19,   19,    2,    2,    2,    2,    2,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 
         0,    0,    0,   14,   19,    2,    2,    2,    2,    2,
@@ -424,24 +424,24 @@ static yyconst flex_int16_t yy_accept[329] =
         2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-       35,    0,    0,    0,    0,   19,    2,    2,    2,    2,
+       34,    0,    0,    0,    0,   19,    2,    2,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    2,    2,    2,    0,   41,    0,    0,    0,
+        2,    2,    2,    2,    2,    0,   40,    0,    0,    0,
 
-        0,    0,    0,    0,    0,   32,    0,    0,    0,    0,
-        0,   20,   36,   18,    2,    2,    2,    2,    2,    2,
+        0,    0,    0,    0,    0,   31,    0,    0,    0,    0,
+        0,   20,   35,   18,    2,    2,    2,    2,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    2,    0,    0,   29,   21,   40,    0,    0,
-        0,    0,   28,    0,    0,    0,    0,    2,    2,    2,
+        2,    2,    2,    0,    0,   28,   21,   39,    0,    0,
+        0,    0,   27,    0,    0,    0,    0,    2,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,   27,    0,   33,    0,   43,   31,    0,    0,    0,
+        2,   26,    0,   32,    0,   42,   30,    0,    0,    0,
         0,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    0,   34,    0,    0,   42,    0,    2,    2,    2,
-        2,    2,    2,    0,   30,    0,    0,    2,    2,    2,
+        2,    0,   33,    0,    0,   41,    0,    2,    2,    2,
+        2,    2,    2,    0,   29,    0,    0,    2,    2,    2,
 
-        2,   39,    0,   37,    2,    2,    2,    0,    2,    0,
+        2,   38,    0,   36,    2,    2,    2,    0,    2,    0,
         2,    0,    2,    0,    2,    0,    2,    0,    2,    0,
-        2,    0,    2,    0,    2,   38,    2,    0
+        2,    0,    2,    0,    2,   37,    2,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -691,11 +691,11 @@ static yyconst flex_int16_t yy_chk[516] =
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static yyconst flex_int32_t yy_rule_can_match_eol[45] =
+static yyconst flex_int32_t yy_rule_can_match_eol[44] =
     {   0,
 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0,     };
+    0, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -902,7 +902,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 23 "nfx_rules.flex"
+#line 22 "nfx_rules.flex"
 
 
  /* ignore c-style comments, cnf. flex manual on conditions */
@@ -1001,229 +1001,224 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 26 "nfx_rules.flex"
+#line 25 "nfx_rules.flex"
 { BEGIN(IN_MULTILN_COMMENT); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 27 "nfx_rules.flex"
+#line 26 "nfx_rules.flex"
 /* ignore anything except '*' */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 28 "nfx_rules.flex"
+#line 27 "nfx_rules.flex"
 /* ignore any '*'s not followed by '/' */
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 29 "nfx_rules.flex"
+#line 28 "nfx_rules.flex"
 { BEGIN(INITIAL); }
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 31 "nfx_rules.flex"
+#line 30 "nfx_rules.flex"
 /* ignore c++-style comments */
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 34 "nfx_rules.flex"
+#line 33 "nfx_rules.flex"
 /* ignore whitespace */
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 36 "nfx_rules.flex"
+#line 35 "nfx_rules.flex"
 { return NFX_TOK_SEMICOL; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 37 "nfx_rules.flex"
+#line 36 "nfx_rules.flex"
 { return NFX_TOK_LBRACE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 38 "nfx_rules.flex"
+#line 37 "nfx_rules.flex"
 { return NFX_TOK_RBRACE; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 39 "nfx_rules.flex"
+#line 38 "nfx_rules.flex"
 { return NFX_TOK_QUOTE; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 40 "nfx_rules.flex"
+#line 39 "nfx_rules.flex"
 { return NFX_TOK_DOT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 41 "nfx_rules.flex"
+#line 40 "nfx_rules.flex"
 { return NFX_TOK_EQUALS; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 43 "nfx_rules.flex"
+#line 42 "nfx_rules.flex"
 { return NFX_TOK_FX; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 44 "nfx_rules.flex"
+#line 43 "nfx_rules.flex"
 { return NFX_TOK_PASS; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 45 "nfx_rules.flex"
+#line 44 "nfx_rules.flex"
 { return NFX_TOK_VS_SRC; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 46 "nfx_rules.flex"
+#line 45 "nfx_rules.flex"
 { return NFX_TOK_FS_SRC; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 47 "nfx_rules.flex"
+#line 46 "nfx_rules.flex"
 { return NFX_TOK_GS_SRC; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 48 "nfx_rules.flex"
+#line 47 "nfx_rules.flex"
 { return NFX_TOK_SORTKEY; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 50 "nfx_rules.flex"
+#line 49 "nfx_rules.flex"
 { return NFX_TOK_IDENT; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 52 "nfx_rules.flex"
+#line 51 "nfx_rules.flex"
 { nfx_val_bool = GL_TRUE; return NFX_TOK_VAL_BOOL; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 53 "nfx_rules.flex"
+#line 52 "nfx_rules.flex"
 { nfx_val_bool = GL_FALSE; return NFX_TOK_VAL_BOOL; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 55 "nfx_rules.flex"
-{ nfx_val_uint = (unsigned)atoi(yynfxtext); return NFX_TOK_VAL_UINT; }
+#line 54 "nfx_rules.flex"
+{ nfx_val_int = atoi(yynfxtext); return NFX_TOK_VAL_INT; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 56 "nfx_rules.flex"
-{ nfx_val_int = atoi(yynfxtext); return NFX_TOK_VAL_INT; }
+#line 55 "nfx_rules.flex"
+{ nfx_val_float = atof(yynfxtext); return NFX_TOK_VAL_FLOAT; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 57 "nfx_rules.flex"
-{ nfx_val_float = atof(yynfxtext); return NFX_TOK_VAL_FLOAT; }
+{ return NFX_TOK_STRING; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 59 "nfx_rules.flex"
-{ return NFX_TOK_STRING; }
-	YY_BREAK
-case 26:
-YY_RULE_SETUP
-#line 61 "nfx_rules.flex"
 { return NFX_TOK_UNKNOWN; }
 	YY_BREAK
 /* BEGIN GL ENUMS */
+case 26:
+YY_RULE_SETUP
+#line 63 "nfx_rules.flex"
+{ nfx_val_enum = GL_ALWAYS;                 return NFX_TOK_VAL_ENUM; }
+	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 65 "nfx_rules.flex"
-{ nfx_val_enum = GL_ALWAYS;                 return NFX_TOK_VAL_ENUM; }
+#line 64 "nfx_rules.flex"
+{ nfx_val_enum = GL_NEVER;                  return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 66 "nfx_rules.flex"
-{ nfx_val_enum = GL_NEVER;                  return NFX_TOK_VAL_ENUM; }
+#line 65 "nfx_rules.flex"
+{ nfx_val_enum = GL_EQUAL;                  return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 67 "nfx_rules.flex"
-{ nfx_val_enum = GL_EQUAL;                  return NFX_TOK_VAL_ENUM; }
+#line 66 "nfx_rules.flex"
+{ nfx_val_enum = GL_NOTEQUAL;               return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 68 "nfx_rules.flex"
-{ nfx_val_enum = GL_NOTEQUAL;               return NFX_TOK_VAL_ENUM; }
+#line 67 "nfx_rules.flex"
+{ nfx_val_enum = GL_LEQUAL;                 return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 69 "nfx_rules.flex"
-{ nfx_val_enum = GL_LEQUAL;                 return NFX_TOK_VAL_ENUM; }
+#line 68 "nfx_rules.flex"
+{ nfx_val_enum = GL_LESS;                   return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 70 "nfx_rules.flex"
-{ nfx_val_enum = GL_LESS;                   return NFX_TOK_VAL_ENUM; }
+#line 69 "nfx_rules.flex"
+{ nfx_val_enum = GL_GEQUAL;                 return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 71 "nfx_rules.flex"
-{ nfx_val_enum = GL_GEQUAL;                 return NFX_TOK_VAL_ENUM; }
+#line 70 "nfx_rules.flex"
+{ nfx_val_enum = GL_GREATER;                return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 72 "nfx_rules.flex"
-{ nfx_val_enum = GL_GREATER;                return NFX_TOK_VAL_ENUM; }
+{ nfx_val_enum = GL_ONE;                    return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 74 "nfx_rules.flex"
-{ nfx_val_enum = GL_ONE;                    return NFX_TOK_VAL_ENUM; }
+#line 73 "nfx_rules.flex"
+{ nfx_val_enum = GL_ZERO;                   return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 75 "nfx_rules.flex"
-{ nfx_val_enum = GL_ZERO;                   return NFX_TOK_VAL_ENUM; }
+#line 74 "nfx_rules.flex"
+{ nfx_val_enum = GL_SRC_ALPHA;              return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 76 "nfx_rules.flex"
-{ nfx_val_enum = GL_SRC_ALPHA;              return NFX_TOK_VAL_ENUM; }
+#line 75 "nfx_rules.flex"
+{ nfx_val_enum = GL_ONE_MINUS_SRC_ALPHA;    return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 77 "nfx_rules.flex"
-{ nfx_val_enum = GL_ONE_MINUS_SRC_ALPHA;    return NFX_TOK_VAL_ENUM; }
+#line 76 "nfx_rules.flex"
+{ nfx_val_enum = GL_DST_COLOR;              return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 78 "nfx_rules.flex"
-{ nfx_val_enum = GL_DST_COLOR;              return NFX_TOK_VAL_ENUM; }
+{ nfx_val_enum = GL_FRONT;                  return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 80 "nfx_rules.flex"
-{ nfx_val_enum = GL_FRONT;                  return NFX_TOK_VAL_ENUM; }
+#line 79 "nfx_rules.flex"
+{ nfx_val_enum = GL_BACK;                   return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 81 "nfx_rules.flex"
-{ nfx_val_enum = GL_BACK;                   return NFX_TOK_VAL_ENUM; }
+{ nfx_val_enum = GL_REPLACE;                return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 83 "nfx_rules.flex"
-{ nfx_val_enum = GL_REPLACE;                return NFX_TOK_VAL_ENUM; }
-	YY_BREAK
-case 43:
-YY_RULE_SETUP
-#line 84 "nfx_rules.flex"
+#line 82 "nfx_rules.flex"
 { nfx_val_enum = GL_INVERT;                 return NFX_TOK_VAL_ENUM; }
 	YY_BREAK
 /* END GL ENUMS */
-case 44:
+case 43:
 YY_RULE_SETUP
-#line 87 "nfx_rules.flex"
+#line 85 "nfx_rules.flex"
 ECHO;
 	YY_BREAK
-#line 1227 "lex.yynfx.cpp"
+#line 1222 "lex.yynfx.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(IN_MULTILN_COMMENT):
 	yyterminate();
@@ -2230,7 +2225,7 @@ void yynfxfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 87 "nfx_rules.flex"
+#line 85 "nfx_rules.flex"
 
 
 

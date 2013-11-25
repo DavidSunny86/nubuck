@@ -1,0 +1,13 @@
+// uses renderList.dirLights only, fills stencil buffer with ref=1
+fx LitDirectionalStencilFill {
+  sortkey = 1;
+
+  pass Pass0 {
+    state.stencil {
+      func.ref        = 1;
+      op.front.zpass  = GL_REPLACE;
+    }
+    vs = "#include <Shaders\lit_directional.vert>";
+    fs = "#include <Shaders\lit_directional.frag>";
+  }
+}

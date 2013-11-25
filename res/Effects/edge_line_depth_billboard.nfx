@@ -1,0 +1,13 @@
+// pitch black billboards! depth only!
+fx EdgeLineDepthBillboard {
+  pass Pass0 {
+    state.color.maskEnabled {
+      red   = GL_FALSE;
+      green = GL_FALSE;
+      blue  = GL_FALSE;
+      alpha = GL_FALSE;
+    }
+    vs = "#include <Shaders\edge_line_billboard.vert>";
+    fs = "#include <Shaders\edge_line_billboard.frag>";
+  }
+}

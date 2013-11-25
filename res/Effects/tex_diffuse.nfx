@@ -1,0 +1,13 @@
+// diffuse texture only
+fx TexDiffuse {
+  pass TexDiffuse {
+    // TODO: flags = USE_TEX_DIFFUSE | USE_MATERIAL
+    state.blend {
+      enabled   = GL_TRUE;
+      srcFactor = GL_SRC_ALPHA;
+      dstFactor = GL_ONE_MINUS_SRC_ALPHA;
+    }
+    vs = "#include <Shaders\textured.vert>";
+    fs = "#include <Shaders\textured.frag>";
+  }
+}

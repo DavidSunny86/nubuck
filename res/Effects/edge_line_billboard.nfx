@@ -1,0 +1,8 @@
+// pitch black billboards!
+fx EdgeLineBillboard {
+  pass Pass0 {
+    state.depth.func = GL_LEQUAL;
+    vs = "#include <Shaders\edge_line_billboard_off.vert>";
+    fs = "#include <Shaders\edge_line_billboard.frag>";
+  }
+}

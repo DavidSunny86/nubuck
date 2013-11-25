@@ -1,0 +1,19 @@
+fx StencilOverlayFS {
+  sortkey = 4;
+
+  pass Pass0 {
+    state {
+      blend {
+        enabled   = GL_TRUE;
+        srcFactor = GL_DST_COLOR;
+        dstFactor = GL_ZERO;
+      }
+      stencil.func {
+        func  = GL_LESS;
+        ref   = 0;
+      }
+    }
+    vs = "#include <Shaders\fs_overlay.vert>";
+    fs = "#include <Shaders\overlay.frag>";
+  }
+}

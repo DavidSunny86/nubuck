@@ -1,0 +1,7 @@
+// used to draw filled cylinders on bounding box of edges
+fx EdgeBillboard {
+  pass Pass0 {
+    vs = "#include <Shaders\edge_billboard.vert>";
+    fs = "#include <Shaders\edge_billboard.frag>";
+  }
+}

@@ -1,0 +1,36 @@
+// uses renderList.dirLights only, transparency
+fx LitDirectionalTransparent {
+  sortkey = 1;
+
+  pass Backfaces {
+    state {
+      culling.hw {
+        enabled   = GL_TRUE;
+        cullFace  = GL_FRONT;
+      }
+      blend {
+        enabled   = GL_TRUE;
+        srcFactor = GL_SRC_ALPHA;
+        dstFactor = GL_ONE_MINUS_SRC_ALPHA;
+      }
+    }
+    vs = "#include <Shaders\lit_directional.vert>"; 
+    fs = "#include <Shaders\lit_directional.frag>"; 
+  }
+
+  pass Frontfaces {
+    state {
+      culling.hw {
+        enabled   = GL_TRUE;
+        cullFace  = GL_BACK;
+      }
+      blend {
+        enabled   = GL_TRUE;
+        srcFactor = GL_SRC_ALPHA;
+        dstFactor = GL_ONE_MINUS_SRC_ALPHA;
+      }
+    }
+    vs = "#include <Shaders\lit_directional.vert>"; 
+    fs = "#include <Shaders\lit_directional.frag>"; 
+  }
+}
