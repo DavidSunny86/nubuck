@@ -13,15 +13,15 @@ void Nodes::ReserveBillboards(void) {
     unsigned numBillboards = _nodes.size();
     if(numBillboards <= billboardsHot.size()) return;
 
-    unsigned numBillboardIndices = 6 * numBillboards - 2;
+    unsigned numBillboardIndices = 5 * numBillboards - 1;
 
     billboardsHot.clear();
     billboardsHot.resize(numBillboards);
 
     static const BillboardColdVertex coldVertices[4] = {
+        { M::Vector2(-1.0f, -1.0f) },
         { M::Vector2( 1.0f, -1.0f) },
         { M::Vector2( 1.0f,  1.0f) },
-        { M::Vector2(-1.0f, -1.0f) },
         { M::Vector2(-1.0f,  1.0f) }
     };
     billboardsCold.clear();
@@ -33,10 +33,7 @@ void Nodes::ReserveBillboards(void) {
     billboardIndices.clear();
     billboardIndices.reserve(numBillboardIndices);
     for(unsigned i = 0; i < 4 * numBillboards; ++i) {
-        if(0 < i && 0 == i % 4) {
-            billboardIndices.push_back(i - 1);
-            billboardIndices.push_back(i);
-        }
+        if(0 < i && 0 == i % 4) billboardIndices.push_back(Mesh::RESTART_INDEX);
         billboardIndices.push_back(i);
     }
     assert(numBillboardIndices == billboardIndices.size());
@@ -52,7 +49,7 @@ void Nodes::ReserveBillboardBuffers(void) {
     if(billboardColdVertexBuffer.IsValid()) billboardColdVertexBuffer->Destroy();
     billboardColdVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, &billboardsCold[0], sizeof(BillboardCold) * numBillboards));
 
-    unsigned numBillboardIndices = 6 * numBillboards - 2;
+    unsigned numBillboardIndices = 5 * numBillboards - 1;
     if(billboardIndexBuffer.IsValid()) billboardIndexBuffer->Destroy();
     billboardIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &billboardIndices[0], sizeof(Mesh::Index) * numBillboardIndices));
 }
@@ -84,9 +81,9 @@ static M::Matrix4 Billboard_FaceViewingPlane(const M::Matrix4& worldMat, const M
 void Nodes::BuildBillboards(const M::Matrix4& worldMat) {
 	float nodeSize = cvar_r_nodeSize;
     const BillboardHotVertex hotVertices[4] = {
+        { M::Vector3(-nodeSize, -nodeSize, 0.0f) },
         { M::Vector3( nodeSize, -nodeSize, 0.0f) },
         { M::Vector3( nodeSize,  nodeSize, 0.0f) },
-        { M::Vector3(-nodeSize, -nodeSize, 0.0f) },
         { M::Vector3(-nodeSize,  nodeSize, 0.0f) }
     };
     unsigned numBillboards = _nodes.size();
@@ -139,7 +136,7 @@ void Nodes::R_Prepare(const M::Matrix4& worldMat) {
 
 void Nodes::DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
     unsigned numBillboards = _nodes.size();
-    unsigned numBillboardIndices = 6 * numBillboards - 2;
+    unsigned numBillboardIndices = 5 * numBillboards - 1;
 
     GEN::Pointer<Effect> fx = effectMgr.GetEffect("NodeBillboard");
     fx->Compile();
@@ -159,7 +156,7 @@ void Nodes::DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
 
     billboardIndexBuffer->Bind();
 
-    glDrawElements(GL_TRIANGLE_STRIP, numBillboardIndices, GL_UNSIGNED_INT, NULL);
+    glDrawElements(GL_TRIANGLE_FAN, numBillboardIndices, GL_UNSIGNED_INT, NULL);
 }
 
 void Nodes::R_Draw(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {

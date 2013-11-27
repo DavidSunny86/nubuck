@@ -14,10 +14,10 @@ void LineEdges::BuildEdgeBillboards(const std::vector<Edge>& edges, const M::Mat
     edgeBBoardsHot.resize(edges.size());
 
     static const M::Vector3 vertPos[] = {
-        M::Vector3( 0.5f,  0.0f, 0.0f),
-        M::Vector3( 0.5f,  1.0f, 0.0f),
+        M::Vector3(-0.5f,  1.0f, 0.0f),
         M::Vector3(-0.5f,  0.0f, 0.0f),
-        M::Vector3(-0.5f,  1.0f, 0.0f)
+        M::Vector3( 0.5f,  0.0f, 0.0f),
+        M::Vector3( 0.5f,  1.0f, 0.0f)
     };
 
     unsigned numEdges = edges.size();
@@ -45,13 +45,10 @@ void LineEdges::BuildEdgeBillboards(const std::vector<Edge>& edges, const M::Mat
 
     edgeBBoardIndices.clear();
     for(unsigned i = 0; i < 4 * numEdges; ++i) {
-        if(0 < i && 0 == i % 4) {
-            edgeBBoardIndices.push_back(i - 1);
-            edgeBBoardIndices.push_back(i);
-        }
+        if(0 < i && 0 == i % 4) edgeBBoardIndices.push_back(Mesh::RESTART_INDEX);
         edgeBBoardIndices.push_back(i);
     }
-    unsigned numBillboardIndices = M::Max(2u, 6 * edges.size()) - 2; // max handles case size = 0
+    unsigned numBillboardIndices = M::Max(1u, 5 * edges.size()) - 1; // max handles case size = 0
     assert(numBillboardIndices == edgeBBoardIndices.size());
 }
 
@@ -97,7 +94,7 @@ void LineEdges::DrawEdgeBillboards(const M::Matrix4& worldMat, const M::Matrix4&
     edgeBBoardIndexBuffer->Bind();
     
     unsigned numBillboardIndices = edgeBBoardIndices.size();
-    GL_CALL(glDrawElements(GL_TRIANGLE_STRIP, numBillboardIndices, GL_UNSIGNED_INT, NULL));
+    GL_CALL(glDrawElements(GL_TRIANGLE_FAN, numBillboardIndices, GL_UNSIGNED_INT, NULL));
 }
 
 void LineEdges::Draw(std::vector<Edge>& edges) {
