@@ -66,7 +66,7 @@ namespace W {
         }
     }
 
-    void Entity::Render(std::vector<R::RenderJob>& renderList) {
+    void Entity::Render(std::vector<R::MeshJob>& renderList) {
     }
 
     void Entity::FreeResources(void) {

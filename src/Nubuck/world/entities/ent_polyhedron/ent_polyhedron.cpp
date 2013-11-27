@@ -4,6 +4,9 @@
 #include <renderer\renderer.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\quad\quad.h>
+#include <renderer\nodes\r_nodes.h>
+#include <renderer\edges\r_cylinder_edges.h>
+#include <renderer\edges\r_line_edges.h>
 #include "ent_polyhedron.h"
 
 COM::Config::Variable<float>    cvar_faceCurveSpeed("faceSpeed", 0.2f);
@@ -252,31 +255,32 @@ void Polyhedron_Rebuild(ENT_Polyhedron& ph) {
 // the renderlist of a polyhedron ph can be build even though
 // it's graph ph.G is no longer valid.
 void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
-    ph.renderList.jobs.clear();
+    ph.renderList.meshJobs.clear();
 
-	R::RenderJob renderJob;
+	R::MeshJob renderJob;
 	renderJob.fx = "LitDirectional";
     renderJob.material = R::Material::White;
 
     unsigned numNodes = ph.nodes.positions.size();
-    ph.renderList.nodePositions.clear();
-    ph.renderList.nodeColors.clear();
+    std::vector<R::Nodes::Node> rnodes;
     if(POLYHEDRON_RENDER_NODES & ph.renderFlags) {
         for(unsigned i = 0; i < numNodes; ++i) {
             if(ph.nodes.valid[i]) {
-                ph.renderList.nodePositions.push_back(ph.nodes.positions[i]);
-
-                if(ph.selection.nodes[i]) ph.renderList.nodeColors.push_back(R::Color(1.0f, 1.0f, 0.0f, 1.0f));
-                else ph.renderList.nodeColors.push_back(ph.nodes.colors[i]);
+                R::Nodes::Node rnode;
+                rnode.position = ph.nodes.positions[i];
+                if(ph.selection.nodes[i]) rnode.color = R::Color(1.0f, 1.0f, 0.0f, 1.0f);
+                else rnode.color = ph.nodes.colors[i];
+                rnodes.push_back(rnode);
             }
         }
+        R::g_nodes.Draw(rnodes);
     } // if(renderNodes)
 
     R::Edge re;
     re.radius   = ph.edges.radius;
     unsigned numEdges = ph.hull.edges.size();
-    ph.renderList.edges.clear();
     if(POLYHEDRON_RENDER_EDGES & ph.renderFlags) {
+        std::vector<R::Edge> redges;
         // TODO: store reversal information to draw edges only once
         for(unsigned i = 0; i < numEdges; ++i) {
             const PolyhedronHullEdge& e = ph.hull.edges[i];
@@ -285,9 +289,10 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
                 re.color = R::BlendMulRGB(ph.edges.colors[i].cur, ph.edges.color);
                 re.p0 = ph.nodes.positions[e.n0];
                 re.p1 = ph.nodes.positions[e.n1];
-                ph.renderList.edges.push_back(re);
+                redges.push_back(re);
             }
         }
+        R::g_cylinderEdges.Draw(redges);
     } // if(renderEdges)
 
     if(POLYHEDRON_RENDER_HULL & ph.renderFlags) {
@@ -301,7 +306,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
             renderJob.mesh = ph.hull.mesh;
             renderJob.primType = 0;
             renderJob.transform = M::Mat4::Identity();
-            ph.renderList.jobs.push_back(renderJob);
+            ph.renderList.meshJobs.push_back(renderJob);
         }
     } // if(renderHull)
 
@@ -315,7 +320,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
             renderJob.transform = 
                 M::Mat4::Translate(ph.hull.curves[i].curve.decalPos[j]) * 
                 M::Mat4::FromRigidTransform(ph.hull.curves[i].localToWorld, M::Vector3::Zero);
-            ph.renderList.jobs.push_back(renderJob);
+            ph.renderList.meshJobs.push_back(renderJob);
         }
     }
 }

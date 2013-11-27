@@ -21,7 +21,14 @@ namespace R {
 class   Effect;
 class   Mesh;
 
-struct RenderJob {
+struct Renderable {
+    virtual ~Renderable(void) { }
+
+    virtual void R_Prepare(const M::Matrix4& worldMat) = 0;
+    virtual void R_Draw(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) = 0;
+};
+
+struct MeshJob {
     std::string         fx;
     MeshMgr::meshPtr_t  mesh;
     GLenum              primType; // value != 0 overrides prim type of mesh
@@ -30,13 +37,7 @@ struct RenderJob {
     M::Matrix4          transform;
 
     // handled by renderer
-    RenderJob* next;
-};
-
-struct Edge {
-    M::Vector3  p0, p1;
-    R::Color    color;
-    float       radius;
+    MeshJob* next;
 };
 
 struct DirectionalLight {
@@ -45,13 +46,11 @@ struct DirectionalLight {
 };
 
 struct RenderList {
-    M::Matrix4              worldMat;
-    DirectionalLight        dirLights[3];
-    std::vector<Light>      lights;
-    std::vector<RenderJob>  jobs;
-    std::vector<M::Vector3> nodePositions;
-    std::vector<Color>      nodeColors;
-    std::vector<Edge>       edges;
+    M::Matrix4                  worldMat;
+    DirectionalLight        	dirLights[3];
+    std::vector<Light>      	lights;
+    std::vector<Renderable*>    renderJobs;
+    std::vector<MeshJob>        meshJobs;
 };
 
 extern RenderList g_renderLists[2];

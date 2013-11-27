@@ -6,6 +6,9 @@
 #include <renderer\mesh\plane\plane.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\cylinder\cylinder.h>
+#include <renderer\nodes\r_nodes.h>
+#include <renderer\edges\r_cylinder_edges.h>
+#include <renderer\edges\r_line_edges.h>
 #include <events\event_defs.h>
 #include <UI\outliner\outliner.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
@@ -624,32 +627,25 @@ namespace W {
 
         R::RenderList& _renderList = R::g_renderLists[rlIdx];
         _renderList.worldMat = _camArcball.GetWorldMatrix();
-		_renderList.jobs.clear();
-        _renderList.nodePositions.clear();
-        _renderList.nodeColors.clear();
-        _renderList.edges.clear();
+		_renderList.meshJobs.clear();
+        _renderList.renderJobs.clear();
+
+        _renderList.renderJobs.push_back(&R::g_nodes);
+        _renderList.renderJobs.push_back(&R::g_cylinderEdges);
+        _renderList.renderJobs.push_back(&R::g_lineEdges);
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
             if(ENT_POLYHEDRON == _entities[i]->type) {
                 ENT_Polyhedron& ph = *_entities[i]->polyhedron;
-                _renderList.jobs.insert(_renderList.jobs.end(),
-                    ph.renderList.jobs.begin(),
-                    ph.renderList.jobs.end());
-                _renderList.nodePositions.insert(_renderList.nodePositions.end(),
-                    ph.renderList.nodePositions.begin(),
-                    ph.renderList.nodePositions.end());
-                _renderList.nodeColors.insert(_renderList.nodeColors.end(),
-                    ph.renderList.nodeColors.begin(),
-                    ph.renderList.nodeColors.end());
-                _renderList.edges.insert(_renderList.edges.end(),
-                    ph.renderList.edges.begin(),
-                    ph.renderList.edges.end());
+                _renderList.meshJobs.insert(_renderList.meshJobs.end(),
+                    ph.renderList.meshJobs.begin(),
+                    ph.renderList.meshJobs.end());
             }
             if(ENT_MESH == _entities[i]->type) {
                 ENT_Mesh& mesh = *_entities[i]->mesh;
-                _renderList.jobs.insert(_renderList.jobs.end(),
-                    mesh.renderList.jobs.begin(),
-                    mesh.renderList.jobs.end());
+                _renderList.meshJobs.insert(_renderList.meshJobs.end(),
+                    mesh.renderList.meshJobs.begin(),
+                    mesh.renderList.meshJobs.end());
             }
         }
 

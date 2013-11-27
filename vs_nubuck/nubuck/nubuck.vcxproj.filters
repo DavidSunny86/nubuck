@@ -195,6 +195,12 @@
     <Filter Include="Private\renderer\effects\statedesc_gen">
       <UniqueIdentifier>{fda313cb-9753-4784-81a5-2b6c77f8f9ac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\nodes">
+      <UniqueIdentifier>{08df3b64-35a6-40fb-a630-ff5e22b4730a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\edges">
+      <UniqueIdentifier>{d3d8b7b4-9a46-4fcd-8bc1-3443c25bd270}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -475,6 +481,24 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\statedesc.h">
       <Filter>Private\renderer\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_nodes.h">
+      <Filter>Private\renderer\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\renderer_local.h">
+      <Filter>Private\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.h">
+      <Filter>Private\renderer\edges</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_line_edges.h">
+      <Filter>Private\renderer\edges</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges_local.h">
+      <Filter>Private\renderer\edges</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edge.h">
+      <Filter>Private\renderer\edges</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -768,6 +792,18 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\statedesc.cpp">
       <Filter>Private\renderer\effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_nodes.cpp">
+      <Filter>Private\renderer\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.cpp">
+      <Filter>Private\renderer\edges</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_line_edges.cpp">
+      <Filter>Private\renderer\edges</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges_local.cpp">
+      <Filter>Private\renderer\edges</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

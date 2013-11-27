@@ -60,7 +60,7 @@ namespace W {
         void Destroy(void) { _isDead = true; }
 
         virtual void Update(float secsPassed);
-        virtual void Render(std::vector<R::RenderJob>& renderList);
+        virtual void Render(std::vector<R::MeshJob>& renderList);
         void FreeResources(void);
         
         virtual void Spawn(const Event& event);

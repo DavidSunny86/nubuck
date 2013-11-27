@@ -43,6 +43,10 @@
     <ClInclude Include="..\..\src\Nubuck\nubuck_private.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\color\color.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\color\color_inl.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edge.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges_local.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_line_edges.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\effect.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\effectmgr.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\nfx_loader\nfx_loader.h" />
@@ -72,8 +76,10 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\metrics\metrics.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_nodes.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\program\program.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\renderer.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\renderer_local.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\resource\resource.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\skin\skin.h" />
@@ -217,6 +223,9 @@
     <ClCompile Include="..\..\src\Nubuck\math\vector3_op.cpp" />
     <ClCompile Include="..\..\src\Nubuck\nubuck.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\color\color.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges_local.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_line_edges.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\default_effects.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\effect.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\effectmgr.cpp" />
@@ -241,6 +250,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\metrics\metrics.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_nodes.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\program\program.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\renderer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\debugoutput.cpp" />
