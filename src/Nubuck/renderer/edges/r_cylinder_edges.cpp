@@ -51,14 +51,15 @@ void CylinderEdges::BindEdgeBBoxVertices(void) {
 }
 
 void CylinderEdges::ReserveEdgeBBoxBuffers(void) {
-    // numbers per bbox
-    const unsigned numVertices = 8;
-    const unsigned numIndices = 14 + 1; // including restart index
-
     unsigned numEdges = _edges.size();
 
-    unsigned vbSize = sizeof(EdgeBBoxVertex) * numVertices * numEdges;
-    unsigned ibSize = sizeof(Mesh::Index) * numIndices * numEdges;
+    const unsigned numVertices = 8 * numEdges;
+
+    // including degen. triangles. max handles case numEdges = 0
+    const unsigned numIndices = std::max(2u, 16 * numEdges) - 2;
+
+    unsigned vbSize = sizeof(EdgeBBoxVertex) * numVertices;
+    unsigned ibSize = sizeof(Mesh::Index) * numIndices;
 
     if(edgeBBoxVertexBuffer.IsValid() && edgeBBoxVertexBuffer->GetSize() >= vbSize) return;
 
@@ -132,9 +133,14 @@ void CylinderEdges::CreateEdges(void) {
             edgeBBoxVertices.push_back(vertex);
         }
         for(unsigned i = 0; i < numIndices; ++i) edgeBBoxIndices.push_back(baseIdx + bboxIndices[i]);
-        edgeBBoxIndices.push_back(Mesh::RESTART_INDEX);
+        edgeBBoxIndices.push_back(baseIdx + 0 /* = bboxIndices[numIndices - 1] */);
+        edgeBBoxIndices.push_back(baseIdx + 11 /* = numVertices + bbodxIndices[0] */);
         baseIdx += numVertices;
     } // for all edges
+    // remove trailing degen. triangle
+    edgeBBoxIndices.pop_back();
+    edgeBBoxIndices.pop_back();
+    assert(16 * _edges.size() - 2 == edgeBBoxIndices.size());
 }
 
 void CylinderEdges::UploadEdges(void) {
