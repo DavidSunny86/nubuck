@@ -201,6 +201,9 @@
     <Filter Include="Private\renderer\edges">
       <UniqueIdentifier>{d3d8b7b4-9a46-4fcd-8bc1-3443c25bd270}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\shader\shader_preprocessor">
+      <UniqueIdentifier>{86b7b8ad-4430-46d9-b923-11097ad4d4bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -499,6 +502,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edge.h">
       <Filter>Private\renderer\edges</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\shader_preprocessor.h">
+      <Filter>Private\renderer\shader\shader_preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\shader_preprocessor_local.h">
+      <Filter>Private\renderer\shader\shader_preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\common\filehandle.h">
+      <Filter>Private\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -804,6 +816,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges_local.cpp">
       <Filter>Private\renderer\edges</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\shader_preprocessor.cpp">
+      <Filter>Private\renderer\shader\shader_preprocessor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\lex.yyspp.cpp">
+      <Filter>Private\renderer\shader\shader_preprocessor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

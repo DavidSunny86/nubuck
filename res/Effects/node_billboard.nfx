@@ -1,5 +1,6 @@
 fx NodeBillboard {
   pass Pass0 {
+    state.culling.hw.enabled = GL_TRUE;
     vs = "#include <Shaders\node_billboard.vert>";
     fs = "#include <Shaders\node_billboard.frag>";
   }

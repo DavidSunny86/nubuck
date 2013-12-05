@@ -1,26 +1,34 @@
 #pragma once
 
+#include <vector>
+#include <string>
 #include <generic\uncopyable.h>
 #include <renderer\glew\glew.h>
 
 namespace R {
 
-    class Shader : private GEN::Uncopyable {
-    private:
-        GLuint _id;
-    public:
-        enum Type {
-            VERTEX = 0,
-            FRAGMENT,
-            GEOMETRY,
+struct AttributeLocation {
+    std::string name;
+    int         loc;
+};
 
-            NUM_TYPES
-        };
+class Shader : private GEN::Uncopyable {
+private:
+    GLuint                          _id;
+    std::vector<AttributeLocation>  _attribLocs;
+public:
+    enum Type {
+        VERTEX = 0,
+        FRAGMENT,
+        GEOMETRY,
 
-        Shader(Type type, const GLchar* source);
-        ~Shader(void);
-
-        GLuint GetID(void) const { return _id; }
+        NUM_TYPES
     };
+
+    Shader(Type type, const GLchar* source);
+    ~Shader(void);
+
+    GLuint GetID(void) const { return _id; }
+};
 
 } // namespace R

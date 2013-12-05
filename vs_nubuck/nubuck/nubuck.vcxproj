@@ -16,6 +16,7 @@
     <ClInclude Include="..\..\src\Nubuck\camera\arcball_camera.h" />
     <ClInclude Include="..\..\src\Nubuck\common\common.h" />
     <ClInclude Include="..\..\src\Nubuck\common\config\config.h" />
+    <ClInclude Include="..\..\src\Nubuck\common\filehandle.h" />
     <ClInclude Include="..\..\src\Nubuck\common\filesystem\filesystem.h" />
     <ClInclude Include="..\..\src\Nubuck\common\types.h" />
     <ClInclude Include="..\..\src\Nubuck\events\events.h" />
@@ -82,6 +83,8 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\renderer_local.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\resource\resource.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\shader_preprocessor.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\shader_preprocessor_local.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\skin\skin.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\skin\skinmgr.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\textures\texallocs.h" />
@@ -256,6 +259,8 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\debugoutput.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\resource\resource.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\lex.yyspp.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\shader_preprocessor.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\skin\skin.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\skin\skinmgr.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\textures\texture.cpp" />

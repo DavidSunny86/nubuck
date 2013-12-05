@@ -7,6 +7,7 @@
 
 #include <renderer\glew\glew.h>
 #include <renderer\glcall.h>
+#include <renderer\shader\shader_preprocessor\shader_preprocessor.h>
 #include "shader.h"
 
 namespace R {
@@ -26,13 +27,20 @@ namespace R {
     };
 
     Shader::Shader(Type type, const GLchar* source) {
+        std::string ppsource;
+        if(!SPP::PreprocessShaderSource(source, ppsource, _attribLocs)) {
+            common.printf("PreprocessShaderSource failed.\n");
+            Crash();
+        }
+
         _id = glCreateShader(glenums[type]);
         if(!_id) {
             common.printf("glCreateShader(%s) failed.\n", names[type]);
             Crash();
         }
 
-		const GLchar* combined[] = { "#version 330\n\n", source };
+		// const GLchar* combined[] = { "#version 330\n\n", source };
+        const GLchar* combined[] = { "#version 330\n\n", ppsource.c_str() };
 
         GL_CALL(glShaderSource(_id, 2, combined, NULL));
         GL_CALL(glCompileShader(_id));
@@ -46,11 +54,14 @@ namespace R {
                 GLchar* buffer = (GLchar*)malloc(len);
                 if(buffer) {
                     GL_CALL(glGetShaderInfoLog(_id, len, NULL, buffer));
-                    common.printf("compiling shader of type %s failed: %s\n", names[type], buffer);
-#ifdef _WIN32
 					std::string msg;
 					msg.append("compiling shader of type '").append(names[type]).append("' failed: \n");
+                    msg.append("<<<<<\n");
+                    msg.append(combined[0]).append(combined[1]);
+                    msg.append(">>>>>\n");
                     msg.append(buffer).append("\n");
+                    common.printf("%s", msg.c_str());
+#ifdef _WIN32
 					OutputDebugStringA(msg.c_str());
 #endif
                     free(buffer);

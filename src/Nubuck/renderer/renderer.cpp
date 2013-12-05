@@ -281,8 +281,9 @@ void Renderer::Init(void) {
 
     SetDefaultState(curState);
 
-    GL_CALL(glEnable(GL_PRIMITIVE_RESTART));
-    GL_CALL(glPrimitiveRestartIndex(Mesh::RESTART_INDEX));
+    assert(GLEW_NV_primitive_restart);
+    GL_CALL(glEnableClientState(GL_PRIMITIVE_RESTART_NV));
+    GL_CALL(glPrimitiveRestartIndexNV(Mesh::RESTART_INDEX));
 
     float f = 1.0f / 255.0f;
     // glClearColor(f * 176, f * 196, f * 222, 1.0f); // light steel blue

@@ -59,8 +59,10 @@ namespace SYS {
 
         const GLubyte* glVersion = glGetString(GL_VERSION);
         common.printf("INFO - supported GL version: '%s'.\n", glVersion);
+        /* requires GL v3.0 or greater
         glGetIntegerv(GL_MAJOR_VERSION, &_major);
         glGetIntegerv(GL_MINOR_VERSION, &_minor);
+        */
 
         wglMakeCurrent(NULL, NULL);
         wglDeleteContext(dummyGLRC);
@@ -103,11 +105,19 @@ namespace SYS {
             CHECK_WIN_ERROR;
         }
 
+        /*
         GLint attribs[] = {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, _major,
-            WGL_CONTEXT_MINOR_VERSION_ARB, _minor,
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
             WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
             WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+            0
+        };
+        */
+        GLint attribs[] = {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 2,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+            WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
             0
         };
 
