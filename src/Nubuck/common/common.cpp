@@ -84,7 +84,7 @@ std::string CurrentDirectory(void) {
     bufferLength = GetCurrentDirectoryA(0, NULL);
     CHECK_WIN_ERROR;
     assert(bufferLength);
-    std::string buffer(bufferLength, '0');
+    std::string buffer(bufferLength - 1, '0');
     bufferLength = GetCurrentDirectoryA(bufferLength, &buffer[0]);
     CHECK_WIN_ERROR;
     assert(bufferLength);

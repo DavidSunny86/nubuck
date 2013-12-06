@@ -5,13 +5,13 @@ layout(std140) uniform UniformsHot {
     mat4 uNormalMat;
 };
 
-layout(location = 0) in vec4 aPosition;
-layout(location = 1) in vec3 aNormal;
-layout(location = 2) in vec4 aColor;
+attribute(0) vec4 aPosition;
+attribute(1) vec3 aNormal;
+attribute(2) vec4 aColor;
 
-out vec4 vPosition;
-out vec3 vNormal;
-out vec4 vColor;
+varying vec4 vPosition;
+varying vec3 vNormal;
+varying vec4 vColor;
 
 /*
 NOTE: strangely this does't work on nv gtx285

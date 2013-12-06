@@ -18,6 +18,7 @@ static const char* TokToString(int tok) {
     TOKTOSTRING_CASE(R::SPP::Tokens::TOK_ATTRIB)
     TOKTOSTRING_CASE(R::SPP::Tokens::TOK_STRING)
     TOKTOSTRING_CASE(R::SPP::Tokens::TOK_IDENT)
+    TOKTOSTRING_CASE(R::SPP::Tokens::TOK_INTEGER)
     TOKTOSTRING_CASE(R::SPP::Tokens::TOK_EOL)
     TOKTOSTRING_CASE(R::SPP::Tokens::TOK_EOF)
     }
@@ -67,8 +68,8 @@ static bool ParseAttributeDecl(std::string& out, R::AttributeLocation& loc) {
     if(!ExpectToken(R::SPP::Tokens::TOK_RPAREN)) return false;
     NextToken();
     if(!ExpectToken(R::SPP::Tokens::TOK_VAR_TYPE)) return false;
-    NextToken();
     std::string type = yyspptext;
+    NextToken();
     if(!ExpectToken(R::SPP::Tokens::TOK_IDENT)) return false;
     loc.name = yyspptext;
     NextToken();

@@ -19,12 +19,10 @@ layout(std140) uniform UniformsSkeleton {
     float   uNodeSize;
 };
 
-in vec3 vPosition;
-in vec4 vColor;
-in vec2 vTexCoord0;
+varying vec3 vPosition;
+varying vec4 vColor;
+varying vec2 vTexCoord0;
 
-out vec4 fragColor;
- 
 void main() {
 	float clip = dot(vTexCoord0, vTexCoord0);
 	if(clip <= 1.0) {
@@ -45,7 +43,7 @@ void main() {
         float h2 = pow(clamp(dot(normal, normalize(view + uLightVec2)), 0.0, 1.0), uShininess);
         vec4 spec = h0 * uLightDiffuseColor0 + h1 * uLightDiffuseColor1 + h2 * uLightDiffuseColor2;
 
-        fragColor = vColor * (diff + spec);
+        gl_FragColor = vColor * (diff + spec);
 		
 		vec4 proj = uProjection * vec4(position, 1.0);
 		gl_FragDepth = 0.5 * (1.0 + proj.z / proj.w);

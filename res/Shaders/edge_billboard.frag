@@ -20,17 +20,15 @@ layout(std140) uniform UniformsSkeleton {
     float   uNodeSize;
 };
 
-out vec4 fragColor;
-
 // in edge's local space
-in vec4     vColor;
-in mat4     vObjectToEye;
-in mat4     vObjectToClip; 
-in vec4     vPosition;
-in float    vHalfHeightSq;
-in float    vRadiusSq;
-in vec4     vEyePos;
-in vec3     vLightDir;
+varying vec4     vColor;
+varying mat4     vObjectToEye;
+varying mat4     vObjectToClip; 
+varying vec4     vPosition;
+varying float    vHalfHeightSq;
+varying float    vRadiusSq;
+varying vec4     vEyePos;
+varying vec3     vLightDir;
 
 void main() {
     vec4 s = vEyePos;
@@ -56,7 +54,7 @@ void main() {
         float h2 = pow(clamp(dot(normal, normalize(view + uLightVec2)), 0.0, 1.0), uShininess);
 		vec4 spec = h0 * uLightDiffuseColor0 + h1 * uLightDiffuseColor1 + h2 * uLightDiffuseColor2;
 
-        fragColor = vColor * (diff + spec);
+        gl_FragColor = vColor * (diff + spec);
 
 		vec4 proj = uProjection * tp;
 		gl_FragDepth = 0.5 * (1.0 + proj.z / proj.w);

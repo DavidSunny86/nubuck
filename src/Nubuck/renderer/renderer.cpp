@@ -254,12 +254,27 @@ static void PrintGLInfo(void) {
     common.printf("} // GL strings\n");
 }
 
+#define STRINGIFY(x) #x
+#define REQUIRE_EXT(x)                                                                  \
+    do {                                                                                \
+        if(!GLEW_##x) {                                                                 \
+            common.printf("ERROR - GL extension '%s' required.\n", STRINGIFY(GL_##x));  \
+            Crash();                                                                    \
+        }                                                                               \
+    } while(0)
+
+static void CheckRequiredExtensions() {
+    REQUIRE_EXT(NV_primitive_restart);
+    REQUIRE_EXT(ARB_uniform_buffer_object);
+}
+
 void Renderer::Init(void) {
     GL_CHECK_ERROR;
 
     PrintGLInfo();
 
     InitDebugOutput();
+    CheckRequiredExtensions();
 
     /*
     uncomment this when using QGLWidget
@@ -281,7 +296,6 @@ void Renderer::Init(void) {
 
     SetDefaultState(curState);
 
-    assert(GLEW_NV_primitive_restart);
     GL_CALL(glEnableClientState(GL_PRIMITIVE_RESTART_NV));
     GL_CALL(glPrimitiveRestartIndexNV(Mesh::RESTART_INDEX));
 

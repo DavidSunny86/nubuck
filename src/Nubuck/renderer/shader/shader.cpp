@@ -12,67 +12,74 @@
 
 namespace R {
 
-    // index with Shader::Type
-    static GLenum glenums[] = {
-        GL_VERTEX_SHADER,       // VERTEX
-        GL_FRAGMENT_SHADER,     // FRAGMENT
-        GL_GEOMETRY_SHADER      // GEOMETRY
-    };
+// index with Shader::Type
+static GLenum glenums[] = {
+    GL_VERTEX_SHADER,       // VERTEX
+    GL_FRAGMENT_SHADER,     // FRAGMENT
+    GL_GEOMETRY_SHADER      // GEOMETRY
+};
 
-    // index with Shader::Type
-    static const char* names[] = {
-        "GL_VERTEX_SHADER",     // VERTEX
-        "GL_FRAGMENT_SHADER",   // FRAGMENT
-        "GL_GEOMETRY_SHADER"    // GEOMETRY
-    };
+// index with Shader::Type
+static const char* names[] = {
+    "GL_VERTEX_SHADER",     // VERTEX
+    "GL_FRAGMENT_SHADER",   // FRAGMENT
+    "GL_GEOMETRY_SHADER"    // GEOMETRY
+};
 
-    Shader::Shader(Type type, const GLchar* source) {
-        std::string ppsource;
-        if(!SPP::PreprocessShaderSource(source, ppsource, _attribLocs)) {
-            common.printf("PreprocessShaderSource failed.\n");
-            Crash();
-        }
+Shader::Shader(Type type, const GLchar* source) {
+    std::string ppsource;
+    if(!SPP::PreprocessShaderSource(source, ppsource, _attribLocs)) {
+        common.printf("PreprocessShaderSource failed.\n");
+        common.printf("<<<<<<<<<<<<<\n");
+        common.printf("%s\n", source);
+        common.printf(">>>>>>>>>>>>>\n");
+        Crash();
+    }
 
-        _id = glCreateShader(glenums[type]);
-        if(!_id) {
-            common.printf("glCreateShader(%s) failed.\n", names[type]);
-            Crash();
-        }
+    _id = glCreateShader(glenums[type]);
+    if(!_id) {
+        common.printf("glCreateShader(%s) failed.\n", names[type]);
+        Crash();
+    }
 
-		// const GLchar* combined[] = { "#version 330\n\n", source };
-        const GLchar* combined[] = { "#version 330\n\n", ppsource.c_str() };
+    const char* preamble =
+        "#version 120                                           \n"
+        "#extension GL_ARB_uniform_buffer_object : enable       \n"
+        "\n";
 
-        GL_CALL(glShaderSource(_id, 2, combined, NULL));
-        GL_CALL(glCompileShader(_id));
+    const GLchar* combined[] = { preamble, ppsource.c_str() };
 
-        GLint compiled = GL_FALSE;
-        GL_CALL(glGetShaderiv(_id, GL_COMPILE_STATUS, &compiled));
-        if(GL_TRUE != compiled) {
-            GLint len = 0;
-            GL_CALL(glGetShaderiv(_id, GL_INFO_LOG_LENGTH, &len));
-            if(0 < len) {
-                GLchar* buffer = (GLchar*)malloc(len);
-                if(buffer) {
-                    GL_CALL(glGetShaderInfoLog(_id, len, NULL, buffer));
-					std::string msg;
-					msg.append("compiling shader of type '").append(names[type]).append("' failed: \n");
-                    msg.append("<<<<<\n");
-                    msg.append(combined[0]).append(combined[1]);
-                    msg.append(">>>>>\n");
-                    msg.append(buffer).append("\n");
-                    common.printf("%s", msg.c_str());
+    GL_CALL(glShaderSource(_id, 2, combined, NULL));
+    GL_CALL(glCompileShader(_id));
+
+    GLint compiled = GL_FALSE;
+    GL_CALL(glGetShaderiv(_id, GL_COMPILE_STATUS, &compiled));
+    if(GL_TRUE != compiled) {
+        GLint len = 0;
+        GL_CALL(glGetShaderiv(_id, GL_INFO_LOG_LENGTH, &len));
+        if(0 < len) {
+            GLchar* buffer = (GLchar*)malloc(len);
+            if(buffer) {
+                GL_CALL(glGetShaderInfoLog(_id, len, NULL, buffer));
+                std::string msg;
+                msg.append("compiling shader of type '").append(names[type]).append("' failed: \n");
+                msg.append("<<<<<\n");
+                msg.append(combined[0]).append(combined[1]);
+                msg.append(">>>>>\n");
+                msg.append(buffer).append("\n");
+                common.printf("%s", msg.c_str());
 #ifdef _WIN32
-					OutputDebugStringA(msg.c_str());
+                OutputDebugStringA(msg.c_str());
 #endif
-                    free(buffer);
-                }
+                free(buffer);
             }
         }
-        assert(GL_TRUE == compiled);
     }
+    assert(GL_TRUE == compiled);
+}
 
-    Shader::~Shader(void) {
-        glDeleteShader(_id);
-    }
+Shader::~Shader(void) {
+    glDeleteShader(_id);
+}
 
 } // namespace R

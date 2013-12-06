@@ -29,6 +29,8 @@ public:
     ~Shader(void);
 
     GLuint GetID(void) const { return _id; }
+
+    const std::vector<AttributeLocation>& GetAttributeLocations() const { return _attribLocs; }
 };
 
 } // namespace R

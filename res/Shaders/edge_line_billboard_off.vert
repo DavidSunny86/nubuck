@@ -4,11 +4,11 @@ layout(std140) uniform UniformsHot {
     mat4 uInvTransform;
 };
 
-layout(location = 0) in vec4 aPosition;
-layout(location = 2) in vec3 aColor;
+attribute(0) vec4 aPosition;
+attribute(2) vec3 aColor;
 
-out vec3 vPosition;
-out vec3 vColor;
+varying vec3 vPosition;
+varying vec3 vColor;
 
 void main() {
 	vPosition = aPosition.xyz;

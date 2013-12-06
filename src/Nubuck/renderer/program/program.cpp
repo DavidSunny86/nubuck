@@ -18,6 +18,13 @@ namespace R {
 
     enum { INVALID_ID = 0 };
 
+    void Program::BindAttributeLocations(const std::vector<AttributeLocation>& locs) {
+        assert(INVALID_ID != _id);
+        for(std::vector<AttributeLocation>::const_iterator it(locs.begin()); locs.end() != it; ++it) {
+            GL_CALL(glBindAttribLocation(_id, it->loc, it->name.c_str()));
+        }
+    }
+
     Program::Program(void) : _id(INVALID_ID), _linked(false) {
     }
 
@@ -44,6 +51,7 @@ namespace R {
     void Program::Attach(const Shader& shader) {
         _linked = false;
         GL_CALL(glAttachShader(_id, shader.GetID()));
+        BindAttributeLocations(shader.GetAttributeLocations());
     }
 
     // type must be in Shader::Type

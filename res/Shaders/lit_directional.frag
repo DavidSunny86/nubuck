@@ -8,11 +8,9 @@ layout(std140) uniform UniformsLights {
     float uShininess;
 };
 
-in vec4 vPosition;
-in vec3 vNormal;
-in vec4 vColor;
-
-out vec4 fragColor;
+varying vec4 vPosition;
+varying vec3 vNormal;
+varying vec4 vColor;
 
 void main() {
     vec3 view = normalize(-vPosition.xyz);
@@ -26,6 +24,6 @@ void main() {
     vec4 diff = d0 * uLightDiffuseColor0 + d1 * uLightDiffuseColor1 + d2 * uLightDiffuseColor2;
     // vec4 spec = h0 * uLightDiffuseColor0 + h1 * uLightDiffuseColor1 + h2 * uLightDiffuseColor2;
     vec4 spec = vec4(0.0, 0.0, 0.0, 0.0);
-    fragColor = vColor * (diff + spec);
-    fragColor.a = vColor.a;
+    gl_FragColor = vColor * (diff + spec);
+    gl_FragColor.a = vColor.a;
 }

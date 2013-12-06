@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <generic\uncopyable.h>
 #include <renderer\glew\glew.h>
+#include <renderer\shader\shader.h>
 
 namespace M {
     struct Vector3;
@@ -21,6 +22,8 @@ namespace R {
         GLuint  _id;
         bool    _linked;
         std::unordered_map<std::string, GLint> _uniformLocations;
+
+        void BindAttributeLocations(const std::vector<AttributeLocation>& locs);
     public:
         Program(void);
         ~Program(void);

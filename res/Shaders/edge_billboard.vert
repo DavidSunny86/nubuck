@@ -5,24 +5,24 @@ layout(std140) uniform UniformsHot {
     mat3 uNormalMat;
 };
 
-layout(location = 0) in vec4    aPosition;
-layout(location = 2) in vec4    aColor;
-layout(location = 4) in vec3    aA0;
-layout(location = 5) in vec3    aA1;
-layout(location = 6) in vec3    aA2;
-layout(location = 7) in vec3    aA3;
-layout(location = 8) in float   aHalfHeightSq;
-layout(location = 9) in float   aRadiusSq;
+attribute(0) vec4    aPosition;
+attribute(2) vec4    aColor;
+attribute(4) vec3    aA0;
+attribute(5) vec3    aA1;
+attribute(6) vec3    aA2;
+attribute(7) vec3    aA3;
+attribute(8) float   aHalfHeightSq;
+attribute(9) float   aRadiusSq;
 
 // in edge's local space
-out vec4    vColor;
-out mat4    vObjectToEye;
-out mat4    vObjectToClip;
-out vec4    vPosition;
-out float   vHalfHeightSq;
-out float   vRadiusSq;
-out vec4    vEyePos;
-out vec3    vLightDir;
+varying vec4    vColor;
+varying mat4    vObjectToEye;
+varying mat4    vObjectToClip;
+varying vec4    vPosition;
+varying float   vHalfHeightSq;
+varying float   vRadiusSq;
+varying vec4    vEyePos;
+varying vec3    vLightDir;
 
 mat4 InvertTR(mat4 m) {
     mat3 R = transpose(mat3(m));

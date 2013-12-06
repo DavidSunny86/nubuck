@@ -17,7 +17,7 @@
 
 WSPACE      [\t\n ]+
 IDENT       [a-zA-Z][a-zA-Z0-9]*
-INTEGER     -?[1-9][0-9]*
+INTEGER     -?([1-9][0-9]*|0)
 INCL_PATH   (<|\").*(>|\")
 
 %%
