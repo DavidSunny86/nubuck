@@ -52,6 +52,10 @@ void Nodes::ReserveBillboardBuffers(void) {
     unsigned numBillboardIndices = 5 * numBillboards - 1;
     if(billboardIndexBuffer.IsValid()) billboardIndexBuffer->Destroy();
     billboardIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &billboardIndices[0], sizeof(Mesh::Index) * numBillboardIndices));
+
+    printf("billboardHotVertexBuffer->size() = %d\n", billboardHotVertexBuffer->GetSize());
+    printf("billboardColdVertexBuffer->size() = %d\n", billboardColdVertexBuffer->GetSize());
+    printf("billboardIndexBuffer->size() = %d\n", billboardIndexBuffer->GetSize());
 }
 
 // camera position at 0
@@ -103,7 +107,7 @@ void Nodes::Draw(const std::vector<Node>& nodes) {
     }
 }
 
-void Nodes::BindHotBillboardVertices(void) {
+void Nodes::BindHotBillboardAttributes(void) {
     GL_CALL(glVertexAttribPointer(IN_POSITION,
         3, GL_FLOAT, GL_FALSE, sizeof(BillboardHotVertex),
         (void*)offsetof(BillboardHotVertex, position)));
@@ -115,11 +119,17 @@ void Nodes::BindHotBillboardVertices(void) {
     GL_CALL(glEnableVertexAttribArray(IN_COLOR));
 }
 
-void Nodes::BindColdBillboardVertices(void) {
+void Nodes::BindColdBillboardAttributes(void) {
     GL_CALL(glVertexAttribPointer(IN_TEXCOORDS,
         2, GL_FLOAT, GL_FALSE, sizeof(BillboardColdVertex),
         (void*)offsetof(BillboardColdVertex, texCoords)));
     GL_CALL(glEnableVertexAttribArray(IN_TEXCOORDS));
+}
+
+void Nodes::UnbindAttributes(void) {
+    GL_CALL(glDisableVertexAttribArray(IN_POSITION));
+    GL_CALL(glDisableVertexAttribArray(IN_COLOR));
+    GL_CALL(glDisableVertexAttribArray(IN_TEXCOORDS));
 }
 
 void Nodes::R_Prepare(const M::Matrix4& worldMat) {
@@ -149,14 +159,16 @@ void Nodes::DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& project
     SetState(pass->GetDesc().state);
 
     billboardHotVertexBuffer->Bind();
-    BindHotBillboardVertices();
+    BindHotBillboardAttributes();
 
     billboardColdVertexBuffer->Bind();
-    BindColdBillboardVertices();
+    BindColdBillboardAttributes();
 
     billboardIndexBuffer->Bind();
 
     glDrawElements(GL_TRIANGLE_FAN, numBillboardIndices, GL_UNSIGNED_INT, NULL);
+
+    UnbindAttributes();
 }
 
 void Nodes::R_Draw(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {

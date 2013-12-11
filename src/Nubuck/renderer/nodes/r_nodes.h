@@ -51,8 +51,9 @@ namespace R {
         void ReserveBillboards(void);
         void ReserveBillboardBuffers(void);
         void BuildBillboards(const M::Matrix4& worldMat);
-        void BindHotBillboardVertices(void);
-        void BindColdBillboardVertices(void);
+        void BindHotBillboardAttributes(void);
+        void BindColdBillboardAttributes(void);
+        void UnbindAttributes(void);
         void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& projectionMat);
     public:
         void Draw(const std::vector<Node>& nodes);

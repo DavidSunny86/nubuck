@@ -25,7 +25,8 @@ private:
     GEN::Pointer<StaticBuffer>  edgeBBoxVertexBuffer;
     GEN::Pointer<StaticBuffer>  edgeBBoxIndexBuffer;
 
-    void BindEdgeBBoxVertices(void);
+    void BindEdgeBBoxAttributes(void);
+    void UnbindAttributes(void);
     void ReserveEdgeBBoxBuffers(void);
     void CreateEdges(void);
     void UploadEdges(void);

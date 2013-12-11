@@ -25,7 +25,7 @@
 
 namespace {
 
-void BindVertices(void) {
+void BindMeshAttributes(void) {
     GL_CALL(glVertexAttribPointer(IN_POSITION,
         3, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
         (void*)offsetof(R::Mesh::Vertex, position)));
@@ -45,6 +45,13 @@ void BindVertices(void) {
         2, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
         (void*)offsetof(R::Mesh::Vertex, texCoords)));
     GL_CALL(glEnableVertexAttribArray(IN_TEXCOORDS));
+}
+
+void UnbindMeshAttributes() {
+    GL_CALL(glDisableVertexAttribArray(IN_POSITION));
+    GL_CALL(glDisableVertexAttribArray(IN_NORMAL));
+    GL_CALL(glDisableVertexAttribArray(IN_COLOR));
+    GL_CALL(glDisableVertexAttribArray(IN_TEXCOORDS));
 }
 
 template<typename T> struct ToGLEnum { };
@@ -373,9 +380,10 @@ static MeshJob* DrawMeshList(Program& prog, const State& state, int passType, in
         indices.push_back(triIt->bufIndices.indices[2]);
     }
     if(!indices.empty()) {
-        BindVertices();
+        BindMeshAttributes();
         GL_CALL(glDrawElements(GL_TRIANGLES, indices.size(), ToGLEnum<Mesh::Index>::ENUM, &indices[0]));
         metrics.frame.numDrawCalls++;
+        UnbindMeshAttributes();
     }
     return meshJob;
 }

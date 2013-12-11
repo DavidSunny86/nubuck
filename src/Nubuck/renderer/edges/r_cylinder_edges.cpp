@@ -8,7 +8,7 @@ namespace R {
 
 CylinderEdges g_cylinderEdges;
 
-void CylinderEdges::BindEdgeBBoxVertices(void) {
+void CylinderEdges::BindEdgeBBoxAttributes(void) {
     GL_CALL(glVertexAttribPointer(IN_POSITION,
         3, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
         (void*)offsetof(EdgeBBoxVertex, position)));
@@ -48,6 +48,17 @@ void CylinderEdges::BindEdgeBBoxVertices(void) {
         1, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoxVertex),
         (void*)(offsetof(EdgeBBoxVertex, radiusSq))));
     GL_CALL(glEnableVertexAttribArray(IN_RADIUS_SQ));
+}
+
+void CylinderEdges::UnbindAttributes(void) {
+    GL_CALL(glDisableVertexAttribArray(IN_POSITION));
+    GL_CALL(glDisableVertexAttribArray(IN_COLOR));
+    GL_CALL(glDisableVertexAttribArray(IN_A0));
+    GL_CALL(glDisableVertexAttribArray(IN_A1));
+    GL_CALL(glDisableVertexAttribArray(IN_A2));
+    GL_CALL(glDisableVertexAttribArray(IN_A3));
+    GL_CALL(glDisableVertexAttribArray(IN_HALF_HEIGHT_SQ));
+    GL_CALL(glDisableVertexAttribArray(IN_RADIUS_SQ));
 }
 
 void CylinderEdges::ReserveEdgeBBoxBuffers(void) {
@@ -156,11 +167,13 @@ void CylinderEdges::DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4&
     SetState(pass->GetDesc().state);
 
     edgeBBoxVertexBuffer->Bind();
-    BindEdgeBBoxVertices();
+    BindEdgeBBoxAttributes();
 
     edgeBBoxIndexBuffer->Bind();
 
     glDrawElements(GL_TRIANGLE_STRIP, edgeBBoxIndices.size(), GL_UNSIGNED_INT, NULL);
+
+    UnbindAttributes();
 }
 
 void CylinderEdges::Draw(std::vector<Edge>& edges) {

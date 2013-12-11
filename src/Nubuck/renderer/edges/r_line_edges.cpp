@@ -63,7 +63,7 @@ void LineEdges::UploadEdgeBillboards(void) {
     edgeBBoardIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &edgeBBoardIndices[0], sizeof(Mesh::Index) * edgeBBoardIndices.size()));
 }
 
-void LineEdges::BindEdgeBillboardVertices(void) {
+void LineEdges::BindEdgeBillboardAttributes(void) {
     GL_CALL(glVertexAttribPointer(IN_POSITION,
         3, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoardHotVertex),
         (void*)offsetof(EdgeBBoardHotVertex, position)));
@@ -73,6 +73,11 @@ void LineEdges::BindEdgeBillboardVertices(void) {
         3, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(EdgeBBoardHotVertex),
         (void*)offsetof(EdgeBBoardHotVertex, color)));
     GL_CALL(glEnableVertexAttribArray(IN_COLOR));
+}
+
+void LineEdges::UnbindAttributes(void) {
+    GL_CALL(glDisableVertexAttribArray(IN_POSITION));
+    GL_CALL(glDisableVertexAttribArray(IN_COLOR));
 }
 
 void LineEdges::DrawEdgeBillboards(const M::Matrix4& worldMat, const M::Matrix4& projectionMat, const char* fxName) {
@@ -89,12 +94,14 @@ void LineEdges::DrawEdgeBillboards(const M::Matrix4& worldMat, const M::Matrix4&
     SetState(pass->GetDesc().state);
 
     edgeBBoardHotVertexBuffer->Bind();
-    BindEdgeBillboardVertices();
+    BindEdgeBillboardAttributes();
 
     edgeBBoardIndexBuffer->Bind();
     
     unsigned numBillboardIndices = edgeBBoardIndices.size();
     GL_CALL(glDrawElements(GL_TRIANGLE_FAN, numBillboardIndices, GL_UNSIGNED_INT, NULL));
+
+    UnbindAttributes();
 }
 
 void LineEdges::Draw(std::vector<Edge>& edges) {

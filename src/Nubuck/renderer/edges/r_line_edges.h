@@ -29,7 +29,8 @@ private:
 
     void BuildEdgeBillboards(const std::vector<Edge>& edges, const M::Matrix4& world, const M::Vector3& wEye);
     void UploadEdgeBillboards(void);
-    void BindEdgeBillboardVertices(void);
+    void BindEdgeBillboardAttributes(void);
+    void UnbindAttributes(void);
     void DrawEdgeBillboards(const M::Matrix4& worldMat, const M::Matrix4& projectionMat, const char* fxName);
 public:
     void Draw(std::vector<Edge>& edges);
