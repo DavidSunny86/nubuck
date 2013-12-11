@@ -74,6 +74,15 @@ namespace SYS {
         InitExtensions();
         CHECK_WIN_ERROR;
 
+        int msaa_enabled    = GL_FALSE;
+        int msaa_numSamples = 0;
+
+        if(GLEW_ARB_multisample) {
+            msaa_enabled    = GL_TRUE;
+            msaa_numSamples = 2;
+        }
+        common.printf("INFO - MSAA enabled: %d, number of samples: %d\n", msaa_enabled, msaa_numSamples);
+
         int pixAttribs[] = {
             WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
             WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
@@ -82,8 +91,8 @@ namespace SYS {
             WGL_DEPTH_BITS_ARB,		24,
             WGL_STENCIL_BITS_ARB,   8,
             WGL_DOUBLE_BUFFER_ARB,	GL_TRUE,
-            WGL_SAMPLE_BUFFERS_ARB,	GL_TRUE,
-            WGL_SAMPLES_ARB,		2,
+            WGL_SAMPLE_BUFFERS_ARB,	msaa_enabled,
+            WGL_SAMPLES_ARB,		msaa_numSamples,
             WGL_PIXEL_TYPE_ARB,		WGL_TYPE_RGBA_ARB,
             0
         };
