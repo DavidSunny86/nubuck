@@ -24,5 +24,7 @@ shared.mk
 src1
 nubuck.dll
 nubuck.lib
+tags
 *_backup[0-9].zip
 *~
+config_dump.txt
