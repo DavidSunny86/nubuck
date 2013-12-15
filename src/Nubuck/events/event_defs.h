@@ -9,8 +9,10 @@ BEGIN_EVENT_DEF(Apocalypse)
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(SpawnPolyhedron)
-    unsigned    entId;
-    graph_t*    G;
+    unsigned                entId;
+    graph_t*    			G;
+    leda::node_map<bool>*   cachedNodes;
+    leda::edge_map<bool>*   cachedEdges;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(SpawnMesh)
@@ -23,7 +25,10 @@ BEGIN_EVENT_DEF(DestroyEntity)
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(Rebuild)
-    unsigned    entId;
+    unsigned                entId;
+    graph_t*    			G;
+    leda::node_map<bool>*   cachedNodes;
+    leda::edge_map<bool>*   cachedEdges;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(SetVisible)

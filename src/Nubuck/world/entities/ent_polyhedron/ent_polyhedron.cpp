@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <algorithm>
 
+#include <system\timer\timer.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\quad\quad.h>
@@ -25,8 +26,6 @@ static R::MeshMgr::meshPtr_t    g_faceCurveDecalMesh;
 static R::SkinMgr::handle_t     g_faceCurveDecalSkin;
 
 static void Polyhedron_ClearEdgeMasks(ENT_Polyhedron& ph) {
-    ph.edges.mask.clear();
-    ph.edges.mask.resize(ph.G->max_edge_index() + 1, 1);
 }
 
 void Polyhedron_InitResources(void) {
@@ -37,148 +36,183 @@ void Polyhedron_InitResources(void) {
 }
 
 void Polyhedron_Init(ENT_Polyhedron& ph) { 
-    ph.renderFlags  = 0;
-    ph.isPickable   = false;
+    ph.renderFlags      = 0;
+    ph.isPickable   	= false;
 
-    ph.edges.color  = R::Color(0.4f, 0.4f, 0.4f);
-    ph.edges.radius = 0.1f;
+    ph.edges.baseColor  = R::Color(0.4f, 0.4f, 0.4f);
+    ph.edges.radius     = 0.1f;
 
-    ph.hull.mesh        = NULL;
-    ph.hull.baseColor   = R::Color::White;
+    ph.faces.maxFaceIdx = 0;
+    ph.faces.baseColor  = R::Color::White;
+
+    ph.mesh.mesh        = NULL;
 
     Polyhedron_ClearEdgeMasks(ph);
 }
 
-static void Polyhedron_RebuildSelection(ENT_Polyhedron& ph) {
+static void Polyhedron_RebuildSelection(ENT_Polyhedron& ph, const graph_t& G) {
     ph.selection.nodes.clear();
-    ph.selection.nodes.resize(ph.G->max_node_index() + 1, false);
+    ph.selection.nodes.resize(G.max_node_index() + 1, false);
 }
 
-static void Polyhedron_RebuildNodes(ENT_Polyhedron& ph) {
+static inline void Polyhedron_ResizeNodeMaps(ENT_Polyhedron& ph, unsigned sz) {
+    ph.nodes.nodes.resize(sz);
+    ph.nodes.positions.resize(sz);
+    ph.nodes.oldPositions.resize(sz);
+    ph.nodes.colors.resize(sz);
+}
+
+static void Polyhedron_RebuildNodes(ENT_Polyhedron& ph, const graph_t& G, const leda::node_map<bool>& cachedNodes) {
+    Polyhedron_ResizeNodeMaps(ph, G.max_node_index() + 1);
+    
+    for(unsigned i = 0; i < ph.nodes.nodes.size(); ++i) ph.nodes.nodes[i].flags &= ~POLYHEDRON_VALID_FLAG;
+
     leda::node n;
-    ph.nodes.valid.clear();
-    ph.nodes.valid.resize(ph.G->max_node_index() + 1, 0);
-    forall_nodes(n, *ph.G) ph.nodes.valid[n->id()] = 1;
-    ph.nodes.positions.resize(ph.G->max_node_index() + 1);
-    ph.nodes.oldPositions.resize(ph.G->max_node_index() + 1);
-    ph.nodes.colors.clear();
-    ph.nodes.colors.resize(ph.G->max_node_index() + 1, R::Color::Black);
-}
-
-static void Polyhedron_RebuildEdges(ENT_Polyhedron& ph) {
-    ph.edges.valid.clear();
-    ph.edges.valid.resize(ph.G->max_edge_index() + 1, 0);
-    ph.edges.mask.resize(ph.G->max_edge_index() + 1, 1);
-    leda::edge e;
-    forall_edges(e, *ph.G) {
-        ph.edges.valid[e->id()] = 1;
+    forall_nodes(n, G) {
+        if(0 == cachedNodes[n]) { // reinitialize
+            ph.nodes.colors[n->id()] = R::Color::Black;
+        }
+        ph.nodes.nodes[n->id()].flags |= POLYHEDRON_VALID_FLAG;
     }
-    PolyhedronEdgeColor edgeColor;
-    edgeColor.cur = R::Color::White;
-    edgeColor.t = 0.0f;
-    edgeColor.ip = false;
-    ph.edges.colors.clear();
-    ph.edges.colors.resize(ph.G->max_edge_index() + 1, edgeColor);
 }
 
-static void Polyhedron_RebuildHull(ENT_Polyhedron& ph) {
-	ph.hull.faceLists.clear();
-    ph.hull.faceColors.clear();
-    ph.hull.faceTrans.clear();
-	ph.hull.edges.clear();
-	ph.hull.vnmap.clear();
-	ph.hull.vertices.clear();
-	ph.hull.indices.clear();
+static inline void Polyhedron_ResizeEdgeMaps(ENT_Polyhedron& ph, unsigned sz) {
+    ph.edges.edges.resize(sz);
+    ph.edges.colors.resize(sz);
+}
 
-    PolyhedronHullEdge invalidEdge = { PolyhedronHullEdge::INVALID_FACE_INDEX, 0, 0, false /* validity */ };
-	ph.hull.edges.resize(ph.G->max_edge_index() + 1, invalidEdge);
+static void Polyhedron_RebuildEdges(ENT_Polyhedron& ph, const graph_t& G, const leda::edge_map<bool>& cachedEdges) {
+    Polyhedron_ResizeEdgeMaps(ph, G.max_edge_index() + 1);
 
-    leda::edge_array<bool> visitedEdge(*ph.G, false);
+    for(unsigned i = 0; i < ph.edges.edges.size(); ++i) ph.edges.edges[i].flags &= ~POLYHEDRON_VALID_FLAG;
+
+    leda::edge e;
+    forall_edges(e, G) {
+        PolyhedronEdge& edge = ph.edges.edges[e->id()];
+        if(0 == cachedEdges[e]) { // reinitialize
+            edge.flags &= ~POLYHEDRON_HIDE_FLAG;
+            edge.faceIdx = POLYHEDRON_INVALID_INDEX;
+
+            PolyhedronEdgeColor edgeColor;
+            edgeColor.cur = R::Color::White;
+            edgeColor.t = 0.0f;
+            edgeColor.ip = false;
+            ph.edges.colors[e->id()] = edgeColor;
+        }
+        edge.flags |= POLYHEDRON_VALID_FLAG; 
+        edge.n0 = leda::source(e)->id();
+        edge.n1 = leda::target(e)->id();
+        assert(G.reversal(e));
+        edge.rev = G.reversal(e)->id();
+    }
+}
+
+static void Polyhedron_ResizeFaceMaps(ENT_Polyhedron& ph, unsigned sz) {
+    ph.faces.lists.resize(sz);
+    ph.faces.colors.resize(sz);
+    ph.faces.trans.resize(sz);
+}
+
+static void Polyhedron_AllocFaceIndex(ENT_Polyhedron& ph, unsigned edgeIdx) {
+    PolyhedronEdge& edge = ph.edges.edges[edgeIdx];
+    if(POLYHEDRON_INVALID_INDEX == edge.faceIdx) {
+        if(!ph.faces.freeIndices.empty()) {
+            edge.faceIdx = ph.faces.freeIndices.back();
+            ph.faces.freeIndices.pop_back();
+        } else {
+            edge.faceIdx = ph.faces.maxFaceIdx;
+            Polyhedron_ResizeFaceMaps(ph, ++ph.faces.maxFaceIdx);
+
+            // initialize new face
+            const R::Color defaultFaceColor = R::Color::White;
+            PolyhedronFaceColor faceColor;
+            faceColor.cur = defaultFaceColor;
+            faceColor.t = 0.0f;
+            faceColor.ip = false;
+            ph.faces.colors[edge.faceIdx] = faceColor;
+        }
+    }
+}
+
+static void Polyhedron_RebuildHull(ENT_Polyhedron& ph, const graph_t& G) {
+	ph.mesh.vnmap.clear();
+	ph.mesh.vertices.clear();
+	ph.mesh.indices.clear();
+
+    leda::edge_array<bool> visitedEdge(G, false);
 
     unsigned indexCnt = 0;
 
-    const R::Color defaultFaceColor = R::Color::White;
-    PolyhedronHullFaceColor faceColor;
-    faceColor.cur = defaultFaceColor;
-    faceColor.t = 0.0f;
-    faceColor.ip = false;
-
     leda::edge e;
-    forall_edges(e, *ph.G) {
-        ph.hull.edges[e->id()].n0 = leda::source(e)->id();
-        ph.hull.edges[e->id()].n1 = leda::target(e)->id();
-        ph.hull.edges[e->id()].valid = true;
-        if(POLYHEDRON_RENDER_HULL & ph.renderFlags && !visitedEdge[e] && ph.edges.mask[e->id()]) {
-            assert(ph.G->reversal(e));
-			leda::edge it = ph.G->face_cycle_succ(e);
+    forall_edges(e, G) {
+        if(POLYHEDRON_RENDER_HULL & ph.renderFlags && !visitedEdge[e] && 0 == (ph.edges.edges[e->id()].flags & POLYHEDRON_HIDE_FLAG)) {
+			leda::edge it = G.face_cycle_succ(e);
 
-            PolyhedronHullFaceList face;
-            face.base = indexCnt; // index of v0
-            face.size = 2; // v0 and v1
+            Polyhedron_AllocFaceIndex(ph, e->id());
+            unsigned faceIdx = ph.edges.edges[e->id()].faceIdx;
+            assert(POLYHEDRON_INVALID_INDEX != faceIdx);
 
-			ph.hull.faceLists.push_back(face);
-            ph.hull.faceColors.push_back(faceColor);
-			unsigned faceIndex = ph.hull.faceLists.size() - 1;
-			PolyhedronHullFaceList& faceRef = ph.hull.faceLists.back();
+            PolyhedronFaceList& faceList = ph.faces.lists[faceIdx];
+            faceList.base = indexCnt; // index of v0
+            faceList.size = 2; // v0 and v1
 
-			ph.hull.vnmap.push_back(source(e)->id());
-            ph.hull.indices.push_back(indexCnt);
+			ph.mesh.vnmap.push_back(source(e)->id());
+            ph.mesh.indices.push_back(indexCnt);
             indexCnt++;
 
-			ph.hull.vnmap.push_back(source(it)->id());
-            ph.hull.indices.push_back(indexCnt);
+			ph.mesh.vnmap.push_back(source(it)->id());
+            ph.mesh.indices.push_back(indexCnt);
             indexCnt++;
 
-			ph.hull.edges[e->id()].faceIdx = ph.hull.edges[it->id()].faceIdx = faceIndex;
+			ph.edges.edges[e->id()].faceIdx = ph.edges.edges[it->id()].faceIdx = faceIdx;
             visitedEdge[e] = visitedEdge[it] = true;
 
-            while((it = ph.G->face_cycle_succ(it)) != e) {
-				ph.hull.vnmap.push_back(source(it)->id());
-                ph.hull.indices.push_back(indexCnt++);
+            while((it = G.face_cycle_succ(it)) != e) {
+				ph.mesh.vnmap.push_back(source(it)->id());
+                ph.mesh.indices.push_back(indexCnt++);
 
                 visitedEdge[it] = true;
-				ph.hull.edges[it->id()].faceIdx = faceIndex;
-                faceRef.size += 1;
+				ph.edges.edges[it->id()].faceIdx = faceIdx;
+                faceList.size += 1;
             }
 
-			ph.hull.indices.push_back(R::Mesh::RESTART_INDEX);
+			ph.mesh.indices.push_back(R::Mesh::RESTART_INDEX);
         }
     } // forall_edges
 
 #ifdef PARANOID
     if(POLYHEDRON_RENDER_HULL & ph.renderFlags) {
-        forall_edges(e, *ph.G) {
-            if(ph.edges.mask[e->id()]) {
+        forall_edges(e, G) {
+            if(0 == (POLYHEDRON_HIDE_FLAG & ph.edges.edges[e->id()].flags)) {
                 assert(visitedEdge[e]);
-                assert(PolyhedronHullEdge::INVALID_FACE_INDEX != ph.hull.edges[e->id()].faceIdx);
+                assert(POLYHEDRON_INVALID_INDEX != ph.edges.edges[e->id()].faceIdx);
             }
         }
     }
 #endif
 
-    if(ph.hull.mesh) R::meshMgr.Destroy(ph.hull.mesh);
-    ph.hull.mesh = NULL;
+    if(ph.mesh.mesh) R::meshMgr.Destroy(ph.mesh.mesh);
+    ph.mesh.mesh = NULL;
 
-    if(!ph.hull.indices.empty() /* ie. hull exists */) {
+    if(!ph.mesh.indices.empty() /* ie. hull exists */) {
         R::Mesh::Vertex vert;
         vert.position = M::Vector3::Zero;
-        vert.color = ph.hull.baseColor;
-        ph.hull.vertices.resize(ph.hull.indices.size(), vert);
-        for(unsigned i = 0; i < ph.hull.vnmap.size() /* ie. number of vertices */; ++i)
-            ph.hull.vertices[i].position = ph.nodes.positions[ph.hull.vnmap[i]];
+        vert.color = ph.faces.baseColor;
+        ph.mesh.vertices.resize(ph.mesh.indices.size(), vert);
+        for(unsigned i = 0; i < ph.mesh.vnmap.size() /* ie. number of vertices */; ++i)
+            ph.mesh.vertices[i].position = ph.nodes.positions[ph.mesh.vnmap[i]];
 
         R::Mesh::Desc desc;
-        desc.vertices = &ph.hull.vertices[0];
-        desc.numVertices = ph.hull.vertices.size();
-        desc.indices = &ph.hull.indices[0];
-        desc.numIndices = ph.hull.indices.size();
+        desc.vertices = &ph.mesh.vertices[0];
+        desc.numVertices = ph.mesh.vertices.size();
+        desc.indices = &ph.mesh.indices[0];
+        desc.numIndices = ph.mesh.indices.size();
         desc.primType = GL_TRIANGLE_FAN;
-        ph.hull.mesh = R::meshMgr.Create(desc);
+        ph.mesh.mesh = R::meshMgr.Create(desc);
     }
 }
 
-static bool Polyhedron_IsPlanar(ENT_Polyhedron& ph) {
-    const graph_t& G = *ph.G;
+static bool Polyhedron_IsPlanar(const graph_t& G) {
     const leda::list<leda::node>& L = G.all_nodes();
     point_t S[] = { 
         G[L[L.get_item(0)]],
@@ -202,8 +236,7 @@ static leda::node MinXY(const graph_t& G, const leda::list<leda::node>& L) {
     return min;
 }
 
-static leda::edge Polyhedron_FindOuterFace(ENT_Polyhedron& ph) {
-    const graph_t& G = *ph.G;
+static leda::edge Polyhedron_FindOuterFace(const graph_t& G) {
     leda::list<leda::node> L = G.all_nodes();
     leda::node n0 = MinXY(G, L);
     leda::edge e0 = NULL;
@@ -225,31 +258,51 @@ static leda::edge Polyhedron_FindOuterFace(ENT_Polyhedron& ph) {
 }
 
 static void Polyhedron_MaskFace(ENT_Polyhedron& ph, leda::edge e) {
+    /*
     leda::edge it = e;
     do {
         it = ph.G->face_cycle_succ(it);
         ph.edges.mask[it->id()] = 0;
     } while(e != it);
+    */
 }
 
 static void Polyhedron_UnmaskFace(ENT_Polyhedron& ph, leda::edge e) {
+    /*
     leda::edge it = e;
     do {
         it = ph.G->face_cycle_succ(it);
         ph.edges.mask[it->id()] = 1;
     } while(e != it);
+    */
 }
 
-void Polyhedron_Rebuild(ENT_Polyhedron& ph) {
-    Polyhedron_RebuildSelection(ph);
-    Polyhedron_RebuildNodes(ph);
-    Polyhedron_RebuildEdges(ph);
+static void Polyhedron_CacheAll(const graph_t& G, leda::node_map<bool>& cachedNodes, leda::edge_map<bool>& cachedEdges) {
+    leda::node n;
+    forall_nodes(n, G) cachedNodes[n] = 1;
+    leda::edge e;
+    forall_edges(e, G) cachedEdges[e] = 1;
+}
 
-    if(Polyhedron_IsPlanar(ph) && 0 < ph.G->number_of_edges() && POLYHEDRON_RENDER_HULL & ph.renderFlags)  {
-        Polyhedron_MaskFace(ph, Polyhedron_FindOuterFace(ph));
+void Polyhedron_Rebuild(ENT_Polyhedron& ph, const graph_t& G, leda::node_map<bool>& cachedNodes, leda::edge_map<bool>& cachedEdges) {
+    SYS::Timer timer;
+    timer.Start();
+
+    Polyhedron_RebuildSelection(ph, G);
+    Polyhedron_RebuildNodes(ph, G, cachedNodes);
+    Polyhedron_RebuildEdges(ph, G, cachedEdges);
+
+    if(Polyhedron_IsPlanar(G) && 0 < G.number_of_edges() && POLYHEDRON_RENDER_HULL & ph.renderFlags)  {
+        Polyhedron_MaskFace(ph, Polyhedron_FindOuterFace(G));
     }
 
-    Polyhedron_RebuildHull(ph);
+    Polyhedron_RebuildHull(ph, G);
+
+    Polyhedron_CacheAll(G, cachedNodes, cachedEdges);
+
+    float secsPassed = timer.Stop();
+    // common.printf("Polyhedron_Rebuild took %f seconds\n", secsPassed);
+    printf("Polyhedron_Rebuild took %f seconds\n", secsPassed);
 }
 
 // the renderlist of a polyhedron ph can be build even though
@@ -261,11 +314,11 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
 	renderJob.fx = "LitDirectional";
     renderJob.material = R::Material::White;
 
-    unsigned numNodes = ph.nodes.positions.size();
+    unsigned numNodes = ph.nodes.nodes.size();
     std::vector<R::Nodes::Node> rnodes;
     if(POLYHEDRON_RENDER_NODES & ph.renderFlags) {
         for(unsigned i = 0; i < numNodes; ++i) {
-            if(ph.nodes.valid[i]) {
+            if(POLYHEDRON_VALID_FLAG & ph.nodes.nodes[i].flags) {
                 R::Nodes::Node rnode;
                 rnode.position = ph.nodes.positions[i];
                 if(ph.selection.nodes[i]) rnode.color = R::Color(1.0f, 1.0f, 0.0f, 1.0f);
@@ -278,15 +331,15 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
 
     R::Edge re;
     re.radius   = ph.edges.radius;
-    unsigned numEdges = ph.hull.edges.size();
+    unsigned numEdges = ph.edges.edges.size();
     if(POLYHEDRON_RENDER_EDGES & ph.renderFlags) {
         std::vector<R::Edge> redges;
         // TODO: store reversal information to draw edges only once
         for(unsigned i = 0; i < numEdges; ++i) {
-            const PolyhedronHullEdge& e = ph.hull.edges[i];
-            if(e.valid)
+            const PolyhedronEdge& e = ph.edges.edges[i];
+            if(POLYHEDRON_VALID_FLAG & e.flags)
             {
-                re.color = R::BlendMulRGB(ph.edges.colors[i].cur, ph.edges.color);
+                re.color = R::BlendMulRGB(ph.edges.colors[i].cur, ph.edges.baseColor);
                 re.p0 = ph.nodes.positions[e.n0];
                 re.p1 = ph.nodes.positions[e.n1];
                 redges.push_back(re);
@@ -296,14 +349,14 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
     } // if(renderEdges)
 
     if(POLYHEDRON_RENDER_HULL & ph.renderFlags) {
-        if(!ph.hull.indices.empty() /* ie. hull exists */) {
-            float alpha = ph.hull.vertices[0].color.a; // constant for all verts
+        if(!ph.mesh.indices.empty() /* ie. hull exists */) {
+            float alpha = ph.mesh.vertices[0].color.a; // constant for all verts
             if(1.0f > alpha) renderJob.fx = "LitDirectionalTransparent";
             else renderJob.fx = "LitDirectional";
             // renderJob.fx = hullFx;
 
             renderJob.material = R::Material::White;
-            renderJob.mesh = ph.hull.mesh;
+            renderJob.mesh = ph.mesh.mesh;
             renderJob.primType = 0;
             renderJob.transform = M::Mat4::Identity();
             ph.renderList.meshJobs.push_back(renderJob);
@@ -314,42 +367,42 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
     renderJob.mesh = g_faceCurveDecalMesh;
     renderJob.primType = 0;
     renderJob.skin = g_faceCurveDecalSkin;
-    for(unsigned i = 0; i < ph.hull.curves.size(); ++i) {
-        for(unsigned j = 0; j < ph.hull.curves[i].curve.decalPos.size(); ++j) {
-            renderJob.material.diffuseColor = ph.hull.curves[i].color;
+    for(unsigned i = 0; i < ph.faces.curves.size(); ++i) {
+        for(unsigned j = 0; j < ph.faces.curves[i].curve.decalPos.size(); ++j) {
+            renderJob.material.diffuseColor = ph.faces.curves[i].color;
             renderJob.transform = 
-                M::Mat4::Translate(ph.hull.curves[i].curve.decalPos[j]) * 
-                M::Mat4::FromRigidTransform(ph.hull.curves[i].localToWorld, M::Vector3::Zero);
+                M::Mat4::Translate(ph.faces.curves[i].curve.decalPos[j]) * 
+                M::Mat4::FromRigidTransform(ph.faces.curves[i].localToWorld, M::Vector3::Zero);
             ph.renderList.meshJobs.push_back(renderJob);
         }
     }
 }
 
-void Polyhedron_Update(ENT_Polyhedron& ph) {
+void Polyhedron_Update(ENT_Polyhedron& ph, const graph_t& G) {
     // update node positions
 	leda::node n;
-	forall_nodes(n, *ph.G) {
-		const M::Vector3 pos = ToVector((*ph.G)[n]);
+	forall_nodes(n, G) {
+		const M::Vector3 pos = ToVector(G[n]);
 		ph.nodes.positions[n->id()] = pos;
 	}
 
-    // update vertex positions (hull)
-	for(unsigned i = 0; i < ph.hull.vnmap.size() /* ie. number of vertices */; ++i)
-        ph.hull.vertices[i].position = ph.nodes.positions[ph.hull.vnmap[i]];
+    // update vertex positions (mesh)
+	for(unsigned i = 0; i < ph.mesh.vnmap.size() /* ie. number of vertices */; ++i)
+        ph.mesh.vertices[i].position = ph.nodes.positions[ph.mesh.vnmap[i]];
 
-    // update face normals (hull)
+    // update face normals (mesh)
 	M::Vector3 p[3];
-	for(unsigned i = 0; i < ph.hull.faceLists.size(); ++i) {
+	for(unsigned i = 0; i < ph.faces.lists.size(); ++i) {
 		for(unsigned j = 0; j < 3; ++j)
-			p[j] = ph.hull.vertices[ph.hull.faceLists[i].base + j].position;
+			p[j] = ph.mesh.vertices[ph.faces.lists[i].base + j].position;
 		const M::Vector3 normal = M::Normalize(M::Cross(p[1] - p[0], p[2] - p[0]));
-		for(unsigned j = 0; j < ph.hull.faceLists[i].size; ++j)
-			ph.hull.vertices[ph.hull.faceLists[i].base + j].normal = normal;
+		for(unsigned j = 0; j < ph.faces.lists[i].size; ++j)
+			ph.mesh.vertices[ph.faces.lists[i].base + j].normal = normal;
 	}
 
-    if(!ph.hull.indices.empty()) {
-        R::Mesh& mesh = R::meshMgr.GetMesh(ph.hull.mesh);
-        mesh.Invalidate(&ph.hull.vertices[0]);
+    if(!ph.mesh.indices.empty()) {
+        R::Mesh& mesh = R::meshMgr.GetMesh(ph.mesh.mesh);
+        mesh.Invalidate(&ph.mesh.vertices[0]);
     }
 }
 
@@ -376,14 +429,14 @@ static void Polyhedron_ComputeCurveDecals(PolyhedronFaceCurve& cv) {
 }
 
 static void Polyhedron_RebuildCurve(const ENT_Polyhedron& ph, PolyhedronFaceCurve& cv) {
-    const PolyhedronHullFaceList& face = ph.hull.faceLists[cv.faceIdx];
+    const PolyhedronFaceList& face = ph.faces.lists[cv.faceIdx];
 
     // create local copy of shrinked points
     std::vector<M::Vector3> points;
     points.reserve(face.size);
     M::Vector3 center = M::Vector3::Zero;
     for(unsigned i = 0; i < face.size; ++i) {
-        const M::Vector3& p = ph.nodes.positions[ph.hull.vnmap[face.base + i]];
+        const M::Vector3& p = ph.nodes.positions[ph.mesh.vnmap[face.base + i]];
         center += p;
         points.push_back(p);
     }
@@ -428,11 +481,11 @@ static void Polyhedron_RebuildCurve(const ENT_Polyhedron& ph, PolyhedronFaceCurv
 
 void Polyhedron_AddCurve(ENT_Polyhedron& ph, leda::edge edge, const R::Color& color) {
     PolyhedronFaceCurve cv;
-    cv.faceIdx = ph.hull.edges[edge->id()].faceIdx;
+    cv.faceIdx = ph.edges.edges[edge->id()].faceIdx;
     cv.time = 0.0f;
     cv.color = color;
     Polyhedron_RebuildCurve(ph, cv);
-    ph.hull.curves.push_back(cv);
+    ph.faces.curves.push_back(cv);
 }
 
 
@@ -443,8 +496,8 @@ void Polyhedron_UpdateCurve(PolyhedronFaceCurve& cv, float secsPassed) {
 
 void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed) {
     const float IP_DUR = 0.5f;
-    for(unsigned i = 0; i < ph.hull.faceColors.size(); ++i) {
-        PolyhedronHullFaceColor& fc = ph.hull.faceColors[i];
+    for(unsigned i = 0; i < ph.faces.colors.size(); ++i) {
+        PolyhedronFaceColor& fc = ph.faces.colors[i];
         if(fc.ip) {
             const float l = M::Min(1.0f, fc.t / IP_DUR);
             fc.cur = R::Lerp(fc.v0, fc.v1, l);
@@ -457,21 +510,21 @@ void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed) {
     }
 
     // update vertex colors
-    for(unsigned i = 0; i < ph.hull.faceLists.size(); ++i) {
-        PolyhedronHullFaceList& fl = ph.hull.faceLists[i];
-        PolyhedronHullFaceColor& fc = ph.hull.faceColors[i];
+    for(unsigned i = 0; i < ph.faces.lists.size(); ++i) {
+        PolyhedronFaceList& fl = ph.faces.lists[i];
+        PolyhedronFaceColor& fc = ph.faces.colors[i];
         for(unsigned j = 0; j < fl.size; ++j) {
-            ph.hull.vertices[fl.base + j].color = R::BlendMulRGBA(fc.cur, ph.hull.baseColor);
+            ph.mesh.vertices[fl.base + j].color = R::BlendMulRGBA(fc.cur, ph.faces.baseColor);
         }
     }
 
-    if(!ph.hull.indices.empty()) R::meshMgr.GetMesh(ph.hull.mesh).Invalidate(&ph.hull.vertices[0]);
+    if(!ph.mesh.indices.empty()) R::meshMgr.GetMesh(ph.mesh.mesh).Invalidate(&ph.mesh.vertices[0]);
 }
 
 void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Color& color) {
-    if(!ph.edges.valid[e->id()] || !ph.edges.mask[e->id()]) return;
-    unsigned faceIdx = ph.hull.edges[e->id()].faceIdx;
-    PolyhedronHullFaceColor& fc = ph.hull.faceColors[faceIdx];
+    if(!(POLYHEDRON_VALID_FLAG & ph.edges.edges[e->id()].flags) || POLYHEDRON_HIDE_FLAG & ph.edges.edges[e->id()].flags) return;
+    unsigned faceIdx = ph.edges.edges[e->id()].faceIdx;
+    PolyhedronFaceColor& fc = ph.faces.colors[faceIdx];
     fc.v0 = fc.cur;
     fc.v1 = color;
     fc.t = 0.0f;
@@ -480,17 +533,21 @@ void Polyhedron_SetFaceColor(ENT_Polyhedron& ph, const leda::edge e, const R::Co
 }
 
 void Polyhedron_SetFaceVisibility(ENT_Polyhedron& ph, const leda::edge e, bool visible) {
+    /*
     if(visible) Polyhedron_UnmaskFace(ph, e);
     else Polyhedron_MaskFace(ph, e);
     Polyhedron_RebuildHull(ph);
+    */
 }
 
 void Polyhedron_SetHullAlpha(ENT_Polyhedron& ph, float alpha) {
+    /*
     assert(0.0f <= alpha && alpha <= 1.0f);
     for(unsigned i = 0; i < ph.hull.vertices.size(); ++i)
         ph.hull.vertices[i].color.a = alpha;
     ph.hull.baseColor.a = alpha;
     if(!ph.hull.indices.empty()) R::meshMgr.GetMesh(ph.hull.mesh).Invalidate(&ph.hull.vertices[0]);
+    */
 }
 
 struct Ray {
@@ -584,6 +641,7 @@ bool Polyhedron_RaycastNodes(ENT_Polyhedron& ph, const M::Vector3& rayOrig, cons
     std::vector<float>      dists;
     bool hit = false;
     leda::node n;
+    /*
     forall_nodes(n, *ph.G) {
         if(ph.nodes.valid[n->id()]) {
             sphere.center = ph.nodes.positions[n->id()];
@@ -594,6 +652,7 @@ bool Polyhedron_RaycastNodes(ENT_Polyhedron& ph, const M::Vector3& rayOrig, cons
             }
         }
     }
+    */
     if(!hit) return false;
     unsigned minIdx = 0;
     for(unsigned i = 1; i < dists.size(); ++i)
@@ -608,16 +667,16 @@ bool Polyhedron_RaycastFaces(ENT_Polyhedron& ph, const M::Vector3& rayOrig, cons
     Ray ray = {rayOrig, rayDir };
     Triangle tri;
     Info info;
-    std::vector<PolyhedronHullFaceList> faces;
-    std::vector<float>                  dists;
+    std::vector<PolyhedronFaceList> faces;
+    std::vector<float>              dists;
     bool hit = false;
-    for(unsigned i = 0; i < ph.hull.faceLists.size(); ++i) {
-        PolyhedronHullFaceList& fl = ph.hull.faceLists[i];
-        tri.p0 = ph.hull.vertices[fl.base].position;
+    for(unsigned i = 0; i < ph.faces.lists.size(); ++i) {
+        PolyhedronFaceList& fl = ph.faces.lists[i];
+        tri.p0 = ph.mesh.vertices[fl.base].position;
         unsigned j = 0;
         while(j + 2 < fl.size) {
-            tri.p1 = ph.hull.vertices[fl.base + j + 1].position;
-            tri.p2 = ph.hull.vertices[fl.base + j + 2].position;
+            tri.p1 = ph.mesh.vertices[fl.base + j + 1].position;
+            tri.p2 = ph.mesh.vertices[fl.base + j + 2].position;
             if(RaycastTriangle(ray, tri, &info)) {
                 faces.push_back(fl);
                 dists.push_back(info.distance);
@@ -632,18 +691,20 @@ bool Polyhedron_RaycastFaces(ENT_Polyhedron& ph, const M::Vector3& rayOrig, cons
         if(dists[minIdx] > dists[i]) minIdx = i;
     leda::edge e;
     hitFace = NULL;
+    /*
     forall_edges(e, *ph.G) {
         if(ph.hull.faceLists[ph.hull.edges[e->id()].faceIdx].base == faces[minIdx].base) {
             hitFace = e;
             break;
         }
     }
+    */
     assert(NULL != hitFace);
     return true;
 }
 
 void Polyhedron_GetInfo(const ENT_Polyhedron& ph, INF_Polyhedron& inf) {
-    inf.edgeColor   = ph.edges.color;
+    inf.edgeColor   = ph.edges.baseColor;
     inf.edgeRadius  = ph.edges.radius;
 }
 

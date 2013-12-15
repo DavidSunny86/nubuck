@@ -77,6 +77,7 @@ public:
 
     // assumes number of vertices and indices is constant
     void Invalidate(Mesh::Vertex* const vertices);
+    void Invalidate(Mesh::Index* const indices, unsigned numIndices);
     void Transform(const M::Matrix4& mat);
 
     // methods prefixed with R_ should only be called by the renderer

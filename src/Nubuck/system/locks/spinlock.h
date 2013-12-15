@@ -15,6 +15,8 @@ namespace SYS {
 
         void Lock(void);
         void Unlock(void);
+
+        LPCRITICAL_SECTION GetNativeHandle(void) { return &_cs; }
     };
 
 } // namespace SYS

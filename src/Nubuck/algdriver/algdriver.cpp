@@ -34,11 +34,9 @@ namespace ALG {
         while(_phase.IsValid() && !_phase->IsDone()) Next();
     }
 
-    Driver::Driver(const GEN::Pointer<IAlgorithm>& algorithm, const GEN::Pointer<IPhase>& phase) 
-        : _cmdsSem(0), _algorithm(algorithm)
-    { 
-        SetPhase(phase);
-    }
+    Driver::Driver(const GEN::Pointer<IAlgorithm>& algorithm, const graph_t& G) 
+        : _cmdsSem(0), _algorithm(algorithm), _G(G)
+    { }
 
     void Driver::AddCommand(unsigned cmd) {
         _cmdsMtx.Lock();
@@ -48,6 +46,8 @@ namespace ALG {
     }
 
     DWORD Driver::Thread_Func(void) {
+        SetPhase(GEN::MakePtr(_algorithm->Init(nubuck, _G)));
+
         while(true) {
             _cmdsSem.Wait();
             _cmdsMtx.Lock();
@@ -87,8 +87,7 @@ namespace ALG {
 
         if(_init) {
             GEN::Pointer<IAlgorithm> algorithm(_algAlloc());
-            GEN::Pointer<IPhase> phase(algorithm->Init(nubuck, _G));
-            _driver = new Driver(algorithm, phase);
+            _driver = new Driver(algorithm, _G);
             _driver->Thread_StartAsync();
         }
     }

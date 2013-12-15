@@ -99,7 +99,7 @@ namespace W {
     public:
 		World(void);
 
-		unsigned SpawnPolyhedron(graph_t* const G);
+		unsigned SpawnPolyhedron(graph_t* const G, leda::node_map<bool>* cachedNodes, leda::edge_map<bool>* cachedEdges);
         unsigned SpawnMesh(R::MeshMgr::meshPtr_t meshPtr);
 
         void Update(void);

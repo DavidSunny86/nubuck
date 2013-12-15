@@ -158,6 +158,8 @@ namespace W {
                 if(_isGrabbing) {
                     _isGrabbing = false;
 
+                    /*
+                    TODO
                     for(unsigned i = 0; i < _entities.size(); ++i) {
                         if(ENT_POLYHEDRON == _entities[i]->type) {
                             ENT_Polyhedron& ph = *_entities[i]->polyhedron;
@@ -172,6 +174,7 @@ namespace W {
                     }
                     GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
                     if(phase.IsValid()) phase->OnNodesMoved();
+                    */
                 }
 
                 if(EV::Params_Mouse::MODIFIER_SHIFT == args.mods)
@@ -199,6 +202,7 @@ namespace W {
                         }
                     }
                     // update
+                    /* TODO
                     for(unsigned i = 0; i < _entities.size(); ++i) {
                         if(ENT_POLYHEDRON == _entities[i]->type) {
                             ENT_Polyhedron& ph = *_entities[i]->polyhedron;
@@ -213,6 +217,7 @@ namespace W {
                     }
                     GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
                     if(phase.IsValid()) phase->OnNodesMoved();
+                    */
 
                     _isGrabbing = false;
                 } else _camArcball.StartPanning(args.x, args.y);
@@ -286,10 +291,10 @@ namespace W {
         entity->transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
         entity->transform.rotation = M::Mat4::Identity();
         ENT_Polyhedron* ph = new ENT_Polyhedron();
-        ph->G = args.G;
+        const graph_t& G = *args.G;
         Polyhedron_Init(*ph);
-        Polyhedron_Rebuild(*ph);
-        Polyhedron_Update(*ph);
+        Polyhedron_Rebuild(*ph, G, *args.cachedNodes, *args.cachedEdges);
+        Polyhedron_Update(*ph, G);
         entity->polyhedron = ph;
         _entities.push_back(entity);
 
@@ -301,6 +306,8 @@ namespace W {
         infArgs.entType = ENT_POLYHEDRON;
         infArgs.inf = inf;
         UI::Outliner::Instance()->Send(EV::def_EntityInfo.Create(infArgs));
+
+        event.Accept();
     }
 
     void World::Event_SpawnMesh(const EV::Event& event) {
@@ -333,9 +340,12 @@ namespace W {
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
         if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
             ENT_Polyhedron& ph = *entity->polyhedron;
-            Polyhedron_Rebuild(ph);
-            Polyhedron_Update(ph);
+            const graph_t& G = *args.G;
+            Polyhedron_Rebuild(ph, G, *args.cachedNodes, *args.cachedEdges);
+            Polyhedron_Update(ph, G);
         }
+
+        event.Accept();
     }
 
     void World::Event_SetVisible(const EV::Event& event) {
@@ -433,7 +443,7 @@ namespace W {
         if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
             ENT_Polyhedron& ph = *entity->polyhedron;
             Polyhedron_SetFaceVisibility(ph, args.edge, args.visible);
-            Polyhedron_Update(ph);
+            // Polyhedron_Update(ph); TODO
         }
     }
 
@@ -451,7 +461,7 @@ namespace W {
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
         assert(entity.IsValid());
         assert(ENT_POLYHEDRON == entity->type);
-        entity->polyhedron->edges.color = args.color;
+        entity->polyhedron->edges.baseColor = args.color;
     }
 
     void World::Event_SetEdgeRadius(const EV::Event& event) {
@@ -510,15 +520,17 @@ namespace W {
         SetupLights();
 	}
 
-	unsigned World::SpawnPolyhedron(graph_t* const G) {
+	unsigned World::SpawnPolyhedron(graph_t* const G, leda::node_map<bool>* cachedNodes, leda::edge_map<bool>* cachedEdges) {
         entIdCntMtx.Lock();
         unsigned entId = entIdCnt++;
         entIdCntMtx.Unlock();
 
         EV::Params_SpawnPolyhedron args;
-        args.entId  = entId;
-        args.G      = G;
-        Send(EV::def_SpawnPolyhedron.Create(args));
+        args.entId          = entId;
+        args.G      		= G;
+        args.cachedNodes    = cachedNodes;
+        args.cachedEdges 	= cachedEdges;
+        Send(EV::def_SpawnPolyhedron.Create(args)); // TODO: block?
 
         return entId;
 	}
@@ -580,6 +592,7 @@ namespace W {
             }
 
             // update
+            /* TODO
             for(unsigned i = 0; i < _entities.size(); ++i) {
                 if(ENT_POLYHEDRON == _entities[i]->type) {
                     ENT_Polyhedron& ph = *_entities[i]->polyhedron;
@@ -594,13 +607,14 @@ namespace W {
             }
             GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
             if(phase.IsValid()) phase->OnNodesMoved();
+            */
         } // if(isGrabbing)
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
             if(ENT_POLYHEDRON == _entities[i]->type) {
                 ENT_Polyhedron& ph = *_entities[i]->polyhedron;
-                for(unsigned j = 0; j < ph.hull.curves.size(); ++j)
-                    Polyhedron_UpdateCurve(ph.hull.curves[j], _secsPassed);
+                for(unsigned j = 0; j < ph.faces.curves.size(); ++j)
+                    Polyhedron_UpdateCurve(ph.faces.curves[j], _secsPassed);
             }
         }
 

@@ -512,6 +512,12 @@
     <ClInclude Include="..\..\src\Nubuck\common\filehandle.h">
       <Filter>Private\common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\locks\condvar.h">
+      <Filter>Private\system\locks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\locks\shared_resources.h">
+      <Filter>Private\system\locks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -822,6 +828,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\lex.yyspp.cpp">
       <Filter>Private\renderer\shader\shader_preprocessor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\system\locks\condvar.cpp">
+      <Filter>Private\system\locks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\system\locks\shared_resources.cpp">
+      <Filter>Private\system\locks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

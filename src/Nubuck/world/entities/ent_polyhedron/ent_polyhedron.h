@@ -14,13 +14,32 @@
 
 namespace W {
 
+enum {
+    POLYHEDRON_VALID_FLAG    = (1 << 0),
+    POLYHEDRON_HIDE_FLAG     = (1 << 1)
+};
+
+struct PolyhedronNode {
+    int flags;
+
+    PolyhedronNode() : flags(0) { }
+};
+
 struct PolyhedronNodes {
-    // valid[i] != 0, if a node n exists with n->id() == i
-    // and 0, otherwise
-    std::vector<int>        valid;
-    std::vector<M::Vector3> positions;
-    std::vector<M::Vector3> oldPositions;
-    std::vector<R::Color>   colors;
+    std::vector<PolyhedronNode> nodes;
+    std::vector<M::Vector3>     positions;
+    std::vector<M::Vector3> 	oldPositions;
+    std::vector<R::Color>   	colors;
+};
+
+enum { POLYHEDRON_INVALID_INDEX = 0xFFFFFFFF };
+
+struct PolyhedronEdge {
+    int         flags;
+    unsigned    faceIdx;
+    unsigned    n0, n1;     // source, target
+    unsigned    rev;        // reversal edge
+    R::Color    color;
 };
 
 struct PolyhedronEdgeColor {
@@ -30,36 +49,28 @@ struct PolyhedronEdgeColor {
 };
 
 struct PolyhedronEdges {
-    std::vector<int>                    valid;
-    std::vector<int>					mask;
+    std::vector<PolyhedronEdge>         edges;
     std::vector<PolyhedronEdgeColor>    colors;
-    R::Color                            color;
-    float               				radius;
+
+    R::Color                            baseColor;
+    float       				        radius;
 };
 
-struct PolyhedronHullFaceList {
+struct PolyhedronFaceList {
 	unsigned base;
 	unsigned size;
 };
 
-struct PolyhedronHullFaceColor {
+struct PolyhedronFaceColor {
     R::Color    v0, v1, cur;
     float       t;
     bool        ip;
 };
 
-struct PolyhedronHullFaceTrans {
+struct PolyhedronFaceTrans {
     // base vertex is local origin
     M::Matrix3  localToWorld;
     M::Vector3  normal;
-};
-
-struct PolyhedronHullEdge {
-    // edge is valid iff INVALID_FACE_INDEX != faceIdx
-	enum { INVALID_FACE_INDEX = 0xFFFFFFFF };
-	unsigned    faceIdx;
-    unsigned    n0, n1;
-    bool        valid;
 };
 
 struct PolyhedronFaceCurve {
@@ -71,17 +82,21 @@ struct PolyhedronFaceCurve {
     R::PolyBezier2U curve; // curve stores points in face's local space. 
 };
 
-struct PolyhedronHull {
-	std::vector<PolyhedronHullFaceList>     faceLists;
-    std::vector<PolyhedronHullFaceColor>    faceColors;
-    std::vector<PolyhedronHullFaceTrans>    faceTrans;
-	std::vector<PolyhedronHullEdge>         edges;
+struct PolyhedronFaces {
+    std::vector<PolyhedronFaceList>         lists;
+    std::vector<PolyhedronFaceColor>    	colors;
+    std::vector<PolyhedronFaceTrans>    	trans;
+    std::vector<unsigned>                   freeIndices;
+    unsigned                                maxFaceIdx;
+    std::vector<PolyhedronFaceCurve>        curves; // TODO: vector of vectors!
+    R::Color                                baseColor;
+};
+
+struct PolyhedronMesh {
 	std::vector<unsigned>                   vnmap; // maps vertices to nodes
 	std::vector<R::Mesh::Vertex>            vertices;
 	std::vector<R::Mesh::Index>             indices; // hull exists iff indices not empty
-    std::vector<PolyhedronFaceCurve>        curves;
     R::MeshMgr::meshPtr_t                   mesh;
-    R::Color                                baseColor;
 };
 
 struct PolyhedronSelection {
@@ -90,12 +105,12 @@ struct PolyhedronSelection {
 
 struct ENT_Polyhedron {
     unsigned                entId;
-	graph_t*                G;
     int                     renderFlags;
     bool                    isPickable;
     PolyhedronNodes         nodes;
     PolyhedronEdges         edges;
-	PolyhedronHull          hull;
+    PolyhedronFaces         faces;
+    PolyhedronMesh          mesh;
     PolyhedronSelection     selection;
     R::RenderList           renderList;
 };
@@ -107,9 +122,9 @@ struct INF_Polyhedron {
 
 void Polyhedron_InitResources(void);
 void Polyhedron_Init(ENT_Polyhedron& ph);
-void Polyhedron_Rebuild(ENT_Polyhedron& ph);
+void Polyhedron_Rebuild(ENT_Polyhedron& ph, const graph_t& G, leda::node_map<bool>& cachedNodes, leda::edge_map<bool>& cachedEdges);
 void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx);
-void Polyhedron_Update(ENT_Polyhedron& ph);
+void Polyhedron_Update(ENT_Polyhedron& ph, const graph_t& G);
 void Polyhedron_AddCurve(ENT_Polyhedron& ph, leda::edge edge, const R::Color& color);
 void Polyhedron_UpdateCurve(PolyhedronFaceCurve& cv, float secsPassed);
 void Polyhedron_UpdateFaceColors(ENT_Polyhedron& ph, float secsPassed);

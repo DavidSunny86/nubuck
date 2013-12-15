@@ -4,6 +4,8 @@
 #include <queue>
 #include <common\common.h>
 #include <system\locks\spinlock.h>
+#include <system\locks\condvar.h>
+#include <system\locks\shared_resources.h>
 
 // events are sent and received between threads. a thread queues it's received events
 // and processes them in order.
@@ -13,10 +15,28 @@
 
 namespace EV {
 
+    struct BlockingEvent {
+        SYS::SpinLock*          mtx;
+        SYS::ConditionVariable* cv;
+        bool                    sig;
+    };
+
     struct Event {
         enum { ARGS_SIZE = 68 };
-        unsigned    id;
-        char        args[ARGS_SIZE]; 
+        unsigned        id;
+        BlockingEvent*  block;
+        char            args[ARGS_SIZE]; 
+
+        void Accept() const {
+            if(block) {
+                assert(block->mtx);
+                assert(block->cv);
+                block->mtx->Lock();
+                block->sig = true;
+                block->mtx->Unlock();
+                block->cv->Signal();
+            }
+        }
     };
 
     class DefinitionBase { 
@@ -55,6 +75,7 @@ namespace EV {
         Event Create(const PARAMS& params) {
             Event event;
             event.id = GetID();
+            event.block = NULL;
             memcpy(event.args, &params, sizeof(PARAMS));
             return event;
         }
@@ -133,10 +154,30 @@ protected:
         } /* while(!done) */                                
     }
 public:
-    void Send(const EV::Event& event) {
+    void Send(const EV::Event& event) { // nonblocking
+        assert(NULL == event.block);
         _ev_eventsMtx.Lock();
         _ev_events.push(event);
         _ev_eventsMtx.Unlock();
+    }
+
+    void SendAndWait(EV::Event event) { // blocking
+        SYS::SharedResource<SYS::SpinLock> mtx;
+        SYS::SharedResource<SYS::ConditionVariable> cv;
+
+        BlockingEvent block;
+        block.mtx = &mtx.Resource();
+        block.cv = &cv.Resource();
+        block.sig = false;
+        event.block = &block;
+
+        _ev_eventsMtx.Lock();
+        _ev_events.push(event);
+        _ev_eventsMtx.Unlock();
+
+        block.mtx->Lock();
+        while(!block.sig) block.cv->Wait(*block.mtx);
+        block.mtx->Unlock();
     }
 }; // class EventHandler
 

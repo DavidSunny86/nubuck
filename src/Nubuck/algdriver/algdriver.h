@@ -20,6 +20,7 @@ namespace ALG {
 
         GEN::Pointer<IAlgorithm>    _algorithm;
         GEN::Pointer<IPhase>        _phase;
+        const graph_t&              _G;
 
         void SetPhase(GEN::Pointer<IPhase> phase);
 
@@ -27,7 +28,7 @@ namespace ALG {
         void Next(void);
         void Run(void);
     public:
-        Driver(const GEN::Pointer<IAlgorithm>& algorithm, const GEN::Pointer<IPhase>& phase);
+        Driver(const GEN::Pointer<IAlgorithm>& algorithm, const graph_t& G);
 
         GEN::Pointer<IPhase> GetPhase(void) { return _phase; }
 

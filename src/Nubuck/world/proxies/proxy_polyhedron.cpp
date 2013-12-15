@@ -5,7 +5,10 @@
 namespace Proxy {
 
 Polyhedron::Polyhedron(const graph_t& G) : _G(G) {
-	_entId = W::world.SpawnPolyhedron(&_G);
+    _cachedNodes.init(_G, 0);
+    _cachedEdges.init(_G, 0);
+
+	_entId = W::world.SpawnPolyhedron(&_G, &_cachedNodes, &_cachedEdges);
 }
 
 void Polyhedron::Destroy(void) {
@@ -91,7 +94,10 @@ void Polyhedron::ShowFace(leda::edge edge) {
 void Polyhedron::Update(void) {
     EV::Params_Rebuild args;
     args.entId = _entId;
-    W::world.Send(EV::def_Rebuild.Create(args));
+    args.G  = &_G;
+    args.cachedNodes = &_cachedNodes;
+    args.cachedEdges = &_cachedEdges;
+    W::world.SendAndWait(EV::def_Rebuild.Create(args));
 }
 
 } // namespace Proxy

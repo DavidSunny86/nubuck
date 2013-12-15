@@ -89,7 +89,9 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\skin\skinmgr.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\textures\texallocs.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\textures\texture.h" />
+    <ClInclude Include="..\..\src\Nubuck\system\locks\condvar.h" />
     <ClInclude Include="..\..\src\Nubuck\system\locks\semaphore.h" />
+    <ClInclude Include="..\..\src\Nubuck\system\locks\shared_resources.h" />
     <ClInclude Include="..\..\src\Nubuck\system\locks\spinlock.h" />
     <ClInclude Include="..\..\src\Nubuck\system\opengl\glwindow\glwindow.h" />
     <ClInclude Include="..\..\src\Nubuck\system\opengl\opengl.h" />
@@ -265,7 +267,9 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\skin\skinmgr.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\textures\texture.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\textures\tga_texalloc.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\system\locks\condvar.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\locks\semaphore.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\system\locks\shared_resources.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\locks\spinlock.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\opengl\glwindow\glwindow.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\opengl\opengl.cpp" />

@@ -7,9 +7,11 @@ namespace Proxy {
 
 class Polyhedron : public IPolyhedron {
 private:
-    graph_t     _G;
-    unsigned    _entId;
-    std::string _name;
+    graph_t                 _G;
+    leda::node_map<bool>    _cachedNodes;
+    leda::edge_map<bool>    _cachedEdges;
+    unsigned                _entId;
+    std::string 			_name;
 public:
     Polyhedron(const graph_t& G);
 

@@ -71,6 +71,11 @@ namespace GEN {
         TYPE&		operator*(void);
     };
 
+    template<typename TYPE>
+    inline GEN::Pointer<TYPE> MakePtr(TYPE* const raw) {
+        return GEN::Pointer<TYPE>(raw);
+    }
+
     template<typename TYPE, typename REFCNT>
     inline Pointer<TYPE, REFCNT>::Pointer(void) : _raw(NULL), _cnt(NULL) { }
 
