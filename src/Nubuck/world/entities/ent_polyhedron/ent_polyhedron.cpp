@@ -556,13 +556,11 @@ void Polyhedron_SetFaceVisibility(ENT_Polyhedron& ph, const leda::edge e, bool v
 }
 
 void Polyhedron_SetHullAlpha(ENT_Polyhedron& ph, float alpha) {
-    /*
     assert(0.0f <= alpha && alpha <= 1.0f);
-    for(unsigned i = 0; i < ph.hull.vertices.size(); ++i)
-        ph.hull.vertices[i].color.a = alpha;
-    ph.hull.baseColor.a = alpha;
-    if(!ph.hull.indices.empty()) R::meshMgr.GetMesh(ph.hull.mesh).Invalidate(&ph.hull.vertices[0]);
-    */
+    for(unsigned i = 0; i < ph.mesh.vertices.size(); ++i)
+        ph.mesh.vertices[i].color.a = alpha;
+    ph.faces.baseColor.a = alpha;
+    ph.flags |= POLYHEDRON_UPDATE_MESH_VERTICES;
 }
 
 struct Ray {
