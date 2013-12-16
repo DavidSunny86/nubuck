@@ -90,6 +90,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\textures\texallocs.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\textures\texture.h" />
     <ClInclude Include="..\..\src\Nubuck\system\locks\condvar.h" />
+    <ClInclude Include="..\..\src\Nubuck\system\locks\scoped_lock.h" />
     <ClInclude Include="..\..\src\Nubuck\system\locks\semaphore.h" />
     <ClInclude Include="..\..\src\Nubuck\system\locks\shared_resources.h" />
     <ClInclude Include="..\..\src\Nubuck\system\locks\spinlock.h" />

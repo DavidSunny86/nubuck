@@ -16,7 +16,11 @@ namespace W {
 
 enum {
     POLYHEDRON_VALID_FLAG    = (1 << 0),
-    POLYHEDRON_HIDE_FLAG     = (1 << 1)
+    POLYHEDRON_HIDE_FLAG     = (1 << 1),
+
+    POLYHEDRON_UPDATE_MESH_VERTICES = (1 << 0),
+    POLYHEDRON_UPDATE_MESH_INDICES  = (1 << 1),
+    POLYHEDRON_REBUILD_MESH
 };
 
 struct PolyhedronNode {
@@ -56,6 +60,10 @@ struct PolyhedronEdges {
     float       				        radius;
 };
 
+struct PolyhedronFace {
+    int flags;
+};
+
 struct PolyhedronFaceList {
 	unsigned base;
 	unsigned size;
@@ -83,6 +91,7 @@ struct PolyhedronFaceCurve {
 };
 
 struct PolyhedronFaces {
+    std::vector<PolyhedronFace>             faces;
     std::vector<PolyhedronFaceList>         lists;
     std::vector<PolyhedronFaceColor>    	colors;
     std::vector<PolyhedronFaceTrans>    	trans;
@@ -105,6 +114,7 @@ struct PolyhedronSelection {
 
 struct ENT_Polyhedron {
     unsigned                entId;
+    int                     flags;
     int                     renderFlags;
     bool                    isPickable;
     PolyhedronNodes         nodes;
@@ -122,6 +132,7 @@ struct INF_Polyhedron {
 
 void Polyhedron_InitResources(void);
 void Polyhedron_Init(ENT_Polyhedron& ph);
+void Polyhedron_Update(ENT_Polyhedron& ph);
 void Polyhedron_Rebuild(ENT_Polyhedron& ph, const graph_t& G, leda::node_map<bool>& cachedNodes, leda::edge_map<bool>& cachedEdges);
 void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx);
 void Polyhedron_Update(ENT_Polyhedron& ph, const graph_t& G);

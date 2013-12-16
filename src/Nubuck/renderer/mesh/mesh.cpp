@@ -1,6 +1,7 @@
 #include <vector>
 #include <string.h>
 
+#include <system\locks\scoped_lock.h>
 #include <renderer\giantbuffer\giant_buffer.h>
 #include "mesh.h"
 
@@ -121,7 +122,7 @@ static void Subdiv(unsigned subdiv, std::vector<Mesh::Vertex>& vertices, std::ve
     }
 }
 
-Mesh::Mesh(const Desc& desc) : _gbHandle(GB_INVALID_HANDLE), _compiled(false), _numVerts(0) {
+Mesh::Mesh(const Desc& desc) : _invalidate(false), _gbHandle(GB_INVALID_HANDLE), _numVerts(0) {
     _vertices.resize(desc.numVertices);
     _indices.resize(desc.numIndices);
 
@@ -136,11 +137,35 @@ Mesh::Mesh(const Desc& desc) : _gbHandle(GB_INVALID_HANDLE), _compiled(false), _
     _tfverts = _vertices;
 }
 
-Mesh::~Mesh(void) {
+Mesh::~Mesh() {
     if(GB_INVALID_HANDLE != _gbHandle) GB_FreeMemItem(_gbHandle);
 }
 
-void Mesh::AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye) {
+void Mesh::Invalidate(Mesh::Vertex* const vertices) {
+    SYS::ScopedLock lock(_mtx);
+    assert(_tfverts.size() == _vertices.size());
+    memcpy(&_vertices[0], vertices, sizeof(Mesh::Vertex) * _vertices.size());
+    memcpy(&_tfverts[0], vertices, sizeof(Mesh::Vertex) * _vertices.size());
+    _invalidate = true;
+}
+
+void Mesh::Invalidate(Mesh::Index* const indices, unsigned numIndices) {
+    SYS::ScopedLock lock(_mtx);
+    _indices.resize(numIndices);
+    memcpy(&_indices[0], indices, sizeof(Index) * numIndices);
+    GenerateTriangles(_indices, _primType, _triangleIndices);
+}
+
+void Mesh::Transform(const M::Matrix4& mat) {
+    SYS::ScopedLock lock(_mtx);
+    assert(_tfverts.size() == _vertices.size());
+    for(unsigned i = 0; i < _vertices.size(); ++i)
+        _tfverts[i].position = M::Transform(mat, _vertices[i].position);
+    _invalidate = true;
+}
+
+void Mesh::R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye) {
+    SYS::ScopedLock lock(_mtx);
     unsigned idxOff = GB_GetOffset(_gbHandle) / sizeof(Mesh::Vertex);
     for(unsigned i = 0; i < _triangleIndices.size(); ++i) {
         Triangle tri;
@@ -160,43 +185,17 @@ void Mesh::AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye) {
     }
 }
 
-void Mesh::Invalidate(Mesh::Vertex* vertices) {
-    _mtx.Lock();
-    assert(_tfverts.size() == _vertices.size());
-    _vertices.clear();
-    _vertices.resize(_numVerts);
-    memcpy(&_vertices[0], vertices, sizeof(Mesh::Vertex) * _vertices.size());
-    _triangleIndices.clear();
-    GenerateTriangles(_indices, _primType, _triangleIndices);
-    _tfverts = _vertices;
-    Transform(_transform);
-    _compiled = false;
-    if(GB_INVALID_HANDLE != _gbHandle)
-        GB_Invalidate(_gbHandle);
-    _mtx.Unlock();
-}
-
-void Mesh::Transform(const M::Matrix4& mat) {
-    assert(_tfverts.size() == _vertices.size());
-    for(unsigned i = 0; i < _vertices.size(); ++i)
-        _tfverts[i].position = M::Transform(mat, _vertices[i].position);
-    if(GB_INVALID_HANDLE != _gbHandle)
-        GB_Invalidate(_gbHandle);
-}
-
-void Mesh::R_Touch(void) { GB_Touch(_gbHandle); }
-
-void Mesh::R_Compile(void) {
-    if(_compiled) return;
-
-    _mtx.Lock();
-
+void Mesh::R_UpdateBuffer(void) {
+    SYS::ScopedLock lock(_mtx);
     if(GB_INVALID_HANDLE == _gbHandle) {
         _gbHandle = GB_AllocMemItem(&_tfverts[0], _tfverts.size());
     }
-    _compiled = true;
-
-    _mtx.Unlock();
+    assert(GB_INVALID_HANDLE != _gbHandle);
+    if(_invalidate) {
+        GB_Invalidate(_gbHandle);
+        _invalidate = false;
+    }
+    GB_Touch(_gbHandle);
 }
 
 } // namespace R

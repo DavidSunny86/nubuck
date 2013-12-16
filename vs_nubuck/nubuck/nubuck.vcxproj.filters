@@ -518,6 +518,9 @@
     <ClInclude Include="..\..\src\Nubuck\system\locks\shared_resources.h">
       <Filter>Private\system\locks</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\system\locks\scoped_lock.h">
+      <Filter>Private\system\locks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">

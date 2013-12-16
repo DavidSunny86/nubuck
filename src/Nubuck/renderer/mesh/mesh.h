@@ -62,27 +62,24 @@ private:
     std::vector<Vertex> _tfverts;
     std::vector<Index>  _indices;
     GLenum              _primType;
-    bool                _compiled;
     M::Matrix4          _transform;
     unsigned            _numVerts;
 
     std::vector<TriIndices> _triangleIndices;
 
+    bool     _invalidate;
     unsigned _gbHandle;
 public:
     Mesh(const Desc& desc); // deep copy
-    ~Mesh(void);
+    ~Mesh();
 
-    void AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye); // eye in mesh local space
-
-    // assumes number of vertices and indices is constant
-    void Invalidate(Mesh::Vertex* const vertices);
+    void Invalidate(Mesh::Vertex* const vertices); // assumes number of vertices and indices is constant
     void Invalidate(Mesh::Index* const indices, unsigned numIndices);
     void Transform(const M::Matrix4& mat);
 
     // methods prefixed with R_ should only be called by the renderer
-    void R_Touch(void);
-    void R_Compile(void);
+    void R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye); // eye in mesh local space
+    void R_UpdateBuffer();
 };
 
 } // namespace R

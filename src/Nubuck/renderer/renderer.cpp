@@ -361,7 +361,7 @@ static MeshJob* DrawMeshList(Program& prog, const State& state, int passType, in
     MeshJob* meshJob = first;
     while(meshJob && meshJob->fx == first->fx) {
         Mesh& mesh = meshMgr.GetMesh(meshJob->mesh);
-        mesh.AppendTriangles(tris, localEye);
+        mesh.R_AppendTriangles(tris, localEye);
         meshJob = meshJob->next;
     }
     triIt_t trisEnd = tris.end();
@@ -431,20 +431,11 @@ static void Link(std::vector<R::MeshJob>& renderJobs) {
 	}
 }
 
-static void Compile(R::MeshJob& rjob) {
+static void BeginFrame(const M::Matrix4& worldMat, R::MeshJob& rjob) {
     effectMgr.GetEffect(rjob.fx)->Compile();
-    meshMgr.GetMesh(rjob.mesh).R_Compile();
-    meshMgr.GetMesh(rjob.mesh).R_Touch();
-}
-
-static void Transform(const M::Matrix4& worldMat, R::MeshJob& rjob) {
     Mesh& mesh = meshMgr.GetMesh(rjob.mesh);
     mesh.Transform(rjob.transform);
-}
-
-static void CompileAndTransform(const M::Matrix4& worldMat, R::MeshJob& rjob) {
-    Compile(rjob);
-    Transform(worldMat, rjob);
+    mesh.R_UpdateBuffer();
 }
 
 static M::Matrix4 ComputeProjectionMatrix(float aspect, const M::Matrix4& worldMat, const std::vector<R::MeshJob>& renderJobs) {
@@ -496,7 +487,7 @@ void Renderer::Render(void) {
         Link(renderList.meshJobs);
         GB_Bind();
         std::for_each(renderList.meshJobs.begin(), renderList.meshJobs.end(),
-            std::bind(CompileAndTransform, renderList.worldMat, std::placeholders::_1));
+            std::bind(BeginFrame, renderList.worldMat, std::placeholders::_1));
         GB_CacheAll();
         DrawFrame(renderList, projectionMat, _time);
     }

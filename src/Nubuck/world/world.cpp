@@ -613,6 +613,13 @@ namespace W {
         for(unsigned i = 0; i < _entities.size(); ++i) {
             if(ENT_POLYHEDRON == _entities[i]->type) {
                 ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                Polyhedron_Update(ph);
+            }
+        }
+
+        for(unsigned i = 0; i < _entities.size(); ++i) {
+            if(ENT_POLYHEDRON == _entities[i]->type) {
+                ENT_Polyhedron& ph = *_entities[i]->polyhedron;
                 for(unsigned j = 0; j < ph.faces.curves.size(); ++j)
                     Polyhedron_UpdateCurve(ph.faces.curves[j], _secsPassed);
             }
