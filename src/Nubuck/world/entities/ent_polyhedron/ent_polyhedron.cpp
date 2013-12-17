@@ -324,6 +324,8 @@ void Polyhedron_Rebuild(ENT_Polyhedron& ph, const graph_t& G, leda::node_map<boo
     float secsPassed = timer.Stop();
     // common.printf("Polyhedron_Rebuild took %f seconds\n", secsPassed);
     printf("Polyhedron_Rebuild took %f seconds\n", secsPassed);
+
+    Polyhedron_PrintSize(ph);
 }
 
 // the renderlist of a polyhedron ph can be build even though

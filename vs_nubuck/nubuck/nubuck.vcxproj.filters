@@ -838,6 +838,9 @@
     <ClCompile Include="..\..\src\Nubuck\system\locks\shared_resources.cpp">
       <Filter>Private\system\locks</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron_printsize.cpp">
+      <Filter>Private\world\entities\ent_polyhedron</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">

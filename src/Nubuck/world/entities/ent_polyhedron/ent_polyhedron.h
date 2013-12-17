@@ -132,6 +132,7 @@ struct INF_Polyhedron {
 
 void Polyhedron_InitResources(void);
 void Polyhedron_Init(ENT_Polyhedron& ph);
+void Polyhedron_PrintSize(ENT_Polyhedron& ph);
 void Polyhedron_Update(ENT_Polyhedron& ph);
 void Polyhedron_Rebuild(ENT_Polyhedron& ph, const graph_t& G, leda::node_map<bool>& cachedNodes, leda::edge_map<bool>& cachedEdges);
 void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx);

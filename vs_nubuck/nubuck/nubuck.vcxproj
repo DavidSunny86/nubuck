@@ -290,6 +290,7 @@
     <ClCompile Include="..\..\src\Nubuck\UI\renderview\renderview.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_mesh\ent_mesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron_printsize.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entity.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\proxies\proxy_mesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.cpp" />
