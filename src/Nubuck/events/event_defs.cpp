@@ -1,6 +1,7 @@
 #include "event_defs.h"
 
 ALLOC_EVENT_DEF(Apocalypse)
+ALLOC_EVENT_DEF(LinkEntity)
 ALLOC_EVENT_DEF(SpawnPolyhedron)
 ALLOC_EVENT_DEF(SpawnMesh)
 ALLOC_EVENT_DEF(DestroyEntity)

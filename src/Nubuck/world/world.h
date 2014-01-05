@@ -17,6 +17,7 @@
 #include <events\events.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include <world\entities\ent_mesh\ent_mesh.h>
+#include <world\entities\ent_geometry\ent_geometry.h>
 
 namespace W {
 
@@ -33,7 +34,8 @@ namespace W {
     public:
         enum EntityType {
             ENT_POLYHEDRON  = 0,
-            ENT_MESH
+            ENT_MESH,
+            ENT_GEOMETRY
         };
     private:
         struct Transform {
@@ -51,9 +53,11 @@ namespace W {
 
             ENT_Polyhedron* polyhedron;
             ENT_Mesh*       mesh;
+            ENT_Geometry*   geometry;
         };
 
         std::vector<GEN::Pointer<Entity> > _entities;
+        SYS::SpinLock _entitiesMtx;
 
         SYS::Timer  _timer;
         float       _secsPassed;
@@ -72,6 +76,7 @@ namespace W {
 
 #pragma region EventHandlers
         void Event_Apocalypse(const EV::Event& event);
+        void Event_LinkEntity(const EV::Event& event);
         void Event_SpawnPolyhedron(const EV::Event& event);
         void Event_SpawnMesh(const EV::Event& event);
         void Event_DestroyEntity(const EV::Event& event);
@@ -106,6 +111,7 @@ namespace W {
 
         // exported to client
         IPolyhedron* CreatePolyhedron(void) override;
+        IGeometry* CreateGeometry() override;
         IMesh* CreatePlaneMesh(const PlaneDesc& desc) override;
         IMesh* CreateSphereMesh(const SphereDesc& desc) override;
         IMesh* CreateCylinderMesh(const CylinderDesc& desc) override;

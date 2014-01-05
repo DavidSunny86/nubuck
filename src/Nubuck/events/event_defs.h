@@ -8,6 +8,10 @@
 BEGIN_EVENT_DEF(Apocalypse)
 END_EVENT_DEF
 
+BEGIN_EVENT_DEF(LinkEntity)
+    void* entity;
+END_EVENT_DEF
+
 BEGIN_EVENT_DEF(SpawnPolyhedron)
     unsigned                entId;
     graph_t*    			G;

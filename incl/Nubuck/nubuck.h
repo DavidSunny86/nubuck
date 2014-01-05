@@ -6,6 +6,8 @@
 #include <LEDA/geo/d3_rat_point.h>
 #include <LEDA/graph/graph.h>
 
+#include <Nubuck\polymesh.h>
+
 #ifdef NUBUCK_LIB
 #define NUBUCK_API __declspec(dllexport)
 #else
@@ -54,6 +56,11 @@ struct IMesh {
     virtual void SetVisible(bool isVisible) = 0;
 };
 
+struct IGeometry {
+    virtual NB::RatPolyMesh& GetRatPolyMesh() = 0;
+    virtual void Update() = 0;
+};
+
 struct IWorld {
     struct PlaneDesc {
         struct Sample2 { float x, y; };
@@ -80,6 +87,7 @@ struct IWorld {
     };
 
     virtual IPolyhedron*    CreatePolyhedron(void) = 0;
+    virtual IGeometry*      CreateGeometry() = 0;
     virtual IMesh*          CreatePlaneMesh(const PlaneDesc& desc) = 0;
     virtual IMesh*          CreateSphereMesh(const SphereDesc& desc) = 0;
     virtual IMesh*          CreateCylinderMesh(const CylinderDesc& desc) = 0;

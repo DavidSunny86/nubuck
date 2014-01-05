@@ -298,6 +298,16 @@ struct Algorithm : IAlgorithm {
         g.ph->GetGraph() = G;
         g.ph->Update();
 
+        // REMOVEME
+        IGeometry* geom = nb.world->CreateGeometry();
+        NB::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+        mesh.MakeTetrahedron(
+            point3_t(-1, -1,  1),
+            point3_t( 1, -1,  1),
+            point3_t( 0, -1, -1),
+            point3_t( 0,  1,  0));
+        geom->Update();
+
         return new Phase0(g);
     }
 

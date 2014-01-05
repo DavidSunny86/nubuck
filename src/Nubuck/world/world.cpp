@@ -3,6 +3,7 @@
 
 #include <common\common.h>
 #include <algdriver\algdriver.h>
+#include <system\locks\scoped_lock.h>
 #include <renderer\mesh\plane\plane.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\cylinder\cylinder.h>
@@ -29,6 +30,7 @@ namespace W {
 
     BEGIN_EVENT_HANDLER(World)
         EVENT_HANDLER(EV::def_Apocalypse,           &World::Event_Apocalypse)
+        EVENT_HANDLER(EV::def_LinkEntity,           &World::Event_LinkEntity)
         EVENT_HANDLER(EV::def_SpawnPolyhedron,      &World::Event_SpawnPolyhedron)
         EVENT_HANDLER(EV::def_SpawnMesh,            &World::Event_SpawnMesh)
         EVENT_HANDLER(EV::def_DestroyEntity,        &World::Event_DestroyEntity)
@@ -279,6 +281,12 @@ namespace W {
         
     void World::Event_Apocalypse(const EV::Event& event) {
         _entities.clear();
+    }
+
+    void World::Event_LinkEntity(const EV::Event& event) {
+        const EV::Params_LinkEntity& args = EV::def_LinkEntity.GetArgs(event);
+        GEN::Pointer<Entity> entity((Entity*)args.entity);
+        _entities.push_back(entity);
     }
 
     void World::Event_SpawnPolyhedron(const EV::Event& event) {
@@ -553,6 +561,8 @@ namespace W {
         _timePassed += _secsPassed;
         _timer.Start();
 
+        SYS::ScopedLock lockEntities(_entitiesMtx);
+
         SetupLights();
 
         HandleEvents();
@@ -646,6 +656,15 @@ namespace W {
             }
         }
 
+        for(unsigned i = 0; i < _entities.size(); ++i) {
+            GEN::Pointer<Entity> entity = _entities[i];
+            if(ENT_GEOMETRY == entity->type) {
+                ENT_Geometry& geom = *entity->geometry;
+                geom.CompileMesh();
+                geom.BuildRenderList();
+            }
+        }
+
         R::RenderList& _renderList = R::g_renderLists[rlIdx];
         _renderList.worldMat = _camArcball.GetWorldMatrix();
 		_renderList.meshJobs.clear();
@@ -668,6 +687,12 @@ namespace W {
                     mesh.renderList.meshJobs.begin(),
                     mesh.renderList.meshJobs.end());
             }
+            if(ENT_GEOMETRY == _entities[i]->type) {
+                ENT_Geometry& geom = *_entities[i]->geometry;
+                _renderList.meshJobs.insert(_renderList.meshJobs.end(),
+                    geom.GetRenderList().meshJobs.begin(),
+                    geom.GetRenderList().meshJobs.end());
+            }
         }
 
         g_worldSem.Signal();
@@ -677,6 +702,30 @@ namespace W {
 
     IPolyhedron* World::CreatePolyhedron(void) {
         return new Proxy::Polyhedron(graph_t());
+    }
+
+    IGeometry* World::CreateGeometry() {
+        entIdCntMtx.Lock();
+        unsigned entId = entIdCnt++;
+        entIdCntMtx.Unlock();
+
+        Entity* entity = new Entity;
+        entity->type = ENT_GEOMETRY;
+        entity->entId = entId;
+        entity->fxName = "LitDirectional";
+        entity->transform.position = M::Vector3::Zero;
+        entity->transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
+        entity->transform.rotation = M::Mat4::Identity();
+        ENT_Geometry* geom = new ENT_Geometry();
+        entity->geometry = geom;
+
+        printf(">>>>>>>>>>>>>>>>>> BEGIN PUSHING BACK GEOM ENTITY\n");
+        EV::Params_LinkEntity args;
+        args.entity = entity;
+        Send(EV::def_LinkEntity.Create(args));
+        printf(">>>>>>>>>>>>>>>>>> END PUSHING BACK GEOM ENTITY\n");
+
+        return geom;
     }
 
     IMesh* World::CreatePlaneMesh(const PlaneDesc& desc) 

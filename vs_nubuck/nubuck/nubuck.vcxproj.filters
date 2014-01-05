@@ -204,6 +204,15 @@
     <Filter Include="Private\renderer\shader\shader_preprocessor">
       <UniqueIdentifier>{86b7b8ad-4430-46d9-b923-11097ad4d4bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\polymesh">
+      <UniqueIdentifier>{51ed8ed5-9290-41e2-b5a5-145956db0899}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\polymesh">
+      <UniqueIdentifier>{38704326-26b1-4fa8-b472-200965af557d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\world\entities\ent_geometry">
+      <UniqueIdentifier>{e19ee440-a151-43e4-85de-5898f314549e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -520,6 +529,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\system\locks\scoped_lock.h">
       <Filter>Private\system\locks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\polymesh.h">
+      <Filter>Public\polymesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.h">
+      <Filter>Private\world\entities\ent_geometry</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -840,6 +855,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron_printsize.cpp">
       <Filter>Private\world\entities\ent_polyhedron</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\polymesh\polymesh.cpp">
+      <Filter>Private\polymesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.cpp">
+      <Filter>Private\world\entities\ent_geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
