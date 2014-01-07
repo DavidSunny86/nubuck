@@ -34,19 +34,23 @@ public:
 
 template<typename TYPE>
 inline size_t ObjectPool<TYPE>::Alloc() {
-    if(INVALID_IDX != _free) {
+    if(false && INVALID_IDX != _free) { // !!!
         TYPE& obj = _objs[_free];
-        size_t tmp = obj.next;
-        obj.next = _used;
+        if(INVALID_IDX != obj.prev) _objs[obj.prev].next = obj.next;
+        if(INVALID_IDX != obj.next) _objs[obj.next].prev = obj.prev;
         _used = _free;
-        _free = tmp;
+        _free = obj.next;
+        obj.prev = INVALID_IDX;
+        obj.next = _used;
         return _used;
     }
 
     _objs.resize(_rend + 1);
 
     TYPE& obj = _objs[_rend];
+    obj.prev = INVALID_IDX;
     obj.next = _used;
+    if(INVALID_IDX != obj.next) _objs[obj.next].prev = _rend;
     _used = _rend;
     return _rend++;
 }
@@ -54,15 +58,21 @@ inline size_t ObjectPool<TYPE>::Alloc() {
 template<typename TYPE>
 inline void ObjectPool<TYPE>::Free(size_t idx) {
     TYPE& obj = _objs[idx];
-    _used = obj.next;
+    if(INVALID_IDX != obj.prev) _objs[obj.prev].next = obj.next;
+    if(INVALID_IDX != obj.next) _objs[obj.next].prev = obj.prev;
+    if(_used == idx) _used = obj.next;
+    /*
+    obj.prev = INVALID_IDX;
     obj.next = _free;
     _free = idx;
+    */
 }
 
 template<typename VEC3>
 class PolyMesh {
 private:
     struct Vertex {
+        size_t  prev;
         size_t  next;
         size_t  halfEdge;
         VEC3    position;
@@ -72,14 +82,17 @@ private:
         size_t vert;
         size_t next;
         size_t prev;
+        size_t face;
     };
 
     struct Edge {
+        size_t      prev;
         size_t      next;
         HalfEdge    halfEdges[2];
     };
 
     struct Face {
+        size_t prev;
         size_t next; 
         size_t halfEdge;
     };
@@ -88,12 +101,16 @@ private:
     ObjectPool<Edge>    _edges;
     ObjectPool<Face>    _faces;
 
-    HalfEdge& GetHalfEdge(const size_t idx) { return _edges[idx >> 1].halfEdges[idx & 1]; }
+    Vertex&     GetVertex(const size_t idx) { return _vertices[idx]; }
+    HalfEdge&   GetHalfEdge(const size_t idx) { return _edges[idx >> 1].halfEdges[idx & 1]; }
+    void SetFacesOfHalfEdges();
+    void SetHalfEdgesOfVertices();
 public:
     size_t      V_MapSize() const                               { return _vertices.MapSize(); }
     size_t      V_Begin() const                                 { return _vertices.Begin(); }
     size_t  	V_End() const                                   { return _vertices.End(); }
     size_t  	V_Next(size_t idx) const                        { return _vertices.Next(idx); }
+    size_t      V_HalfEdge(size_t idx) const                    { return _vertices[idx].halfEdge; }
     void        V_SetPosition(size_t idx, const VEC3& position) { _vertices[idx].position = position; }
     const VEC3& V_GetPosition(size_t idx) const                 { return _vertices[idx].position; }
 
@@ -112,6 +129,7 @@ public:
     size_t H_End() const;
     size_t H_Next(size_t idx) const;
     size_t H_Reversal(size_t idx) const     { return idx ^ 1; }
+    size_t H_Face(size_t idx) const         { return _edges[idx >> 1].halfEdges[idx & 1].face; }
     size_t H_FaceSucc(size_t idx) const     { return _edges[idx >> 1].halfEdges[idx & 1].next; }
     size_t H_FacePred(size_t idx) const     { return _edges[idx >> 1].halfEdges[idx & 1].prev; }
     size_t H_StartVertex(size_t idx) const  { return _edges[idx >> 1].halfEdges[idx & 1].vert; }
@@ -124,9 +142,35 @@ public:
     size_t SplitVertex(size_t he0, size_t he1);
     size_t SplitFace(size_t h0, size_t h1);
     size_t SplitHalfEdge(size_t h);
+
+    size_t DeleteFace(size_t f);
 };
 
 typedef PolyMesh<leda::d3_rat_point> RatPolyMesh;
+
+template<typename VEC3>
+void PolyMesh<VEC3>::SetFacesOfHalfEdges() {
+    size_t face = F_Begin();
+    while(F_End() != face) {
+        size_t edge = F_HalfEdge(face);
+        size_t it = edge;
+        do {
+            GetHalfEdge(it).face = face;
+            it = H_FaceSucc(it);
+        } while(edge != it);
+        face = F_Next(face);
+    }
+}
+
+template<typename VEC3>
+void PolyMesh<VEC3>::SetHalfEdgesOfVertices() {
+    size_t h = H_Begin();
+    while(H_End() != h) {
+        Vertex& v = GetVertex(H_StartVertex(h));
+        v.halfEdge = h;
+        h = H_Next(h);
+    }
+}
 
 template<typename VEC3>
 size_t PolyMesh_H_ComputePrev(const PolyMesh<VEC3>& pm, size_t idx) {
@@ -213,6 +257,9 @@ size_t PolyMesh<VEC3>::MakeTetrahedron(const VEC3& p0, const VEC3& p1, const VEC
     _faces[2].halfEdge = 4;
     _faces[3].halfEdge = 2;
 
+    SetFacesOfHalfEdges();
+    SetHalfEdgesOfVertices();
+
     // removeme
     assert(H_FaceSucc(0) == 9);
     assert(H_FaceSucc(9) == 10);
@@ -236,75 +283,102 @@ size_t PolyMesh<VEC3>::MakeTetrahedron(const VEC3& p0, const VEC3& p1, const VEC
 }
 
 template<typename VEC3>
-size_t PolyMesh<VEC3>::SplitVertex(size_t he0, size_t he1) {
+size_t PolyMesh<VEC3>::SplitVertex(size_t h0, size_t h1) {
+    assert(H_StartVertex(h0) == H_StartVertex(h1));
+    assert(h0 != h1);
+
     size_t w = _vertices.Alloc();
     size_t e = _edges.Alloc();
 
-    size_t n0 = e << 1 | 0;
-    size_t n1 = e << 1 | 1;
+    size_t a0 = e << 1;
+    size_t a1 = e << 1 | 1;
+    size_t r0 = H_Reversal(h0);
 
-    HalfEdge& N0 = GetHalfEdge(n0);
-    HalfEdge& N1 = GetHalfEdge(n1);
-    HalfEdge& H0 = GetHalfEdge(he0);
-    HalfEdge& H1 = GetHalfEdge(he1);
+    HalfEdge& A0 = GetHalfEdge(a0);
+    HalfEdge& A1 = GetHalfEdge(a1);
+    HalfEdge& H0 = GetHalfEdge(h0);
+    HalfEdge& H1 = GetHalfEdge(h1);
+    HalfEdge& R0 = GetHalfEdge(r0);
 
-    N0.vert = w;
-    N1.vert = H_StartVertex(he0);
-
-    size_t it = H_StartCW(he0);
-    while(he1 != it) {
+    size_t it = H_StartCW(h0);
+    while(h1 != it) {
         GetHalfEdge(it).vert = w;
         it = H_StartCW(it);
     }
 
-    N0.prev = H1.prev;
-    N0.next = he1;
-    GetHalfEdge(H1.prev).next = n0;
-    H1.prev = n0;
+    GetVertex(w).halfEdge = a0;
+    GetVertex(H1.vert).halfEdge = a1;
 
-    N1.next = H_FaceSucc(H_Reversal(he0));
-    N1.prev = H_Reversal(he0);
-    GetHalfEdge(H_FaceSucc(H_Reversal(he0))).prev = n1;
-    GetHalfEdge(H_Reversal(he0)).next = n1;
+    A0.prev = H1.prev;
+    A0.next = h1;
+    A0.vert = w;
+    A0.face = H1.face;
 
+    A1.prev = r0;
+    A1.next = R0.next;
+    A1.vert = H1.vert;
+    A1.face = R0.face;
+
+    R0.next = a1;
+    GetHalfEdge(A1.next).prev = a1;
+
+    GetHalfEdge(A0.prev).next = a0;
+    H1.prev = a0;
+
+#ifdef _DEBUG
     PolyMesh_H_CheckPrev(*this);
+#endif
 
-    return n0;
+    return a0;
 }
 
 template<typename VEC3>
 size_t PolyMesh<VEC3>::SplitFace(size_t h0, size_t h1) {
+    assert(H_Face(h0) == H_Face(h1));
+    assert(h0 != h1);
+
     size_t e = _edges.Alloc();
-    size_t n0 = e << 1 | 0;
-    size_t n1 = e << 1 | 1;
+    size_t a0 = e << 1;
+    size_t a1 = e << 1 | 1;
     size_t p0 = H_FacePred(h0);
 	size_t p1 = H_FacePred(h1);
 
-    HalfEdge& N0 = GetHalfEdge(n0);
-    HalfEdge& N1 = GetHalfEdge(n1);
+    HalfEdge& A0 = GetHalfEdge(a0);
+    HalfEdge& A1 = GetHalfEdge(a1);
     HalfEdge& H0 = GetHalfEdge(h0);
     HalfEdge& H1 = GetHalfEdge(h1);
     HalfEdge& P0 = GetHalfEdge(p0);
     HalfEdge& P1 = GetHalfEdge(p1);
 
-    N0.vert = H_StartVertex(h1);
-    N1.vert = H_StartVertex(h0);
+    A0.vert = H_StartVertex(h1);
+    A1.vert = H_StartVertex(h0);
 
-    N0.next = h0;
-    N0.prev = p1;
-    N1.next = h1;
-    N1.prev = p0;
-    H0.prev = n0;
-    H1.prev = n1;
-    P0.next = n1;
-    P1.next = n0;
+    A0.next = h0;
+    A0.prev = p1;
+    A1.next = h1;
+    A1.prev = p0;
+    H0.prev = a0;
+    H1.prev = a1;
+    P0.next = a1;
+    P1.next = a0;
 
     size_t f = _faces.Alloc();
-    _faces[f].halfEdge = n0;
+    _faces[f].halfEdge = a0;
+    _faces[H1.face].halfEdge = a1;
 
+    A1.face = H1.face;
+
+    size_t it = a0;
+    do {
+        GetHalfEdge(it).face = f;
+        it = H_FaceSucc(it);
+    } while(a0 != it);
+
+#ifdef _DEBUG
     PolyMesh_H_CheckPrev(*this);
+#endif
 
-    return n1;
+    return a0;
 }
 
 template<typename VEC3>
@@ -312,6 +386,58 @@ size_t PolyMesh<VEC3>::SplitHalfEdge(size_t h) {
     size_t h0 = H_StartCCW(h);
     size_t h1 = H_StartCW(h);
     return SplitVertex(h0, h1);
+}
+
+template<typename VEC3>
+size_t PolyMesh<VEC3>::DeleteFace(size_t f) {
+    size_t hs = F_HalfEdge(f);
+    size_t h = hs;
+    do {
+        HalfEdge& H = GetHalfEdge(h);
+        H.face = F_End();
+        size_t n = H_FaceSucc(h);
+        if(F_End() == H_Face(H_Reversal(h))) {
+            size_t h0 = h;
+            size_t h1 = H_Reversal(h);
+            size_t h0p = H_FacePred(h0);
+            size_t h0s = H_FaceSucc(h0);
+            size_t h1p = H_FacePred(h1);
+            size_t h1s = H_FaceSucc(h1);
+            GetHalfEdge(h0p).next = h1s;
+            GetHalfEdge(h1s).prev = h0p;
+            GetHalfEdge(h1p).next = h0s;
+            GetHalfEdge(h0s).prev = h1p;
+
+            if(hs == h0) hs = h1s;
+
+            size_t v0 = H_StartVertex(h0);
+            if(h0 == V_HalfEdge(v0)) {
+                size_t succ = H_StartCCW(h0);
+                GetVertex(v0).halfEdge = succ;
+                if(succ == h0) {
+                    // delete vert
+                    assert(0);
+                }
+            }
+
+            size_t v1 = H_StartVertex(h1);
+            if(h1 == V_HalfEdge(v1)) {
+                size_t succ = H_StartCCW(h1);
+                GetVertex(v1).halfEdge = succ;
+                if(succ == h1) {
+                    // delete vert
+                    assert(0);
+                }
+            }
+
+            // delete edge
+            size_t e = h >> 1;
+            _edges.Free(e);
+        }
+        h = n;
+    } while(hs != h);
+    _faces.Free(f);
+    return 0;
 }
 
 // ==================================================
