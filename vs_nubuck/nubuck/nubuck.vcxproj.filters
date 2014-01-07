@@ -536,6 +536,9 @@
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.h">
       <Filter>Private\world\entities\ent_geometry</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\polymesh_fwd.h">
+      <Filter>Public\polymesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">

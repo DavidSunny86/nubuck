@@ -6,7 +6,7 @@
 #include <LEDA/geo/d3_rat_point.h>
 #include <LEDA/graph/graph.h>
 
-#include <Nubuck\polymesh.h>
+#include <Nubuck\polymesh_fwd.h>
 
 #ifdef NUBUCK_LIB
 #define NUBUCK_API __declspec(dllexport)

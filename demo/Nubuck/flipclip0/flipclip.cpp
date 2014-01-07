@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <Nubuck\nubuck.h>
+#include <Nubuck\polymesh.h>
 
 typedef leda::rational              scalar_t;
 typedef leda::d3_rat_point          point3_t;

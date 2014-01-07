@@ -15,11 +15,12 @@
 #include <renderer\renderer.h>
 #include <camera\arcball_camera.h>
 #include <events\events.h>
-#include <world\entities\ent_polyhedron\ent_polyhedron.h>
-#include <world\entities\ent_mesh\ent_mesh.h>
-#include <world\entities\ent_geometry\ent_geometry.h>
 
 namespace W {
+
+    class ENT_Polyhedron;
+    class ENT_Mesh;
+    class ENT_Geometry;
 
     extern SYS::Semaphore g_worldSem;
 

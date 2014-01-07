@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Nubuck\nubuck.h>
+#include <Nubuck\polymesh.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>

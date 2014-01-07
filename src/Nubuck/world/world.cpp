@@ -13,6 +13,8 @@
 #include <events\event_defs.h>
 #include <UI\outliner\outliner.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
+#include <world\entities\ent_mesh\ent_mesh.h>
+#include <world\entities\ent_geometry\ent_geometry.h>
 #include <world\proxies\proxy_polyhedron.h>
 #include <world\proxies\proxy_mesh.h>
 #include "entity.h"

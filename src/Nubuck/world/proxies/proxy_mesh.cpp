@@ -1,5 +1,6 @@
 #include <events\event_defs.h>
 #include <world\world.h>
+#include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include "proxy_mesh.h"
 
 namespace Proxy {

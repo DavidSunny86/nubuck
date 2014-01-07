@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\incl\Nubuck\nubuck.h" />
     <ClInclude Include="..\..\incl\Nubuck\polymesh.h" />
+    <ClInclude Include="..\..\incl\Nubuck\polymesh_fwd.h" />
     <ClInclude Include="..\..\src\Nubuck\algdriver\algdriver.h" />
     <ClInclude Include="..\..\src\Nubuck\camera\arcball_camera.h" />
     <ClInclude Include="..\..\src\Nubuck\common\common.h" />
