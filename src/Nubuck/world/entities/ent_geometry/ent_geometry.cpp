@@ -1,3 +1,5 @@
+#include <renderer\nodes\r_nodes.h>
+#include <renderer\edges\r_cylinder_edges.h>
 #include "ent_geometry.h"
 
 namespace {
@@ -67,6 +69,7 @@ void ENT_Geometry::CompileMesh() {
 }
 
 void ENT_Geometry::BuildRenderList() {
+    _renderList.renderJobs.clear();
     _renderList.meshJobs.clear();
 
     if(NULL == _mesh) return;
@@ -78,6 +81,31 @@ void ENT_Geometry::BuildRenderList() {
     rjob.primType   = 0;
     rjob.transform  = M::Mat4::Identity();
     _renderList.meshJobs.push_back(rjob);
+
+    std::vector<R::Nodes::Node> rnodes;
+    size_t vert = _ratPolyMesh.V_Begin();
+    while(_ratPolyMesh.V_End() != vert) {
+        R::Nodes::Node rnode;
+        rnode.position = ToVector(_ratPolyMesh.V_GetPosition(vert));
+        rnode.color = R::Color(0.3f, 0.3f, 0.3f);
+        rnodes.push_back(rnode);
+        vert = _ratPolyMesh.V_Next(vert);
+    }
+    R::g_nodes.Draw(rnodes);
+
+    std::vector<R::Edge> redges;
+    R::Edge re;
+    re.radius = 0.1f;
+    size_t edge = _ratPolyMesh.E_Begin();
+    while(_ratPolyMesh.E_End() != edge) {
+        re.color = R::Color(0.3f, 0.3f, 0.3f);
+        re.p0 = ToVector(_ratPolyMesh.V_GetPosition(_ratPolyMesh.E_StartVertex(edge)));
+        re.p1 = ToVector(_ratPolyMesh.V_GetPosition(_ratPolyMesh.E_EndVertex(edge)));
+        edge = _ratPolyMesh.E_Next(edge);
+        redges.push_back(re);
+    }
+    redges.push_back(re);
+    R::g_cylinderEdges.Draw(redges);
 }
 
 } // namespace W
