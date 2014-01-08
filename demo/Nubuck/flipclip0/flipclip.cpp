@@ -302,6 +302,7 @@ struct Algorithm : IAlgorithm {
         // REMOVEME
         IGeometry* geom = nb.world->CreateGeometry();
         NB::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+        // mesh.FromObj("bunny2.obj");
         size_t h = mesh.MakeTetrahedron(
             point3_t(-1, -1,  1),
             point3_t( 1, -1,  1),

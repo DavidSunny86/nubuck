@@ -95,7 +95,7 @@ void ENT_Geometry::BuildRenderList() {
 
     std::vector<R::Edge> redges;
     R::Edge re;
-    re.radius = 0.1f;
+    re.radius = 0.02f;
     size_t edge = _ratPolyMesh.E_Begin();
     while(_ratPolyMesh.E_End() != edge) {
         re.color = R::Color(0.3f, 0.3f, 0.3f);

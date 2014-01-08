@@ -1,9 +1,20 @@
 #pragma once
 
+#include <utility>
+#include <map>
 #include <vector>
 #include <LEDA\geo\d3_rat_point.h>
 
 namespace NB {
+
+template<typename VEC3>
+struct FromFloat3 { };
+
+template<> struct FromFloat3<leda::d3_rat_point> {
+    static leda::d3_rat_point Conv(float x, float y, float z) {
+        return leda::d3_rat_point(leda::rational(x), leda::rational(y), leda::rational(z));
+    }
+};
 
 template<typename TYPE>
 class ObjectPool {
@@ -101,8 +112,9 @@ private:
     ObjectPool<Edge>    _edges;
     ObjectPool<Face>    _faces;
 
-    Vertex&     GetVertex(const size_t idx) { return _vertices[idx]; }
-    HalfEdge&   GetHalfEdge(const size_t idx) { return _edges[idx >> 1].halfEdges[idx & 1]; }
+    Vertex&     GetVertex(const size_t idx)     { return _vertices[idx]; }
+    Face&       GetFace(const size_t idx)       { return _faces[idx]; }
+    HalfEdge&   GetHalfEdge(const size_t idx)   { return _edges[idx >> 1].halfEdges[idx & 1]; }
     void SetFacesOfHalfEdges();
     void SetHalfEdgesOfVertices();
 public:
@@ -138,6 +150,7 @@ public:
     size_t H_StartCW(size_t idx) const      { return H_FaceSucc(H_Reversal(idx)); }
     
     size_t MakeTetrahedron(const VEC3& p0, const VEC3& p1, const VEC3& p2, const VEC3& p3);
+    size_t FromObj(const char* filename);
 
     size_t SplitVertex(size_t he0, size_t he1);
     size_t SplitFace(size_t h0, size_t h1);
@@ -279,6 +292,76 @@ size_t PolyMesh<VEC3>::MakeTetrahedron(const VEC3& p0, const VEC3& p1, const VEC
         it = H_Next(it);
     }
 
+    return 0;
+}
+
+struct OBJ_Face {
+    size_t      face;
+    unsigned    vertices[3];
+};
+
+template<typename VEC3>
+size_t PolyMesh<VEC3>::FromObj(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    assert(file);
+
+    std::vector<OBJ_Face> obj_faces;
+
+    typedef std::pair<unsigned, unsigned> uedge_t; // edge described by pair of vertices, with e.first() < e.second()
+    std::map<uedge_t, size_t> edgemap; // maps pairs of vertices to edge handles
+
+    unsigned numVertices = 0, numFaces = 0;
+    int r = 0;
+    while(!feof(file)) {
+        char buffer[512];
+        float f[3];
+        unsigned d[3];
+
+        memset(buffer, 0, sizeof(buffer));
+        fgets(buffer, 512, file);
+
+        if(r = sscanf(buffer, "v %f %f %f", &f[0], &f[1], &f[2])) {
+            size_t v = _vertices.Alloc();
+            float scale = 1.0f;
+            V_SetPosition(v, FromFloat3<VEC3>::Conv(scale * f[0], scale * f[1], scale * f[2]));
+            numVertices++;
+        }
+        if(r = sscanf(buffer, "f %d %d %d", &d[0], &d[1], &d[2])) {
+            OBJ_Face f;
+            f.vertices[0] = d[0] - 1;
+            f.vertices[1] = d[1] - 1;
+            f.vertices[2] = d[2] - 1;
+            obj_faces.push_back(f);
+            numFaces++;
+        }
+    }
+
+    printf("NUM VERTICES: %d, NUM FACES %d\n", numVertices, numFaces);
+
+    for(unsigned i = 0; i < numFaces; ++i) {
+        OBJ_Face& f = obj_faces[i];
+        f.face = _faces.Alloc();
+        size_t h[3];
+        for(unsigned j = 0; j < 3; ++j) {
+            unsigned v0 = f.vertices[j];
+            unsigned v1 = f.vertices[(j + 1) % 3];
+            uedge_t uedge = std::make_pair(std::min(v0, v1), std::max(v0, v1));
+            if(edgemap.end() == edgemap.find(uedge)) edgemap[uedge] = _edges.Alloc() << 1;
+            h[j] = edgemap[uedge];
+            edgemap[uedge] |= 1;
+            GetVertex(v0).halfEdge = h[j];
+            GetHalfEdge(h[j]).vert = v0;
+            GetHalfEdge(h[j] ^ 1).vert = v1; // TODO: shouldn't be necessary?
+        }
+        for(unsigned j = 0; j < 3; ++j) {
+            GetHalfEdge(h[j]).next = h[(j + 1) % 3];
+            GetHalfEdge(GetHalfEdge(h[j]).next).prev = h[j];
+            GetHalfEdge(h[j]).face = f.face;
+        }
+        GetFace(f.face).halfEdge = h[0];
+    }
+
+    fclose(file);
     return 0;
 }
 
