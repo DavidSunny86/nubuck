@@ -299,26 +299,6 @@ struct Algorithm : IAlgorithm {
         g.ph->GetGraph() = G;
         g.ph->Update();
 
-        // REMOVEME
-        IGeometry* geom = nb.world->CreateGeometry();
-        NB::RatPolyMesh& mesh = geom->GetRatPolyMesh();
-        // mesh.FromObj("bunny2.obj");
-        size_t h = mesh.MakeTetrahedron(
-            point3_t(-1, -1,  1),
-            point3_t( 1, -1,  1),
-            point3_t( 0, -1, -1),
-            point3_t( 0,  1,  0));
-        size_t h0 = mesh.SplitHalfEdge(h);
-        size_t h1 = mesh.H_FacePred(mesh.H_Reversal(h0));
-        size_t h2 = mesh.H_FaceSucc(mesh.H_Reversal(h0));
-        mesh.V_SetPosition(mesh.H_StartVertex(h0), point3_t(0, -1, 1));
-        size_t f0 = mesh.SplitFace(h1, h2);
-        size_t f1 = mesh.H_Reversal(f0);
-        mesh.DeleteFace(mesh.H_Face(f0));
-        mesh.DeleteFace(mesh.H_Face(f1));
-
-        geom->Update();
-
         return new Phase0(g);
     }
 

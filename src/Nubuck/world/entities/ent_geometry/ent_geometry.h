@@ -10,7 +10,7 @@ namespace W {
 
 class ENT_Geometry : public IGeometry {
 private:
-    NB::RatPolyMesh _ratPolyMesh;
+    leda::nb::RatPolyMesh _ratPolyMesh;
 
     std::vector<R::Mesh::Vertex>    _vertices;
     std::vector<R::Mesh::Index>     _indices;
@@ -25,7 +25,7 @@ public:
     bool IsMeshCompiled() const { return _meshCompiled; }
     void CompileMesh();
 
-    NB::RatPolyMesh& GetRatPolyMesh() override { return _ratPolyMesh; }
+    leda::nb::RatPolyMesh& GetRatPolyMesh() override { return _ratPolyMesh; }
     void Update() override;
     void BuildRenderList();
     const R::RenderList& GetRenderList() const { return _renderList; }

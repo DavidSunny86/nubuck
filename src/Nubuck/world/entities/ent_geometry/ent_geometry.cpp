@@ -17,45 +17,49 @@ void ENT_Geometry::Update() {
     _vertices.clear();
     _indices.clear();
 
+    if(0 == _ratPolyMesh.number_of_faces()) return;
+
     unsigned idxCnt = 0;
 
-    std::vector<M::Vector3> positions(_ratPolyMesh.V_MapSize());
-    size_t vertex = _ratPolyMesh.V_Begin();
-    while(_ratPolyMesh.V_End() != vertex) {
-        positions[vertex] = ToVector(_ratPolyMesh.V_GetPosition(vertex));
-        vertex = _ratPolyMesh.V_Next(vertex);
+    leda::node_array<M::Vector3> fpos(_ratPolyMesh);
+
+    leda::node v;
+    forall_nodes(v, _ratPolyMesh) {
+        fpos[v] = ToVector(_ratPolyMesh.position_of(v));
     }
 
-    size_t face = _ratPolyMesh.F_Begin();
-    while(_ratPolyMesh.F_End() != face) {
-        size_t edge = _ratPolyMesh.F_HalfEdge(face);
+    leda::face f;
+    forall_faces(f, _ratPolyMesh) {
+        if(!_ratPolyMesh.is_visible(f)) continue;
 
-        size_t next = _ratPolyMesh.H_FaceSucc(edge);
-        const M::Vector3& p0 = positions[_ratPolyMesh.H_StartVertex(edge)];
-        const M::Vector3& p1 = positions[_ratPolyMesh.H_StartVertex(next)];
-        const M::Vector3& p2 = positions[_ratPolyMesh.H_EndVertex(next)];
+        leda::edge e = _ratPolyMesh.first_face_edge(f);
+
+        leda::edge n = _ratPolyMesh.face_cycle_succ(e);
+        const M::Vector3& p0 = fpos[leda::source(e)];
+        const M::Vector3& p1 = fpos[leda::target(e)];
+        const M::Vector3& p2 = fpos[leda::target(n)];
         const M::Vector3 normal = M::Normalize(M::Cross(p1 - p0, p2 - p0));
 
-        size_t it = edge;
         R::Mesh::Vertex vert;
-        vert.color = R::Color::White;
         vert.normal = normal;
+        vert.color = R::Color::White;
+
+        leda::edge it = e;
         do {
-            vert.position = positions[_ratPolyMesh.H_StartVertex(it)];
+            vert.position = fpos[leda::source(it)];
             _vertices.push_back(vert);
             _indices.push_back(idxCnt++);
-            it = _ratPolyMesh.H_FaceSucc(it);
-        } while(edge != it);
+            it = _ratPolyMesh.face_cycle_succ(it);
+        } while(e != it);
         _indices.push_back(R::Mesh::RESTART_INDEX);
-        face = _ratPolyMesh.F_Next(face);
-    }
+    } // forall_faces
 
     _meshDesc.vertices = &_vertices[0];
     _meshDesc.numVertices = _vertices.size();
     _meshDesc.indices = &_indices[0];
     _meshDesc.numIndices = _indices.size();
     _meshDesc.primType = GL_TRIANGLE_FAN;
-
+         
     _meshCompiled = false;
 }
 
@@ -83,25 +87,23 @@ void ENT_Geometry::BuildRenderList() {
     _renderList.meshJobs.push_back(rjob);
 
     std::vector<R::Nodes::Node> rnodes;
-    size_t vert = _ratPolyMesh.V_Begin();
-    while(_ratPolyMesh.V_End() != vert) {
+    leda::node v;
+    forall_nodes(v, _ratPolyMesh) {
         R::Nodes::Node rnode;
-        rnode.position = ToVector(_ratPolyMesh.V_GetPosition(vert));
+        rnode.position = ToVector(_ratPolyMesh.position_of(v));
         rnode.color = R::Color(0.3f, 0.3f, 0.3f);
         rnodes.push_back(rnode);
-        vert = _ratPolyMesh.V_Next(vert);
     }
     R::g_nodes.Draw(rnodes);
 
     std::vector<R::Edge> redges;
     R::Edge re;
     re.radius = 0.02f;
-    size_t edge = _ratPolyMesh.E_Begin();
-    while(_ratPolyMesh.E_End() != edge) {
+    leda::edge e;
+    forall_edges(e, _ratPolyMesh) {
         re.color = R::Color(0.3f, 0.3f, 0.3f);
-        re.p0 = ToVector(_ratPolyMesh.V_GetPosition(_ratPolyMesh.E_StartVertex(edge)));
-        re.p1 = ToVector(_ratPolyMesh.V_GetPosition(_ratPolyMesh.E_EndVertex(edge)));
-        edge = _ratPolyMesh.E_Next(edge);
+        re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
+        re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
         redges.push_back(re);
     }
     redges.push_back(re);

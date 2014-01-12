@@ -57,7 +57,7 @@ struct IMesh {
 };
 
 struct IGeometry {
-    virtual NB::RatPolyMesh& GetRatPolyMesh() = 0;
+    virtual leda::nb::RatPolyMesh& GetRatPolyMesh() = 0;
     virtual void Update() = 0;
 };
 
