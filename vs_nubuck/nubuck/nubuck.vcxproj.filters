@@ -213,6 +213,9 @@
     <Filter Include="Private\world\entities\ent_geometry">
       <UniqueIdentifier>{e19ee440-a151-43e4-85de-5898f314549e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\mainloop">
+      <UniqueIdentifier>{94427047-45f9-4567-ace9-a16e9d1ebe4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -316,9 +319,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\quad\quad.h">
       <Filter>Private\renderer\mesh\quad</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\world.h">
-      <Filter>Private\world</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\system\opengl\glwindow\glwindow.h">
       <Filter>Private\system\opengl\glwindow</Filter>
@@ -865,6 +865,15 @@
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.cpp">
       <Filter>Private\world\entities\ent_geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\mainloop\mainloop.cpp">
+      <Filter>Private\mainloop</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_mainloop.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_mainloop.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -914,6 +923,12 @@
     </CustomBuild>
     <CustomBuild Include="..\..\res\nubuck.qrc">
       <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\world\world.h">
+      <Filter>Private\world</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\mainloop\mainloop.h">
+      <Filter>Private\mainloop</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

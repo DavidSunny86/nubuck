@@ -33,7 +33,6 @@ struct MeshJob {
     MeshMgr::meshPtr_t  mesh;
     GLenum              primType; // value != 0 overrides prim type of mesh
     Material	        material;
-    SkinMgr::handle_t   skin;
     M::Matrix4          transform;
 
     // handled by renderer
@@ -48,13 +47,14 @@ struct DirectionalLight {
 struct RenderList {
     M::Matrix4                  worldMat;
     DirectionalLight        	dirLights[3];
-    std::vector<Light>      	lights;
     std::vector<Renderable*>    renderJobs;
     std::vector<MeshJob>        meshJobs;
-};
 
-extern RenderList g_renderLists[2];
-extern SYS::Semaphore g_rendererSem;
+    void Clear() {
+        renderJobs.clear();
+        meshJobs.clear();
+    }
+};
 
 class Renderer {
 private:
@@ -69,7 +69,9 @@ public:
 
     void Resize(int width, int height);
 
-    void Render(void);
+    void BeginFrame();
+    void Render(RenderList& renderList);
+    void EndFrame();
 };
 
 } // namespace R

@@ -64,7 +64,7 @@ namespace W {
         float       _secsPassed;
         float       _timePassed;
 
-        void SetupLights(void);
+        void SetupLights(R::RenderList& renderList);
 
         ArcballCamera _camArcball;
 
@@ -109,6 +109,7 @@ namespace W {
         unsigned SpawnMesh(R::MeshMgr::meshPtr_t meshPtr);
 
         void Update(void);
+        void Render(R::RenderList& renderList);
 
         // exported to client
         IPolyhedron* CreatePolyhedron(void) override;

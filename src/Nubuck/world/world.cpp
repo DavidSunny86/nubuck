@@ -102,41 +102,15 @@ namespace W {
         return Transform(normalMat, t);
     }
 
-    void World::SetupLights(void) {
-        R::Light light;
+    void World::SetupLights(R::RenderList& renderList) {
+        renderList.dirLights[0].direction      = M::Vector3(-1.0f,  1.0f,  0.0f);
+        renderList.dirLights[0].diffuseColor   = R::Color(0.6f, 0.85f, 0.91f);
 
-        R::RenderList& _renderList = R::g_renderLists[rlIdx];
-        _renderList.lights.clear();
+        renderList.dirLights[1].direction      = M::Vector3( 1.0f,  1.0f,  0.0f);
+        renderList.dirLights[1].diffuseColor   = R::Color(1.0f, 0.5f, 0.15f);
 
-        _renderList.dirLights[0].direction      = M::Vector3(-1.0f,  1.0f,  0.0f);
-        _renderList.dirLights[0].diffuseColor   = R::Color(0.6f, 0.85f, 0.91f);
-
-        _renderList.dirLights[1].direction      = M::Vector3( 1.0f,  1.0f,  0.0f);
-        _renderList.dirLights[1].diffuseColor   = R::Color(1.0f, 0.5f, 0.15f);
-
-        _renderList.dirLights[2].direction      = M::Vector3( 0.0f, -0.5f, -1.5f);
-        _renderList.dirLights[2].diffuseColor   = R::Color(1.0f, 1.0f, 1.0f);
-
-        float dist = 20;
-
-        light.constantAttenuation   = 1.0f;
-        light.linearAttenuation     = 0.01f;
-        light.quadricAttenuation    = 0.0f;
-
-        light.position          = M::Vector3(-dist,  dist, dist);
-        // light.diffuseColor      = R::Color::Red;
-        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
-        _renderList.lights.push_back(light);
-
-        light.position          = M::Vector3( dist,  dist, dist);
-        // light.diffuseColor      = R::Color::White;
-        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
-        _renderList.lights.push_back(light);
-
-        light.position          = M::Vector3( dist, -dist, dist);
-        // light.diffuseColor      = R::Color::Blue;
-        light.diffuseColor = R::Color(0.8f, 0.8f, 0.8f);
-        _renderList.lights.push_back(light);
+        renderList.dirLights[2].direction      = M::Vector3( 0.0f, -0.5f, -1.5f);
+        renderList.dirLights[2].diffuseColor   = R::Color(1.0f, 1.0f, 1.0f);
     }
 
     static float mouseX, mouseY;
@@ -526,8 +500,6 @@ namespace W {
 
 	World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
         _isGrabbing = false;
-
-        SetupLights();
 	}
 
 	unsigned World::SpawnPolyhedron(graph_t* const G, leda::node_map<bool>* cachedNodes, leda::edge_map<bool>* cachedEdges) {
@@ -564,8 +536,6 @@ namespace W {
         _timer.Start();
 
         SYS::ScopedLock lockEntities(_entitiesMtx);
-
-        SetupLights();
 
         HandleEvents();
 
@@ -667,39 +637,39 @@ namespace W {
             }
         }
 
-        R::RenderList& _renderList = R::g_renderLists[rlIdx];
-        _renderList.worldMat = _camArcball.GetWorldMatrix();
-		_renderList.meshJobs.clear();
-        _renderList.renderJobs.clear();
+    }
 
-        _renderList.renderJobs.push_back(&R::g_nodes);
-        _renderList.renderJobs.push_back(&R::g_cylinderEdges);
-        _renderList.renderJobs.push_back(&R::g_lineEdges);
+    void World::Render(R::RenderList& renderList) {
+        SetupLights(renderList);
+
+        renderList.worldMat = _camArcball.GetWorldMatrix();
+		renderList.meshJobs.clear();
+        renderList.renderJobs.clear();
+
+        renderList.renderJobs.push_back(&R::g_nodes);
+        renderList.renderJobs.push_back(&R::g_cylinderEdges);
+        renderList.renderJobs.push_back(&R::g_lineEdges);
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
             if(ENT_POLYHEDRON == _entities[i]->type) {
                 ENT_Polyhedron& ph = *_entities[i]->polyhedron;
-                _renderList.meshJobs.insert(_renderList.meshJobs.end(),
+                renderList.meshJobs.insert(renderList.meshJobs.end(),
                     ph.renderList.meshJobs.begin(),
                     ph.renderList.meshJobs.end());
             }
             if(ENT_MESH == _entities[i]->type) {
                 ENT_Mesh& mesh = *_entities[i]->mesh;
-                _renderList.meshJobs.insert(_renderList.meshJobs.end(),
+                renderList.meshJobs.insert(renderList.meshJobs.end(),
                     mesh.renderList.meshJobs.begin(),
                     mesh.renderList.meshJobs.end());
             }
             if(ENT_GEOMETRY == _entities[i]->type) {
                 ENT_Geometry& geom = *_entities[i]->geometry;
-                _renderList.meshJobs.insert(_renderList.meshJobs.end(),
+                renderList.meshJobs.insert(renderList.meshJobs.end(),
                     geom.GetRenderList().meshJobs.begin(),
                     geom.GetRenderList().meshJobs.end());
             }
         }
-
-        g_worldSem.Signal();
-        R::g_rendererSem.Wait();
-        rlIdx = 1 - rlIdx;
     }
 
     IPolyhedron* World::CreatePolyhedron(void) {

@@ -389,7 +389,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
     renderJob.fx = "TexDiffuse";
     renderJob.mesh = g_faceCurveDecalMesh;
     renderJob.primType = 0;
-    renderJob.skin = g_faceCurveDecalSkin;
+    // renderJob.skin = g_faceCurveDecalSkin;
     for(unsigned i = 0; i < ph.faces.curves.size(); ++i) {
         for(unsigned j = 0; j < ph.faces.curves[i].curve.decalPos.size(); ++j) {
             renderJob.material.diffuseColor = ph.faces.curves[i].color;

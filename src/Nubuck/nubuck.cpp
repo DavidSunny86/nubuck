@@ -1,4 +1,5 @@
 #include <QtGui\QApplication.h>
+#include <QTimer>
 
 #include <renderer\glew\glew.h>
 #include <QGLWidget>
@@ -7,10 +8,12 @@
 #include <common\common.h>
 #include <common\config\config.h>
 #include <world\world.h>
+#include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include <renderer\effects\effect.h>
 #include <algdriver\algdriver.h>
 #include <UI\mainwindow\mainwindow.h>
 #include <UI\logwidget\logwidget.h>
+#include <mainloop\mainloop.h>
 #include "nubuck_private.h"
 
 Nubuck nubuck;
@@ -65,9 +68,10 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
         i++;
     }
 
-#ifdef NUBUCK_MT
-    W::world.Thread_StartAsync();
-#endif
+    W::Polyhedron_InitResources();
+
+    MainLoop mainLoop;
+    mainLoop.Enter();
 
     nubuck.common   = &common;
     nubuck.world    = &W::world;

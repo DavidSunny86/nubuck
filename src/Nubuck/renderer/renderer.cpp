@@ -65,10 +65,6 @@ COM::Config::Variable<float>    cvar_r_edgeRadius("r_edgeRadius", 0.1f);
 
 namespace R {
 
-RenderList g_renderLists[2];
-SYS::Semaphore g_rendererSem(0);
-static int rlIdx = 0;
-
 static MeshMgr::meshPtr_t nodeMesh;
 
 static State curState;
@@ -454,7 +450,10 @@ static M::Matrix4 ComputeProjectionMatrix(float aspect, const M::Matrix4& worldM
     return M::Mat4::Perspective(45.0f, aspect, 0.1f, 100.0f);
 }
 
-void Renderer::Render(void) {
+static SYS::Timer   frame_time;
+static float        frame_secsPassed = 0.0f;
+
+void Renderer::BeginFrame() {
     float secsPassed = _timer.Stop();
     _time += secsPassed;
     _timer.Start();
@@ -465,13 +464,18 @@ void Renderer::Render(void) {
     }
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
-    RenderList& renderList = g_renderLists[rlIdx];
-
-    static SYS::Timer frameTime;
-    frameTime.Start();
+    frame_time.Start();
 
     metrics.frame.numDrawCalls = 0;
+}
 
+void Renderer::EndFrame() {
+    meshMgr.R_Update();
+
+    metrics.frame.time = frame_time.Stop();
+}
+
+void Renderer::Render(RenderList& renderList) {
     M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, renderList.meshJobs);
 
     Uniforms_Update(projectionMat, renderList.worldMat, renderList.dirLights);
@@ -487,18 +491,10 @@ void Renderer::Render(void) {
         Link(renderList.meshJobs);
         GB_Bind();
         std::for_each(renderList.meshJobs.begin(), renderList.meshJobs.end(),
-            std::bind(BeginFrame, renderList.worldMat, std::placeholders::_1));
+            std::bind(R::BeginFrame, renderList.worldMat, std::placeholders::_1));
         GB_CacheAll();
         DrawFrame(renderList, projectionMat, _time);
     }
-
-    meshMgr.R_Update();
-
-    metrics.frame.time = frameTime.Stop();
-
-    g_rendererSem.Signal();
-    W::g_worldSem.Wait();
-    rlIdx = 1 - rlIdx;
 }
 
 

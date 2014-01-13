@@ -20,12 +20,12 @@ namespace UI {
 
         QTimer _timer;
 
-        R::Renderer     _renderer;
-        R::RenderList   _renderList;
-
         int         _numFrames;
         float       _time;
         SYS::Timer  _rtimer;
+
+        R::Renderer     _renderer;
+        R::RenderList   _renderList;
     protected:
         void initializeGL(void) override;
         void resizeGL(int width, int height) override;

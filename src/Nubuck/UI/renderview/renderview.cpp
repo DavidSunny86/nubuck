@@ -34,8 +34,6 @@ namespace UI {
         }
         _numFrames++;
         _rtimer.Start();
-
-        _renderer.Render();
     }
 
     void RenderView::enterEvent(QEvent* event) {
@@ -110,10 +108,14 @@ namespace UI {
 
     void RenderView::Update(void) {
         updateGL();
-#ifndef NUBUCK_MT
-        W::world.Update();
-#endif
         Outliner::Instance()->Update();
+
+        _renderList.Clear();
+        W::world.Render(_renderList);
+
+        _renderer.BeginFrame();
+        _renderer.Render(_renderList);
+        _renderer.EndFrame();
     }
 
     QLabel* RenderView::FpsLabel(void) {
