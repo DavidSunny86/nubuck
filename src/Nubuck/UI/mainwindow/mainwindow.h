@@ -9,7 +9,7 @@
 
 namespace UI {
 
-	class MainWindow : public QMainWindow {
+	class MainWindow : public QMainWindow, public IMainWindow {
         Q_OBJECT
 	private:
 		Ui::MainWindow  _ui;
@@ -24,6 +24,9 @@ namespace UI {
         void OnShowOutliner(void) { }
     public:
 		MainWindow(void);
+
+        QMenu* GetSceneMenu() override { return _ui.menuScene; }
+        void SetOperatorPanel(QWidget* widget) override;
 	};
 
 } // namespace UI

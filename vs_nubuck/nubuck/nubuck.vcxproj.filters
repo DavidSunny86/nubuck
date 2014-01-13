@@ -216,6 +216,21 @@
     <Filter Include="Private\mainloop">
       <UniqueIdentifier>{94427047-45f9-4567-ace9-a16e9d1ebe4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\UI\operatorpanel">
+      <UniqueIdentifier>{aecc050e-96e7-4c92-b9e0-2e1901096cca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\operators">
+      <UniqueIdentifier>{adb65b1b-9e91-4a09-bcc2-c2783d9614cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\operators\op_gen_incube">
+      <UniqueIdentifier>{a7539c82-fe7d-480a-9ec1-602933c965ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\UI\simple_panel">
+      <UniqueIdentifier>{f37dedb2-9459-4887-aee5-838fb25ee20d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\operators\op_chull">
+      <UniqueIdentifier>{a3ce9a9d-33f5-4a97-a495-0113b837f2b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -538,6 +553,18 @@
     </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\polymesh_fwd.h">
       <Filter>Public\polymesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\UI\operatorpanel\operatorpanel.h">
+      <Filter>Private\UI\operatorpanel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\operator.h">
+      <Filter>Private\operators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\UI\simple_panel\simple_panel.h">
+      <Filter>Private\UI\simple_panel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_chull\op_chull.h">
+      <Filter>Private\operators\op_chull</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -874,6 +901,33 @@
     <ClCompile Include="GeneratedFiles\Release\moc_mainloop.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\operatorpanel\operatorpanel.cpp">
+      <Filter>Private\UI\operatorpanel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\operators.cpp">
+      <Filter>Private\operators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.cpp">
+      <Filter>Private\operators\op_gen_incube</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_operators.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_operators.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\simple_panel\simple_panel.cpp">
+      <Filter>Private\UI\simple_panel</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_op_gen_incube.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_op_gen_incube.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_chull\op_chull.cpp">
+      <Filter>Private\operators\op_chull</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -929,6 +983,12 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\mainloop\mainloop.h">
       <Filter>Private\mainloop</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\operators\operators.h">
+      <Filter>Private\operators</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.h">
+      <Filter>Private\operators\op_gen_incube</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

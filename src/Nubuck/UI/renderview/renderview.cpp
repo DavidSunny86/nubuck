@@ -21,7 +21,7 @@ namespace UI {
         W::world.Send(EV::def_Resize.Create(args));
 
         _renderer.Resize(width, height);
-        Update();
+        // Update();
     }
 
     void RenderView::paintGL(void) {

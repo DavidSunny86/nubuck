@@ -10,6 +10,7 @@
 #include <UI\algorithmwidget\algorithmwidget.h>
 #include <UI\logwidget\logwidget.h>
 #include <UI\outliner\outliner.h>
+#include <UI\operatorpanel\operatorpanel.h>
 #include "mainwindow.h"
 
 namespace {
@@ -69,9 +70,15 @@ namespace UI {
         UI::LogWidget* logWidget = UI::LogWidget::Instance();
         addDockWidget(Qt::RightDockWidgetArea, ScrollableDockWidget("LogWidget", logWidget));
 
+        addDockWidget(Qt::LeftDockWidgetArea, OperatorPanel::Instance());
+
         _renderConfig = new RenderConfig(this);
         _renderConfig->setFloating(true);
         _renderConfig->hide();
+    }
+
+    void MainWindow::SetOperatorPanel(QWidget* panel) {
+        OperatorPanel::Instance()->setWidget(panel);
     }
 
 } // namespace UI

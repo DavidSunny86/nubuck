@@ -16,6 +16,11 @@
 #include <mainloop\mainloop.h>
 #include "nubuck_private.h"
 
+// REMOVEME
+#include <operators\operators.h>
+#include <operators\op_gen_incube\op_gen_incube.h>
+#include <operators\op_chull\op_chull.h>
+
 Nubuck nubuck;
 
 namespace {
@@ -80,6 +85,16 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     ALG::gs_algorithm.SetAlloc(algAlloc);
 
     UI::MainWindow mainWindow;
+
+    nubuck.common   = &common;
+    nubuck.world    = &W::world;
+    nubuck.log      = UI::LogWidget::Instance();
+    nubuck.ui       = &mainWindow;
+
+    // REMOVEME
+    OP::g_operators.Register(new OP::GEN::InCube());
+    OP::g_operators.Register(new OP::ConvexHull());
+
     mainWindow.show();
     return app.exec();
 }

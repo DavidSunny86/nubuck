@@ -57,6 +57,11 @@ namespace W {
             ENT_Geometry*   geometry;
         };
 
+        struct Selection {
+            IGeometry*   geometry;
+            Selection() : geometry(NULL) { }
+        } _selection;
+
         std::vector<GEN::Pointer<Entity> > _entities;
         SYS::SpinLock _entitiesMtx;
 
@@ -117,6 +122,9 @@ namespace W {
         IMesh* CreatePlaneMesh(const PlaneDesc& desc) override;
         IMesh* CreateSphereMesh(const SphereDesc& desc) override;
         IMesh* CreateCylinderMesh(const CylinderDesc& desc) override;
+
+        void SelectGeometry(IGeometry* geom) override { _selection.geometry = geom; }
+        IGeometry* SelectedGeometry() override { return _selection.geometry; }
 
         // thread interface
         DWORD Thread_Func(void);

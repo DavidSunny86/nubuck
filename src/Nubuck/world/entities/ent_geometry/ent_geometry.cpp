@@ -72,29 +72,37 @@ void ENT_Geometry::CompileMesh() {
     _meshCompiled = true;
 }
 
+void ENT_Geometry::Destroy() {
+    // TODO
+    if(_mesh) R::meshMgr.Destroy(_mesh);
+    _meshCompiled = true;
+}
+
 void ENT_Geometry::BuildRenderList() {
     _renderList.renderJobs.clear();
     _renderList.meshJobs.clear();
 
-    if(NULL == _mesh) return;
-
-    R::MeshJob rjob;
-    rjob.fx         = "LitDirectional";
-    rjob.material   = R::Material::White;
-    rjob.mesh       = _mesh;
-    rjob.primType   = 0;
-    rjob.transform  = M::Mat4::Identity();
-    _renderList.meshJobs.push_back(rjob);
-
-    std::vector<R::Nodes::Node> rnodes;
-    leda::node v;
-    forall_nodes(v, _ratPolyMesh) {
-        R::Nodes::Node rnode;
-        rnode.position = ToVector(_ratPolyMesh.position_of(v));
-        rnode.color = R::Color(0.3f, 0.3f, 0.3f);
-        rnodes.push_back(rnode);
+    if(RENDER_SOLID == _renderMode && NULL != _mesh) {
+        R::MeshJob rjob;
+        rjob.fx         = "LitDirectional";
+        rjob.material   = R::Material::White;
+        rjob.mesh       = _mesh;
+        rjob.primType   = 0;
+        rjob.transform  = M::Mat4::Identity();
+        _renderList.meshJobs.push_back(rjob);
     }
-    R::g_nodes.Draw(rnodes);
+
+    if(RENDER_SOLID == _renderMode) {
+        std::vector<R::Nodes::Node> rnodes;
+        leda::node v;
+        forall_nodes(v, _ratPolyMesh) {
+            R::Nodes::Node rnode;
+            rnode.position = ToVector(_ratPolyMesh.position_of(v));
+            rnode.color = R::Color(0.3f, 0.3f, 0.3f);
+            rnodes.push_back(rnode);
+        }
+        R::g_nodes.Draw(rnodes);
+    }
 
     std::vector<R::Edge> redges;
     R::Edge re;

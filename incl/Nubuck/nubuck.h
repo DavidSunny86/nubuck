@@ -14,6 +14,9 @@
 #define NUBUCK_API __declspec(dllimport)
 #endif
 
+class QMenu;
+class QWidget;
+
 struct ICommon {
     virtual ~ICommon(void) { }
 
@@ -57,8 +60,17 @@ struct IMesh {
 };
 
 struct IGeometry {
+    virtual void Destroy() = 0;
+
     virtual leda::nb::RatPolyMesh& GetRatPolyMesh() = 0;
     virtual void Update() = 0;
+
+    enum RenderMode {
+        RENDER_SOLID = 0,
+        RENDER_WIREFRAME
+    };
+
+    virtual void SetRenderMode(RenderMode mode) = 0;
 };
 
 struct IWorld {
@@ -91,6 +103,9 @@ struct IWorld {
     virtual IMesh*          CreatePlaneMesh(const PlaneDesc& desc) = 0;
     virtual IMesh*          CreateSphereMesh(const SphereDesc& desc) = 0;
     virtual IMesh*          CreateCylinderMesh(const CylinderDesc& desc) = 0;
+
+    virtual void SelectGeometry(IGeometry* geometry) = 0;
+    virtual IGeometry* SelectedGeometry() = 0;
 };
 
 struct ILog {
@@ -99,10 +114,18 @@ struct ILog {
     virtual void printf(const char* format, ...) = 0;
 };
 
+struct IMainWindow {
+    virtual ~IMainWindow() { }
+
+    virtual QMenu* GetSceneMenu() = 0;
+    virtual void SetOperatorPanel(QWidget* panel) = 0;
+};
+
 struct Nubuck {
-    ICommon*    common;
-    IWorld*     world;
-    ILog*       log;
+    ICommon*        common;
+    IWorld*     	world;
+    ILog*           log;
+    IMainWindow*    ui;
 };
 
 struct IPhase {
