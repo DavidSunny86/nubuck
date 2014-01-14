@@ -177,8 +177,8 @@ void CylinderEdges::DrawEdges(const M::Matrix4& projectionMat, const M::Matrix4&
 }
 
 void CylinderEdges::Draw(std::vector<Edge>& edges) {
-    RemoveDegeneratedEdges(edges);
     if(!edges.empty()) {
+        RemoveDegeneratedEdges(edges);
         _stagedEdgesMtx.Lock();
         _stagedEdges.insert(_stagedEdges.end(), edges.begin(), edges.end());
         _stagedEdgesMtx.Unlock();

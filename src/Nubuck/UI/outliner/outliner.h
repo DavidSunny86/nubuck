@@ -14,6 +14,7 @@
 #include <UI\colorbutton\colorbutton.h>
 #include <events\events.h>
 #include <world\world.h>
+#include <world\entity.h>
 
 namespace UI {
 
@@ -32,16 +33,13 @@ public:
 class Outliner : public QWidget, public EV::EventHandler<Outliner> {
     DECLARE_EVENT_HANDLER(Outliner);
 private:
-    typedef W::World::EntityType EntityType;
-
-
     struct EntityOutline {
-        EntityType          type;
-        unsigned    		entId;
-        QPushButton*        headerWidget;
-        QWidget*            widget;
-        QGridLayout*        layout;
-        PolyhedronOutline*  polyhedron;
+        W::EntityType::Enum     type;
+        unsigned    		    entId;
+        QPushButton*            headerWidget;
+        QWidget*            	widget;
+        QGridLayout*        	layout;
+        PolyhedronOutline*  	polyhedron;
     };
 
     void EntityOutline_Init(EntityOutline& outln);

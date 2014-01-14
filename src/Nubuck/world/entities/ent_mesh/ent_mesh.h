@@ -2,10 +2,11 @@
 
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
+#include <world\entity.h>
 
 namespace W {
 
-struct ENT_Mesh {
+struct ENT_Mesh : public Entity {
     bool                    isVisible;
     R::MeshMgr::meshPtr_t   meshPtr;
     R::RenderList           renderList;

@@ -5,10 +5,11 @@
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>
+#include <world\entity.h>
 
 namespace W {
 
-class ENT_Geometry : public IGeometry {
+class ENT_Geometry : public IGeometry, public Entity {
 private:
     leda::nb::RatPolyMesh _ratPolyMesh;
 
@@ -26,7 +27,7 @@ public:
     bool IsMeshCompiled() const { return _meshCompiled; }
     void CompileMesh();
 
-    void Destroy() override;
+    void Destroy() override { Entity::Destroy(); }
 
     leda::nb::RatPolyMesh& GetRatPolyMesh() override { return _ratPolyMesh; }
     void Update() override;

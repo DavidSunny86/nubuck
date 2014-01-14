@@ -88,7 +88,7 @@ void Outliner::Event_SpawnPolyhedron(const EV::Event& event) {
     EntityOutline outln;
     outln.entId = args.entId;
     EntityOutline_Init(outln);
-    outln.type = W::World::ENT_POLYHEDRON;
+    outln.type = W::EntityType::ENT_POLYHEDRON;
     PolyhedronOutline_Init(outln);
 
     QTreeWidgetItem* headerIt = new QTreeWidgetItem;
@@ -120,7 +120,7 @@ void Outliner::Event_EntityInfo(const EV::Event& event) {
     assert(outln);
     assert(outln->type == args.entType);
 
-    if(W::World::ENT_POLYHEDRON == args.entType) {
+    if(W::EntityType::ENT_POLYHEDRON == args.entType) {
         W::INF_Polyhedron* phInf = (W::INF_Polyhedron*)inf->inf;
         outln->polyhedron->sbEdgeRadius->setValue(phInf->edgeRadius);
         outln->polyhedron->btnEdgeColor->SetColor(phInf->edgeColor.r, phInf->edgeColor.g, phInf->edgeColor.b);

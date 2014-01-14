@@ -11,6 +11,7 @@
 #include <math\vector3.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\bezier\bezier.h>
+#include <world\entity.h>
 
 namespace W {
 
@@ -109,10 +110,10 @@ struct PolyhedronMesh {
 };
 
 struct PolyhedronSelection {
-    std::vector<bool> nodes;
+    std::vector<int> nodes;
 };
 
-struct ENT_Polyhedron {
+struct ENT_Polyhedron : public Entity {
     unsigned                entId;
     int                     flags;
     int                     renderFlags;

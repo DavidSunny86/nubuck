@@ -161,8 +161,8 @@ namespace W {
 
                 // pick faces
                 for(unsigned i = 0; i < _entities.size(); ++i) {
-                    if(ENT_POLYHEDRON == _entities[i]->type) {
-                        ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                    if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {
+                        ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*_entities[i]);
                         if(!ph.isPickable) continue;
                         leda::edge hitFace = NULL;
                         if(Polyhedron_RaycastFaces(ph, rayOrig, rayDir, hitFace)) {
@@ -174,8 +174,8 @@ namespace W {
             if(EV::Params_Mouse::BUTTON_RIGHT == args.button) {
                 if(_isGrabbing) {
                     for(unsigned i = 0; i < _entities.size(); ++i) {
-                        if(ENT_POLYHEDRON == _entities[i]->type) {
-                            ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                        if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {
+                            ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*_entities[i]);
                             ph.nodes.positions = ph.nodes.oldPositions;
                         }
                     }
@@ -201,8 +201,8 @@ namespace W {
                 } else _camArcball.StartPanning(args.x, args.y);
 
                 for(unsigned i = 0; i < _entities.size(); ++i) {
-                    if(ENT_POLYHEDRON == _entities[i]->type) {
-                        ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                    if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {
+                        ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*_entities[i]);
                         leda::node hitNode = NULL;
                         if(!ph.isPickable) continue;
                         if(Polyhedron_RaycastNodes(ph, rayOrig, rayDir, hitNode)) {
@@ -237,20 +237,21 @@ namespace W {
         }
     }
 
-    GEN::Pointer<World::Entity> World::FindByEntityID(unsigned entId) {
+    GEN::Pointer<Entity> World::FindByEntityID(unsigned entId) {
         for(unsigned i = 0; i < _entities.size(); ++i) {
-            if(_entities[i]->entId == entId) return _entities[i];
+            if(_entities[i]->GetID() == entId) return _entities[i];
         }
-        return GEN::Pointer<World::Entity>();
+        return GEN::Pointer<Entity>();
     }
 
     void World::GetInfo(Entity& ent, EntityInf& inf) {
-        inf.entId   = ent.entId;
-        inf.name    = ent.name;
+        inf.entId   = ent.GetID();
+        inf.name    = ent.GetName();
         
-        if(ENT_POLYHEDRON == ent.type) {
+        if(EntityType::ENT_POLYHEDRON == ent.GetType()) {
+            ENT_Polyhedron& ph = *(static_cast<ENT_Polyhedron*>(&ent));
             INF_Polyhedron* phInf = new INF_Polyhedron;
-            Polyhedron_GetInfo(*ent.polyhedron, *phInf);
+            Polyhedron_GetInfo(ph, *phInf);
             inf.inf = phInf;
         }
     }
@@ -261,33 +262,36 @@ namespace W {
 
     void World::Event_LinkEntity(const EV::Event& event) {
         const EV::Params_LinkEntity& args = EV::def_LinkEntity.GetArgs(event);
-        GEN::Pointer<Entity> entity((Entity*)args.entity);
+        GEN::Pointer<Entity> entity(args.entity);
         _entities.push_back(entity);
     }
 
     void World::Event_SpawnPolyhedron(const EV::Event& event) {
         const EV::Params_SpawnPolyhedron& args = EV::def_SpawnPolyhedron.GetArgs(event);
-        GEN::Pointer<Entity> entity(new Entity());
-        entity->type = ENT_POLYHEDRON;
-        entity->entId = args.entId;
-        entity->fxName = "LitDirectional";
-        entity->transform.position = M::Vector3::Zero;
-        entity->transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
-        entity->transform.rotation = M::Mat4::Identity();
-        ENT_Polyhedron* ph = new ENT_Polyhedron();
+
+        GEN::Pointer<ENT_Polyhedron> ph(new ENT_Polyhedron());
+        ph->SetType(EntityType::ENT_POLYHEDRON);
+        ph->SetID(args.entId);
+        ph->SetFxName("LitDirectional");
+
+        EntTransform transform;
+        transform.position = M::Vector3::Zero;
+        transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
+        transform.rotation = M::Mat4::Identity();
+        ph->SetTransform(transform);
+
         const graph_t& G = *args.G;
         Polyhedron_Init(*ph);
         Polyhedron_Rebuild(*ph, G, *args.cachedNodes, *args.cachedEdges);
         Polyhedron_Update(*ph, G);
-        entity->polyhedron = ph;
-        _entities.push_back(entity);
+        _entities.push_back(ph);
 
         UI::Outliner::Instance()->Send(event);
 
         EntityInf* inf = new EntityInf;
-        GetInfo(*entity, *inf);
+        GetInfo(*ph, *inf);
         EV::Params_EntityInfo infArgs;
-        infArgs.entType = ENT_POLYHEDRON;
+        infArgs.entType = EntityType::ENT_POLYHEDRON;
         infArgs.inf = inf;
         UI::Outliner::Instance()->Send(EV::def_EntityInfo.Create(infArgs));
 
@@ -296,23 +300,25 @@ namespace W {
 
     void World::Event_SpawnMesh(const EV::Event& event) {
         const EV::Params_SpawnMesh& args = EV::def_SpawnMesh.GetArgs(event);
-        GEN::Pointer<Entity> entity(new Entity());
-        entity->type = ENT_MESH;
-        entity->entId = args.entId;
-        entity->fxName = "LitDirectional";
-        entity->transform.position = M::Vector3::Zero;
-        entity->transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
-        entity->transform.rotation = M::Mat4::Identity();
-        ENT_Mesh* mesh = new ENT_Mesh();
+        GEN::Pointer<ENT_Mesh> mesh(new ENT_Mesh());
+        mesh->SetType(EntityType::ENT_MESH);
+        mesh->SetID(args.entId);
+        mesh->SetFxName("LitDirectional");
+
+        EntTransform transform;
+        transform.position = M::Vector3::Zero;
+        transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
+        transform.rotation = M::Mat4::Identity();
+        mesh->SetTransform(transform);
+
         Mesh_Init(*mesh, args.meshPtr);
-        entity->mesh = mesh;
-        _entities.push_back(entity);
+        _entities.push_back(mesh);
     }
 
     void World::Event_DestroyEntity(const EV::Event& event) {
         const EV::Params_DestroyEntity& args = EV::def_DestroyEntity.GetArgs(event);
         for(unsigned i = 0; i < _entities.size(); ++i) {
-            if(_entities[i]->entId == args.entId && ENT_POLYHEDRON == _entities[i]->type) {
+            if(_entities[i]->GetID() == args.entId) {
                 std::swap(_entities[i], _entities.back());
                 _entities.erase(_entities.end() - 1);
             }
@@ -322,8 +328,8 @@ namespace W {
     void World::Event_Rebuild(const EV::Event& event) {
         const EV::Params_Rebuild& args = EV::def_Rebuild.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
-            ENT_Polyhedron& ph = *entity->polyhedron;
+        if(entity.IsValid() && EntityType::ENT_POLYHEDRON == entity->GetType()) {
+            ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*entity);
             const graph_t& G = *args.G;
             Polyhedron_Rebuild(ph, G, *args.cachedNodes, *args.cachedEdges);
             Polyhedron_Update(ph, G);
@@ -335,8 +341,8 @@ namespace W {
     void World::Event_SetVisible(const EV::Event& event) {
         const EV::Params_SetVisible& args = EV::def_SetVisible.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid() && ENT_MESH == entity->type) {
-            ENT_Mesh& mesh = *entity->mesh;
+        if(entity.IsValid() && EntityType::ENT_MESH == entity->GetType()) {
+            ENT_Mesh& mesh = static_cast<ENT_Mesh&>(*entity);
             mesh.isVisible = args.isVisible;
         }
     }
@@ -345,7 +351,7 @@ namespace W {
         const EV::Params_SetName& args = EV::def_SetName.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
         assert(entity.IsValid());
-        entity->name = args.name;
+        entity->SetName(args.name);
 
         UI::Outliner::Instance()->Send(event);
     }
@@ -353,26 +359,26 @@ namespace W {
     void World::Event_SetPosition(const EV::Event& event) {
         const EV::Params_SetPosition& args = EV::def_SetPosition.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid()) entity->transform.position = args.pos;
+        if(entity.IsValid()) entity->GetTransform().position = args.pos;
     }
 
     void World::Event_SetScale(const EV::Event& event) {
         const EV::Params_SetScale& args = EV::def_SetScale.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid()) entity->transform.scale = M::Vector3(args.sx, args.sy, args.sz);
+        if(entity.IsValid()) entity->GetTransform().scale = M::Vector3(args.sx, args.sy, args.sz);
     }
 
     void World::Event_SetRotation(const EV::Event& event) {
         const EV::Params_SetRotation& args = EV::def_SetRotation.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid()) entity->transform.rotation = args.mat;
+        if(entity.IsValid()) entity->GetTransform().rotation = args.mat;
     }
 
     void World::Event_SetRenderFlags(const EV::Event& event) {
         const EV::Params_SetRenderFlags& args = EV::def_SetRenderFlags.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
-            ENT_Polyhedron& ph = *entity->polyhedron;
+        if(entity.IsValid() && EntityType::ENT_POLYHEDRON == entity->GetType()) {
+            ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*entity);
             ph.renderFlags = args.flags;
         }
     }
@@ -380,8 +386,8 @@ namespace W {
     void World::Event_SetPickable(const EV::Event& event) {
         const EV::Params_SetPickable& args = EV::def_SetPickable.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
-            ENT_Polyhedron& ph = *entity->polyhedron;
+        if(entity.IsValid() && EntityType::ENT_POLYHEDRON == entity->GetType()) {
+            ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*entity);
             ph.isPickable = args.isPickable;
         }
     }
@@ -389,8 +395,8 @@ namespace W {
     void World::Event_SetNodeColor(const EV::Event& event) {
         const EV::Params_SetNodeColor& args = EV::def_SetNodeColor.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
-            ENT_Polyhedron& ph = *entity->polyhedron;
+        if(entity.IsValid() && EntityType::ENT_POLYHEDRON == entity->GetType()) {
+            ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*entity);
             ph.nodes.colors[args.node->id()] = args.color;
         }
     }
@@ -398,8 +404,8 @@ namespace W {
     void World::Event_SetEdgeColor(const EV::Event& event) {
         const EV::Params_SetEdgeColor& args = EV::def_SetEdgeColor.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
-            ENT_Polyhedron& ph = *entity->polyhedron;
+        if(entity.IsValid() && EntityType::ENT_POLYHEDRON == entity->GetType()) {
+            ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*entity);
             ph.edges.colors[args.edge->id()].cur = args.color;
         }
     }
@@ -407,7 +413,7 @@ namespace W {
     void World::Event_SetFaceColor(const EV::Event& event) {
         const EV::Params_SetFaceColor& args = EV::def_SetFaceColor.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
+        if(entity.IsValid() && EntityType::ENT_POLYHEDRON == entity->GetType()) {
             /*
             PolyhedronHullFaceList& face = ph.hull.faceLists[ph.hull.edges[args->edge->id()].faceIdx];
             for(unsigned i = 0; i < face.size; ++i) {
@@ -416,7 +422,7 @@ namespace W {
             Polyhedron_Update(ph);
             */
             // Polyhedron_AddCurve(ph, args->edge, args->color);
-            ENT_Polyhedron& ph = *entity->polyhedron;
+            ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*entity);
             Polyhedron_SetFaceColor(ph, args.edge, args.color);
         }
     }
@@ -424,8 +430,8 @@ namespace W {
     void World::Event_SetFaceVisibility(const EV::Event& event) {
         const EV::Params_SetFaceVisibility& args = EV::def_SetFaceVisibility.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
-            ENT_Polyhedron& ph = *entity->polyhedron;
+        if(entity.IsValid() && EntityType::ENT_POLYHEDRON == entity->GetType()) {
+            ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*entity);
             Polyhedron_SetFaceVisibility(ph, args.edge, args.visible);
             // Polyhedron_Update(ph); TODO
         }
@@ -434,8 +440,8 @@ namespace W {
     void World::Event_SetHullAlpha(const EV::Event& event) {
         const EV::Params_SetHullAlpha& args = EV::def_SetHullAlpha.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
-        if(entity.IsValid() && ENT_POLYHEDRON == entity->type) {
-            ENT_Polyhedron& ph = *entity->polyhedron;
+        if(entity.IsValid() && EntityType::ENT_POLYHEDRON == entity->GetType()) {
+            ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*entity);
             Polyhedron_SetHullAlpha(ph, args.alpha);
         }
     }
@@ -444,23 +450,25 @@ namespace W {
         const EV::Params_SetEdgeBaseColor& args = EV::def_SetEdgeBaseColor.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
         assert(entity.IsValid());
-        assert(ENT_POLYHEDRON == entity->type);
-        entity->polyhedron->edges.baseColor = args.color;
+        assert(EntityType::ENT_POLYHEDRON == entity->GetType());
+        ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*entity);
+        ph.edges.baseColor = args.color;
     }
 
     void World::Event_SetEdgeRadius(const EV::Event& event) {
         const EV::Params_SetEdgeRadius& args = EV::def_SetEdgeRadius.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
         assert(entity.IsValid());
-        assert(ENT_POLYHEDRON == entity->type);
-        entity->polyhedron->edges.radius = args.radius;
+        assert(EntityType::ENT_POLYHEDRON == entity->GetType());
+        ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*entity);
+        ph.edges.radius = args.radius;
     }
 
     void World::Event_SetEffect(const EV::Event& event) {
         const EV::Params_SetEffect& args = EV::def_SetEffect.GetArgs(event);
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
         assert(entity.IsValid());
-        entity->fxName = args.fxName;
+        entity->SetFxName(args.fxName);
     }
 
     void World::Event_Resize(const EV::Event& event) {
@@ -481,8 +489,8 @@ namespace W {
 
 
                 for(unsigned i = 0; i < _entities.size(); ++i) {
-                    if(ENT_POLYHEDRON == _entities[i]->type) {
-                        ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                    if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {
+                        ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*_entities[i]);
                         ph.nodes.oldPositions = ph.nodes.positions;
                     }
                 }
@@ -553,8 +561,8 @@ namespace W {
             const M::Vector3 rayOrig = M::Transform(invWorld, M::Vector3::Zero);
 
             for(unsigned i = 0; i < _entities.size(); ++i) {
-                if(ENT_POLYHEDRON == _entities[i]->type) {
-                    ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+                if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {
+                    ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*_entities[i]);
                     unsigned numNodes = ph.nodes.positions.size();
                     for(unsigned j = 0; j < numNodes; ++j) {
                         if(ph.selection.nodes[j]) {
@@ -593,45 +601,45 @@ namespace W {
         } // if(isGrabbing)
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
-            if(ENT_POLYHEDRON == _entities[i]->type) {
-                ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+            if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {
+                ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*_entities[i]);
                 Polyhedron_Update(ph);
             }
         }
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
-            if(ENT_POLYHEDRON == _entities[i]->type) {
-                ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+            if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {
+                ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*_entities[i]);
                 for(unsigned j = 0; j < ph.faces.curves.size(); ++j)
                     Polyhedron_UpdateCurve(ph.faces.curves[j], _secsPassed);
             }
         }
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
-            if(ENT_POLYHEDRON == _entities[i]->type) {
-                ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+            if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {
+                ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*_entities[i]);
                 Polyhedron_UpdateFaceColors(ph, _secsPassed);
             }
         }
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
             GEN::Pointer<Entity> entity = _entities[i];
-            if(ENT_POLYHEDRON == entity->type) {
-                ENT_Polyhedron& ph = *entity->polyhedron;
-                Polyhedron_BuildRenderList(ph, entity->fxName);
+            if(EntityType::ENT_POLYHEDRON == entity->GetType()) {
+                ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*_entities[i]);
+                Polyhedron_BuildRenderList(ph, entity->GetFxName());
             }
-            if(ENT_MESH == entity->type) {
-                ENT_Mesh& mesh = *entity->mesh;
-                const Transform& tf = entity->transform;
+            if(EntityType::ENT_MESH == entity->GetType()) {
+                ENT_Mesh& mesh = static_cast<ENT_Mesh&>(*entity);
+                const EntTransform& tf = entity->GetTransform();
                 M::Matrix4 transform = M::Mat4::Translate(tf.position) * tf.rotation * M::Mat4::Scale(tf.scale.x, tf.scale.y, tf.scale.z);
-                Mesh_BuildRenderList(mesh, entity->fxName, transform);
+                Mesh_BuildRenderList(mesh, entity->GetFxName(), transform);
             }
         }
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
             GEN::Pointer<Entity> entity = _entities[i];
-            if(ENT_GEOMETRY == entity->type) {
-                ENT_Geometry& geom = *entity->geometry;
+            if(EntityType::ENT_GEOMETRY == entity->GetType()) {
+                ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
                 geom.CompileMesh();
                 geom.BuildRenderList();
             }
@@ -651,20 +659,20 @@ namespace W {
         renderList.renderJobs.push_back(&R::g_lineEdges);
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
-            if(ENT_POLYHEDRON == _entities[i]->type) {
-                ENT_Polyhedron& ph = *_entities[i]->polyhedron;
+            if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {
+                ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*_entities[i]);
                 renderList.meshJobs.insert(renderList.meshJobs.end(),
                     ph.renderList.meshJobs.begin(),
                     ph.renderList.meshJobs.end());
             }
-            if(ENT_MESH == _entities[i]->type) {
-                ENT_Mesh& mesh = *_entities[i]->mesh;
+            if(EntityType::ENT_MESH == _entities[i]->GetType()) {
+                ENT_Mesh& mesh = static_cast<ENT_Mesh&>(*_entities[i]);
                 renderList.meshJobs.insert(renderList.meshJobs.end(),
                     mesh.renderList.meshJobs.begin(),
                     mesh.renderList.meshJobs.end());
             }
-            if(ENT_GEOMETRY == _entities[i]->type) {
-                ENT_Geometry& geom = *_entities[i]->geometry;
+            if(EntityType::ENT_GEOMETRY == _entities[i]->GetType()) {
+                ENT_Geometry& geom = static_cast<ENT_Geometry&>(*_entities[i]);
                 renderList.meshJobs.insert(renderList.meshJobs.end(),
                     geom.GetRenderList().meshJobs.begin(),
                     geom.GetRenderList().meshJobs.end());
@@ -681,19 +689,20 @@ namespace W {
         unsigned entId = entIdCnt++;
         entIdCntMtx.Unlock();
 
-        Entity* entity = new Entity;
-        entity->type = ENT_GEOMETRY;
-        entity->entId = entId;
-        entity->fxName = "LitDirectional";
-        entity->transform.position = M::Vector3::Zero;
-        entity->transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
-        entity->transform.rotation = M::Mat4::Identity();
-        ENT_Geometry* geom = new ENT_Geometry();
-        entity->geometry = geom;
+        ENT_Geometry* geom = new ENT_Geometry;
+        geom->SetType(EntityType::ENT_GEOMETRY);
+        geom->SetID(entId);
+        geom->SetFxName("LitDirectional");
+
+        EntTransform transform;
+        transform.position = M::Vector3::Zero;
+        transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
+        transform.rotation = M::Mat4::Identity();
+        geom->SetTransform(transform);
 
         printf(">>>>>>>>>>>>>>>>>> BEGIN PUSHING BACK GEOM ENTITY\n");
         EV::Params_LinkEntity args;
-        args.entity = entity;
+        args.entity = geom;
         Send(EV::def_LinkEntity.Create(args));
         printf(">>>>>>>>>>>>>>>>>> END PUSHING BACK GEOM ENTITY\n");
 

@@ -15,6 +15,7 @@
 #include <renderer\renderer.h>
 #include <camera\arcball_camera.h>
 #include <events\events.h>
+#include "entity.h"
 
 namespace W {
 
@@ -32,31 +33,7 @@ namespace W {
 
     class World : public IWorld, public SYS::Thread, public EV::EventHandler<World> {
         DECLARE_EVENT_HANDLER(World)
-    public:
-        enum EntityType {
-            ENT_POLYHEDRON  = 0,
-            ENT_MESH,
-            ENT_GEOMETRY
-        };
     private:
-        struct Transform {
-            M::Vector3  position;
-            M::Vector3  scale;
-            M::Matrix4  rotation;
-        };
-
-        struct Entity {
-            EntityType      type;
-            unsigned        entId;
-            std::string     name;
-            std::string     fxName;
-            Transform       transform;
-
-            ENT_Polyhedron* polyhedron;
-            ENT_Mesh*       mesh;
-            ENT_Geometry*   geometry;
-        };
-
         struct Selection {
             IGeometry*   geometry;
             Selection() : geometry(NULL) { }

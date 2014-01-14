@@ -72,12 +72,6 @@ void ENT_Geometry::CompileMesh() {
     _meshCompiled = true;
 }
 
-void ENT_Geometry::Destroy() {
-    // TODO
-    if(_mesh) R::meshMgr.Destroy(_mesh);
-    _meshCompiled = true;
-}
-
 void ENT_Geometry::BuildRenderList() {
     _renderList.renderJobs.clear();
     _renderList.meshJobs.clear();
@@ -114,7 +108,6 @@ void ENT_Geometry::BuildRenderList() {
         re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
         redges.push_back(re);
     }
-    redges.push_back(re);
     R::g_cylinderEdges.Draw(redges);
 }
 

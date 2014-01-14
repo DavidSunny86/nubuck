@@ -3,13 +3,14 @@
 #include <common\types.h>
 #include <renderer\renderer.h>
 #include <world\world.h>
+#include <world\entity.h>
 #include <events\events.h>
 
 BEGIN_EVENT_DEF(Apocalypse)
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(LinkEntity)
-    void* entity;
+    W::Entity* entity;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(SpawnPolyhedron)
