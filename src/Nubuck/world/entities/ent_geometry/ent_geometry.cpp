@@ -13,6 +13,20 @@ M::Vector3 ToVector(const leda::d3_rat_point& p) {
 
 namespace W {
 
+void ENT_Geometry::TransformVertices() {
+    _tfverts = _vertices;
+    for(unsigned i = 0; i < _vertices.size(); ++i) {
+        _tfverts[i].position = Transform(_vertices[i].position);
+    }
+}
+
+ENT_Geometry::ENT_Geometry() : 
+_mesh(NULL), 
+_meshCompiled(true), 
+_renderMode(0), 
+_shadingMode(ShadingMode::NICE)
+{ }
+
 void ENT_Geometry::Update() {
     _vertices.clear();
     _indices.clear();
@@ -42,7 +56,7 @@ void ENT_Geometry::Update() {
 
         R::Mesh::Vertex vert;
         vert.normal = normal;
-        vert.color = R::Color::White;
+        vert.color = _ratPolyMesh.color_of(f);
 
         leda::edge it = e;
         do {
@@ -72,11 +86,18 @@ void ENT_Geometry::CompileMesh() {
     _meshCompiled = true;
 }
 
+void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
+    GetTransform().rotation = M::RotationOf(M::Mat4::RotateAxis(M::Normalize(M::Vector3(x, y, z)), ang)) * GetTransform().rotation;
+}
+
 void ENT_Geometry::BuildRenderList() {
     _renderList.renderJobs.clear();
     _renderList.meshJobs.clear();
 
-    if(RENDER_SOLID == _renderMode && NULL != _mesh) {
+    if(RenderMode::FACES & _renderMode && NULL != _mesh) {
+        TransformVertices();
+        R::meshMgr.GetMesh(_mesh).Invalidate(&_tfverts[0]);
+
         R::MeshJob rjob;
         rjob.fx         = "LitDirectional";
         rjob.material   = R::Material::White;
@@ -86,7 +107,7 @@ void ENT_Geometry::BuildRenderList() {
         _renderList.meshJobs.push_back(rjob);
     }
 
-    if(RENDER_SOLID == _renderMode) {
+    if(RenderMode::NODES & _renderMode && ShadingMode::NICE == _shadingMode) {
         std::vector<R::Nodes::Node> rnodes;
         leda::node v;
         forall_nodes(v, _ratPolyMesh) {
@@ -98,17 +119,19 @@ void ENT_Geometry::BuildRenderList() {
         R::g_nodes.Draw(rnodes);
     }
 
-    std::vector<R::Edge> redges;
-    R::Edge re;
-    re.radius = 0.02f;
-    leda::edge e;
-    forall_edges(e, _ratPolyMesh) {
-        re.color = R::Color(0.3f, 0.3f, 0.3f);
-        re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
-        re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
-        redges.push_back(re);
+    if(RenderMode::EDGES & _renderMode && ShadingMode::NICE == _shadingMode) {
+        std::vector<R::Edge> redges;
+        R::Edge re;
+        re.radius = 0.02f;
+        leda::edge e;
+        forall_edges(e, _ratPolyMesh) {
+            re.color = R::Color(0.3f, 0.3f, 0.3f);
+            re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
+            re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
+            redges.push_back(re);
+        }
+        R::g_cylinderEdges.Draw(redges);
     }
-    R::g_cylinderEdges.Draw(redges);
 }
 
 } // namespace W

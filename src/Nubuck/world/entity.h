@@ -1,13 +1,13 @@
 #pragma once
 
 #include <math\vector3.h>
-#include <math\matrix4.h>
+#include <math\matrix3.h>
 
 namespace W {
 
 struct EntTransform {
     M::Vector3  position;
-    M::Matrix4  rotation;
+    M::Matrix3  rotation;
     M::Vector3  scale;
 };
 
@@ -36,6 +36,7 @@ public:
     const EntTransform& GetTransform() const { return _transform; }
 
     EntTransform&       GetTransform() { return _transform; }
+    M::Vector3          Transform(const M::Vector3& v);
 
     void                SetType(EntityType::Enum type) { _type = type; }
     void                SetID(unsigned id) { _entId = id; }

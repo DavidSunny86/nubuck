@@ -65,12 +65,26 @@ struct IGeometry {
     virtual leda::nb::RatPolyMesh& GetRatPolyMesh() = 0;
     virtual void Update() = 0;
 
-    enum RenderMode {
-        RENDER_SOLID = 0,
-        RENDER_WIREFRAME
+    struct RenderMode {
+        enum Flags {
+            FACES    = (1 << 0),
+            NODES    = (1 << 1),
+            EDGES    = (1 << 2)
+        };
     };
 
-    virtual void SetRenderMode(RenderMode mode) = 0;
+    struct ShadingMode {
+        enum Enum {
+            NICE = 0,
+            FAST
+        };
+    };
+
+    virtual void SetPosition(float x, float y, float z) = 0;
+    virtual void Rotate(float ang, float x, float y, float z) = 0;
+
+    virtual void SetRenderMode(int flags) = 0;
+    virtual void SetShadingMode(ShadingMode::Enum mode) = 0;
 };
 
 struct IWorld {

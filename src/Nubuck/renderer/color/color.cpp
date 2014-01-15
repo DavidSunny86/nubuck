@@ -1,7 +1,8 @@
 #include <stdlib.h>
 
+#include <Nubuck\renderer\color\color.h>
+
 #include <math\math.h>
-#include "color.h"
 
 static float RandomIn01(void) {
     const unsigned range = 1000;

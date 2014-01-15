@@ -4,7 +4,6 @@
 
 #include <generic\pointer.h>
 #include <generic\uncopyable.h>
-#include <renderer\color\color.h>
 #include <renderer\shader\shader.h>
 #include <renderer\program\program.h>
 #include <renderer\effects\state.h>

@@ -231,6 +231,15 @@
     <Filter Include="Private\operators\op_chull">
       <UniqueIdentifier>{a3ce9a9d-33f5-4a97-a495-0113b837f2b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_translate">
+      <UniqueIdentifier>{11dbda2c-5f2e-435e-baac-b2b295912593}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\renderer">
+      <UniqueIdentifier>{c70f0992-5327-40aa-ba25-b9156690e2ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\renderer\color">
+      <UniqueIdentifier>{6b790fd9-1337-4dba-bad9-62cf75603351}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -265,12 +274,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\program\program.h">
       <Filter>Private\renderer\program</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\renderer\color\color.h">
-      <Filter>Private\renderer\color</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\renderer\color\color_inl.h">
-      <Filter>Private\renderer\color</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\math\line_mem_inl.h">
       <Filter>Private\math</Filter>
@@ -565,6 +568,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\operators\op_chull\op_chull.h">
       <Filter>Private\operators\op_chull</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_translate\op_translate.h">
+      <Filter>Private\operators\op_translate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\renderer\color\color.h">
+      <Filter>Public\renderer\color</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\renderer\color\color_inl.h">
+      <Filter>Public\renderer\color</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -927,6 +939,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\operators\op_chull\op_chull.cpp">
       <Filter>Private\operators\op_chull</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_translate\op_translate.cpp">
+      <Filter>Private\operators\op_translate</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

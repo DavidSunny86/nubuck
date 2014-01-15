@@ -49,7 +49,7 @@ namespace Proxy {
         M::Vector3 d = M::Normalize(M::Vector3(x, y, z));
         EV::Params_SetRotation args;
         args.entId = _entId;
-        args.mat = _AlignZ(d);
+        args.mat = M::RotationOf(_AlignZ(d));
         W::world.Send(EV::def_SetRotation.Create(args));
     }
 
@@ -60,7 +60,7 @@ namespace Proxy {
         M::Matrix3 m = M::Mat3::FromColumns(x, y, z);
         EV::Params_SetRotation args;
         args.entId = _entId;
-        args.mat = M::Mat4::FromRigidTransform(m, M::Vector3::Zero);
+        args.mat = m;
         W::world.Send(EV::def_SetRotation.Create(args));
     }
 

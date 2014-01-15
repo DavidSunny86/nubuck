@@ -5,12 +5,13 @@
 #include <Windows.h> // OutputDebugString
 #endif
 
+#include <Nubuck\renderer\color\color.h>
+
 #include <common\common.h>
 #include <math\vector3.h>
 #include <math\matrix3.h>
 #include <math\matrix4.h>
 #include <renderer\glcall.h>
-#include <renderer\color\color.h>
 #include <renderer\shader\shader.h>
 #include <renderer\program\program.h>
 

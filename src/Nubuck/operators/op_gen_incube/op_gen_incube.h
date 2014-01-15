@@ -106,8 +106,10 @@ public:
         CreateOperatorPanel();
 
         _bbox = _nb.world->CreateGeometry();
-        _bbox->SetRenderMode(IGeometry::RENDER_WIREFRAME);
+        _bbox->SetRenderMode(IGeometry::RenderMode::EDGES);
+        // _bbox->SetShadingMode(IGeometry::ShadingMode::FAST);
         _cloud = _nb.world->CreateGeometry();
+        _cloud->SetRenderMode(IGeometry::RenderMode::NODES);
 
         _nb.world->SelectGeometry(_cloud);
 

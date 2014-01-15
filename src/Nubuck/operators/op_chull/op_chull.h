@@ -34,6 +34,7 @@ public:
         forall_nodes(v, cloudMesh) L.push_back(cloudMesh.position_of(v));
 
         IGeometry* chull = _nb.world->CreateGeometry();
+        chull->SetRenderMode(IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES);
         leda::nb::RatPolyMesh& chullMesh = chull->GetRatPolyMesh();
         leda::CONVEX_HULL(L, chullMesh);
         chullMesh.compute_faces();

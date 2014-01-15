@@ -14,15 +14,19 @@ private:
     leda::nb::RatPolyMesh _ratPolyMesh;
 
     std::vector<R::Mesh::Vertex>    _vertices;
+    std::vector<R::Mesh::Vertex>    _tfverts;
     std::vector<R::Mesh::Index>     _indices;
     R::Mesh::Desc                   _meshDesc;
     R::MeshMgr::meshPtr_t           _mesh;
     bool                            _meshCompiled; // TODO: might be a race cond
 
-    RenderMode                      _renderMode;
-    R::RenderList                   _renderList;
+    int                 _renderMode;
+    ShadingMode::Enum   _shadingMode;
+    R::RenderList       _renderList;
+
+    void TransformVertices();
 public:
-    ENT_Geometry() : _mesh(NULL), _meshCompiled(true), _renderMode(RENDER_SOLID) { }
+    ENT_Geometry();
 
     bool IsMeshCompiled() const { return _meshCompiled; }
     void CompileMesh();
@@ -31,7 +35,12 @@ public:
 
     leda::nb::RatPolyMesh& GetRatPolyMesh() override { return _ratPolyMesh; }
     void Update() override;
-    void SetRenderMode(RenderMode mode) override { _renderMode = mode; Update(); }
+
+    void SetPosition(float x, float y, float z) override { GetTransform().position = M::Vector3(x, y, z); }
+    void Rotate(float ang, float x, float y, float z) override;
+
+    void SetRenderMode(int flags) override { _renderMode = flags; }
+    void SetShadingMode(ShadingMode::Enum mode) override { _shadingMode = mode; }
 
     void BuildRenderList();
     const R::RenderList& GetRenderList() const { return _renderList; }

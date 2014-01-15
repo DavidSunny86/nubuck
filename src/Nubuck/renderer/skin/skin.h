@@ -2,7 +2,8 @@
 
 #include <string>
 
-#include <renderer\color\color.h>
+#include <Nubuck\renderer\color\color.h>
+
 #include <renderer\textures\texture.h>
 
 namespace R {

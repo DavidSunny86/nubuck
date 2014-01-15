@@ -58,7 +58,7 @@ END_EVENT_DEF
 
 BEGIN_EVENT_DEF(SetRotation)
     unsigned    entId;
-    M::Matrix4  mat;
+    M::Matrix3  mat;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(SetRenderFlags)

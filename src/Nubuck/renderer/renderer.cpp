@@ -357,7 +357,13 @@ static MeshJob* DrawMeshList(Program& prog, const State& state, int passType, in
     MeshJob* meshJob = first;
     while(meshJob && meshJob->fx == first->fx) {
         Mesh& mesh = meshMgr.GetMesh(meshJob->mesh);
-        mesh.R_AppendTriangles(tris, localEye);
+        if(mesh.IsSolid()) mesh.R_AppendTriangles(tris, localEye);
+        else {
+            BindMeshAttributes();
+            GL_CALL(glDrawElements(mesh.PrimitiveType(), mesh.NumIndices(), ToGLEnum<Mesh::Index>::ENUM, mesh.Indices()));
+            metrics.frame.numDrawCalls++;
+            UnbindMeshAttributes();
+        }
         meshJob = meshJob->next;
     }
     triIt_t trisEnd = tris.end();
@@ -430,7 +436,6 @@ static void Link(std::vector<R::MeshJob>& renderJobs) {
 static void BeginFrame(const M::Matrix4& worldMat, R::MeshJob& rjob) {
     effectMgr.GetEffect(rjob.fx)->Compile();
     Mesh& mesh = meshMgr.GetMesh(rjob.mesh);
-    mesh.Transform(rjob.transform);
     mesh.R_UpdateBuffer();
 }
 

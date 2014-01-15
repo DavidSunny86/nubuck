@@ -1,7 +1,8 @@
 #pragma once
 
+#include <Nubuck\renderer\color\color.h>
+
 #include <math\vector3.h>
-#include <renderer\color\color.h>
 
 namespace R {
 

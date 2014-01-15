@@ -277,7 +277,7 @@ namespace W {
         EntTransform transform;
         transform.position = M::Vector3::Zero;
         transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
-        transform.rotation = M::Mat4::Identity();
+        transform.rotation = M::Mat3::Identity();
         ph->SetTransform(transform);
 
         const graph_t& G = *args.G;
@@ -308,7 +308,7 @@ namespace W {
         EntTransform transform;
         transform.position = M::Vector3::Zero;
         transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
-        transform.rotation = M::Mat4::Identity();
+        transform.rotation = M::Mat3::Identity();
         mesh->SetTransform(transform);
 
         Mesh_Init(*mesh, args.meshPtr);
@@ -631,7 +631,10 @@ namespace W {
             if(EntityType::ENT_MESH == entity->GetType()) {
                 ENT_Mesh& mesh = static_cast<ENT_Mesh&>(*entity);
                 const EntTransform& tf = entity->GetTransform();
-                M::Matrix4 transform = M::Mat4::Translate(tf.position) * tf.rotation * M::Mat4::Scale(tf.scale.x, tf.scale.y, tf.scale.z);
+                M::Matrix4 transform = 
+                    M::Mat4::Translate(tf.position) * 
+                    M::Mat4::FromRigidTransform(tf.rotation, M::Vector3::Zero) * 
+                    M::Mat4::Scale(tf.scale.x, tf.scale.y, tf.scale.z);
                 Mesh_BuildRenderList(mesh, entity->GetFxName(), transform);
             }
         }
@@ -697,7 +700,7 @@ namespace W {
         EntTransform transform;
         transform.position = M::Vector3::Zero;
         transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
-        transform.rotation = M::Mat4::Identity();
+        transform.rotation = M::Mat3::Identity();
         geom->SetTransform(transform);
 
         printf(">>>>>>>>>>>>>>>>>> BEGIN PUSHING BACK GEOM ENTITY\n");

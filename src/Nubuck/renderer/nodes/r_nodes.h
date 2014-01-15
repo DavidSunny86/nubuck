@@ -1,13 +1,15 @@
 #pragma once
 
 #include <vector>
+
+#include <Nubuck\renderer\color\color.h>
+
 #include <generic\uncopyable.h>
 #include <generic\pointer.h>
 #include <math\vector2.h>
 #include <math\vector3.h>
 #include <system\locks\spinlock.h>
 #include <renderer\renderer.h>
-#include <renderer\color\color.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\staticbuffer.h>
 

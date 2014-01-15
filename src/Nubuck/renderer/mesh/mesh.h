@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <Nubuck\renderer\color\color.h>
+
 #include <common\common.h>
 
 #include <generic\pointer.h>
@@ -11,7 +13,6 @@
 #include <math\vector3.h>
 #include <math\vector2.h>
 #include <math\matrix4.h>
-#include <renderer\color\color.h>
 #include <renderer\mesh\staticbuffer.h>
 #include <system\locks\spinlock.h>
 
@@ -59,11 +60,8 @@ private:
     SYS::SpinLock _mtx;
 
     std::vector<Vertex> _vertices;
-    std::vector<Vertex> _tfverts;
     std::vector<Index>  _indices;
     GLenum              _primType;
-    M::Matrix4          _transform;
-    unsigned            _numVerts;
 
     std::vector<TriIndices> _triangleIndices;
 
@@ -73,9 +71,13 @@ public:
     Mesh(const Desc& desc); // deep copy
     ~Mesh();
 
+    bool            IsSolid() const;
+    GLenum      	PrimitiveType() const;
+    unsigned    	NumIndices() const;
+    const Index*    Indices() const;
+
     void Invalidate(Mesh::Vertex* const vertices); // assumes number of vertices and indices is constant
     void Invalidate(Mesh::Index* const indices, unsigned numIndices);
-    void Transform(const M::Matrix4& mat);
 
     // methods prefixed with R_ should only be called by the renderer
     void R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye); // eye in mesh local space
