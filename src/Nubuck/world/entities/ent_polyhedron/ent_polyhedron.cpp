@@ -8,6 +8,7 @@
 #include <renderer\nodes\r_nodes.h>
 #include <renderer\edges\r_cylinder_edges.h>
 #include <renderer\edges\r_line_edges.h>
+#include <renderer\mesh\meshmgr.h>
 #include "ent_polyhedron.h"
 
 COM::Config::Variable<float>    cvar_faceCurveSpeed("faceSpeed", 0.2f);
@@ -22,8 +23,8 @@ static M::Vector3 ToVector(const leda::d3_rat_point& p) {
 
 namespace W {
 
-static R::MeshMgr::meshPtr_t    g_faceCurveDecalMesh;
-static R::SkinMgr::handle_t     g_faceCurveDecalSkin;
+static R::meshPtr_t         g_faceCurveDecalMesh;
+static R::SkinMgr::handle_t g_faceCurveDecalSkin;
 
 static void Polyhedron_ClearEdgeMasks(ENT_Polyhedron& ph) {
 }

@@ -2,23 +2,27 @@
 
 #include <generic\pointer.h>
 #include <system\locks\spinlock.h>
+#include "meshmgr_fwd.h"
 #include "mesh.h"
 
 namespace R {
 
+namespace MeshMgr_Impl {
+
+struct MeshLink {
+    MeshLink *prev, *next;
+    Mesh* mesh;
+    bool  destroy;
+    MeshLink(Mesh* const mesh) : prev(NULL), next(NULL), mesh(mesh), destroy(false) { }
+};
+
+} // namespace MeshMgr_Impl
+
 class MeshMgr {
 private:
-    struct MeshLink {
-        MeshLink *prev, *next;
-        Mesh* mesh;
-        bool  destroy;
-        MeshLink(Mesh* const mesh) : prev(NULL), next(NULL), mesh(mesh), destroy(false) { }
-    };
-    MeshLink*       _meshes;
+    MeshMgr_Impl::MeshLink*       _meshes;
     SYS::SpinLock   _meshesMtx;
 public:
-    typedef MeshLink* meshPtr_t;
-
     MeshMgr(void) : _meshes(NULL) { }
 
     meshPtr_t   Create(const Mesh::Desc& desc); // deep copy

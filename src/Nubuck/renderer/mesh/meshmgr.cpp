@@ -5,9 +5,9 @@ namespace R {
 
 MeshMgr meshMgr;
 
-MeshMgr::meshPtr_t MeshMgr::Create(const Mesh::Desc& desc) {
+meshPtr_t MeshMgr::Create(const Mesh::Desc& desc) {
     Mesh* mesh = new Mesh(desc);
-    MeshLink* link = new MeshLink(mesh);
+    MeshMgr_Impl::MeshLink* link = new MeshMgr_Impl::MeshLink(mesh);
     _meshesMtx.Lock();
     link->next = _meshes;
     if(_meshes) _meshes->prev = link;
@@ -17,7 +17,7 @@ MeshMgr::meshPtr_t MeshMgr::Create(const Mesh::Desc& desc) {
 }
 
 void MeshMgr::R_Update(void) {
-    MeshLink *next, *it = _meshes;
+    MeshMgr_Impl::MeshLink *next, *it = _meshes;
     while(it) {
         next = it->next;
         if(it->destroy) {

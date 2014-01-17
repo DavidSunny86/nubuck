@@ -65,7 +65,7 @@ COM::Config::Variable<float>    cvar_r_edgeRadius("r_edgeRadius", 0.1f);
 
 namespace R {
 
-static MeshMgr::meshPtr_t nodeMesh;
+static meshPtr_t nodeMesh;
 
 static State curState;
 
@@ -494,7 +494,6 @@ void Renderer::Render(RenderList& renderList) {
     if(!renderList.meshJobs.empty()) {
         std::sort(renderList.meshJobs.begin(), renderList.meshJobs.end(), CompareJobs);
         Link(renderList.meshJobs);
-        GB_Bind();
         std::for_each(renderList.meshJobs.begin(), renderList.meshJobs.end(),
             std::bind(R::BeginFrame, renderList.worldMat, std::placeholders::_1));
         GB_CacheAll();

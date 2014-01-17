@@ -3,6 +3,7 @@
 #include <vector>
 #include <generic\uncopyable.h>
 #include <renderer\renderer.h>
+#include <renderer\mesh\mesh.h>
 #include "r_edge.h"
 
 namespace R {

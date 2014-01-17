@@ -22,7 +22,7 @@ END_EVENT_DEF
 
 BEGIN_EVENT_DEF(SpawnMesh)
     unsigned                entId;
-    R::MeshMgr::meshPtr_t   meshPtr;
+    R::meshPtr_t   meshPtr;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(DestroyEntity)

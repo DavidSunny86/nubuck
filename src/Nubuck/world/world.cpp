@@ -525,7 +525,7 @@ namespace W {
         return entId;
 	}
 
-    unsigned World::SpawnMesh(R::MeshMgr::meshPtr_t meshPtr) {
+    unsigned World::SpawnMesh(R::meshPtr_t meshPtr) {
         entIdCntMtx.Lock();
         unsigned entId = entIdCnt++;
         entIdCntMtx.Unlock();

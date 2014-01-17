@@ -103,6 +103,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\cylinder\cylinder.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\mesh.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr_fwd.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr_inl.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\plane\plane.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.h" />

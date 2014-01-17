@@ -106,7 +106,7 @@ struct PolyhedronMesh {
 	std::vector<unsigned>                   vnmap; // maps vertices to nodes
 	std::vector<R::Mesh::Vertex>            vertices;
 	std::vector<R::Mesh::Index>             indices; // hull exists iff indices not empty
-    R::MeshMgr::meshPtr_t                   mesh;
+    R::meshPtr_t                   mesh;
 };
 
 struct PolyhedronSelection {

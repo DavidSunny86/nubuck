@@ -88,7 +88,7 @@ namespace W {
 		World(void);
 
 		unsigned SpawnPolyhedron(graph_t* const G, leda::node_map<bool>* cachedNodes, leda::edge_map<bool>* cachedEdges);
-        unsigned SpawnMesh(R::MeshMgr::meshPtr_t meshPtr);
+        unsigned SpawnMesh(R::meshPtr_t meshPtr);
 
         void Update(void);
         void Render(R::RenderList& renderList);

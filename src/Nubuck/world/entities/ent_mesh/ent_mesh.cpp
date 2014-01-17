@@ -2,7 +2,7 @@
 
 namespace W {
 
-void Mesh_Init(ENT_Mesh& mesh, R::MeshMgr::meshPtr_t meshPtr) {
+void Mesh_Init(ENT_Mesh& mesh, R::meshPtr_t meshPtr) {
     mesh.isVisible  = true;
     mesh.meshPtr    = meshPtr;
 }

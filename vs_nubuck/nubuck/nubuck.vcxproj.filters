@@ -578,6 +578,9 @@
     <ClInclude Include="..\..\incl\Nubuck\renderer\color\color_inl.h">
       <Filter>Public\renderer\color</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr_fwd.h">
+      <Filter>Private\renderer\mesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">

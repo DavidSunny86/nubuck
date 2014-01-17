@@ -9,7 +9,7 @@
 #include <system\timer\timer.h>
 #include <math\matrix4.h>
 #include "material\material.h"
-#include "mesh\meshmgr.h"
+#include "mesh\meshmgr_fwd.h"
 #include "skin\skinmgr.h"
 #include "light\light.h"
 
@@ -29,11 +29,11 @@ struct Renderable {
 };
 
 struct MeshJob {
-    std::string         fx;
-    MeshMgr::meshPtr_t  mesh;
-    GLenum              primType; // value != 0 overrides prim type of mesh
-    Material	        material;
-    M::Matrix4          transform;
+    std::string     fx;
+    meshPtr_t       mesh;
+    GLenum          primType; // value != 0 overrides prim type of mesh
+    Material	    material;
+    M::Matrix4      transform;
 
     // handled by renderer
     MeshJob* next;

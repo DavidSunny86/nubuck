@@ -17,7 +17,7 @@ private:
     std::vector<R::Mesh::Vertex>    _tfverts;
     std::vector<R::Mesh::Index>     _indices;
     R::Mesh::Desc                   _meshDesc;
-    R::MeshMgr::meshPtr_t           _mesh;
+    R::meshPtr_t                    _mesh;
     bool                            _meshCompiled; // TODO: might be a race cond
 
     int                 _renderMode;
