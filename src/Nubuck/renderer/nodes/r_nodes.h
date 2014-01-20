@@ -5,65 +5,40 @@
 #include <Nubuck\renderer\color\color.h>
 
 #include <generic\uncopyable.h>
-#include <generic\pointer.h>
-#include <math\vector2.h>
-#include <math\vector3.h>
-#include <system\locks\spinlock.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
-#include <renderer\mesh\staticbuffer.h>
+#include <renderer\mesh\meshmgr_fwd.h>
 
 namespace R {
 
-    class Nodes : private GEN::Uncopyable, public Renderable {
-    public:
-        struct Node {
-            M::Vector3  position;
-            R::Color    color;
-        };
-    private:
-        struct BillboardHotVertex {
-            M::Vector3  position;
-            Color       color;
-        };
-
-        struct BillboardHot {
-            BillboardHotVertex verts[4];
-        };
-
-        struct BillboardColdVertex {
-            M::Vector2 texCoords; // used for clipping
-        };
-
-        struct BillboardCold {
-            BillboardColdVertex verts[4];
-        };
-
-        SYS::SpinLock                   _stagedNodesMtx;
-        std::vector<Node>               _stagedNodes;
-
-        std::vector<Node>               _nodes;
-        std::vector<Mesh::Index>        billboardIndices;
-        std::vector<BillboardHot>    	billboardsHot;
-        std::vector<BillboardCold>   	billboardsCold;
-        GEN::Pointer<StaticBuffer>   	billboardHotVertexBuffer;
-        GEN::Pointer<StaticBuffer>   	billboardColdVertexBuffer;
-        GEN::Pointer<StaticBuffer>   	billboardIndexBuffer;
-
-        void ReserveBillboards(void);
-        void ReserveBillboardBuffers(void);
-        void BuildBillboards(const M::Matrix4& worldMat);
-        void BindHotBillboardAttributes(void);
-        void BindColdBillboardAttributes(void);
-        void UnbindAttributes(void);
-        void DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& projectionMat);
-    public:
-        void Draw(const std::vector<Node>& nodes);
-
-        void R_Prepare(const M::Matrix4& worldMat) override;
-        void R_Draw(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) override;
+class Nodes : private GEN::Uncopyable {
+public:
+    struct Node {
+        M::Vector3  position;
+        R::Color    color;
     };
+private:
+    struct Billboard { Mesh::Vertex verts[4]; };
 
-    extern Nodes g_nodes;
+    std::vector<Node>               _nodes;
+    std::vector<Billboard>          _billboards;
+    std::vector<Mesh::Index>        _billboardIndices;
+    meshPtr_t                       _mesh;
+
+    void DestroyMesh();
+public:
+    Nodes() : _mesh(NULL) { }
+    ~Nodes();
+
+    bool IsEmpty() const { return _nodes.empty(); }
+
+    void Clear();
+    void Push(const Node& node) { _nodes.push_back(node); }
+    void Rebuild();
+
+    void Transform(const M::Matrix4& modelView);
+
+    R::MeshJob GetRenderJob() const;    
+};
 
 } // namespace R

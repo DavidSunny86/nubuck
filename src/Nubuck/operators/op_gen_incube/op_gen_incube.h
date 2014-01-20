@@ -34,11 +34,11 @@ private:
         UI::SimplePanel* panel = new UI::SimplePanel();
         panel->AddLabel("Random Points in Cube");
 
-        _sbRadius = panel->AddSpinBox("radius", 1, 10);
+        _sbRadius = panel->AddSpinBox("radius", 1, 100);
         _sbRadius->setValue(_radius);
         connect(_sbRadius, SIGNAL(valueChanged(int)), this, SLOT(OnArgsChanged(int)));
 
-        _sbSize = panel->AddSpinBox("size", 1, 50);
+        _sbSize = panel->AddSpinBox("size", 1, 10000);
         _sbSize->setValue(_size);
         connect(_sbSize, SIGNAL(valueChanged(int)), this, SLOT(OnArgsChanged(int)));
 

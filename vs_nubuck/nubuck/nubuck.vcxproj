@@ -80,8 +80,7 @@
     <ClInclude Include="..\..\src\Nubuck\operators\op_chull\op_chull.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_translate\op_translate.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.h" />
-    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edge.h" />
-    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges_local.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_line_edges.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\effect.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\effectmgr.h" />
@@ -290,7 +289,7 @@
     <ClCompile Include="..\..\src\Nubuck\polymesh\polymesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\color\color.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges_local.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_line_edges.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\default_effects.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\effect.cpp" />

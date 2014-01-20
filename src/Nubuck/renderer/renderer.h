@@ -21,13 +21,6 @@ namespace R {
 class   Effect;
 class   Mesh;
 
-struct Renderable {
-    virtual ~Renderable(void) { }
-
-    virtual void R_Prepare(const M::Matrix4& worldMat) = 0;
-    virtual void R_Draw(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) = 0;
-};
-
 struct MeshJob {
     std::string     fx;
     meshPtr_t       mesh;
@@ -47,11 +40,9 @@ struct DirectionalLight {
 struct RenderList {
     M::Matrix4                  worldMat;
     DirectionalLight        	dirLights[3];
-    std::vector<Renderable*>    renderJobs;
     std::vector<MeshJob>        meshJobs;
 
     void Clear() {
-        renderJobs.clear();
         meshJobs.clear();
     }
 };

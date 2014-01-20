@@ -29,6 +29,7 @@ public:
         M::Vector3  normal;
         Color       color;
         M::Vector2  texCoords;
+        M::Vector3  A[4];
     };
 
     typedef unsigned Index;

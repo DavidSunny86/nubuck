@@ -1,5 +1,4 @@
-#include <renderer\nodes\r_nodes.h>
-#include <renderer\edges\r_cylinder_edges.h>
+#include <world\world.h>
 #include "ent_geometry.h"
 
 namespace {
@@ -21,13 +20,39 @@ void ENT_Geometry::TransformVertices() {
 }
 
 ENT_Geometry::ENT_Geometry() : 
+_edgeRenderer(NULL),
 _mesh(NULL), 
 _meshCompiled(true), 
 _renderMode(0), 
 _shadingMode(ShadingMode::NICE)
-{ }
+{ 
+    _edgeRenderer = &_cylinderEdges;
+}
 
 void ENT_Geometry::Update() {
+    leda::node v;
+    leda::edge e;
+
+    _nodes.Clear();
+    forall_nodes(v, _ratPolyMesh) {
+        R::Nodes::Node rnode;
+        rnode.position = ToVector(_ratPolyMesh.position_of(v));
+        rnode.color = R::Color(0.3f, 0.3f, 0.3f);
+        _nodes.Push(rnode);
+    }
+    _nodes.Rebuild();
+
+    _edgeRenderer->Clear();
+    R::EdgeRenderer::Edge re;
+    re.radius = 0.02f;
+    forall_edges(e, _ratPolyMesh) {
+        re.color = R::Color(0.3f, 0.3f, 0.3f);
+        re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
+        re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
+        _edgeRenderer->Push(re);
+    }
+    _edgeRenderer->Rebuild();
+
     _vertices.clear();
     _indices.clear();
 
@@ -37,7 +62,7 @@ void ENT_Geometry::Update() {
 
     leda::node_array<M::Vector3> fpos(_ratPolyMesh);
 
-    leda::node v;
+    // leda::node v;
     forall_nodes(v, _ratPolyMesh) {
         fpos[v] = ToVector(_ratPolyMesh.position_of(v));
     }
@@ -90,8 +115,12 @@ void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
     GetTransform().rotation = M::RotationOf(M::Mat4::RotateAxis(M::Normalize(M::Vector3(x, y, z)), ang)) * GetTransform().rotation;
 }
 
+void ENT_Geometry::FrameUpdate() {
+    _nodes.Transform(world.GetCameraMatrix());
+    _edgeRenderer->Transform(world.GetCameraMatrix());
+}
+
 void ENT_Geometry::BuildRenderList() {
-    _renderList.renderJobs.clear();
     _renderList.meshJobs.clear();
 
     if(RenderMode::FACES & _renderMode && NULL != _mesh) {
@@ -107,30 +136,12 @@ void ENT_Geometry::BuildRenderList() {
         _renderList.meshJobs.push_back(rjob);
     }
 
-    if(RenderMode::NODES & _renderMode && ShadingMode::NICE == _shadingMode) {
-        std::vector<R::Nodes::Node> rnodes;
-        leda::node v;
-        forall_nodes(v, _ratPolyMesh) {
-            R::Nodes::Node rnode;
-            rnode.position = ToVector(_ratPolyMesh.position_of(v));
-            rnode.color = R::Color(0.3f, 0.3f, 0.3f);
-            rnodes.push_back(rnode);
-        }
-        R::g_nodes.Draw(rnodes);
+    if(RenderMode::NODES & _renderMode && ShadingMode::NICE == _shadingMode && !_nodes.IsEmpty()) {
+        _renderList.meshJobs.push_back(_nodes.GetRenderJob());
     }
 
     if(RenderMode::EDGES & _renderMode && ShadingMode::NICE == _shadingMode) {
-        std::vector<R::Edge> redges;
-        R::Edge re;
-        re.radius = 0.02f;
-        leda::edge e;
-        forall_edges(e, _ratPolyMesh) {
-            re.color = R::Color(0.3f, 0.3f, 0.3f);
-            re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
-            re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
-            redges.push_back(re);
-        }
-        R::g_cylinderEdges.Draw(redges);
+        if(!_edgeRenderer->IsEmpty()) _renderList.meshJobs.push_back(_edgeRenderer->GetRenderJob());
     }
 }
 

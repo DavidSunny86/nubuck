@@ -2,43 +2,30 @@
 
 #include <generic\uncopyable.h>
 #include <renderer\renderer.h>
-#include <renderer\mesh\mesh.h>
-#include "r_edge.h"
+#include <renderer\mesh\meshmgr_fwd.h>
+#include "r_edges.h"
 
 namespace R {
 
-class CylinderEdges : private GEN::Uncopyable, public Renderable {
+class CylinderEdges : private GEN::Uncopyable, public EdgeRenderer {
 private:
-    struct EdgeBBoxVertex {
-        M::Vector3  position;
-        Color4ub    color;
-        M::Vector3  A[4];
-        float       halfHeightSq;
-        float       radiusSq;
-    };
+    std::vector<Edge>   _edges;
+    meshPtr_t           _mesh;
 
-    SYS::SpinLock               _stagedEdgesMtx;
-    std::vector<Edge>           _stagedEdges;
-
-    std::vector<Edge>           _edges;               
-    std::vector<EdgeBBoxVertex> edgeBBoxVertices;
-    std::vector<Mesh::Index>    edgeBBoxIndices;
-    GEN::Pointer<StaticBuffer>  edgeBBoxVertexBuffer;
-    GEN::Pointer<StaticBuffer>  edgeBBoxIndexBuffer;
-
-    void BindEdgeBBoxAttributes(void);
-    void UnbindAttributes(void);
-    void ReserveEdgeBBoxBuffers(void);
-    void CreateEdges(void);
-    void UploadEdges(void);
-    void DrawEdges(const M::Matrix4& worldMat, const M::Matrix4& projectionMat);
+    void DestroyMesh();
 public:
-    void Draw(std::vector<Edge>& edges);
+    CylinderEdges() : _mesh(NULL) { }
+    ~CylinderEdges();
 
-    void R_Prepare(const M::Matrix4& worldMat) override;
-    void R_Draw(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) override;
+    bool IsEmpty() const override { return _edges.empty(); }
+
+    void Clear() override;
+    void Push(const Edge& edge) override { _edges.push_back(edge); }
+    void Rebuild() override;
+
+    void Transform(const M::Matrix4&) override { }
+
+    MeshJob GetRenderJob() const override;
 };
-
-extern CylinderEdges g_cylinderEdges;
 
 } // namespace R

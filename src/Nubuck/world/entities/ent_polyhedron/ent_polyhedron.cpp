@@ -341,6 +341,8 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
     unsigned numNodes = ph.nodes.nodes.size();
     std::vector<R::Nodes::Node> rnodes;
     if(POLYHEDRON_RENDER_NODES & ph.renderFlags) {
+        /*
+        TODO: draw nodes
         for(unsigned i = 0; i < numNodes; ++i) {
             if(POLYHEDRON_VALID_FLAG & ph.nodes.nodes[i].flags) {
                 R::Nodes::Node rnode;
@@ -351,12 +353,15 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
             }
         }
         R::g_nodes.Draw(rnodes);
+        */
     } // if(renderNodes)
 
-    R::Edge re;
+    R::EdgeRenderer::Edge re;
     re.radius   = ph.edges.radius;
     unsigned numEdges = ph.edges.edges.size();
     if(POLYHEDRON_RENDER_EDGES & ph.renderFlags) {
+        /*
+        TODO: draw edges
         std::vector<R::Edge> redges;
         // TODO: store reversal information to draw edges only once
         for(unsigned i = 0; i < numEdges; ++i) {
@@ -370,6 +375,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
             }
         }
         R::g_cylinderEdges.Draw(redges);
+        */
     } // if(renderEdges)
 
     if(POLYHEDRON_RENDER_HULL & ph.renderFlags) {

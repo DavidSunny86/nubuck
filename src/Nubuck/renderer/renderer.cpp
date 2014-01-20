@@ -45,6 +45,26 @@ void BindMeshAttributes(void) {
         2, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
         (void*)offsetof(R::Mesh::Vertex, texCoords)));
     GL_CALL(glEnableVertexAttribArray(IN_TEXCOORDS));
+
+    GL_CALL(glVertexAttribPointer(IN_A0,
+        3, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
+        (void*)(offsetof(R::Mesh::Vertex, A) + sizeof(M::Vector3) * 0)));
+    GL_CALL(glEnableVertexAttribArray(IN_A0));
+
+    GL_CALL(glVertexAttribPointer(IN_A1,
+        3, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
+        (void*)(offsetof(R::Mesh::Vertex, A) + sizeof(M::Vector3) * 1)));
+    GL_CALL(glEnableVertexAttribArray(IN_A1));
+
+    GL_CALL(glVertexAttribPointer(IN_A2,
+        3, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
+        (void*)(offsetof(R::Mesh::Vertex, A) + sizeof(M::Vector3) * 2)));
+    GL_CALL(glEnableVertexAttribArray(IN_A2));
+
+    GL_CALL(glVertexAttribPointer(IN_A3,
+        3, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
+        (void*)(offsetof(R::Mesh::Vertex, A) + sizeof(M::Vector3) * 3)));
+    GL_CALL(glEnableVertexAttribArray(IN_A3));
 }
 
 void UnbindMeshAttributes() {
@@ -52,6 +72,10 @@ void UnbindMeshAttributes() {
     GL_CALL(glDisableVertexAttribArray(IN_NORMAL));
     GL_CALL(glDisableVertexAttribArray(IN_COLOR));
     GL_CALL(glDisableVertexAttribArray(IN_TEXCOORDS));
+    GL_CALL(glDisableVertexAttribArray(IN_A0));
+    GL_CALL(glDisableVertexAttribArray(IN_A1));
+    GL_CALL(glDisableVertexAttribArray(IN_A2));
+    GL_CALL(glDisableVertexAttribArray(IN_A3));
 }
 
 template<typename T> struct ToGLEnum { };
@@ -485,13 +509,8 @@ void Renderer::Render(RenderList& renderList) {
 
     Uniforms_Update(projectionMat, renderList.worldMat, renderList.dirLights);
 
-    for(unsigned i = 0; i < renderList.renderJobs.size(); ++i) {
-        Renderable* r = renderList.renderJobs[i];
-        r->R_Prepare(renderList.worldMat);
-        r->R_Draw(renderList.worldMat, projectionMat);
-    }
-
     if(!renderList.meshJobs.empty()) {
+        GB_Bind();
         std::sort(renderList.meshJobs.begin(), renderList.meshJobs.end(), CompareJobs);
         Link(renderList.meshJobs);
         std::for_each(renderList.meshJobs.begin(), renderList.meshJobs.end(),

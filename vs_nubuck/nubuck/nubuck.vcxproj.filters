@@ -524,12 +524,6 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_line_edges.h">
       <Filter>Private\renderer\edges</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges_local.h">
-      <Filter>Private\renderer\edges</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edge.h">
-      <Filter>Private\renderer\edges</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\shader_preprocessor.h">
       <Filter>Private\renderer\shader\shader_preprocessor</Filter>
     </ClInclude>
@@ -580,6 +574,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr_fwd.h">
       <Filter>Private\renderer\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges.h">
+      <Filter>Private\renderer\edges</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -883,9 +880,6 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_line_edges.cpp">
       <Filter>Private\renderer\edges</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges_local.cpp">
-      <Filter>Private\renderer\edges</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\shader_preprocessor.cpp">
       <Filter>Private\renderer\shader\shader_preprocessor</Filter>
     </ClCompile>
@@ -945,6 +939,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\operators\op_translate\op_translate.cpp">
       <Filter>Private\operators\op_translate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges.cpp">
+      <Filter>Private\renderer\edges</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

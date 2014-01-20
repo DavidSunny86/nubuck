@@ -644,6 +644,7 @@ namespace W {
             if(EntityType::ENT_GEOMETRY == entity->GetType()) {
                 ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
                 geom.CompileMesh();
+                geom.FrameUpdate();
                 geom.BuildRenderList();
             }
         }
@@ -655,11 +656,6 @@ namespace W {
 
         renderList.worldMat = _camArcball.GetWorldMatrix();
 		renderList.meshJobs.clear();
-        renderList.renderJobs.clear();
-
-        renderList.renderJobs.push_back(&R::g_nodes);
-        renderList.renderJobs.push_back(&R::g_cylinderEdges);
-        renderList.renderJobs.push_back(&R::g_lineEdges);
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
             if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {

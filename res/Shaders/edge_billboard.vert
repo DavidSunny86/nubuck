@@ -7,12 +7,11 @@ layout(std140) uniform UniformsHot {
 
 attribute(0) vec4    aPosition;
 attribute(2) vec4    aColor;
+attribute(3) vec2    aTexCoords; // = (halfHeightSq, radiusSq)
 attribute(4) vec3    aA0;
 attribute(5) vec3    aA1;
 attribute(6) vec3    aA2;
 attribute(7) vec3    aA3;
-attribute(8) float   aHalfHeightSq;
-attribute(9) float   aRadiusSq;
 
 // in edge's local space
 varying vec4    vColor;
@@ -48,8 +47,8 @@ void main() {
     vObjectToClip = uProjection * vObjectToEye;
     mat4 eyeToObject = worldToObject * uInvTransform;
     vPosition = worldToObject * aPosition;
-    vHalfHeightSq = aHalfHeightSq;
-    vRadiusSq = aRadiusSq;
+    vHalfHeightSq = aTexCoords.x;
+    vRadiusSq = aTexCoords.y;
     vEyePos = eyeToObject * vec4(0.0, 0.0, 0.0, 1.0);
     vLightDir = (eyeToObject * vec4(0.0, 0.0, 1.0, 0.0)).xyz;
 	gl_Position = uProjection * (uTransform * aPosition);

@@ -5,6 +5,9 @@
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>
+#include <renderer\nodes\r_nodes.h>
+#include <renderer\edges\r_cylinder_edges.h>
+#include <renderer\edges\r_line_edges.h>
 #include <world\entity.h>
 
 namespace W {
@@ -12,6 +15,11 @@ namespace W {
 class ENT_Geometry : public IGeometry, public Entity {
 private:
     leda::nb::RatPolyMesh _ratPolyMesh;
+
+    R::Nodes                        _nodes;
+    R::CylinderEdges                _cylinderEdges;
+    R::LineEdges                    _lineEdges;
+    R::EdgeRenderer*                _edgeRenderer;
 
     std::vector<R::Mesh::Vertex>    _vertices;
     std::vector<R::Mesh::Vertex>    _tfverts;
@@ -42,6 +50,7 @@ public:
     void SetRenderMode(int flags) override { _renderMode = flags; }
     void SetShadingMode(ShadingMode::Enum mode) override { _shadingMode = mode; }
 
+    void FrameUpdate();
     void BuildRenderList();
     const R::RenderList& GetRenderList() const { return _renderList; }
 };

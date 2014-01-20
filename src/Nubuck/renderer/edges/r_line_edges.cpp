@@ -1,17 +1,69 @@
 #include <math\matrix3.h>
 #include <renderer\renderer_local.h>
-#include <renderer\effects\effectmgr.h>
-#include <renderer\effects\effect.h>
-#include "r_edges_local.h"
+#include <renderer\mesh\meshmgr.h>
 #include "r_line_edges.h"
 
 namespace R {
 
-LineEdges g_lineEdges;
+void LineEdges::DestroyMesh() {
+    if(_mesh) {
+        meshMgr.Destroy(_mesh);
+        _mesh = NULL;
+    }
+}
 
-// wEye: eye position in world space
-void LineEdges::BuildEdgeBillboards(const std::vector<Edge>& edges, const M::Matrix4& world, const M::Vector3& wEye) {
-    edgeBBoardsHot.resize(edges.size());
+LineEdges::~LineEdges() {
+    DestroyMesh();
+}
+
+void LineEdges::Clear() {
+    _edges.clear();
+    DestroyMesh();
+}
+
+void LineEdges::Rebuild() {
+    RemoveDegeneratedEdges(_edges);
+    if(_edges.empty()) return;
+
+    _edgeBBoards.clear();
+    _edgeBBoards.resize(_edges.size());
+
+    unsigned numEdges = _edges.size();
+    for(unsigned i = 0; i < numEdges; ++i) {
+        const Edge& edge = _edges[i];
+        for(unsigned j = 0; j < 4; ++j) {
+            // edgeBBoards[i].verts[j].color = ColorTo3ub(edge.color);
+            _edgeBBoards[i].verts[j].color = edge.color;
+        }
+    }
+
+    std::vector<Mesh::Index> edgeBBoardIndices;
+    for(unsigned i = 0; i < 4 * numEdges; ++i) {
+        if(0 < i && 0 == i % 4) edgeBBoardIndices.push_back(Mesh::RESTART_INDEX);
+        edgeBBoardIndices.push_back(i);
+    }
+    unsigned numBillboardIndices = M::Max(1u, 5 * numEdges) - 1; // max handles case size = 0
+    assert(numBillboardIndices == edgeBBoardIndices.size());
+
+    assert(NULL == _mesh);
+
+    Mesh::Desc meshDesc;
+    meshDesc.vertices = &_edgeBBoards[0].verts[0];
+    meshDesc.numVertices = 4 * _edgeBBoards.size();
+    meshDesc.indices = &edgeBBoardIndices[0];
+    meshDesc.numIndices = edgeBBoardIndices.size();
+    meshDesc.primType = GL_TRIANGLE_FAN;
+
+    _mesh = meshMgr.Create(meshDesc);
+}
+
+void LineEdges::Transform(const M::Matrix4& modelView) {
+    if(IsEmpty()) return;
+
+    // wEye: eye position in world space
+    M::Matrix4 invWorld;
+    bool ret = M::TryInvert(modelView, invWorld);
+    const M::Vector3 eyePos = M::Transform(invWorld, M::Vector3::Zero);
 
     static const M::Vector3 vertPos[] = {
         M::Vector3(-0.5f,  1.0f, 0.0f),
@@ -20,12 +72,12 @@ void LineEdges::BuildEdgeBillboards(const std::vector<Edge>& edges, const M::Mat
         M::Vector3( 0.5f,  1.0f, 0.0f)
     };
 
-    unsigned numEdges = edges.size();
+    unsigned numEdges = _edges.size();
     for(unsigned i = 0; i < numEdges; ++i) {
-        const Edge& edge = edges[i];
+        const Edge& edge = _edges[i];
 
-        const M::Vector3 p0 = M::Transform(world, edge.p0);
-        const M::Vector3 p1 = M::Transform(world, edge.p1);
+        const M::Vector3 p0 = M::Transform(modelView, edge.p0);
+        const M::Vector3 p1 = M::Transform(modelView, edge.p1);
 
         const M::Vector3 wAxisY = M::Normalize(p1 - p0);
         const M::Vector3 wAxisX = M::Normalize(M::Cross(wAxisY, -p0));
@@ -38,96 +90,24 @@ void LineEdges::BuildEdgeBillboards(const std::vector<Edge>& edges, const M::Mat
         const M::Matrix3 M = rotate * scale;
 
         for(unsigned j = 0; j < 4; ++j) {
-            edgeBBoardsHot[i].verts[j].position = p0 + M::Transform(M, vertPos[j]);
-            edgeBBoardsHot[i].verts[j].color = ColorTo3ub(edge.color);
+            _edgeBBoards[i].verts[j].position = p0 + M::Transform(M, vertPos[j]);
         }
     }
 
-    edgeBBoardIndices.clear();
-    for(unsigned i = 0; i < 4 * numEdges; ++i) {
-        if(0 < i && 0 == i % 4) edgeBBoardIndices.push_back(Mesh::RESTART_INDEX);
-        edgeBBoardIndices.push_back(i);
-    }
-    unsigned numBillboardIndices = M::Max(1u, 5 * edges.size()) - 1; // max handles case size = 0
-    assert(numBillboardIndices == edgeBBoardIndices.size());
+    if(_mesh) meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoards[0].verts[0]);
 }
 
-void LineEdges::UploadEdgeBillboards(void) {
-    unsigned numBillboards = edgeBBoardsHot.size();
-    if(!numBillboards) return;
+MeshJob LineEdges::GetRenderJob() const {
+    assert(!IsEmpty());
 
-    if(edgeBBoardHotVertexBuffer.IsValid()) edgeBBoardHotVertexBuffer->Destroy();
-    edgeBBoardHotVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, &edgeBBoardsHot[0], sizeof(EdgeBBoardHot) * numBillboards));
+    MeshJob meshJob;
+    meshJob.fx = "EdgeLineBillboard";
+    meshJob.mesh = _mesh;
+    meshJob.material = Material::White;
+    meshJob.primType = 0;
+    meshJob.transform = M::Mat4::Identity();
 
-    if(edgeBBoardIndexBuffer.IsValid()) edgeBBoardIndexBuffer->Destroy();
-    edgeBBoardIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &edgeBBoardIndices[0], sizeof(Mesh::Index) * edgeBBoardIndices.size()));
-}
-
-void LineEdges::BindEdgeBillboardAttributes(void) {
-    GL_CALL(glVertexAttribPointer(IN_POSITION,
-        3, GL_FLOAT, GL_FALSE, sizeof(EdgeBBoardHotVertex),
-        (void*)offsetof(EdgeBBoardHotVertex, position)));
-    GL_CALL(glEnableVertexAttribArray(IN_POSITION));
-
-    GL_CALL(glVertexAttribPointer(IN_COLOR,
-        3, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(EdgeBBoardHotVertex),
-        (void*)offsetof(EdgeBBoardHotVertex, color)));
-    GL_CALL(glEnableVertexAttribArray(IN_COLOR));
-}
-
-void LineEdges::UnbindAttributes(void) {
-    GL_CALL(glDisableVertexAttribArray(IN_POSITION));
-    GL_CALL(glDisableVertexAttribArray(IN_COLOR));
-}
-
-void LineEdges::DrawEdgeBillboards(const M::Matrix4& worldMat, const M::Matrix4& projectionMat, const char* fxName) {
-    if(_edges.empty()) return;
-
-    GEN::Pointer<Effect> fx = effectMgr.GetEffect(fxName);
-    fx->Compile();
-    Pass* pass = fx->GetPass(0);
-    pass->Use();
-
-    Program& prog = pass->GetProgram();
-    Uniforms_BindBlocks(prog);
-    Uniforms_BindBuffers();
-    SetState(pass->GetDesc().state);
-
-    edgeBBoardHotVertexBuffer->Bind();
-    BindEdgeBillboardAttributes();
-
-    edgeBBoardIndexBuffer->Bind();
-    
-    unsigned numBillboardIndices = edgeBBoardIndices.size();
-    GL_CALL(glDrawElements(GL_TRIANGLE_FAN, numBillboardIndices, GL_UNSIGNED_INT, NULL));
-
-    UnbindAttributes();
-}
-
-void LineEdges::Draw(std::vector<Edge>& edges) {
-    RemoveDegeneratedEdges(edges);
-    if(!edges.empty()) {
-        _stagedEdgesMtx.Lock();
-        _stagedEdges.insert(_stagedEdges.end(), edges.begin(), edges.end());
-        _stagedEdgesMtx.Unlock();
-    }
-}
-
-void LineEdges::R_Prepare(const M::Matrix4& worldMat) {
-    _stagedEdgesMtx.Lock();
-    _edges = _stagedEdges;
-    _stagedEdges.clear();
-    _stagedEdgesMtx.Unlock();
-
-    M::Matrix4 invWorld;
-    bool ret = M::TryInvert(worldMat, invWorld);
-    const M::Vector3 eyePos = M::Transform(invWorld, M::Vector3::Zero);
-    BuildEdgeBillboards(_edges, worldMat, eyePos);
-}
-
-void LineEdges::R_Draw(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
-    UploadEdgeBillboards();
-    DrawEdgeBillboards(worldMat, projectionMat, "EdgeLineBillboard");
+    return meshJob;
 }
 
 } // namespace R

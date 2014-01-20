@@ -87,6 +87,8 @@ namespace W {
     public:
 		World(void);
 
+        M::Matrix4 GetCameraMatrix() const { return _camArcball.GetWorldMatrix(); }
+
 		unsigned SpawnPolyhedron(graph_t* const G, leda::node_map<bool>* cachedNodes, leda::edge_map<bool>* cachedEdges);
         unsigned SpawnMesh(R::meshPtr_t meshPtr);
 

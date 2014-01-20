@@ -1,61 +1,23 @@
 #include <math\matrix3.h>
-#include <renderer\renderer_local.h>
-#include <renderer\effects\effectmgr.h>
-#include <renderer\effects\effect.h>
-#include <renderer\program\program.h>
+#include <renderer\mesh\meshmgr.h>
 #include "r_nodes.h"
 
 namespace R {
 
-Nodes g_nodes;
-
-void Nodes::ReserveBillboards(void) {
-    unsigned numBillboards = _nodes.size();
-    if(numBillboards <= billboardsHot.size()) return;
-
-    unsigned numBillboardIndices = 5 * numBillboards - 1;
-
-    billboardsHot.clear();
-    billboardsHot.resize(numBillboards);
-
-    static const BillboardColdVertex coldVertices[4] = {
-        { M::Vector2(-1.0f, -1.0f) },
-        { M::Vector2( 1.0f, -1.0f) },
-        { M::Vector2( 1.0f,  1.0f) },
-        { M::Vector2(-1.0f,  1.0f) }
-    };
-    billboardsCold.clear();
-    billboardsCold.resize(numBillboards);
-    for(unsigned i = 0; i < numBillboards; ++i) {
-        memcpy(billboardsCold[i].verts, coldVertices, sizeof(coldVertices));
+void Nodes::DestroyMesh() {
+    if(_mesh) {
+        meshMgr.Destroy(_mesh);
+        _mesh = NULL;
     }
-
-    billboardIndices.clear();
-    billboardIndices.reserve(numBillboardIndices);
-    for(unsigned i = 0; i < 4 * numBillboards; ++i) {
-        if(0 < i && 0 == i % 4) billboardIndices.push_back(Mesh::RESTART_INDEX);
-        billboardIndices.push_back(i);
-    }
-    assert(numBillboardIndices == billboardIndices.size());
 }
 
-void Nodes::ReserveBillboardBuffers(void) {
-    unsigned numBillboards = _nodes.size();
-    if(billboardHotVertexBuffer.IsValid() && sizeof(BillboardHot) * numBillboards <= billboardHotVertexBuffer->GetSize()) return;
+Nodes::~Nodes() {
+    DestroyMesh();
+}
 
-    if(billboardHotVertexBuffer.IsValid()) billboardHotVertexBuffer->Destroy();
-    billboardHotVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, NULL, sizeof(BillboardHot) * numBillboards));
-
-    if(billboardColdVertexBuffer.IsValid()) billboardColdVertexBuffer->Destroy();
-    billboardColdVertexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ARRAY_BUFFER, &billboardsCold[0], sizeof(BillboardCold) * numBillboards));
-
-    unsigned numBillboardIndices = 5 * numBillboards - 1;
-    if(billboardIndexBuffer.IsValid()) billboardIndexBuffer->Destroy();
-    billboardIndexBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_ELEMENT_ARRAY_BUFFER, &billboardIndices[0], sizeof(Mesh::Index) * numBillboardIndices));
-
-    printf("billboardHotVertexBuffer->size() = %d\n", billboardHotVertexBuffer->GetSize());
-    printf("billboardColdVertexBuffer->size() = %d\n", billboardColdVertexBuffer->GetSize());
-    printf("billboardIndexBuffer->size() = %d\n", billboardIndexBuffer->GetSize());
+void Nodes::Clear() {
+    _nodes.clear();
+    DestroyMesh();
 }
 
 // camera position at 0
@@ -82,103 +44,80 @@ static M::Matrix4 Billboard_FaceViewingPlane(const M::Matrix4& worldMat, const M
         0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-void Nodes::BuildBillboards(const M::Matrix4& worldMat) {
-	float nodeSize = cvar_r_nodeSize;
-    const BillboardHotVertex hotVertices[4] = {
-        { M::Vector3(-nodeSize, -nodeSize, 0.0f) },
-        { M::Vector3( nodeSize, -nodeSize, 0.0f) },
-        { M::Vector3( nodeSize,  nodeSize, 0.0f) },
-        { M::Vector3(-nodeSize,  nodeSize, 0.0f) }
-    };
-    unsigned numBillboards = _nodes.size();
-    for(unsigned i = 0; i < numBillboards; ++i) {
-        for(unsigned k = 0; k < 4; ++k) {
-            billboardsHot[i].verts[k].position = M::Transform(worldMat, _nodes[i].position) + hotVertices[k].position;
-            billboardsHot[i].verts[k].color = _nodes[i].color;
-        }
-    }
-}
-
-void Nodes::Draw(const std::vector<Node>& nodes) {
-    if(!nodes.empty()) {
-        _stagedNodesMtx.Lock();
-        _stagedNodes.insert(_stagedNodes.end(), nodes.begin(), nodes.end());
-        _stagedNodesMtx.Unlock();
-    }
-}
-
-void Nodes::BindHotBillboardAttributes(void) {
-    GL_CALL(glVertexAttribPointer(IN_POSITION,
-        3, GL_FLOAT, GL_FALSE, sizeof(BillboardHotVertex),
-        (void*)offsetof(BillboardHotVertex, position)));
-    GL_CALL(glEnableVertexAttribArray(IN_POSITION));
-
-    GL_CALL(glVertexAttribPointer(IN_COLOR,
-        4, GL_FLOAT, GL_FALSE, sizeof(BillboardHotVertex),
-        (void*)offsetof(BillboardHotVertex, color)));
-    GL_CALL(glEnableVertexAttribArray(IN_COLOR));
-}
-
-void Nodes::BindColdBillboardAttributes(void) {
-    GL_CALL(glVertexAttribPointer(IN_TEXCOORDS,
-        2, GL_FLOAT, GL_FALSE, sizeof(BillboardColdVertex),
-        (void*)offsetof(BillboardColdVertex, texCoords)));
-    GL_CALL(glEnableVertexAttribArray(IN_TEXCOORDS));
-}
-
-void Nodes::UnbindAttributes(void) {
-    GL_CALL(glDisableVertexAttribArray(IN_POSITION));
-    GL_CALL(glDisableVertexAttribArray(IN_COLOR));
-    GL_CALL(glDisableVertexAttribArray(IN_TEXCOORDS));
-}
-
-void Nodes::R_Prepare(const M::Matrix4& worldMat) {
-    _stagedNodesMtx.Lock();
-    _nodes = _stagedNodes;
-    _stagedNodes.clear();
-    _stagedNodesMtx.Unlock();
-
-    if(!_nodes.empty()) {
-        ReserveBillboards();
-        BuildBillboards(worldMat);
-    }
-}
-
-void Nodes::DrawBillboards(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
+void Nodes::Rebuild() {
     unsigned numBillboards = _nodes.size();
     unsigned numBillboardIndices = 5 * numBillboards - 1;
 
-    GEN::Pointer<Effect> fx = effectMgr.GetEffect("NodeBillboard");
-    fx->Compile();
-    Pass* pass = fx->GetPass(0);
-    pass->Use();
+    _billboards.clear();
+    _billboards.resize(numBillboards);
 
-    Program& prog = pass->GetProgram();
-    Uniforms_BindBlocks(prog);
-    Uniforms_BindBuffers();
-    SetState(pass->GetDesc().state);
+    static const M::Vector2 bbTexCoords[4] = {
+        M::Vector2(-1.0f, -1.0f),
+        M::Vector2( 1.0f, -1.0f),
+        M::Vector2( 1.0f,  1.0f),
+        M::Vector2(-1.0f,  1.0f)
+    };
 
-    billboardHotVertexBuffer->Bind();
-    BindHotBillboardAttributes();
+    for(unsigned i = 0; i < numBillboards; ++i) {
+        for(unsigned k = 0; k < 4; ++k) {
+            _billboards[i].verts[k].color = _nodes[i].color;
+            _billboards[i].verts[k].texCoords = bbTexCoords[k];
+        }
+    }
 
-    billboardColdVertexBuffer->Bind();
-    BindColdBillboardAttributes();
+    _billboardIndices.clear();
+    _billboardIndices.reserve(numBillboardIndices);
+    for(unsigned i = 0; i < 4 * numBillboards; ++i) {
+        if(0 < i && 0 == i % 4) _billboardIndices.push_back(Mesh::RESTART_INDEX);
+        _billboardIndices.push_back(i);
+    }
+    assert(numBillboardIndices == _billboardIndices.size());
 
-    billboardIndexBuffer->Bind();
 
-    glDrawElements(GL_TRIANGLE_FAN, numBillboardIndices, GL_UNSIGNED_INT, NULL);
+    if(!_nodes.empty()) {
+        assert(NULL == _mesh);
 
-    UnbindAttributes();
+        Mesh::Desc meshDesc;
+        meshDesc.vertices = &_billboards[0].verts[0];
+        meshDesc.numVertices = 4 * numBillboards;
+        meshDesc.indices = &_billboardIndices[0];
+        meshDesc.numIndices = numBillboardIndices;
+        meshDesc.primType = GL_TRIANGLE_FAN;
+        
+        _mesh = meshMgr.Create(meshDesc);
+    }
 }
 
-void Nodes::R_Draw(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) {
-    unsigned numBillboards = _nodes.size();
-    if(numBillboards) {
-        ReserveBillboardBuffers();
-        billboardHotVertexBuffer->Update_Mapped(0, sizeof(BillboardHot) * numBillboards, &billboardsHot[0]);
-        DrawBillboards(worldMat, projectionMat);
-        billboardHotVertexBuffer->Discard();
+void Nodes::Transform(const M::Matrix4& modelView) {
+    if(IsEmpty()) return;
+
+	float nodeSize = cvar_r_nodeSize;
+    const M::Vector3 bbPositions[4] = {
+        M::Vector3(-nodeSize, -nodeSize, 0.0f),
+        M::Vector3( nodeSize, -nodeSize, 0.0f),
+        M::Vector3( nodeSize,  nodeSize, 0.0f),
+        M::Vector3(-nodeSize,  nodeSize, 0.0f)
+    };
+
+    for(unsigned i = 0; i < _billboards.size(); ++i) {
+        for(unsigned k = 0; k < 4; ++k) {
+            _billboards[i].verts[k].position = M::Transform(modelView, _nodes[i].position) + bbPositions[k];
+        }
     }
+
+    if(_mesh) meshMgr.GetMesh(_mesh).Invalidate(&_billboards[0].verts[0]);
+}
+
+MeshJob Nodes::GetRenderJob() const {
+    assert(!IsEmpty());
+
+    R::MeshJob meshJob;
+    meshJob.fx = "NodeBillboard";
+    meshJob.mesh = _mesh;
+    meshJob.material = Material::White;
+    meshJob.primType = 0;
+    meshJob.transform = M::Mat4::Identity();
+    return meshJob;
 }
 
 } // namespace R

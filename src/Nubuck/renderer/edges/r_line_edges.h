@@ -4,42 +4,33 @@
 #include <generic\uncopyable.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
-#include "r_edge.h"
+#include <renderer\mesh\meshmgr_fwd.h>
+#include "r_edges.h"
 
 namespace R {
 
-class LineEdges : private GEN::Uncopyable, public Renderable {
+class LineEdges : private GEN::Uncopyable, public EdgeRenderer {
 private:
-    struct EdgeBBoardHotVertex {
-        M::Vector3  position;
-        Color3ub    color;
-    };
+    struct Billboard { Mesh::Vertex verts[4]; };
 
-    struct EdgeBBoardHot {
-        EdgeBBoardHotVertex verts[4];
-    };
+    std::vector<Edge>       _edges;
+    std::vector<Billboard>  _edgeBBoards;
+    meshPtr_t               _mesh;
 
-    SYS::SpinLock               _stagedEdgesMtx;
-    std::vector<Edge>           _stagedEdges;
-
-    std::vector<Edge>           _edges;
-    std::vector<EdgeBBoardHot>  edgeBBoardsHot;
-    std::vector<Mesh::Index>    edgeBBoardIndices;
-    GEN::Pointer<StaticBuffer>  edgeBBoardHotVertexBuffer;
-    GEN::Pointer<StaticBuffer>  edgeBBoardIndexBuffer;
-
-    void BuildEdgeBillboards(const std::vector<Edge>& edges, const M::Matrix4& world, const M::Vector3& wEye);
-    void UploadEdgeBillboards(void);
-    void BindEdgeBillboardAttributes(void);
-    void UnbindAttributes(void);
-    void DrawEdgeBillboards(const M::Matrix4& worldMat, const M::Matrix4& projectionMat, const char* fxName);
+    void DestroyMesh();
 public:
-    void Draw(std::vector<Edge>& edges);
+    LineEdges() : _mesh(NULL) { }
+    ~LineEdges();
 
-    void R_Prepare(const M::Matrix4& worldMat) override;
-    void R_Draw(const M::Matrix4& worldMat, const M::Matrix4& projectionMat) override;
+    bool IsEmpty() const override { return _edges.empty(); }
+
+    void Clear() override;
+    void Push(const Edge& edge) override { _edges.push_back(edge); }
+    void Rebuild() override;
+
+    void Transform(const M::Matrix4& modelView) override;
+
+    MeshJob GetRenderJob() const override;
 };
-
-extern LineEdges g_lineEdges;
 
 } // namespace R
