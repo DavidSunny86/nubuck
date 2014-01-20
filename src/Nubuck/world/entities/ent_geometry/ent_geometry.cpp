@@ -24,6 +24,7 @@ _edgeRenderer(NULL),
 _mesh(NULL), 
 _meshCompiled(true), 
 _renderMode(0), 
+_renderLayer(0),
 _shadingMode(ShadingMode::NICE)
 { 
     _edgeRenderer = &_cylinderEdges;
@@ -128,6 +129,7 @@ void ENT_Geometry::BuildRenderList() {
         R::meshMgr.GetMesh(_mesh).Invalidate(&_tfverts[0]);
 
         R::MeshJob rjob;
+        rjob.layer      = _renderLayer;
         rjob.fx         = "LitDirectional";
         rjob.material   = R::Material::White;
         rjob.mesh       = _mesh;
@@ -137,11 +139,15 @@ void ENT_Geometry::BuildRenderList() {
     }
 
     if(RenderMode::NODES & _renderMode && ShadingMode::NICE == _shadingMode && !_nodes.IsEmpty()) {
-        _renderList.meshJobs.push_back(_nodes.GetRenderJob());
+        R::MeshJob rjob = _nodes.GetRenderJob();
+        rjob.layer = _renderLayer;
+        _renderList.meshJobs.push_back(rjob);
     }
 
-    if(RenderMode::EDGES & _renderMode && ShadingMode::NICE == _shadingMode) {
-        if(!_edgeRenderer->IsEmpty()) _renderList.meshJobs.push_back(_edgeRenderer->GetRenderJob());
+    if(RenderMode::EDGES & _renderMode && ShadingMode::NICE == _shadingMode && !_edgeRenderer->IsEmpty()) {
+        R::MeshJob rjob = _edgeRenderer->GetRenderJob();
+        rjob.layer = _renderLayer;
+        _renderList.meshJobs.push_back(rjob);
     }
 }
 

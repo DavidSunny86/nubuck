@@ -414,13 +414,13 @@ static MeshJob* DrawMeshList(Program& prog, const State& state, int passType, in
     return meshJob;
 }
 
-static void DrawFrame(RenderList& renderList, const M::Matrix4& projectionMat, float time) {
-    if(renderList.meshJobs.empty()) return;
+static void DrawFrame(const M::Matrix4& modelView, const M::Matrix4& projectionMat, float time, std::vector<MeshJob>& rjobs) {
+    if(rjobs.empty()) return;
 
     GB_Bind();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    MeshJob* cur = &renderList.meshJobs[0];
+    MeshJob* cur = &rjobs[0];
     MeshJob* next = NULL;
     while(cur) {
         next = NULL;
@@ -436,7 +436,7 @@ static void DrawFrame(RenderList& renderList, const M::Matrix4& projectionMat, f
             Uniforms_BindBuffers();
             SetState(desc.state);
 
-            next = DrawMeshList(prog, desc.state, desc.type, desc.flags, renderList.worldMat, cur);
+            next = DrawMeshList(prog, desc.state, desc.type, desc.flags, modelView, cur);
         }
         cur = next;
     }
@@ -487,15 +487,15 @@ void Renderer::BeginFrame() {
     _time += secsPassed;
     _timer.Start();
 
+    frame_time.Start();
+
+    metrics.frame.numDrawCalls = 0;
+
     if(curState.depth.maskEnabled != GL_TRUE) {
         GL_CALL(glDepthMask(GL_TRUE));
         curState.depth.maskEnabled = GL_TRUE;
     }
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
-
-    frame_time.Start();
-
-    metrics.frame.numDrawCalls = 0;
 }
 
 void Renderer::EndFrame() {
@@ -504,21 +504,39 @@ void Renderer::EndFrame() {
     metrics.frame.time = frame_time.Stop();
 }
 
-void Renderer::Render(RenderList& renderList) {
-    M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, renderList.meshJobs);
+void Renderer::Render(const RenderList& renderList, std::vector<MeshJob>& rjobs) {
+    if(curState.depth.maskEnabled != GL_TRUE) {
+        GL_CALL(glDepthMask(GL_TRUE));
+        curState.depth.maskEnabled = GL_TRUE;
+    }
+    GL_CALL(glClear(GL_DEPTH_BUFFER_BIT));
+
+    M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, rjobs);
 
     Uniforms_Update(projectionMat, renderList.worldMat, renderList.dirLights);
 
-    if(!renderList.meshJobs.empty()) {
+    if(!rjobs.empty()) {
         GB_Bind();
-        std::sort(renderList.meshJobs.begin(), renderList.meshJobs.end(), CompareJobs);
-        Link(renderList.meshJobs);
-        std::for_each(renderList.meshJobs.begin(), renderList.meshJobs.end(),
+        std::sort(rjobs.begin(), rjobs.end(), CompareJobs);
+        Link(rjobs);
+        std::for_each(rjobs.begin(), rjobs.end(),
             std::bind(R::BeginFrame, renderList.worldMat, std::placeholders::_1));
         GB_CacheAll();
-        DrawFrame(renderList, projectionMat, _time);
+        DrawFrame(renderList.worldMat, projectionMat, _time, rjobs);
     }
 }
 
+void Renderer::Render(RenderList& renderList) {
+    for(unsigned i = 0; i < Layers::NUM_LAYERS; ++i) _renderLayers[i].clear();
+
+    for(unsigned i = 0; i < renderList.meshJobs.size(); ++i) {
+        const MeshJob& rjob = renderList.meshJobs[i];
+        _renderLayers[rjob.layer].push_back(rjob);
+    }
+
+    for(unsigned i = 0; i < Layers::NUM_LAYERS; ++i) {
+        if(!_renderLayers[i].empty()) Render(renderList, _renderLayers[i]);
+    }
+}
 
 } // namespace R

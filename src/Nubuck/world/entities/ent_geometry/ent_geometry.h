@@ -29,6 +29,7 @@ private:
     bool                            _meshCompiled; // TODO: might be a race cond
 
     int                 _renderMode;
+    unsigned            _renderLayer;
     ShadingMode::Enum   _shadingMode;
     R::RenderList       _renderList;
 
@@ -48,6 +49,7 @@ public:
     void Rotate(float ang, float x, float y, float z) override;
 
     void SetRenderMode(int flags) override { _renderMode = flags; }
+    void SetRenderLayer(unsigned layer) override { _renderLayer = layer; }
     void SetShadingMode(ShadingMode::Enum mode) override { _shadingMode = mode; }
 
     void FrameUpdate();

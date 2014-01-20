@@ -28,6 +28,7 @@ private:
     void BuildAxis() {
         _geom_axis = _nb.world->CreateGeometry();
         _geom_axis->SetRenderMode(IGeometry::RenderMode::EDGES);
+        _geom_axis->SetRenderLayer(1);
         leda::nb::RatPolyMesh& mesh = _geom_axis->GetRatPolyMesh();
         leda::node v0 = mesh.new_node();
         leda::node vX = mesh.new_node();
@@ -62,6 +63,7 @@ private:
             _geom_arrowHeads[i]->GetRatPolyMesh() = mesh;
             _geom_arrowHeads[i]->GetRatPolyMesh().compute_faces();
             _geom_arrowHeads[i]->SetRenderMode(IGeometry::RenderMode::FACES);
+            _geom_arrowHeads[i]->SetRenderLayer(1);
         }
 
         leda::nb::set_color(_geom_arrowHeads[X]->GetRatPolyMesh(), R::Color::Red);

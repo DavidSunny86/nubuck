@@ -22,6 +22,7 @@ class   Effect;
 class   Mesh;
 
 struct MeshJob {
+    unsigned        layer;
     std::string     fx;
     meshPtr_t       mesh;
     GLenum          primType; // value != 0 overrides prim type of mesh
@@ -30,6 +31,8 @@ struct MeshJob {
 
     // handled by renderer
     MeshJob* next;
+
+    MeshJob() : layer(0) { }
 };
 
 struct DirectionalLight {
@@ -48,11 +51,24 @@ struct RenderList {
 };
 
 class Renderer {
+public:
+    struct Layers {
+        enum Enum {
+            GEOMETRY_0 = 0,
+            GEOMETRY_1,
+
+            NUM_LAYERS
+        };
+    };
 private:
     SYS::Timer  _timer;
     float       _time;
 
     float _aspect;
+
+    std::vector<MeshJob> _renderLayers[Layers::NUM_LAYERS];
+
+    void Render(const RenderList& renderList, std::vector<MeshJob>& rjobs);
 public:
     Renderer(void);
 

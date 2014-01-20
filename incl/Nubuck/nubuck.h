@@ -84,6 +84,7 @@ struct IGeometry {
     virtual void Rotate(float ang, float x, float y, float z) = 0;
 
     virtual void SetRenderMode(int flags) = 0;
+    virtual void SetRenderLayer(unsigned layer) = 0;
     virtual void SetShadingMode(ShadingMode::Enum mode) = 0;
 };
 
