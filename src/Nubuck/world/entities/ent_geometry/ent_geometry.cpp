@@ -27,7 +27,8 @@ _renderMode(0),
 _renderLayer(0),
 _shadingMode(ShadingMode::NICE)
 { 
-    _edgeRenderer = &_cylinderEdges;
+    // _edgeRenderer = &_cylinderEdges;
+    _edgeRenderer = &_lineEdges;
 }
 
 void ENT_Geometry::Update() {
@@ -116,8 +117,9 @@ void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
 }
 
 void ENT_Geometry::FrameUpdate() {
-    _nodes.Transform(world.GetCameraMatrix());
-    _edgeRenderer->Transform(world.GetCameraMatrix());
+    M::Matrix4 tf = M::Mat4::FromRigidTransform(GetTransform().rotation, GetTransform().position);
+    _nodes.Transform(world.GetCameraMatrix() * tf);
+    _edgeRenderer->SetTransform(tf, world.GetCameraMatrix());
 }
 
 void ENT_Geometry::BuildRenderList() {

@@ -57,7 +57,7 @@ void LineEdges::Rebuild() {
     _mesh = meshMgr.Create(meshDesc);
 }
 
-void LineEdges::Transform(const M::Matrix4& modelView) {
+void LineEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4& modelView) {
     if(IsEmpty()) return;
 
     // wEye: eye position in world space
@@ -76,8 +76,8 @@ void LineEdges::Transform(const M::Matrix4& modelView) {
     for(unsigned i = 0; i < numEdges; ++i) {
         const Edge& edge = _edges[i];
 
-        const M::Vector3 p0 = M::Transform(modelView, edge.p0);
-        const M::Vector3 p1 = M::Transform(modelView, edge.p1);
+        const M::Vector3 p0 = M::Transform(modelView, M::Transform(transform, edge.p0));
+        const M::Vector3 p1 = M::Transform(modelView, M::Transform(transform, edge.p1));
 
         const M::Vector3 wAxisY = M::Normalize(p1 - p0);
         const M::Vector3 wAxisX = M::Normalize(M::Cross(wAxisY, -p0));

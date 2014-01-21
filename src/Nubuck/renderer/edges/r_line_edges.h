@@ -28,7 +28,7 @@ public:
     void Push(const Edge& edge) override { _edges.push_back(edge); }
     void Rebuild() override;
 
-    void Transform(const M::Matrix4& modelView) override;
+    void SetTransform(const M::Matrix4& transform, const M::Matrix4& modelView) override;
 
     MeshJob GetRenderJob() const override;
 };
