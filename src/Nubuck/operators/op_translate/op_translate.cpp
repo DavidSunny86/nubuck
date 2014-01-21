@@ -74,15 +74,33 @@ void Translate::BuildBBoxes() {
     _bboxes[Z] = M::Box::FromCenterSize(M::Vector3(0.0f, 0.0f, 0.5f), M::Vector3(0.2f, 0.2f, 1.0f));
 }
 
+void Translate::BuildCursor() {
+    BuildAxis();
+    BuildArrowHead();
+    BuildBBoxes();
+}
+
+void Translate::HideCursor() {
+    _geom_axis->Hide();
+    for(int i = 0; i < DIM; ++i)
+        _geom_arrowHeads[i]->Hide();
+}
+
+void Translate::ShowCursor() {
+    _geom_axis->Show();
+    for(int i = 0; i < DIM; ++i)
+        _geom_arrowHeads[i]->Show();
+}
+
 void Translate::Register(const Nubuck& nb, Invoker& invoker) {
     _nb = nb;
 
     QAction* action = _nb.ui->GetSceneMenu()->addAction("Translate");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 
-    BuildAxis();
-    BuildArrowHead();
-    BuildBBoxes();
+    BuildCursor();
+
+    if(!W::world.SelectedGeometry()) HideCursor();
 }
 
 static M::Vector3 Axis(int i) {
@@ -93,7 +111,15 @@ static M::Vector3 Axis(int i) {
     return M::Vector3::Zero;
 }
 
-void Translate::OnMouseDown(const M::Vector2& mouseCoords) {
+void Translate::Invoke() {
+    _nb.ui->SetOperatorName("Translate");
+}
+
+void Translate::OnGeometrySelected() {
+    ShowCursor();
+}
+
+bool Translate::OnMouseDown(const M::Vector2& mouseCoords) {
     if(!_dragging) {
         M::Ray ray = W::world.PickingRay(mouseCoords);
 
@@ -125,11 +151,22 @@ void Translate::OnMouseDown(const M::Vector2& mouseCoords) {
         }
         if(_dragging) {
             printf("N = %f %f %f\n", _dragPlane.n.x, _dragPlane.n.y, _dragPlane.n.z);
+            return true;
         }
+        return false;
     }
+    return false;
 }
 
-void Translate::OnMouseMove(const M::Vector2& mouseCoords) {
+bool Translate::OnMouseUp(const M::Vector2& mouseCoords) {
+    if(_dragging) {
+        _dragging = false;
+        return true;
+    }
+    return false;
+}
+
+bool Translate::OnMouseMove(const M::Vector2& mouseCoords) {
     if(_dragging) {
         M::Ray ray = W::world.PickingRay(mouseCoords);
         M::IS::Info inf;
@@ -138,7 +175,13 @@ void Translate::OnMouseMove(const M::Vector2& mouseCoords) {
         M::Vector3 p = inf.where;
         _position.vec[_dragAxis] = (p - _dragOrig).vec[_dragAxis];
         SetPosition(_position);
+
+        IGeometry* geom = W::world.SelectedGeometry();
+        geom->SetPosition(_position.x, _position.y, _position.z);
+
+        return true;
     }
+    return false;
 }
 
 } // namespace OP

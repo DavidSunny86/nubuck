@@ -23,6 +23,7 @@ ENT_Geometry::ENT_Geometry() :
 _edgeRenderer(NULL),
 _mesh(NULL), 
 _meshCompiled(true), 
+_isHidden(false),
 _renderMode(0), 
 _renderLayer(0),
 _shadingMode(ShadingMode::NICE)
@@ -124,6 +125,8 @@ void ENT_Geometry::FrameUpdate() {
 
 void ENT_Geometry::BuildRenderList() {
     _renderList.meshJobs.clear();
+
+    if(_isHidden) return;
 
     if(RenderMode::FACES & _renderMode && NULL != _mesh) {
         TransformVertices();

@@ -107,7 +107,7 @@ namespace W {
         IMesh* CreateSphereMesh(const SphereDesc& desc) override;
         IMesh* CreateCylinderMesh(const CylinderDesc& desc) override;
 
-        void SelectGeometry(IGeometry* geom) override { _selection.geometry = geom; }
+        void SelectGeometry(IGeometry* geom) override;
         IGeometry* SelectedGeometry() override { return _selection.geometry; }
 
         // thread interface

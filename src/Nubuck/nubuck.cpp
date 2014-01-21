@@ -95,7 +95,8 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     // REMOVEME
     OP::g_operators.Register(new OP::GEN::InCube());
     OP::g_operators.Register(new OP::ConvexHull());
-    OP::g_operators.Register(new OP::Translate());
+    unsigned op = OP::g_operators.Register(new OP::Translate());
+    OP::g_operators.SetInitOp(op);
 
     mainWindow.show();
     return app.exec();

@@ -103,6 +103,7 @@ public:
     }
 
     void Invoke() override {
+        _nb.ui->SetOperatorName("Random Points in Cube");
         CreateOperatorPanel();
 
         _bbox = _nb.world->CreateGeometry();

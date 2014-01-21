@@ -5,7 +5,7 @@ namespace OP {
 
 Operators g_operators;
 
-void Operators::Register(Operator* op) {
+unsigned Operators::Register(Operator* op) {
     unsigned id = _ops.size();
 
     Invoker* invoker = new Invoker(id);
@@ -19,6 +19,8 @@ void Operators::Register(Operator* op) {
     desc.op = op;
 
     _ops.push_back(desc);
+
+    return id;
 }
 
 } // namespace OP

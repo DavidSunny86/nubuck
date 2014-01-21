@@ -12,6 +12,7 @@
 #include <renderer\edges\r_line_edges.h>
 #include <events\event_defs.h>
 #include <UI\outliner\outliner.h>
+#include <operators\operators.h>
 #include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include <world\entities\ent_mesh\ent_mesh.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
@@ -736,6 +737,12 @@ namespace W {
         R::Cylinder cylinder(desc.radius, desc.height, desc.numSlices, desc.caps);
         unsigned entId = SpawnMesh(R::meshMgr.Create(cylinder.GetDesc()));
         return new Proxy::Mesh(entId);
+    }
+
+
+    void World::SelectGeometry(IGeometry* geom) { 
+        _selection.geometry = geom; 
+        OP::g_operators.SelectGeometry();
     }
 
     DWORD World::Thread_Func(void) {

@@ -34,12 +34,21 @@ private:
     void BuildAxis();
     void BuildArrowHead();
     void BuildBBoxes();
+    void BuildCursor();
+    void ShowCursor();
+    void HideCursor();
+
+    void SetCenterPosition(M::Box& box, const M::Vector3& center) {
+        M::Vector3 size = box.max - box.min;
+        box = M::Box::FromCenterSize(center, size);
+    }
 
     void SetPosition(const M::Vector3& pos) {
         _geom_axis->SetPosition(pos.x, pos.y, pos.z);
         for(unsigned i = 0; i < DIM; ++i) {
             const M::Vector3& off = _arrowHeadsOffsets[i];
             _geom_arrowHeads[i]->SetPosition(off.x + pos.x, off.y + pos.y, off.z + pos.z);
+            SetCenterPosition(_bboxes[i], pos);
         }
     }
 
@@ -53,11 +62,13 @@ public:
     Translate();
 
     void Register(const Nubuck& nb, Invoker& invoker) override;
-    void Invoke() override { }
+    void Invoke() override;
     void Finish() override { }
 
-    void OnMouseDown(const M::Vector2& mouseCoords) override;
-    void OnMouseMove(const M::Vector2& mouseCoords) override;
+    void OnGeometrySelected() override;
+    bool OnMouseDown(const M::Vector2& mouseCoords) override;
+    bool OnMouseUp(const M::Vector2& mouseCoords) override;
+    bool OnMouseMove(const M::Vector2& mouseCoords) override;
 };
 
 } // namespace OP

@@ -77,6 +77,10 @@ namespace UI {
         _renderConfig->hide();
     }
 
+    void MainWindow::SetOperatorName(const char* name) {
+        OperatorPanel::Instance()->setWindowTitle(QString("Operator ") + name);
+    }
+
     void MainWindow::SetOperatorPanel(QWidget* panel) {
         OperatorPanel::Instance()->setWidget(panel);
     }

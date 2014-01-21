@@ -87,6 +87,9 @@ struct IGeometry {
     virtual void SetPosition(float x, float y, float z) = 0;
     virtual void Rotate(float ang, float x, float y, float z) = 0;
 
+    virtual void Hide() = 0;
+    virtual void Show() = 0;
+
     virtual void SetRenderMode(int flags) = 0;
     virtual void SetRenderLayer(unsigned layer) = 0;
     virtual void SetShadingMode(ShadingMode::Enum mode) = 0;
@@ -137,6 +140,7 @@ struct IMainWindow {
     virtual ~IMainWindow() { }
 
     virtual QMenu* GetSceneMenu() = 0;
+    virtual void SetOperatorName(const char* name) = 0;
     virtual void SetOperatorPanel(QWidget* panel) = 0;
 };
 

@@ -25,6 +25,8 @@ public:
     }
 
     void Invoke() override {
+        _nb.ui->SetOperatorName("Convex Hull");
+
         IGeometry* cloud = _nb.world->SelectedGeometry();
         assert(cloud);
 
@@ -40,6 +42,12 @@ public:
         chullMesh.compute_faces();
         chull->Update();
 
+        float x = cloud->GetPosX();
+        float y = cloud->GetPosY();
+        float z = cloud->GetPosZ();
+        chull->SetPosition(x, y, z);
+
+        cloud->Destroy();
         _nb.world->SelectGeometry(chull);
     }
 

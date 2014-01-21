@@ -16,8 +16,10 @@ public:
     virtual void Invoke() = 0;
     virtual void Finish() = 0;
 
-    virtual void OnMouseDown(const M::Vector2& mouseCoords) { }
-    virtual void OnMouseMove(const M::Vector2& mouseCoords) { }
+    virtual void OnGeometrySelected() { }
+    virtual bool OnMouseDown(const M::Vector2& mouseCoords) { return false; }
+    virtual bool OnMouseUp(const M::Vector2& mouseCoords)  { return false; }
+    virtual bool OnMouseMove(const M::Vector2& mouseCoords) { return false; }
 };
 
 } // namespace OP

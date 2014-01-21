@@ -28,6 +28,7 @@ private:
     R::meshPtr_t                    _mesh;
     bool                            _meshCompiled; // TODO: might be a race cond
 
+    bool                _isHidden;
     int                 _renderMode;
     unsigned            _renderLayer;
     ShadingMode::Enum   _shadingMode;
@@ -51,6 +52,9 @@ public:
 
     void SetPosition(float x, float y, float z) override { GetTransform().position = M::Vector3(x, y, z); }
     void Rotate(float ang, float x, float y, float z) override;
+
+    void Show() override { _isHidden = false; }
+    void Hide() override { _isHidden = true; }
 
     void SetRenderMode(int flags) override { _renderMode = flags; }
     void SetRenderLayer(unsigned layer) override { _renderLayer = layer; }

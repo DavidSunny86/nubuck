@@ -48,10 +48,9 @@ namespace UI {
         args.mods = qevent->modifiers();
         args.x = qevent->x();
         args.y = qevent->y();
-        W::world.Send(EV::def_Mouse.Create(args));
 
-        OP::Operator* activeOp = OP::g_operators.ActiveOperator();
-        if(activeOp) activeOp->OnMouseDown(M::Vector2(args.x, args.y));
+        if(!OP::g_operators.OnMouseDown(M::Vector2(args.x, args.y)))
+            W::world.Send(EV::def_Mouse.Create(args));
     }
 
     void RenderView::mouseReleaseEvent(QMouseEvent* qevent) {
@@ -61,7 +60,9 @@ namespace UI {
         args.mods = qevent->modifiers();
         args.x = qevent->x();
         args.y = qevent->y();
-        W::world.Send(EV::def_Mouse.Create(args));
+
+        if(!OP::g_operators.OnMouseUp(M::Vector2(args.x, args.y)))
+            W::world.Send(EV::def_Mouse.Create(args));
     }
 
     void RenderView::mouseMoveEvent(QMouseEvent* qevent) {
@@ -71,10 +72,9 @@ namespace UI {
         args.mods = qevent->modifiers();
         args.x = qevent->x();
         args.y = qevent->y();
-        W::world.Send(EV::def_Mouse.Create(args));
 
-        OP::Operator* activeOp = OP::g_operators.ActiveOperator();
-        if(activeOp) activeOp->OnMouseMove(M::Vector2(args.x, args.y));
+        if(!OP::g_operators.OnMouseMove(M::Vector2(args.x, args.y)))
+            W::world.Send(EV::def_Mouse.Create(args));
     }
 
     void RenderView::wheelEvent(QWheelEvent* qevent) {
