@@ -5,6 +5,7 @@
 #include <events\event_defs.h>
 #include <UI\outliner\outliner.h>
 #include <world\world.h>
+#include <operators\operators.h>
 #include <renderer\effects\effectmgr.h>
 #include "renderview.h"
 
@@ -48,6 +49,9 @@ namespace UI {
         args.x = qevent->x();
         args.y = qevent->y();
         W::world.Send(EV::def_Mouse.Create(args));
+
+        OP::Operator* activeOp = OP::g_operators.ActiveOperator();
+        if(activeOp) activeOp->OnMouseDown(M::Vector2(args.x, args.y));
     }
 
     void RenderView::mouseReleaseEvent(QMouseEvent* qevent) {
@@ -68,6 +72,9 @@ namespace UI {
         args.x = qevent->x();
         args.y = qevent->y();
         W::world.Send(EV::def_Mouse.Create(args));
+
+        OP::Operator* activeOp = OP::g_operators.ActiveOperator();
+        if(activeOp) activeOp->OnMouseMove(M::Vector2(args.x, args.y));
     }
 
     void RenderView::wheelEvent(QWheelEvent* qevent) {

@@ -43,6 +43,8 @@ public:
     Operators() : _activeOp(NULL) { }
 
     void Register(Operator* op);
+
+    Operator* ActiveOperator() { return _activeOp; }
 };
 
 extern Operators g_operators;

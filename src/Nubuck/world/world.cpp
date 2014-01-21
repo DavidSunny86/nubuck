@@ -510,6 +510,17 @@ namespace W {
         _isGrabbing = false;
 	}
 
+    M::Ray World::PickingRay(const M::Vector2& mouseCoords) {
+        M::Matrix4 projectionMat = M::Mat4::Perspective(45.0f, aspect, 0.1f, 1000.0f);
+        M::Matrix4 invWorldMat;
+        M::TryInvert(_camArcball.GetWorldMatrix(), invWorldMat);
+        M::Ray ray;
+        ray.origin = M::Transform(invWorldMat, M::Vector3::Zero);
+        ray.direction = UnprojectPoint(projectionMat, _camArcball.GetWorldMatrix(), screenWidth, screenHeight, mouseCoords);
+        ray.direction.Normalize();
+        return ray;
+    }
+
 	unsigned World::SpawnPolyhedron(graph_t* const G, leda::node_map<bool>* cachedNodes, leda::edge_map<bool>* cachedEdges) {
         entIdCntMtx.Lock();
         unsigned entId = entIdCnt++;

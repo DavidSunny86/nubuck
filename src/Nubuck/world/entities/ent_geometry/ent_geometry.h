@@ -45,6 +45,10 @@ public:
     leda::nb::RatPolyMesh& GetRatPolyMesh() override { return _ratPolyMesh; }
     void Update() override;
 
+    float GetPosX() const override { return GetTransform().position.x; }
+    float GetPosY() const override { return GetTransform().position.y; }
+    float GetPosZ() const override { return GetTransform().position.z; }
+
     void SetPosition(float x, float y, float z) override { GetTransform().position = M::Vector3(x, y, z); }
     void Rotate(float ang, float x, float y, float z) override;
 

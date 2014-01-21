@@ -5,6 +5,8 @@
 #include <QMenu>
 
 #include <Nubuck\nubuck.h>
+#include <math\box.h>
+#include <math\plane.h>
 #include <operators\operator.h>
 #include <operators\operators.h>
 #include <renderer\mesh\mesh.h>
@@ -22,79 +24,40 @@ private:
 
     IGeometry* _geom_axis;
 
-    enum { X = 0, Y, Z };
-    IGeometry* _geom_arrowHeads[3];
+    enum { X = 0, Y, Z, DIM };
+    IGeometry*  _geom_arrowHeads[DIM];
+    scalar_t    _arrowHeadSize;
+    M::Vector3  _arrowHeadsOffsets[DIM];
 
-    void BuildAxis() {
-        _geom_axis = _nb.world->CreateGeometry();
-        _geom_axis->SetRenderMode(IGeometry::RenderMode::EDGES);
-        _geom_axis->SetRenderLayer(1);
-        leda::nb::RatPolyMesh& mesh = _geom_axis->GetRatPolyMesh();
-        leda::node v0 = mesh.new_node();
-        leda::node vX = mesh.new_node();
-        leda::node vY = mesh.new_node();
-        leda::node vZ = mesh.new_node();
-        mesh.set_position(v0, point3_t(0, 0, 0));
-        mesh.set_position(vX, point3_t(1, 0, 0));
-        mesh.set_position(vY, point3_t(0, 1, 0));
-        mesh.set_position(vZ, point3_t(0, 0, 1));
-        mesh.set_reversal(mesh.new_edge(v0, vX), mesh.new_edge(vX, v0));
-        mesh.set_reversal(mesh.new_edge(v0, vY), mesh.new_edge(vY, v0));
-        mesh.set_reversal(mesh.new_edge(v0, vZ), mesh.new_edge(vZ, v0));
-        _geom_axis->Update();
-    }
+    M::Box _bboxes[DIM];
 
-    void BuildArrowHead() {
-        leda::nb::RatPolyMesh mesh;
-        scalar_t s = scalar_t(1) / scalar_t(10);
-        leda::list<point3_t> L;
-        L.push(point3_t( 0,  2 * s,  0));
-        L.push(point3_t(-s, -s, -s));
-        L.push(point3_t(-s, -s,  s));
-        L.push(point3_t( s, -s,  s));
-        L.push(point3_t( s, -s, -s));
-        leda::CONVEX_HULL(L, mesh);
-        mesh.compute_faces();
+    void BuildAxis();
+    void BuildArrowHead();
+    void BuildBBoxes();
 
-        float off = s.to_float() + 1.0f;
-
-        for(int i = 0; i < 3; ++i) {
-            _geom_arrowHeads[i] = _nb.world->CreateGeometry();
-            _geom_arrowHeads[i]->GetRatPolyMesh() = mesh;
-            _geom_arrowHeads[i]->GetRatPolyMesh().compute_faces();
-            _geom_arrowHeads[i]->SetRenderMode(IGeometry::RenderMode::FACES);
-            _geom_arrowHeads[i]->SetRenderLayer(1);
+    void SetPosition(const M::Vector3& pos) {
+        _geom_axis->SetPosition(pos.x, pos.y, pos.z);
+        for(unsigned i = 0; i < DIM; ++i) {
+            const M::Vector3& off = _arrowHeadsOffsets[i];
+            _geom_arrowHeads[i]->SetPosition(off.x + pos.x, off.y + pos.y, off.z + pos.z);
         }
-
-        leda::nb::set_color(_geom_arrowHeads[X]->GetRatPolyMesh(), R::Color::Red);
-        _geom_arrowHeads[X]->Rotate(-90.0f, 0.0f, 0.0f, 1.0f);
-        _geom_arrowHeads[X]->SetPosition(off, 0.0f, 0.0f);
-
-        leda::nb::set_color(_geom_arrowHeads[Y]->GetRatPolyMesh(), R::Color::Blue);
-        _geom_arrowHeads[Y]->SetPosition(0.0f, off, 0.0f);
-
-        leda::nb::set_color(_geom_arrowHeads[Z]->GetRatPolyMesh(), R::Color::Green);
-        _geom_arrowHeads[Z]->Rotate(90.0f, 1.0f, 0.0f, 0.0f);
-        _geom_arrowHeads[Z]->SetPosition(0.0f, 0.0f, off);
-
-        for(int i = 0; i < 3; ++i) _geom_arrowHeads[i]->Update();
     }
+
+    M::Vector3  _position;
+
+    bool        _dragging;
+    int         _dragAxis;
+    M::Vector3  _dragOrig;
+    M::Plane    _dragPlane;
 public:
-    void Register(const Nubuck& nb, Invoker& invoker) override {
-        _nb = nb;
+    Translate();
 
-        QAction* action = _nb.ui->GetSceneMenu()->addAction("Translate");
-        QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
+    void Register(const Nubuck& nb, Invoker& invoker) override;
+    void Invoke() override { }
+    void Finish() override { }
 
-        BuildAxis();
-        BuildArrowHead();
-    }
-
-    void Invoke() override {
-    }
-
-    void Finish() override {
-    }
+    void OnMouseDown(const M::Vector2& mouseCoords) override;
+    void OnMouseMove(const M::Vector2& mouseCoords) override;
 };
 
 } // namespace OP

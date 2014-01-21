@@ -12,6 +12,8 @@
 #include <system\locks\spinlock.h>
 #include <system\locks\semaphore.h>
 #include <common\types.h>
+#include <math\vector2.h>
+#include <math\ray.h>
 #include <renderer\renderer.h>
 #include <camera\arcball_camera.h>
 #include <events\events.h>
@@ -88,6 +90,9 @@ namespace W {
 		World(void);
 
         M::Matrix4 GetCameraMatrix() const { return _camArcball.GetWorldMatrix(); }
+        M::Matrix4 GetModelView() const { return _camArcball.GetWorldMatrix(); }
+
+        M::Ray PickingRay(const M::Vector2& mouseCoords);
 
 		unsigned SpawnPolyhedron(graph_t* const G, leda::node_map<bool>* cachedNodes, leda::edge_map<bool>* cachedEdges);
         unsigned SpawnMesh(R::meshPtr_t meshPtr);

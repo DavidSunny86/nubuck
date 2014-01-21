@@ -38,6 +38,8 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
     </CustomBuild>
+    <ClInclude Include="..\..\src\Nubuck\math\box.h" />
+    <ClInclude Include="..\..\src\Nubuck\math\intersections.h" />
     <ClInclude Include="..\..\src\Nubuck\math\line2.h" />
     <ClInclude Include="..\..\src\Nubuck\math\line3.h" />
     <ClInclude Include="..\..\src\Nubuck\math\line_mem_inl.h" />
@@ -45,9 +47,12 @@
     <ClInclude Include="..\..\src\Nubuck\math\math_inl.h" />
     <ClInclude Include="..\..\src\Nubuck\math\matrix3.h" />
     <ClInclude Include="..\..\src\Nubuck\math\matrix4.h" />
+    <ClInclude Include="..\..\src\Nubuck\math\plane.h" />
     <ClInclude Include="..\..\src\Nubuck\math\quaternion.h" />
     <ClInclude Include="..\..\src\Nubuck\math\quaternion_mem_inl.h" />
     <ClInclude Include="..\..\src\Nubuck\math\quaternion_op_inl.h" />
+    <ClInclude Include="..\..\src\Nubuck\math\ray.h" />
+    <ClInclude Include="..\..\src\Nubuck\math\sphere.h" />
     <ClInclude Include="..\..\src\Nubuck\math\transform.h" />
     <ClInclude Include="..\..\src\Nubuck\math\vector2.h" />
     <ClInclude Include="..\..\src\Nubuck\math\vector2_mem_inl.h" />
@@ -269,6 +274,10 @@
     <ClCompile Include="..\..\src\Nubuck\events\events.cpp" />
     <ClCompile Include="..\..\src\Nubuck\events\event_defs.cpp" />
     <ClCompile Include="..\..\src\Nubuck\mainloop\mainloop.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\math\box.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\math\is_ray_box.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\math\is_ray_plane.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\math\is_ray_sphere.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\line2.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\line3.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\math.cpp" />

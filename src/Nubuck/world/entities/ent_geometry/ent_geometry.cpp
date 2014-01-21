@@ -63,7 +63,6 @@ void ENT_Geometry::Update() {
 
     leda::node_array<M::Vector3> fpos(_ratPolyMesh);
 
-    // leda::node v;
     forall_nodes(v, _ratPolyMesh) {
         fpos[v] = ToVector(_ratPolyMesh.position_of(v));
     }

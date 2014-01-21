@@ -578,6 +578,21 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges.h">
       <Filter>Private\renderer\edges</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\box.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\ray.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\sphere.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\intersections.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\plane.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -942,6 +957,18 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges.cpp">
       <Filter>Private\renderer\edges</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\box.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\is_ray_sphere.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\is_ray_box.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\is_ray_plane.cpp">
+      <Filter>Private\math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
