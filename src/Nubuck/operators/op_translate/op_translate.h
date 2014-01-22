@@ -39,8 +39,10 @@ private:
     void HideCursor();
 
     void SetCenterPosition(M::Box& box, const M::Vector3& center) {
-        M::Vector3 size = box.max - box.min;
-        box = M::Box::FromCenterSize(center, size);
+        const M::Vector3 oldCenter = 0.5f * (box.max - box.min) + box.min;
+        const M::Vector3 d = (center - oldCenter);
+        box.min += d;
+        box.max += d;
     }
 
     void SetPosition(const M::Vector3& pos) {
@@ -49,10 +51,15 @@ private:
             const M::Vector3& off = _arrowHeadsOffsets[i];
             _geom_arrowHeads[i]->SetPosition(off.x + pos.x, off.y + pos.y, off.z + pos.z);
             SetCenterPosition(_bboxes[i], pos);
+    const float l = 1.2f;
+    const float w = 0.2f;
+    _bboxes[X] = M::Box::FromCenterSize(pos + M::Vector3(0.5f, 0.0f, 0.0f), M::Vector3(l, w, w));
+    _bboxes[Y] = M::Box::FromCenterSize(pos + M::Vector3(0.0f, 0.5f, 0.0f), M::Vector3(w, l, w));
+    _bboxes[Z] = M::Box::FromCenterSize(pos + M::Vector3(0.0f, 0.0f, 0.5f), M::Vector3(w, w, l));
         }
     }
 
-    M::Vector3  _position;
+    M::Vector3  _cursorPos;
 
     bool        _dragging;
     int         _dragAxis;

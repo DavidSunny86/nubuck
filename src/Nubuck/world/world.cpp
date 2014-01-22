@@ -98,7 +98,7 @@ namespace W {
         M::Matrix4 M;
         M::TryInvert(projectionMat, M);
         M::Vector3 t = Transform(M, q, clipW); // in world space
-        printf("eye = %f, %f, %f\n", t.x, t.y, t.z);
+        // printf("eye = %f, %f, %f\n", t.x, t.y, t.z);
         M::Matrix3 normalMat = M::Inverse(M::RotationOf(worldMat));
         return Transform(normalMat, t);
     }

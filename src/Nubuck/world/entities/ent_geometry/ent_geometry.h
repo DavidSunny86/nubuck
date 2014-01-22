@@ -34,7 +34,10 @@ private:
     ShadingMode::Enum   _shadingMode;
     R::RenderList       _renderList;
 
+    M::Vector3          _center; // untransformed center
+
     void TransformVertices();
+    void ComputeCenter();
 public:
     ENT_Geometry();
 
@@ -45,6 +48,9 @@ public:
 
     leda::nb::RatPolyMesh& GetRatPolyMesh() override { return _ratPolyMesh; }
     void Update() override;
+
+    const M::Vector3& GetLocalCenter() const { return _center; }
+    M::Vector3 GetGlobalCenter() { return Transform(_center); }
 
     float GetPosX() const override { return GetTransform().position.x; }
     float GetPosY() const override { return GetTransform().position.y; }

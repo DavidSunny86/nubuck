@@ -1,18 +1,19 @@
 #include <Nubuck\polymesh.h>
 #include <math\intersections.h>
 #include <world\world.h>
+#include <world\entities\ent_geometry\ent_geometry.h>
 #include "op_translate.h"
 
 namespace OP {
 
 Translate::Translate() : _dragging(false) {
-    _arrowHeadSize = scalar_t(1) / scalar_t(10);
-    float off = _arrowHeadSize.to_float() + 1.0f;
+    _arrowHeadSize = scalar_t(1) / scalar_t(8);
+    float off = _arrowHeadSize.to_float() + 0.8f;
     _arrowHeadsOffsets[X] = M::Vector3(off, 0.0f, 0.0f);
     _arrowHeadsOffsets[Y] = M::Vector3(0.0f, off, 0.0f);
     _arrowHeadsOffsets[Z] = M::Vector3(0.0f, 0.0f, off);
 
-    _position = M::Vector3::Zero;
+    _cursorPos = M::Vector3::Zero;
 }
 
 void Translate::BuildAxis() {
@@ -69,9 +70,11 @@ void Translate::BuildArrowHead() {
 }
 
 void Translate::BuildBBoxes() {
-    _bboxes[X] = M::Box::FromCenterSize(M::Vector3(0.5f, 0.0f, 0.0f), M::Vector3(1.0f, 0.2f, 0.2f));
-    _bboxes[Y] = M::Box::FromCenterSize(M::Vector3(0.0f, 0.5f, 0.0f), M::Vector3(0.2f, 1.0f, 0.2f));
-    _bboxes[Z] = M::Box::FromCenterSize(M::Vector3(0.0f, 0.0f, 0.5f), M::Vector3(0.2f, 0.2f, 1.0f));
+    const float l = 1.2f;
+    const float w = 0.4f;
+    _bboxes[X] = M::Box::FromCenterSize(M::Vector3(0.5f, 0.0f, 0.0f), M::Vector3(l, w, w));
+    _bboxes[Y] = M::Box::FromCenterSize(M::Vector3(0.0f, 0.5f, 0.0f), M::Vector3(w, l, w));
+    _bboxes[Z] = M::Box::FromCenterSize(M::Vector3(0.0f, 0.0f, 0.5f), M::Vector3(w, w, l));
 }
 
 void Translate::BuildCursor() {
@@ -116,8 +119,14 @@ void Translate::Invoke() {
 }
 
 void Translate::OnGeometrySelected() {
+    W::ENT_Geometry* geom = (W::ENT_Geometry*)W::world.SelectedGeometry();
+    _cursorPos = geom->GetTransform().position;
+    SetPosition(_cursorPos);
+
     ShowCursor();
 }
+
+static float tmp;
 
 bool Translate::OnMouseDown(const M::Vector2& mouseCoords) {
     if(!_dragging) {
@@ -134,7 +143,7 @@ bool Translate::OnMouseDown(const M::Vector2& mouseCoords) {
         for(int i = 0; i < DIM; ++i) {
             if(M::IS::Intersects(ray, _bboxes[i])) {
                 _dragAxis = i;
-                _dragPlane = M::Plane::FromPointSpan(M::Vector3::Zero, M::Cross(eyeZ, Axis(i)), Axis(i));
+                _dragPlane = M::Plane::FromPointSpan(_cursorPos, M::Cross(eyeZ, Axis(i)), Axis(i));
                 printf("Cross: %f %f %f, Axis(i): %f %f %f\n",
                     M::Cross(eyeZ, Axis(i)).x,
                     M::Cross(eyeZ, Axis(i)).y,
@@ -145,6 +154,7 @@ bool Translate::OnMouseDown(const M::Vector2& mouseCoords) {
                 M::IS::Info inf;
                 bool is = M::IS::Intersects(ray, _dragPlane, &inf);
                 assert(is);
+                tmp = _cursorPos.vec[_dragAxis];
                 _dragOrig = inf.where;
                 _dragging = true;
             }
@@ -167,17 +177,36 @@ bool Translate::OnMouseUp(const M::Vector2& mouseCoords) {
 }
 
 bool Translate::OnMouseMove(const M::Vector2& mouseCoords) {
+    R::Color arrowHeadColors[] = {
+        R::Color::Red,
+        R::Color::Green,
+        R::Color::Blue
+    };
+    if(!_dragging) {
+        M::Ray ray = W::world.PickingRay(mouseCoords);
+        for(int i = 0; i < DIM; ++i) {
+            if(M::IS::Intersects(ray, _bboxes[i])) {
+                leda::nb::set_color(_geom_arrowHeads[i]->GetRatPolyMesh(), R::BlendAddRGB(arrowHeadColors[i], R::Color::White));
+            } else leda::nb::set_color(_geom_arrowHeads[i]->GetRatPolyMesh(), arrowHeadColors[i]);
+            _geom_arrowHeads[i]->Update();
+        }
+    }
+
     if(_dragging) {
         M::Ray ray = W::world.PickingRay(mouseCoords);
         M::IS::Info inf;
         bool is = M::IS::Intersects(ray, _dragPlane, &inf);
         assert(is);
         M::Vector3 p = inf.where;
-        _position.vec[_dragAxis] = (p - _dragOrig).vec[_dragAxis];
-        SetPosition(_position);
+        _cursorPos.vec[_dragAxis] = tmp + (p - _dragOrig).vec[_dragAxis];
+        printf("orig = %f %f %f, p = %f %f %f\n",
+            _dragOrig.x, _dragOrig.y, _dragOrig.z,
+            p.x, p.y, p.z);
+        printf("COORD = %f\n", _cursorPos.vec[_dragAxis]);
+        SetPosition(_cursorPos);
 
         IGeometry* geom = W::world.SelectedGeometry();
-        geom->SetPosition(_position.x, _position.y, _position.z);
+        geom->SetPosition(_cursorPos.x, _cursorPos.y, _cursorPos.z);
 
         return true;
     }

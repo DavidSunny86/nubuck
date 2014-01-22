@@ -112,9 +112,9 @@ public:
         _cloud = _nb.world->CreateGeometry();
         _cloud->SetRenderMode(IGeometry::RenderMode::NODES);
 
-        _nb.world->SelectGeometry(_cloud);
-
         Update();
+
+        _nb.world->SelectGeometry(_cloud);
     }
 
     void Finish() override {
