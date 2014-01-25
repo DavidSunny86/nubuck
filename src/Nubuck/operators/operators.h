@@ -70,6 +70,14 @@ public:
         }
     }
 
+    void OnCameraChanged() {
+        for(std::vector<Operator*>::reverse_iterator it(_activeOps.rbegin());
+            _activeOps.rend() != it; ++it)
+        {
+            (*it)->OnCameraChanged();
+        }
+    }
+
     bool OnMouseDown(const M::Vector2& mouseCoords) {
         for(int i = _activeOps.size() - 1; 0 <= i; --i) {
             Operator* op = _activeOps[i];

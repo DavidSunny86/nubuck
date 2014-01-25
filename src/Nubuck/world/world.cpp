@@ -224,20 +224,26 @@ namespace W {
                 _camArcball.StopPanning();
         }
 
+        bool cameraChanged = false;
+
         if(EV::Params_Mouse::MOUSE_MOVE == args.type) {
             _camArcball.Drag(args.x, args.y);
             _camArcball.Pan(args.x, args.y);
             _camArcball.Zoom(args.x, args.y);
             mouseX = args.x;
             mouseY = args.y;
-
-            OP::g_operators.OnMouseMove(M::Vector2(mouseX, mouseY));
+            cameraChanged = true;
         }
 
         if(EV::Params_Mouse::MOUSE_WHEEL == args.type) {
             if(args.delta > 0) _camArcball.ZoomIn();
             if(args.delta < 0) _camArcball.ZoomOut();
-            OP::g_operators.OnMouseMove(M::Vector2(mouseX, mouseY));
+            cameraChanged = true;
+        }
+
+        // TODO: do this once per world.Update()
+        if(cameraChanged) {
+            OP::g_operators.OnCameraChanged();
         }
     }
 

@@ -36,14 +36,10 @@ private:
 
     M::Vector3          _center; // untransformed center
 
-    M::Matrix4          _M;
-
     void TransformVertices();
     void ComputeCenter();
 public:
     ENT_Geometry();
-
-    void SetM(const M::Matrix4& M) { _M = M; }
 
     bool IsMeshCompiled() const { return _meshCompiled; }
     void CompileMesh();

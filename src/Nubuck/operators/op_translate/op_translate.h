@@ -65,6 +65,8 @@ private:
     int         _dragAxis;
     M::Vector3  _dragOrig;
     M::Plane    _dragPlane;
+
+    void AlignWithCamera();
 public:
     Translate();
 
@@ -73,6 +75,7 @@ public:
     void Finish() override { }
 
     void OnGeometrySelected() override;
+    void OnCameraChanged() override;
     bool OnMouseDown(const M::Vector2& mouseCoords) override;
     bool OnMouseUp(const M::Vector2& mouseCoords) override;
     bool OnMouseMove(const M::Vector2& mouseCoords) override;

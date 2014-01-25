@@ -17,6 +17,7 @@ public:
     virtual void Finish() = 0;
 
     virtual void OnGeometrySelected() { }
+    virtual void OnCameraChanged() { }
     virtual bool OnMouseDown(const M::Vector2& mouseCoords) { return false; }
     virtual bool OnMouseUp(const M::Vector2& mouseCoords)  { return false; }
     virtual bool OnMouseMove(const M::Vector2& mouseCoords) { return false; }
