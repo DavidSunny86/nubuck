@@ -504,16 +504,19 @@ void Renderer::EndFrame() {
     metrics.frame.time = frame_time.Stop();
 }
 
-void Renderer::Render(const RenderList& renderList, std::vector<MeshJob>& rjobs) {
+void Renderer::Render(
+    const RenderList& renderList, 
+    const M::Matrix4& projection,
+    const M::Matrix4& worldToEye, 
+    std::vector<MeshJob>& rjobs) 
+{
     if(curState.depth.maskEnabled != GL_TRUE) {
         GL_CALL(glDepthMask(GL_TRUE));
         curState.depth.maskEnabled = GL_TRUE;
     }
     GL_CALL(glClear(GL_DEPTH_BUFFER_BIT));
 
-    M::Matrix4 projectionMat = ComputeProjectionMatrix(_aspect, renderList.worldMat, rjobs);
-
-    Uniforms_Update(projectionMat, renderList.worldMat, renderList.dirLights);
+    Uniforms_Update(projection, worldToEye, renderList.dirLights);
 
     if(!rjobs.empty()) {
         GB_Bind();
@@ -522,7 +525,7 @@ void Renderer::Render(const RenderList& renderList, std::vector<MeshJob>& rjobs)
         std::for_each(rjobs.begin(), rjobs.end(),
             std::bind(R::BeginFrame, renderList.worldMat, std::placeholders::_1));
         GB_CacheAll();
-        DrawFrame(renderList.worldMat, projectionMat, _time, rjobs);
+        DrawFrame(renderList.worldMat, projection, _time, rjobs);
     }
 }
 
@@ -535,7 +538,11 @@ void Renderer::Render(RenderList& renderList) {
     }
 
     for(unsigned i = 0; i < Layers::NUM_LAYERS; ++i) {
-        if(!_renderLayers[i].empty()) Render(renderList, _renderLayers[i]);
+        M::Matrix4 projection = M::Mat4::Perspective(45.0f, _aspect, 0.1f, 100.0f);
+        M::Matrix4 worldToEye = M::Mat4::Identity();
+        if(Layers::GEOMETRY_0 == i) worldToEye = renderList.worldMat;
+        if(Layers::GEOMETRY_1 == i) worldToEye = M::Mat4::Identity();
+        if(!_renderLayers[i].empty()) Render(renderList, projection, worldToEye, _renderLayers[i]);
     }
 }
 

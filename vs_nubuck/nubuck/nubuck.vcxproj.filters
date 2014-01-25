@@ -593,6 +593,9 @@
     <ClInclude Include="..\..\src\Nubuck\math\plane.h">
       <Filter>Private\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\math\view_frustrum.h">
+      <Filter>Private\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -968,6 +971,9 @@
       <Filter>Private\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\math\is_ray_plane.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\view_frustrum.cpp">
       <Filter>Private\math</Filter>
     </ClCompile>
   </ItemGroup>

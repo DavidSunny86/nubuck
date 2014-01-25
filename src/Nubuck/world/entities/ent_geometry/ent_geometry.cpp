@@ -15,7 +15,8 @@ namespace W {
 void ENT_Geometry::TransformVertices() {
     _tfverts = _vertices;
     for(unsigned i = 0; i < _vertices.size(); ++i) {
-        _tfverts[i].position = Transform(_vertices[i].position);
+        // _tfverts[i].position = Transform(_vertices[i].position);
+        _tfverts[i].position = M::Transform(_M, Transform(_vertices[i].position));
     }
 }
 
@@ -41,6 +42,8 @@ _shadingMode(ShadingMode::NICE)
 { 
     // _edgeRenderer = &_cylinderEdges;
     _edgeRenderer = &_lineEdges;
+
+    _M = M::Mat4::Identity();
 }
 
 void ENT_Geometry::Update() {
@@ -133,7 +136,7 @@ void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
 void ENT_Geometry::FrameUpdate() {
     M::Matrix4 tf = M::Mat4::FromRigidTransform(GetTransform().rotation, GetTransform().position);
     _nodes.Transform(world.GetCameraMatrix() * tf);
-    _edgeRenderer->SetTransform(tf, world.GetCameraMatrix());
+    _edgeRenderer->SetTransform(tf, _M);
 }
 
 void ENT_Geometry::BuildRenderList() {

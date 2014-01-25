@@ -60,6 +60,7 @@
     <ClInclude Include="..\..\src\Nubuck\math\vector3.h" />
     <ClInclude Include="..\..\src\Nubuck\math\vector3_mem_inl.h" />
     <ClInclude Include="..\..\src\Nubuck\math\vector3_op_inl.h" />
+    <ClInclude Include="..\..\src\Nubuck\math\view_frustrum.h" />
     <ClInclude Include="..\..\src\Nubuck\nubuck_private.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\operator.h" />
     <CustomBuild Include="..\..\src\Nubuck\operators\operators.h">
@@ -290,6 +291,7 @@
     <ClCompile Include="..\..\src\Nubuck\math\vector2_op.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\vector3_mem.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\vector3_op.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\math\view_frustrum.cpp" />
     <ClCompile Include="..\..\src\Nubuck\nubuck.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\operators.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_chull\op_chull.cpp" />

@@ -68,7 +68,11 @@ private:
 
     std::vector<MeshJob> _renderLayers[Layers::NUM_LAYERS];
 
-    void Render(const RenderList& renderList, std::vector<MeshJob>& rjobs);
+    void Render(
+        const RenderList& renderList, 
+        const M::Matrix4& projection,
+        const M::Matrix4& worldToEye, 
+        std::vector<MeshJob>& rjobs);
 public:
     Renderer(void);
 

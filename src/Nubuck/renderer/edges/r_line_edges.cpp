@@ -60,11 +60,6 @@ void LineEdges::Rebuild() {
 void LineEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4& modelView) {
     if(IsEmpty()) return;
 
-    // wEye: eye position in world space
-    M::Matrix4 invWorld;
-    bool ret = M::TryInvert(modelView, invWorld);
-    const M::Vector3 eyePos = M::Transform(invWorld, M::Vector3::Zero);
-
     static const M::Vector3 vertPos[] = {
         M::Vector3(-0.5f,  1.0f, 0.0f),
         M::Vector3(-0.5f,  0.0f, 0.0f),

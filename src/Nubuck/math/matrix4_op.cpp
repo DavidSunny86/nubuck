@@ -353,6 +353,13 @@ namespace M {
                            0.0f, 0.0f, -1.0f, 0.0f);
         }
 
+        Matrix4 Frustrum(float left, float right, float bottom, float top, float zNear, float zFar) {
+            return Matrix4((2.0f * zNear) / (right - left), 0.0f, (right + left) / (right - left), 0.0f,
+                0.0f, (2.0f * zNear) / (top - bottom), (top + bottom) / (top - bottom), 0.0f,
+                0.0f, 0.0f, -(zFar + zNear) / (zFar - zNear), -(2.0f * zNear * zFar) / (zFar - zNear),
+                0.0f, 0.0f, -1.0f, 0.0f);
+        }
+
         Matrix4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar) {
             return Matrix4(2.0f / (right - left), 0.0f, 0.0f, -(right + left) / (right - left),
                     0.0f, 2.0f / (top - bottom), 0.0f, -(top + bottom) / (top - bottom),

@@ -58,6 +58,7 @@ namespace M {
 
         Matrix4 Perspective(float fovy, float aspect, float zNear, float zFar);
         Matrix4 Perspective(float fovy, float aspect, float zNear, float zFar, float zOff);
+        Matrix4 Frustrum(float left, float right, float bottom, float top, float zNear, float zFar);
         Matrix4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar);
 
 	} // namespace Mat4

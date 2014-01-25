@@ -176,7 +176,28 @@ bool Translate::OnMouseUp(const M::Vector2& mouseCoords) {
     return false;
 }
 
+static inline M::Matrix4 SetZ(const M::Vector3& pos, float z) {
+    M::Matrix4 m = M::Mat4::Identity();
+    m.m22 = z / pos.z;
+    return m;
+}
+
 bool Translate::OnMouseMove(const M::Vector2& mouseCoords) {
+    IGeometry* geom = W::world.SelectedGeometry();
+    if(NULL != geom) {
+        W::ENT_Geometry* ent = NULL;
+        M::Matrix4 worldToEye = W::world.GetModelView();
+        M::Vector3 pos = M::Transform(worldToEye, _cursorPos);
+        const float c = 10.0f;
+        M::Matrix4 M = M::Mat4::Translate(-(pos.Length() - c) * M::Normalize(pos)) * worldToEye;
+        for(int i = 0; i < 3; ++i) {
+            ent = (W::ENT_Geometry*)_geom_arrowHeads[i];
+            ent->SetM(M);
+        }
+        ent = (W::ENT_Geometry*)_geom_axis;
+        ent->SetM(M);
+    }
+
     R::Color arrowHeadColors[] = {
         R::Color::Red,
         R::Color::Green,
