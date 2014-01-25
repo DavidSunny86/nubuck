@@ -148,7 +148,7 @@ void Translate::OnCameraChanged() {
 static float tmp;
 
 bool Translate::OnMouseDown(const M::Vector2& mouseCoords) {
-    if(!_dragging) {
+    if(!_dragging && NULL != W::world.SelectedGeometry()) {
         M::Ray ray = W::world.PickingRay(mouseCoords);
 
         M::Matrix3 M = M::RotationOf(W::world.GetModelView());

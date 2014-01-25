@@ -240,6 +240,9 @@
     <Filter Include="Public\renderer\color">
       <UniqueIdentifier>{6b790fd9-1337-4dba-bad9-62cf75603351}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\mesh\grid">
+      <UniqueIdentifier>{851ab214-9a34-4625-bfa9-c71f14f14fbf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -595,6 +598,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\math\view_frustrum.h">
       <Filter>Private\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\grid\grid.h">
+      <Filter>Private\renderer\mesh\grid</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -975,6 +981,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\math\view_frustrum.cpp">
       <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\grid\grid.cpp">
+      <Filter>Private\renderer\mesh\grid</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

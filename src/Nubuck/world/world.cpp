@@ -10,6 +10,7 @@
 #include <renderer\nodes\r_nodes.h>
 #include <renderer\edges\r_cylinder_edges.h>
 #include <renderer\edges\r_line_edges.h>
+#include <renderer\mesh\grid\grid.h>
 #include <events\event_defs.h>
 #include <UI\outliner\outliner.h>
 #include <operators\operators.h>
@@ -516,8 +517,26 @@ namespace W {
         }
     }
 
+    void World::Grid_Build() {
+        R::Grid grid(5, 20.0f);
+        _gridMesh = R::meshMgr.Create(grid.GetDesc());
+    }
+
+    R::MeshJob World::Grid_GetRenderJob() {
+        R::MeshJob meshJob;
+        meshJob.fx = "LitDirectional";
+        meshJob.layer = 0;
+        meshJob.material = R::Material::White;
+        meshJob.mesh = _gridMesh;
+        meshJob.primType = 0;
+        meshJob.transform = M::Mat4::Identity();
+        return meshJob;
+    }
+
 	World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
         _isGrabbing = false;
+
+        Grid_Build();
 	}
 
     M::Ray World::PickingRay(const M::Vector2& mouseCoords) {
@@ -677,6 +696,8 @@ namespace W {
 
         renderList.worldMat = _camArcball.GetWorldMatrix();
 		renderList.meshJobs.clear();
+
+        renderList.meshJobs.push_back(Grid_GetRenderJob());
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
             if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {

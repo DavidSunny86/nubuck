@@ -59,6 +59,11 @@ namespace W {
         bool        _isGrabbing;
         M::Vector3  _grabPivot;
 
+        R::meshPtr_t _gridMesh;
+
+        void        Grid_Build();
+        R::MeshJob  Grid_GetRenderJob();
+
 #pragma region EventHandlers
         void Event_Apocalypse(const EV::Event& event);
         void Event_LinkEntity(const EV::Event& event);

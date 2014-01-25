@@ -106,6 +106,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\material\material.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\bezier\bezier.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\cylinder\cylinder.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\grid\grid.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\mesh.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr_fwd.h" />
@@ -317,6 +318,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\material\material.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\bezier\bezier.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\cylinder\cylinder.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\grid\grid.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\mesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\meshmgr.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\plane\plane.cpp" />
