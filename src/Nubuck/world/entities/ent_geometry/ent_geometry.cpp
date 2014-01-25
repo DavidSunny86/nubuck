@@ -136,7 +136,8 @@ void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
 void ENT_Geometry::FrameUpdate() {
     M::Matrix4 tf = M::Mat4::FromRigidTransform(GetTransform().rotation, GetTransform().position);
     _nodes.Transform(world.GetCameraMatrix() * tf);
-    _edgeRenderer->SetTransform(tf, _M);
+    // _edgeRenderer->SetTransform(tf, _M);
+    _edgeRenderer->SetTransform(tf, world.GetCameraMatrix());
 }
 
 void ENT_Geometry::BuildRenderList() {

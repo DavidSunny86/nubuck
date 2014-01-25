@@ -230,11 +230,14 @@ namespace W {
             _camArcball.Zoom(args.x, args.y);
             mouseX = args.x;
             mouseY = args.y;
+
+            OP::g_operators.OnMouseMove(M::Vector2(mouseX, mouseY));
         }
 
         if(EV::Params_Mouse::MOUSE_WHEEL == args.type) {
             if(args.delta > 0) _camArcball.ZoomIn();
             if(args.delta < 0) _camArcball.ZoomOut();
+            OP::g_operators.OnMouseMove(M::Vector2(mouseX, mouseY));
         }
     }
 

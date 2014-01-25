@@ -73,8 +73,7 @@ namespace UI {
         args.x = qevent->x();
         args.y = qevent->y();
 
-        if(!OP::g_operators.OnMouseMove(M::Vector2(args.x, args.y)))
-            W::world.Send(EV::def_Mouse.Create(args));
+        W::world.Send(EV::def_Mouse.Create(args));
     }
 
     void RenderView::wheelEvent(QWheelEvent* qevent) {

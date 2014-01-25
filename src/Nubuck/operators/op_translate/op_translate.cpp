@@ -185,6 +185,7 @@ static inline M::Matrix4 SetZ(const M::Vector3& pos, float z) {
 bool Translate::OnMouseMove(const M::Vector2& mouseCoords) {
     IGeometry* geom = W::world.SelectedGeometry();
     if(NULL != geom) {
+        /*
         W::ENT_Geometry* ent = NULL;
         M::Matrix4 worldToEye = W::world.GetModelView();
         M::Vector3 pos = M::Transform(worldToEye, _cursorPos);
@@ -196,6 +197,24 @@ bool Translate::OnMouseMove(const M::Vector2& mouseCoords) {
         }
         ent = (W::ENT_Geometry*)_geom_axis;
         ent->SetM(M);
+        */
+        M::Matrix4 eyeToWorld, worldToEye = W::world.GetModelView();
+        bool r = true;
+        r = M::TryInvert(worldToEye, eyeToWorld);
+        assert(r);
+        M::Matrix4 R = M::Mat4::FromRigidTransform(M::RigidInverse(M::RotationOf(worldToEye)), M::Vector3::Zero);
+        M::Matrix4 T = M::Mat4::Translate(-M::TranslationOf(worldToEye));
+        // eyeToWorld = T * R;
+        eyeToWorld = R * T;
+        M::Vector3 eye = M::Transform(eyeToWorld, M::Vector3::Zero); // eye pos in world space
+        const float c = 10.0f;
+        M::Vector3 d = _cursorPos - eye;
+        M::Matrix4 M = M::Mat4::Translate(-(d.Length() - c) * M::Normalize(d));
+        W::ENT_Geometry* ent = NULL;
+        for(int i = 0; i < 3; ++i) {
+            ent = (W::ENT_Geometry*)_geom_arrowHeads[i];
+            ent->SetM(M);
+        }
     }
 
     R::Color arrowHeadColors[] = {

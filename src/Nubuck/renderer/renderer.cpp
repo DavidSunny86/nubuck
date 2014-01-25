@@ -539,9 +539,12 @@ void Renderer::Render(RenderList& renderList) {
 
     for(unsigned i = 0; i < Layers::NUM_LAYERS; ++i) {
         M::Matrix4 projection = M::Mat4::Perspective(45.0f, _aspect, 0.1f, 100.0f);
+        M::Matrix4 worldToEye = renderList.worldMat;
+        /*
         M::Matrix4 worldToEye = M::Mat4::Identity();
         if(Layers::GEOMETRY_0 == i) worldToEye = renderList.worldMat;
         if(Layers::GEOMETRY_1 == i) worldToEye = M::Mat4::Identity();
+        */
         if(!_renderLayers[i].empty()) Render(renderList, projection, worldToEye, _renderLayers[i]);
     }
 }
