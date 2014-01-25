@@ -1,0 +1,7 @@
+// only vertex colors
+fx Unlit {
+  pass Pass0 {
+    vs = "#include <Shaders\unlit.vert>";
+    fs = "#include <Shaders\unlit.frag>";
+  }
+}

@@ -10,7 +10,7 @@ Grid::Grid(int subdiv, float size) {
 
     Mesh::Vertex vert;
     vert.normal = M::Vector3(0.0f, 1.0f, 0.0f);
-    vert.color = Color::White;
+    vert.color = Color(0.9f, 0.9f, 0.9f);
 
     unsigned idxCnt = 0;
     float c = 0.0f;

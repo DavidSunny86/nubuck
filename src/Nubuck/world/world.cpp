@@ -518,13 +518,13 @@ namespace W {
     }
 
     void World::Grid_Build() {
-        R::Grid grid(5, 20.0f);
+        R::Grid grid(4, 20.0f);
         _gridMesh = R::meshMgr.Create(grid.GetDesc());
     }
 
     R::MeshJob World::Grid_GetRenderJob() {
         R::MeshJob meshJob;
-        meshJob.fx = "LitDirectional";
+        meshJob.fx = "Unlit";
         meshJob.layer = 0;
         meshJob.material = R::Material::White;
         meshJob.mesh = _gridMesh;
@@ -537,6 +537,13 @@ namespace W {
         _isGrabbing = false;
 
         Grid_Build();
+
+        // set default camera position
+        M::TransformTRS tf;
+        tf.trans = M::Vector3(0.0f, 0.0f, -28.0f);
+        tf.rot = M::Quaternion(0.876f, M::Vector3(-0.298f, 0.355f, 0.126f));
+        tf.scale = 1.0f;
+        _camArcball.SetTransform(tf);
 	}
 
     M::Ray World::PickingRay(const M::Vector2& mouseCoords) {

@@ -28,6 +28,7 @@ public:
     void ResetRotation(void);
 
     void SetScreenSize(int width, int height);
+    void SetTransform(const M::TransformTRS& tf) { _transform = tf; }
 
     void ZoomIn(void);
     void ZoomOut(void);
