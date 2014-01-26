@@ -523,6 +523,7 @@ void Renderer::Render(
             meshMgr.GetMesh(rjob.mesh).R_AllocBuffer(); // might invalidate other meshes
         }
         for(unsigned i = 0; i < rjobs.size(); ++i) meshMgr.GetMesh(rjobs[i].mesh).R_TouchBuffer();
+        GB_CacheBuffer();
         DrawFrame(renderList.worldMat, projection, _time, rjobs);
     }
 }

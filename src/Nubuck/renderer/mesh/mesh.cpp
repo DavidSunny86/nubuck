@@ -208,17 +208,14 @@ void Mesh::R_AllocBuffer() {
     if(GB_INVALID_HANDLE == _gbHandle) {
         _gbHandle = GB_AllocMemItem(&_vertices[0], _vertices.size());
     }
-    GB_Touch(_gbHandle);
-}
-
-void Mesh::R_TouchBuffer() {
-    SYS::ScopedLock lock(_mtx);
-    assert(GB_INVALID_HANDLE != _gbHandle);
     if(_invalidate) {
         GB_Invalidate(_gbHandle);
         _invalidate = false;
     }
-    GB_Cache(_gbHandle);
+    GB_Touch(_gbHandle);
+}
+
+void Mesh::R_TouchBuffer() {
 }
 
 } // namespace R

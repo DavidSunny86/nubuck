@@ -22,14 +22,17 @@ struct GB_MemItem {
     Mesh::Vertex*   vertices;
     unsigned        numVertices;
     GB_BufSeg*      bufSeg;
+    unsigned        touched;
+    bool            dead;
 };
 
 static std::vector<GB_MemItem> memItems;
 
-static GLuint       giantBufferId   = 0;
-static unsigned     giantBufferSize = 0;
-static GB_BufSeg*   usedList        = NULL;
-static GB_BufSeg*   freeList        = NULL;
+static GLuint       giantBufferId       = 0;
+static unsigned     giantBufferPSize 	= 0; // physical size
+static unsigned     giantBufferLSize    = 0; // logical size
+static GB_BufSeg*   usedList            = NULL;
+static GB_BufSeg*   freeList        	= NULL;
 
 static void PrintInfo(void) {
     GB_BufSeg* it = NULL;
@@ -109,6 +112,8 @@ gbHandle_t GB_AllocMemItem(Mesh::Vertex* const vertices, unsigned numVertices) {
     memItem.vertices    = vertices;
     memItem.numVertices = numVertices;
     memItem.bufSeg      = NULL;
+    memItem.touched     = 0;
+    memItem.dead        = false;
     return handle;
 }
 
@@ -117,6 +122,7 @@ void GB_FreeMemItem(gbHandle_t handle) {
     GB_MemItem& memItem = memItems[handle];
     GB_BufSeg* bufSeg = memItem.bufSeg;
     memItem.bufSeg = NULL;
+    memItem.dead = true;
     if(bufSeg) {
         Unlink(bufSeg);
         Prepend(&freeList, bufSeg);
@@ -142,15 +148,15 @@ static void AllocateGiantBuffer(unsigned size) {
     GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, giantBufferId));
     GL_CALL(glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_DYNAMIC_DRAW));
     metrics.resources.totalVertexBufferSize += size;
-    giantBufferSize = size;
+    giantBufferPSize = size;
 }
 
 static void DeleteGiantBuffer(void) {
     assert(0 != giantBufferId);
     GL_CALL(glDeleteBuffers(1, &giantBufferId));
-    metrics.resources.totalVertexBufferSize -= giantBufferSize;
+    metrics.resources.totalVertexBufferSize -= giantBufferPSize;
     giantBufferId = 0;
-    giantBufferSize = 0;
+    giantBufferPSize = 0;
 }
 
 static void InvalidateSegs(void) {
@@ -162,25 +168,31 @@ static void InvalidateSegs(void) {
 }
 
 static void Resize(unsigned size) {
-    assert(giantBufferSize < size);
+    assert(giantBufferLSize < size);
 
     GB_BufSeg* bufSeg = new GB_BufSeg;
-    bufSeg->off = giantBufferSize;
-    bufSeg->size = size - giantBufferSize;
+    bufSeg->off = giantBufferLSize;
+    bufSeg->size = size - giantBufferLSize;
     bufSeg->cached = false;
 
     Prepend(&freeList, bufSeg);
 
-    if(0 != giantBufferId) DeleteGiantBuffer(); 
-    AllocateGiantBuffer(size);
-
     InvalidateSegs();
+
+    giantBufferLSize = size;
+}
+
+static void ResizeBuffer() {
+    if(giantBufferLSize > giantBufferPSize) {
+        if(0 != giantBufferId) DeleteGiantBuffer(); 
+        AllocateGiantBuffer(giantBufferLSize);
+    }
 }
 
 static GB_BufSeg* GB_AllocBufSeg(unsigned size) {
     GB_BufSeg* bufSeg = FindFreeBufSeg(size);
     if(!bufSeg) {
-        Resize(giantBufferSize + size);
+        Resize(giantBufferLSize + size);
         bufSeg = FindFreeBufSeg(size);
     }
     assert(bufSeg);
@@ -228,7 +240,7 @@ void GB_Cache(gbHandle_t handle) {
     GB_BufSeg* bufSeg = memItem.bufSeg;
     assert(bufSeg);
     assert(sizeof(Mesh::Vertex) * memItem.numVertices <= bufSeg->size);
-    assert(bufSeg->off + bufSeg->size <= giantBufferSize);
+    assert(bufSeg->off + bufSeg->size <= giantBufferPSize);
     if(!bufSeg->cached) {
         unsigned size = sizeof(Mesh::Vertex) * memItem.numVertices;
         void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, bufSeg->off, bufSeg->size, GL_MAP_WRITE_BIT);
@@ -242,7 +254,22 @@ void GB_Cache(gbHandle_t handle) {
 void GB_Touch(gbHandle_t handle) {
     assert(GB_INVALID_HANDLE != handle);
     GB_MemItem& memItem = memItems[handle];
-    if(!memItem.bufSeg) memItem.bufSeg = GB_AllocBufSeg(sizeof(Mesh::Vertex) * memItem.numVertices);
+    memItem.touched = 1;
+}
+
+void GB_CacheBuffer() {
+    for(unsigned i = 0; i < memItems.size(); ++i) {
+        if(!memItems[i].dead && memItems[i].touched && !memItems[i].bufSeg)
+            memItems[i].bufSeg = GB_AllocBufSeg(sizeof(Mesh::Vertex) * memItems[i].numVertices);
+    }
+    ResizeBuffer();
+    assert(giantBufferLSize <= giantBufferPSize);
+    for(unsigned i = 0; i < memItems.size(); ++i) {
+        if(!memItems[i].dead && memItems[i].touched) {
+            GB_Cache(i);
+            memItems[i].touched = 0;
+        }
+    }
 }
 
 unsigned GB_GetOffset(gbHandle_t handle) {
