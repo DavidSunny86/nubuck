@@ -72,6 +72,8 @@ public:
     Mesh(const Desc& desc); // deep copy
     ~Mesh();
 
+    bool            IsCached() const;
+
     bool            IsSolid() const;
     GLenum      	PrimitiveType() const;
     unsigned    	NumIndices() const;
@@ -82,7 +84,8 @@ public:
 
     // methods prefixed with R_ should only be called by the renderer
     void R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye); // eye in mesh local space
-    void R_UpdateBuffer();
+    void R_AllocBuffer();
+    void R_TouchBuffer();
 };
 
 } // namespace R

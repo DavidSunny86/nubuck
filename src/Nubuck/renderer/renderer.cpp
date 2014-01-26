@@ -381,6 +381,7 @@ static MeshJob* DrawMeshList(Program& prog, const State& state, int passType, in
     MeshJob* meshJob = first;
     while(meshJob && meshJob->fx == first->fx) {
         Mesh& mesh = meshMgr.GetMesh(meshJob->mesh);
+        assert(mesh.IsCached());
         if(mesh.IsSolid()) mesh.R_AppendTriangles(tris, localEye);
         else {
             BindMeshAttributes();
@@ -457,12 +458,6 @@ static void Link(std::vector<R::MeshJob>& renderJobs) {
 	}
 }
 
-static void BeginFrame(const M::Matrix4& worldMat, R::MeshJob& rjob) {
-    effectMgr.GetEffect(rjob.fx)->Compile();
-    Mesh& mesh = meshMgr.GetMesh(rjob.mesh);
-    mesh.R_UpdateBuffer();
-}
-
 static M::Matrix4 ComputeProjectionMatrix(float aspect, const M::Matrix4& worldMat, const std::vector<R::MeshJob>& renderJobs) {
     /*
     float zMin = 10000.0f, zMax = -10000.0f;
@@ -522,9 +517,12 @@ void Renderer::Render(
         GB_Bind();
         std::sort(rjobs.begin(), rjobs.end(), CompareJobs);
         Link(rjobs);
-        std::for_each(rjobs.begin(), rjobs.end(),
-            std::bind(R::BeginFrame, renderList.worldMat, std::placeholders::_1));
-        GB_CacheAll();
+        for(unsigned i = 0; i < rjobs.size(); ++i) {
+            MeshJob rjob = rjobs[i];
+            effectMgr.GetEffect(rjob.fx)->Compile();
+            meshMgr.GetMesh(rjob.mesh).R_AllocBuffer(); // might invalidate other meshes
+        }
+        for(unsigned i = 0; i < rjobs.size(); ++i) meshMgr.GetMesh(rjobs[i].mesh).R_TouchBuffer();
         DrawFrame(renderList.worldMat, projection, _time, rjobs);
     }
 }

@@ -222,7 +222,7 @@ void GB_CacheAll(void) {
     }
 }
 
-static void GB_Cache(gbHandle_t handle) {
+void GB_Cache(gbHandle_t handle) {
     assert(GB_INVALID_HANDLE != handle);
     GB_MemItem& memItem = memItems[handle];
     GB_BufSeg* bufSeg = memItem.bufSeg;
@@ -264,6 +264,12 @@ void GB_Bind(void) {
     if(0 < giantBufferId) {
         GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, giantBufferId));
     }
+}
+
+bool GB_IsCached(gbHandle_t handle) {
+    assert(GB_INVALID_HANDLE != handle);
+    GB_MemItem& memItem = memItems[handle];
+    return memItem.bufSeg && memItem.bufSeg->cached;
 }
 
 } // namespace R

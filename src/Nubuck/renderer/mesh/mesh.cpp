@@ -136,6 +136,10 @@ Mesh::~Mesh() {
     if(GB_INVALID_HANDLE != _gbHandle) GB_FreeMemItem(_gbHandle);
 }
 
+bool Mesh::IsCached() const {
+    return GB_IsCached(_gbHandle);
+}
+
 static inline bool IsSolid(GLenum primType) {
     switch(primType) {
     case GL_POINTS:         return false;
@@ -199,17 +203,22 @@ void Mesh::R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye)
     }
 }
 
-void Mesh::R_UpdateBuffer(void) {
+void Mesh::R_AllocBuffer() {
     SYS::ScopedLock lock(_mtx);
     if(GB_INVALID_HANDLE == _gbHandle) {
         _gbHandle = GB_AllocMemItem(&_vertices[0], _vertices.size());
     }
+    GB_Touch(_gbHandle);
+}
+
+void Mesh::R_TouchBuffer() {
+    SYS::ScopedLock lock(_mtx);
     assert(GB_INVALID_HANDLE != _gbHandle);
     if(_invalidate) {
         GB_Invalidate(_gbHandle);
         _invalidate = false;
     }
-    GB_Touch(_gbHandle);
+    GB_Cache(_gbHandle);
 }
 
 } // namespace R
