@@ -15,7 +15,7 @@ fx LitDirectionalTransparent {
       }
     }
     vs = "#include <Shaders\lit_directional.vert>"; 
-    fs = "#include <Shaders\lit_directional.frag>"; 
+    fs = "#include <Shaders\lit_directional_twosided.frag>"; 
   }
 
   pass Frontfaces {
