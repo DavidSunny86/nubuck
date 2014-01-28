@@ -10,6 +10,10 @@ void LineEdges::DestroyMesh() {
         meshMgr.Destroy(_mesh);
         _mesh = NULL;
     }
+    if(_tfmesh) {
+        meshMgr.Destroy(_tfmesh);
+        _tfmesh = NULL;
+    }
 }
 
 LineEdges::~LineEdges() {
@@ -55,6 +59,11 @@ void LineEdges::Rebuild() {
     meshDesc.primType = GL_TRIANGLE_FAN;
 
     _mesh = meshMgr.Create(meshDesc);
+
+    assert(NULL == _tfmesh);
+
+    _tfmesh = meshMgr.Create(_mesh);
+    meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
 }
 
 void LineEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4& modelView) {
@@ -97,10 +106,9 @@ MeshJob LineEdges::GetRenderJob() const {
 
     MeshJob meshJob;
     meshJob.fx = "EdgeLineBillboard";
-    meshJob.mesh = _mesh;
+    meshJob.tfmesh = _tfmesh;
     meshJob.material = Material::White;
     meshJob.primType = 0;
-    meshJob.transform = M::Mat4::Identity();
 
     return meshJob;
 }

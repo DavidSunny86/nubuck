@@ -9,6 +9,10 @@ void CylinderEdges::DestroyMesh() {
         meshMgr.Destroy(_mesh);
         _mesh = NULL;
     }
+    if(_tfmesh) {
+        meshMgr.Destroy(_tfmesh);
+        _tfmesh = NULL;
+    }
 }
 
 static M::Matrix4 RotationOf(const M::Matrix4& mat) {
@@ -129,6 +133,11 @@ void CylinderEdges::Rebuild() {
     meshDesc.primType = GL_TRIANGLE_STRIP;
 
     _mesh = meshMgr.Create(meshDesc);
+
+    assert(NULL == _tfmesh);
+
+    _tfmesh = meshMgr.Create(_mesh);
+    meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
 }
 
 void CylinderEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4&) {
@@ -140,10 +149,9 @@ MeshJob CylinderEdges::GetRenderJob() const {
 
     MeshJob meshJob;
     meshJob.fx = "EdgeBillboard";
-    meshJob.mesh = _mesh;
+    meshJob.tfmesh = _tfmesh;
     meshJob.material = Material::White;
     meshJob.primType = 0;
-    meshJob.transform = M::Mat4::Identity();
     return meshJob;
 }
 

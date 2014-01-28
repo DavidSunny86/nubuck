@@ -14,6 +14,7 @@ void Mesh_SetVisible(ENT_Mesh& mesh, bool isVisible) {
 void Mesh_BuildRenderList(ENT_Mesh& mesh, const std::string& fxName, const M::Matrix4& transform) {
     mesh.renderList.meshJobs.clear();
     if(mesh.isVisible) {
+        /* TODO: TFMesh
         R::MeshJob rjob;
         // rjob.fx         = "LitDirectionalTransparent";
         rjob.fx         = fxName;
@@ -22,6 +23,7 @@ void Mesh_BuildRenderList(ENT_Mesh& mesh, const std::string& fxName, const M::Ma
         rjob.primType   = 0;
         rjob.transform  = transform;
         mesh.renderList.meshJobs.push_back(rjob);
+        */
     }
 }
 

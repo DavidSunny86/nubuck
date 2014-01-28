@@ -59,7 +59,8 @@ namespace W {
         bool        _isGrabbing;
         M::Vector3  _grabPivot;
 
-        R::meshPtr_t _gridMesh;
+        R::meshPtr_t    _gridMesh;
+        R::tfmeshPtr_t  _gridTFMesh;
 
         void        Grid_Build();
         R::MeshJob  Grid_GetRenderJob();

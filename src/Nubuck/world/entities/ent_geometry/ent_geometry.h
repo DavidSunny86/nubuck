@@ -26,6 +26,7 @@ private:
     std::vector<R::Mesh::Index>     _indices;
     R::Mesh::Desc                   _meshDesc;
     R::meshPtr_t                    _mesh;
+    R::tfmeshPtr_t                  _tfmesh;
     bool                            _meshCompiled; // TODO: might be a race cond
 
     bool                _isHidden;

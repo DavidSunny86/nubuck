@@ -9,6 +9,10 @@ void Nodes::DestroyMesh() {
         meshMgr.Destroy(_mesh);
         _mesh = NULL;
     }
+    if(_tfmesh) {
+        meshMgr.Destroy(_tfmesh);
+        _tfmesh = NULL;
+    }
 }
 
 Nodes::~Nodes() {
@@ -85,6 +89,11 @@ void Nodes::Rebuild() {
         meshDesc.primType = GL_TRIANGLE_FAN;
         
         _mesh = meshMgr.Create(meshDesc);
+
+        assert(NULL == _tfmesh);
+
+        _tfmesh = meshMgr.Create(_mesh);
+        meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
     }
 }
 
@@ -113,10 +122,9 @@ MeshJob Nodes::GetRenderJob() const {
 
     R::MeshJob meshJob;
     meshJob.fx = "NodeBillboard";
-    meshJob.mesh = _mesh;
+    meshJob.tfmesh = _tfmesh;
     meshJob.material = Material::White;
     meshJob.primType = 0;
-    meshJob.transform = M::Mat4::Identity();
     return meshJob;
 }
 

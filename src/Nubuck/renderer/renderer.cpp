@@ -182,6 +182,13 @@ static void Uniforms_Update(
     uniformsSkeletonBuffer->Update_Mapped(0, sizeof(UniformsSkeleton), &uniformsSkeleton);
 }
 
+static void Uniforms_UpdateModelView(const M::Matrix4& modelView) {
+    uniformsHot.uTransform = modelView;
+    M::TryInvert(modelView, uniformsHot.uInvTransform);
+    uniformsHot.uNormalMat = M::Mat4::FromRigidTransform(M::Transpose(M::Inverse(M::RotationOf(modelView))), M::Vector3::Zero);
+    uniformsHotBuffer->Update_Mapped(0, sizeof(UniformsHot), &uniformsHot);
+}
+
 static float RandFloat(float min, float max) {
     return min + (rand() % 1000 / 1000.0f) * (max - min);
 }
@@ -380,12 +387,18 @@ static MeshJob* DrawMeshList(Program& prog, const State& state, int passType, in
     std::vector<Mesh::Triangle> tris;
     MeshJob* meshJob = first;
     while(meshJob && meshJob->fx == first->fx) {
-        Mesh& mesh = meshMgr.GetMesh(meshJob->mesh);
-        assert(mesh.IsCached());
-        if(mesh.IsSolid()) mesh.R_AppendTriangles(tris, localEye);
+        TFMesh& tfmesh = meshMgr.GetMesh(meshJob->tfmesh);
+        Mesh& mesh = tfmesh.GetMesh();
+        mesh.R_AllocBuffer();
+        GB_CacheBuffer();
+        if(mesh.IsSolid()) {
+            mesh.R_AppendTriangles(tris, localEye);
+        }
         else {
+            mesh.R_TouchBuffer();
+            Uniforms_UpdateModelView(worldMat * tfmesh.GetTransform());
             BindMeshAttributes();
-            GL_CALL(glDrawElements(mesh.PrimitiveType(), mesh.NumIndices(), ToGLEnum<Mesh::Index>::ENUM, mesh.Indices()));
+            GL_CALL(glDrawElements(mesh.PrimitiveType(), mesh.NumIndices(), ToGLEnum<Mesh::Index>::ENUM, mesh.OffIndices()));
             metrics.frame.numDrawCalls++;
             UnbindMeshAttributes();
         }
@@ -407,6 +420,8 @@ static MeshJob* DrawMeshList(Program& prog, const State& state, int passType, in
         indices.push_back(triIt->bufIndices.indices[2]);
     }
     if(!indices.empty()) {
+        GB_CacheBuffer();
+        Uniforms_UpdateModelView(worldMat);
         BindMeshAttributes();
         GL_CALL(glDrawElements(GL_TRIANGLES, indices.size(), ToGLEnum<Mesh::Index>::ENUM, &indices[0]));
         metrics.frame.numDrawCalls++;
@@ -518,12 +533,9 @@ void Renderer::Render(
         std::sort(rjobs.begin(), rjobs.end(), CompareJobs);
         Link(rjobs);
         for(unsigned i = 0; i < rjobs.size(); ++i) {
-            MeshJob rjob = rjobs[i];
+            MeshJob& rjob = rjobs[i];
             effectMgr.GetEffect(rjob.fx)->Compile();
-            meshMgr.GetMesh(rjob.mesh).R_AllocBuffer(); // might invalidate other meshes
         }
-        for(unsigned i = 0; i < rjobs.size(); ++i) meshMgr.GetMesh(rjobs[i].mesh).R_TouchBuffer();
-        GB_CacheBuffer();
         DrawFrame(renderList.worldMat, projection, _time, rjobs);
     }
 }

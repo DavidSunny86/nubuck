@@ -62,6 +62,7 @@ private:
 
     std::vector<Vertex> _vertices;
     std::vector<Index>  _indices;
+    std::vector<Index>  _offIndices;
     GLenum              _primType;
 
     std::vector<TriIndices> _triangleIndices;
@@ -78,6 +79,7 @@ public:
     GLenum      	PrimitiveType() const;
     unsigned    	NumIndices() const;
     const Index*    Indices() const;
+    const Index*    OffIndices() const;
 
     const std::vector<Mesh::Vertex>& GetVertices() const { return _vertices; }
 

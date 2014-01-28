@@ -18,6 +18,7 @@ public:
     explicit TFMesh(const meshPtr_t meshPtr);
 
     const Mesh& GetMesh() const;
+    Mesh&       GetMesh();
 
     const M::Matrix4& GetTransform() const { return _transform; }
 

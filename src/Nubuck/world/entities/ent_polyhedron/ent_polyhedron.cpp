@@ -385,14 +385,17 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
             else renderJob.fx = "LitDirectional";
             // renderJob.fx = hullFx;
 
+            /* TODO: TFMesh
             renderJob.material = R::Material::White;
             renderJob.mesh = ph.mesh.mesh;
             renderJob.primType = 0;
             renderJob.transform = M::Mat4::Identity();
             ph.renderList.meshJobs.push_back(renderJob);
+            */
         }
     } // if(renderHull)
 
+    /* TODO: TFMesh
     renderJob.fx = "TexDiffuse";
     renderJob.mesh = g_faceCurveDecalMesh;
     renderJob.primType = 0;
@@ -406,6 +409,7 @@ void Polyhedron_BuildRenderList(ENT_Polyhedron& ph, const std::string& hullFx) {
             ph.renderList.meshJobs.push_back(renderJob);
         }
     }
+    */
 }
 
 void Polyhedron_Update(ENT_Polyhedron& ph, const graph_t& G) {

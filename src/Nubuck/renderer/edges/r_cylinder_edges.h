@@ -17,11 +17,12 @@ private:
     std::vector<FatEdge>        _edges;
     std::vector<Mesh::Vertex>   _edgeBBoxVertices;
     meshPtr_t                   _mesh;
+    tfmeshPtr_t                 _tfmesh;
 
     void DestroyMesh();
     void RebuildVertices(const M::Matrix4& transform);
 public:
-    CylinderEdges() : _mesh(NULL) { }
+    CylinderEdges() : _mesh(NULL), _tfmesh(NULL) { }
     ~CylinderEdges();
 
     bool IsEmpty() const override { return _edges.empty(); }

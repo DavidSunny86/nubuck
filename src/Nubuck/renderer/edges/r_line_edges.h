@@ -16,10 +16,11 @@ private:
     std::vector<Edge>       _edges;
     std::vector<Billboard>  _edgeBBoards;
     meshPtr_t               _mesh;
+    tfmeshPtr_t             _tfmesh;
 
     void DestroyMesh();
 public:
-    LineEdges() : _mesh(NULL) { }
+    LineEdges() : _mesh(NULL), _tfmesh(NULL) { }
     ~LineEdges();
 
     bool IsEmpty() const override { return _edges.empty(); }

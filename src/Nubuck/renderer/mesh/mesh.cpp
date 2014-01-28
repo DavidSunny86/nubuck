@@ -167,6 +167,8 @@ unsigned Mesh::NumIndices() const { return _indices.size(); }
 
 const Mesh::Index* Mesh::Indices() const { return &_indices[0]; }
 
+const Mesh::Index* Mesh::OffIndices() const { return &_offIndices[0]; }
+
 void Mesh::Invalidate(Mesh::Vertex* const vertices) {
     SYS::ScopedLock lock(_mtx);
     memcpy(&_vertices[0], vertices, sizeof(Mesh::Vertex) * _vertices.size());
@@ -177,6 +179,7 @@ void Mesh::Invalidate(Mesh::Index* const indices, unsigned numIndices) {
     SYS::ScopedLock lock(_mtx);
     _indices.resize(numIndices);
     memcpy(&_indices[0], indices, sizeof(Index) * numIndices);
+    _offIndices.clear();
     _triangleIndices.clear();
 }
 
@@ -220,6 +223,12 @@ void Mesh::R_AllocBuffer() {
 }
 
 void Mesh::R_TouchBuffer() {
+    _offIndices = _indices;
+    for(unsigned i = 0; i < _offIndices.size(); ++i) {
+        if(Mesh::RESTART_INDEX != _offIndices[i]) {
+            _offIndices[i] += R_IndexOff();
+        }
+    }
 }
 
 } // namespace R

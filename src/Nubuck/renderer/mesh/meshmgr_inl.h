@@ -9,7 +9,7 @@ template<typename TMESH>
 void MeshMgr::Link(MeshMgr_Impl::MeshLink<TMESH>** head, MeshMgr_Impl::MeshLink<TMESH>* link) {
     SYS::ScopedLock lock(_meshesMtx);
     link->next = *head;
-    if(_meshes) (*head)->prev = link;
+    if(*head) (*head)->prev = link;
     *head = link;
 }
 

@@ -24,10 +24,9 @@ class   Mesh;
 struct MeshJob {
     unsigned        layer;
     std::string     fx;
-    meshPtr_t       mesh;
+    tfmeshPtr_t     tfmesh;
     GLenum          primType; // value != 0 overrides prim type of mesh
     Material	    material;
-    M::Matrix4      transform;
 
     // handled by renderer
     MeshJob* next;

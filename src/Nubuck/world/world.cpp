@@ -520,6 +520,8 @@ namespace W {
     void World::Grid_Build() {
         R::Grid grid(4, 20.0f);
         _gridMesh = R::meshMgr.Create(grid.GetDesc());
+        _gridTFMesh = R::meshMgr.Create(_gridMesh);
+        R::meshMgr.GetMesh(_gridTFMesh).SetTransform(M::Mat4::Identity());
     }
 
     R::MeshJob World::Grid_GetRenderJob() {
@@ -527,9 +529,8 @@ namespace W {
         meshJob.fx = "Unlit";
         meshJob.layer = 0;
         meshJob.material = R::Material::White;
-        meshJob.mesh = _gridMesh;
+        meshJob.tfmesh = _gridTFMesh;
         meshJob.primType = 0;
-        meshJob.transform = M::Mat4::Identity();
         return meshJob;
     }
 

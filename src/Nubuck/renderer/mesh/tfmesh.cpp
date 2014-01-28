@@ -11,6 +11,8 @@ _gbHandle(GB_INVALID_HANDLE)
 
 const Mesh& TFMesh::GetMesh() const { return meshMgr.GetMesh(_meshPtr); }
 
+Mesh& TFMesh::GetMesh() { return meshMgr.GetMesh(_meshPtr); }
+
 void TFMesh::SetTransform(const M::Matrix4& transform) {
     _transform = transform;
 }

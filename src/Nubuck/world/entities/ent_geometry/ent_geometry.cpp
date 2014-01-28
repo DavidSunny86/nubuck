@@ -33,6 +33,7 @@ void ENT_Geometry::ComputeCenter() {
 ENT_Geometry::ENT_Geometry() : 
 _edgeRenderer(NULL),
 _mesh(NULL), 
+_tfmesh(NULL), 
 _meshCompiled(true), 
 _isHidden(false),
 _renderMode(0), 
@@ -123,6 +124,10 @@ void ENT_Geometry::CompileMesh() {
     if(NULL != _mesh) R::meshMgr.Destroy(_mesh);
     _mesh = R::meshMgr.Create(_meshDesc);
 
+    if(NULL != _tfmesh) R::meshMgr.Destroy(_tfmesh);
+    _tfmesh = R::meshMgr.Create(_mesh);
+    R::meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
+
     _meshCompiled = true;
 }
 
@@ -149,9 +154,8 @@ void ENT_Geometry::BuildRenderList() {
         rjob.layer      = _renderLayer;
         rjob.fx         = "LitDirectional";
         rjob.material   = R::Material::White;
-        rjob.mesh       = _mesh;
+        rjob.tfmesh     = _tfmesh;
         rjob.primType   = 0;
-        rjob.transform  = M::Mat4::Identity();
         _renderList.meshJobs.push_back(rjob);
     }
 

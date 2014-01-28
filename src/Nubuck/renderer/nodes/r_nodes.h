@@ -24,10 +24,11 @@ private:
     std::vector<Billboard>          _billboards;
     std::vector<Mesh::Index>        _billboardIndices;
     meshPtr_t                       _mesh;
+    tfmeshPtr_t                     _tfmesh;
 
     void DestroyMesh();
 public:
-    Nodes() : _mesh(NULL) { }
+    Nodes() : _mesh(NULL), _tfmesh(NULL) { }
     ~Nodes();
 
     bool IsEmpty() const { return _nodes.empty(); }
