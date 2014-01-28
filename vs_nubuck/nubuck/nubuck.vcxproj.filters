@@ -602,6 +602,9 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\grid\grid.h">
       <Filter>Private\renderer\mesh\grid</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\tfmesh.h">
+      <Filter>Private\renderer\mesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -984,6 +987,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\grid\grid.cpp">
       <Filter>Private\renderer\mesh\grid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\tfmesh.cpp">
+      <Filter>Private\renderer\mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

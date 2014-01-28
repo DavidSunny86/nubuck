@@ -118,6 +118,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\quad\quad.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\tfmesh.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\metrics\metrics.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_nodes.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\program\program.h" />
@@ -327,6 +328,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\quad\quad.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\tfmesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\metrics\metrics.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_nodes.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\program\program.cpp" />

@@ -7,29 +7,21 @@ MeshMgr meshMgr;
 
 meshPtr_t MeshMgr::Create(const Mesh::Desc& desc) {
     Mesh* mesh = new Mesh(desc);
-    MeshMgr_Impl::MeshLink* link = new MeshMgr_Impl::MeshLink(mesh);
-    _meshesMtx.Lock();
-    link->next = _meshes;
-    if(_meshes) _meshes->prev = link;
-    _meshes = link;
-    _meshesMtx.Unlock();
+    MeshMgr_Impl::MeshLink<Mesh>* link = new MeshMgr_Impl::MeshLink<Mesh>(mesh);
+    Link(&_meshes, link);
     return link;
 }
 
-void MeshMgr::R_Update(void) {
-    MeshMgr_Impl::MeshLink *next, *it = _meshes;
-    while(it) {
-        next = it->next;
-        if(it->destroy) {
-            if(it->next) it->next->prev = it->prev;
-            if(it->prev) it->prev->next = it->next;
-            if(_meshes == it) _meshes = it->next;
-            assert(it->mesh);
-            delete it->mesh;
-            delete it;
-        }
-        it = next;
-    }
+tfmeshPtr_t MeshMgr::Create(meshPtr_t meshPtr) {
+    TFMesh* tfmesh = new TFMesh(meshPtr);
+    MeshMgr_Impl::MeshLink<TFMesh>* link = new MeshMgr_Impl::MeshLink<TFMesh>(tfmesh);
+    Link(&_tfmeshes, link);
+    return link;
+}
+
+void MeshMgr::R_Update() {
+    R_Update(&_meshes);
+    R_Update(&_tfmeshes);
 }
 
 } // namespace R

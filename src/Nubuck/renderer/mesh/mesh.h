@@ -79,11 +79,14 @@ public:
     unsigned    	NumIndices() const;
     const Index*    Indices() const;
 
+    const std::vector<Mesh::Vertex>& GetVertices() const { return _vertices; }
+
     void Invalidate(Mesh::Vertex* const vertices); // assumes number of vertices and indices is constant
     void Invalidate(Mesh::Index* const indices, unsigned numIndices);
 
     // methods prefixed with R_ should only be called by the renderer
     void R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye); // eye in mesh local space
+    unsigned R_IndexOff() const;
     void R_AllocBuffer();
     void R_TouchBuffer();
 };

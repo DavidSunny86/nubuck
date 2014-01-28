@@ -4,32 +4,39 @@
 #include <system\locks\spinlock.h>
 #include "meshmgr_fwd.h"
 #include "mesh.h"
+#include "tfmesh.h"
 
 namespace R {
 
 namespace MeshMgr_Impl {
 
+template<typename TMESH> // TYPE in { Mesh, TFMesh }
 struct MeshLink {
     MeshLink *prev, *next;
-    Mesh* mesh;
+    TMESH* mesh;
     bool  destroy;
-    MeshLink(Mesh* const mesh) : prev(NULL), next(NULL), mesh(mesh), destroy(false) { }
+    MeshLink(TMESH* const mesh) : prev(NULL), next(NULL), mesh(mesh), destroy(false) { }
 };
 
 } // namespace MeshMgr_Impl
 
 class MeshMgr {
 private:
-    MeshMgr_Impl::MeshLink*       _meshes;
-    SYS::SpinLock   _meshesMtx;
+    MeshMgr_Impl::MeshLink<Mesh>*       _meshes;
+    MeshMgr_Impl::MeshLink<TFMesh>*     _tfmeshes;
+    SYS::SpinLock                       _meshesMtx;
+
+    template<typename TMESH> void Link(MeshMgr_Impl::MeshLink<TMESH>** head, MeshMgr_Impl::MeshLink<TMESH>* meshPtr);
+    template<typename TMESH> void R_Update(MeshMgr_Impl::MeshLink<TMESH>** head);
 public:
-    MeshMgr(void) : _meshes(NULL) { }
+    MeshMgr(void) : _meshes(NULL), _tfmeshes(NULL) { }
 
     meshPtr_t   Create(const Mesh::Desc& desc); // deep copy
-    void        Destroy(meshPtr_t meshPtr) { meshPtr->destroy = true; }
+    tfmeshPtr_t Create(meshPtr_t meshPtr);
 
-    const Mesh& GetMesh(meshPtr_t meshPtr) const { return *meshPtr->mesh; }
-    Mesh& GetMesh(meshPtr_t meshPtr) { return *meshPtr->mesh; }
+    template<typename TMESH> void           Destroy(MeshMgr_Impl::MeshLink<TMESH>* meshPtr);
+    template<typename TMESH> const TMESH&   GetMesh(MeshMgr_Impl::MeshLink<TMESH>* meshPtr) const;
+    template<typename TMESH> TMESH&         GetMesh(MeshMgr_Impl::MeshLink<TMESH>* meshPtr);
 
     // methods prefixed with R_ should only be called by the renderer
     void R_Update(void);

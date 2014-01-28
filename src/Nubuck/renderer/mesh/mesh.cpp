@@ -184,13 +184,13 @@ void Mesh::R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye)
     assert(IsSolid());
     SYS::ScopedLock lock(_mtx);
     if(_triangleIndices.empty()) GenerateTriangles(_indices, _primType, _triangleIndices);
-    unsigned idxOff = GB_GetOffset(_gbHandle) / sizeof(Mesh::Vertex);
+    unsigned idxOff = R_IndexOff();
     for(unsigned i = 0; i < _triangleIndices.size(); ++i) {
         Triangle tri;
         M::Vector3 center = M::Vector3::Zero;
         M::Vector3 p[3];
         for(unsigned j = 0; j < 3; ++j) {
-            tri.bufIndices.indices[j] = _triangleIndices[i].indices[j] + idxOff; 
+            tri.bufIndices.indices[j] = _triangleIndices[i].indices[j] + idxOff;
             p[j] = _vertices[_triangleIndices[i].indices[j]].position;
             center += p[j];
         }
@@ -201,6 +201,10 @@ void Mesh::R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye)
         tri.dist = M::Distance(eye, center);
         tris.push_back(tri);
     }
+}
+
+unsigned Mesh::R_IndexOff() const {
+    return GB_GetOffset(_gbHandle) / sizeof(Mesh::Vertex);
 }
 
 void Mesh::R_AllocBuffer() {
