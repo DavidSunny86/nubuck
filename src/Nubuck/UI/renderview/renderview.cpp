@@ -119,6 +119,7 @@ namespace UI {
 
         _renderList.Clear();
         W::world.Render(_renderList);
+        OP::g_operators.GetMeshJobs(_renderList.meshJobs);
 
         _renderer.BeginFrame();
         _renderer.Render(_renderList);

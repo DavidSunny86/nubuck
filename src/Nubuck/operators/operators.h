@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <UI\operatorpanel\operatorpanel.h>
+#include <renderer\renderer.h>
 #include "operator.h"
 
 namespace OP {
@@ -60,6 +61,11 @@ public:
     Operator* ActiveOperator() {
         if(_activeOps.empty()) return NULL;
         return _activeOps.back();
+    }
+
+    void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
+        for(unsigned i = 0; i < _activeOps.size(); ++i)
+            _activeOps[i]->GetMeshJobs(meshJobs);
     }
 
     void SelectGeometry() {

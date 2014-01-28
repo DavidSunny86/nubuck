@@ -10,6 +10,7 @@
 #include <operators\operator.h>
 #include <operators\operators.h>
 #include <renderer\mesh\mesh.h>
+#include <renderer\mesh\meshmgr.h>
 
 #include <LEDA\geo\d3_hull.h>
 
@@ -22,7 +23,8 @@ private:
 
     Nubuck _nb;
 
-    IGeometry* _geom_axis;
+    R::meshPtr_t    _axisMesh;
+    R::tfmeshPtr_t  _axisTFMesh;
 
     enum { X = 0, Y, Z, DIM };
     IGeometry*  _geom_arrowHeads[DIM];
@@ -31,7 +33,6 @@ private:
 
     M::Box _bboxes[DIM];
 
-    void BuildAxis();
     void BuildArrowHead();
     void BuildBBoxes();
     void BuildCursor();
@@ -46,7 +47,8 @@ private:
     }
 
     void SetPosition(const M::Vector3& pos) {
-        _geom_axis->SetPosition(pos.x, pos.y, pos.z);
+        M::Matrix4 T = M::Mat4::Translate(pos);
+        R::meshMgr.GetMesh(_axisTFMesh).SetTransform(T);
         for(unsigned i = 0; i < DIM; ++i) {
             const M::Vector3& off = _arrowHeadsOffsets[i];
             _geom_arrowHeads[i]->SetPosition(off.x + pos.x, off.y + pos.y, off.z + pos.z);
@@ -74,6 +76,7 @@ public:
     void Invoke() override;
     void Finish() override { }
 
+    void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) override;
     void OnGeometrySelected() override;
     void OnCameraChanged() override;
     bool OnMouseDown(const M::Vector2& mouseCoords) override;

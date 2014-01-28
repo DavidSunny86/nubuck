@@ -4,6 +4,12 @@
 
 struct Nubuck;
 
+namespace R {
+
+struct MeshJob;
+
+} // namespace R
+
 namespace OP {
 
 class Invoker;
@@ -16,6 +22,7 @@ public:
     virtual void Invoke() = 0;
     virtual void Finish() = 0;
 
+    virtual void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) { }
     virtual void OnGeometrySelected() { }
     virtual void OnCameraChanged() { }
     virtual bool OnMouseDown(const M::Vector2& mouseCoords) { return false; }

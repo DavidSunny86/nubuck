@@ -1,0 +1,8 @@
+// only vertex colors
+fx UnlitThickLines {
+  pass Pass0 {
+    state.raster.lineWidth = 2.0;
+    vs = "#include <Shaders\unlit.vert>";
+    fs = "#include <Shaders\unlit.frag>";
+  }
+}

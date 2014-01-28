@@ -2,9 +2,58 @@
 #include <math\intersections.h>
 #include <world\world.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
+#include <renderer\mesh\mesh.h>
 #include "op_translate.h"
 
 namespace OP {
+
+struct AxisMesh {
+    std::vector<R::Mesh::Vertex>    vertices;
+    std::vector<R::Mesh::Index>     indices;
+
+    AxisMesh(
+        float size, 
+        int subdiv, 
+        float spacing,
+        const R::Color& colX, 
+        const R::Color& colY, 
+        const R::Color& colZ) 
+    {
+        unsigned idxCnt = 0;
+        R::Color colors[] = { colX, colY, colZ };
+
+        unsigned N = (1 << subdiv);
+        float f = size / N;
+        for(int i = 0; i < 3; ++i) {
+            M::Vector3 d = M::Vector3::Zero;
+            d.vec[i] = 1.0f;
+
+            for(int j = 0; j < N; ++j) {
+                R::Mesh::Vertex vert;
+                vert.position = f * d * j;
+                vert.color = colors[i];
+                vertices.push_back(vert);
+                indices.push_back(idxCnt++);
+
+                M::Vector3 p = f * d * (j + 1) - spacing * f * d;
+                vert.position = p;
+                vert.color = colors[i];
+                vertices.push_back(vert);
+                indices.push_back(idxCnt++);
+            }
+        }
+    }
+
+    R::Mesh::Desc GetDesc() {
+        R::Mesh::Desc desc;
+        desc.vertices = &vertices[0];
+        desc.numVertices = vertices.size();
+        desc.indices = &indices[0];
+        desc.numIndices = indices.size();
+        desc.primType = GL_LINES;
+        return desc;
+    }
+};
 
 Translate::Translate() : _dragging(false) {
     _arrowHeadSize = scalar_t(1) / scalar_t(8);
@@ -14,25 +63,10 @@ Translate::Translate() : _dragging(false) {
     _arrowHeadsOffsets[Z] = M::Vector3(0.0f, 0.0f, off);
 
     _cursorPos = M::Vector3::Zero;
-}
 
-void Translate::BuildAxis() {
-    _geom_axis = _nb.world->CreateGeometry();
-    _geom_axis->SetRenderMode(IGeometry::RenderMode::EDGES);
-    _geom_axis->SetRenderLayer(1);
-    leda::nb::RatPolyMesh& mesh = _geom_axis->GetRatPolyMesh();
-    leda::node v0 = mesh.new_node();
-    leda::node vX = mesh.new_node();
-    leda::node vY = mesh.new_node();
-    leda::node vZ = mesh.new_node();
-    mesh.set_position(v0, point3_t(0, 0, 0));
-    mesh.set_position(vX, point3_t(1, 0, 0));
-    mesh.set_position(vY, point3_t(0, 1, 0));
-    mesh.set_position(vZ, point3_t(0, 0, 1));
-    mesh.set_reversal(mesh.new_edge(v0, vX), mesh.new_edge(vX, v0));
-    mesh.set_reversal(mesh.new_edge(v0, vY), mesh.new_edge(vY, v0));
-    mesh.set_reversal(mesh.new_edge(v0, vZ), mesh.new_edge(vZ, v0));
-    _geom_axis->Update();
+    AxisMesh axisDesc(1.0f, 4, 0.4f, R::Color::Red, R::Color::Blue, R::Color::Green);
+    _axisMesh = R::meshMgr.Create(axisDesc.GetDesc());
+    _axisTFMesh = R::meshMgr.Create(_axisMesh);
 }
 
 void Translate::BuildArrowHead() {
@@ -78,19 +112,16 @@ void Translate::BuildBBoxes() {
 }
 
 void Translate::BuildCursor() {
-    BuildAxis();
     BuildArrowHead();
     BuildBBoxes();
 }
 
 void Translate::HideCursor() {
-    _geom_axis->Hide();
     for(int i = 0; i < DIM; ++i)
         _geom_arrowHeads[i]->Hide();
 }
 
 void Translate::ShowCursor() {
-    _geom_axis->Show();
     for(int i = 0; i < DIM; ++i)
         _geom_arrowHeads[i]->Show();
 }
@@ -129,6 +160,16 @@ static M::Vector3 Axis(int i) {
 
 void Translate::Invoke() {
     _nb.ui->SetOperatorName("Translate");
+}
+
+void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
+    R::MeshJob meshJob;
+    meshJob.fx = "UnlitThickLines";
+    meshJob.layer = 1;
+    meshJob.material = R::Material::White;
+    meshJob.primType = 0;
+    meshJob.tfmesh = _axisTFMesh;
+    meshJobs.push_back(meshJob);
 }
 
 void Translate::OnGeometrySelected() {
