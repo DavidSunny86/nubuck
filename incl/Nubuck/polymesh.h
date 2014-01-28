@@ -25,6 +25,8 @@ private:
 public:
     PolyMesh();
 
+    size_t FromObj(const char* filename);
+
     PolyMesh& operator=(const PolyMesh& other);
 
     const VEC3& position_of(const node v);
@@ -123,6 +125,81 @@ edge PolyMesh<VEC3>::make_triangle(const VEC3& p0, const VEC3& p1, const VEC3& p
     _faceAttribs[face_of(b[0])].visible = false;
 
     return f[0];
+}
+
+struct OBJ_Face {
+    size_t      face;
+    unsigned    vertices[3];
+};
+
+template<typename VEC3>
+struct FromFloat3 { };
+
+template<> struct FromFloat3<leda::d3_rat_point> {
+    static leda::d3_rat_point Conv(float x, float y, float z) {
+        return leda::d3_rat_point(leda::rational(x), leda::rational(y), leda::rational(z));
+    }
+};
+
+template<typename VEC3>
+size_t PolyMesh<VEC3>::FromObj(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    assert(file);
+
+    std::vector<OBJ_Face> obj_faces;
+    std::vector<node> verts;
+
+    typedef std::pair<unsigned, unsigned> uedge_t; // edge described by pair of vertices, with e.first() < e.second()
+    std::map<uedge_t, edge> edgemap; // maps pairs of vertices to edge handles
+
+    unsigned numVertices = 0, numFaces = 0;
+    int r = 0;
+    while(!feof(file)) {
+        char buffer[512];
+        float f[3];
+        unsigned d[3];
+
+        memset(buffer, 0, sizeof(buffer));
+        fgets(buffer, 512, file);
+
+        if(r = sscanf(buffer, "v %f %f %f", &f[0], &f[1], &f[2])) {
+            node v = new_node();
+            verts.push_back(v);
+            float scale = 1.0f;
+            set_position(v, FromFloat3<VEC3>::Conv(scale * f[0], scale * f[1], scale * f[2]));
+            numVertices++;
+        }
+        if(r = sscanf(buffer, "f %d %d %d", &d[0], &d[1], &d[2])) {
+            OBJ_Face f;
+            f.vertices[0] = d[0] - 1;
+            f.vertices[1] = d[1] - 1;
+            f.vertices[2] = d[2] - 1;
+            obj_faces.push_back(f);
+            numFaces++;
+        }
+    }
+
+    printf("NUM VERTICES: %d, NUM FACES %d\n", numVertices, numFaces);
+
+    for(unsigned i = 0; i < numFaces; ++i) {
+        OBJ_Face& f = obj_faces[i];
+        for(unsigned j = 0; j < 3; ++j) {
+            unsigned v0 = f.vertices[j];
+            unsigned v1 = f.vertices[(j + 1) % 3];
+            uedge_t uedge = std::make_pair(std::min(v0, v1), std::max(v0, v1));
+            edge e = new_edge(verts[v0], verts[v1]);
+            if(edgemap.end() == edgemap.find(uedge)) edgemap[uedge] = e;
+            else set_reversal(edgemap[uedge], e);
+        }
+    }
+    leda::list<edge> E;
+    make_bidirected(E);
+    printf("|E| = %d\n", E.size());
+    make_planar_map();
+    compute_faces();
+
+    fclose(file);
+    return 0;
 }
 
 } // namespace nb
