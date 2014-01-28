@@ -696,7 +696,6 @@ namespace W {
                 geom.BuildRenderList();
             }
         }
-
     }
 
     void World::Render(R::RenderList& renderList) {

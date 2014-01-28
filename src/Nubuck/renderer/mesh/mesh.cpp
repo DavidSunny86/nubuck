@@ -183,11 +183,10 @@ void Mesh::Invalidate(Mesh::Index* const indices, unsigned numIndices) {
     _triangleIndices.clear();
 }
 
-void Mesh::R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye) {
+void Mesh::R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye, unsigned idxOff) {
     assert(IsSolid());
     SYS::ScopedLock lock(_mtx);
     if(_triangleIndices.empty()) GenerateTriangles(_indices, _primType, _triangleIndices);
-    unsigned idxOff = R_IndexOff();
     for(unsigned i = 0; i < _triangleIndices.size(); ++i) {
         Triangle tri;
         M::Vector3 center = M::Vector3::Zero;

@@ -379,7 +379,15 @@ namespace {
 
 } // unnamed namespace
 
-static MeshJob* DrawMeshList(Program& prog, const State& state, int passType, int passFlags, const M::Matrix4& worldMat, MeshJob* first) {
+static MeshJob* DrawMeshList(
+    Program& prog,
+    const State& state,
+    int passType,
+    int passFlags,
+    const M::Matrix4& worldMat,
+    const R::Renderer::GeomSortMode::Enum geomSortMode,
+    MeshJob* first) 
+{
     typedef std::vector<Mesh::Triangle>::iterator triIt_t;
     M::Matrix4 invWorld;
     M::TryInvert(worldMat, invWorld);
@@ -389,10 +397,8 @@ static MeshJob* DrawMeshList(Program& prog, const State& state, int passType, in
     while(meshJob && meshJob->fx == first->fx) {
         TFMesh& tfmesh = meshMgr.GetMesh(meshJob->tfmesh);
         Mesh& mesh = tfmesh.GetMesh();
-        mesh.R_AllocBuffer();
-        GB_CacheBuffer();
-        if(mesh.IsSolid()) {
-            mesh.R_AppendTriangles(tris, localEye);
+        if(Renderer::GeomSortMode::SORT_TRIANGLES == geomSortMode && mesh.IsSolid()) {
+            mesh.R_AppendTriangles(tris, localEye, tfmesh.R_TF_IndexOff());
         }
         else {
             mesh.R_TouchBuffer();
@@ -420,7 +426,6 @@ static MeshJob* DrawMeshList(Program& prog, const State& state, int passType, in
         indices.push_back(triIt->bufIndices.indices[2]);
     }
     if(!indices.empty()) {
-        GB_CacheBuffer();
         Uniforms_UpdateModelView(worldMat);
         BindMeshAttributes();
         GL_CALL(glDrawElements(GL_TRIANGLES, indices.size(), ToGLEnum<Mesh::Index>::ENUM, &indices[0]));
@@ -430,8 +435,27 @@ static MeshJob* DrawMeshList(Program& prog, const State& state, int passType, in
     return meshJob;
 }
 
-static void DrawFrame(const M::Matrix4& modelView, const M::Matrix4& projectionMat, float time, std::vector<MeshJob>& rjobs) {
+static void DrawFrame(
+    const M::Matrix4& modelView,
+    const M::Matrix4& projectionMat,
+    R::Renderer::GeomSortMode::Enum geomSortMode,
+    float time, std::vector<MeshJob>& rjobs) 
+{
     if(rjobs.empty()) return;
+
+    MeshJob* meshJob = &rjobs[0];
+    while(meshJob) {
+        TFMesh& tfmesh = meshMgr.GetMesh(meshJob->tfmesh);
+        if(R::Renderer::GeomSortMode::SORT_TRIANGLES == geomSortMode) {
+            tfmesh.TransformVertices();
+            tfmesh.R_TF_Touch();
+        } else {
+            tfmesh.R_Touch();
+        }
+
+        meshJob = meshJob->next;
+    }
+    GB_CacheBuffer();
 
     GB_Bind();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -452,7 +476,7 @@ static void DrawFrame(const M::Matrix4& modelView, const M::Matrix4& projectionM
             Uniforms_BindBuffers();
             SetState(desc.state);
 
-            next = DrawMeshList(prog, desc.state, desc.type, desc.flags, modelView, cur);
+            next = DrawMeshList(prog, desc.state, desc.type, desc.flags, modelView, geomSortMode, cur);
         }
         cur = next;
     }
@@ -518,6 +542,7 @@ void Renderer::Render(
     const RenderList& renderList, 
     const M::Matrix4& projection,
     const M::Matrix4& worldToEye, 
+    const GeomSortMode::Enum geomSortMode,
     std::vector<MeshJob>& rjobs) 
 {
     if(curState.depth.maskEnabled != GL_TRUE) {
@@ -536,7 +561,7 @@ void Renderer::Render(
             MeshJob& rjob = rjobs[i];
             effectMgr.GetEffect(rjob.fx)->Compile();
         }
-        DrawFrame(renderList.worldMat, projection, _time, rjobs);
+        DrawFrame(renderList.worldMat, projection, geomSortMode, _time, rjobs);
     }
 }
 
@@ -556,7 +581,9 @@ void Renderer::Render(RenderList& renderList) {
         if(Layers::GEOMETRY_0 == i) worldToEye = renderList.worldMat;
         if(Layers::GEOMETRY_1 == i) worldToEye = M::Mat4::Identity();
         */
-        if(!_renderLayers[i].empty()) Render(renderList, projection, worldToEye, _renderLayers[i]);
+        GeomSortMode::Enum geomSortMode = GeomSortMode::UNSORTED;
+        if(Layers::GEOMETRY_TRANSPARENT == i) geomSortMode = GeomSortMode::SORT_TRIANGLES;
+        if(!_renderLayers[i].empty()) Render(renderList, projection, worldToEye, geomSortMode, _renderLayers[i]);
     }
 }
 

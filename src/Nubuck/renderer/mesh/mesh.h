@@ -87,7 +87,7 @@ public:
     void Invalidate(Mesh::Index* const indices, unsigned numIndices);
 
     // methods prefixed with R_ should only be called by the renderer
-    void R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye); // eye in mesh local space
+    void R_AppendTriangles(std::vector<Triangle>& tris, const M::Vector3& eye, unsigned idxOff); // eye in mesh local space
     unsigned R_IndexOff() const;
     void R_AllocBuffer();
     void R_TouchBuffer();

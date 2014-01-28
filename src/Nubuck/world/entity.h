@@ -37,6 +37,7 @@ public:
 
     EntTransform&       GetTransform() { return _transform; }
     M::Vector3          Transform(const M::Vector3& v);
+    M::Matrix4          GetTransformationMatrix() const;
 
     void                SetType(EntityType::Enum type) { _type = type; }
     void                SetID(unsigned id) { _entId = id; }

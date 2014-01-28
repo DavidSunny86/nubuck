@@ -55,8 +55,17 @@ public:
         enum Enum {
             GEOMETRY_0 = 0,
             GEOMETRY_1,
+            GEOMETRY_TRANSPARENT,
 
             NUM_LAYERS
+        };
+    };
+
+    struct GeomSortMode {
+        enum Enum {
+            UNSORTED = 0,
+            SORT_MESHES,
+            SORT_TRIANGLES
         };
     };
 private:
@@ -71,6 +80,7 @@ private:
         const RenderList& renderList, 
         const M::Matrix4& projection,
         const M::Matrix4& worldToEye, 
+        const GeomSortMode::Enum geomSortMode,
         std::vector<MeshJob>& rjobs);
 public:
     Renderer(void);

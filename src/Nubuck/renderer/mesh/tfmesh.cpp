@@ -9,6 +9,10 @@ _meshPtr(meshPtr),
 _gbHandle(GB_INVALID_HANDLE)
 { }
 
+TFMesh::~TFMesh() {
+    if(GB_INVALID_HANDLE != _gbHandle) GB_FreeMemItem(_gbHandle);
+}
+
 const Mesh& TFMesh::GetMesh() const { return meshMgr.GetMesh(_meshPtr); }
 
 Mesh& TFMesh::GetMesh() { return meshMgr.GetMesh(_meshPtr); }
@@ -33,13 +37,13 @@ void TFMesh::R_TF_Touch() {
 }
 
 unsigned TFMesh::R_TF_IndexOff() const {
-    return meshMgr.GetMesh(_meshPtr).R_IndexOff();
+    return GB_GetOffset(_gbHandle) / sizeof(Mesh::Vertex);
 }
 
 void TFMesh::R_Touch() { meshMgr.GetMesh(_meshPtr).R_AllocBuffer(); }
 
 unsigned TFMesh::R_IndexOff() const {
-    return GB_GetOffset(_gbHandle) / sizeof(Mesh::Vertex);
+    return meshMgr.GetMesh(_meshPtr).R_IndexOff();
 }
 
 } // namespace R

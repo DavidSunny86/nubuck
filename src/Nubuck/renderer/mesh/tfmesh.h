@@ -16,6 +16,7 @@ private:
     gbHandle_t                  _gbHandle;
 public:
     explicit TFMesh(const meshPtr_t meshPtr);
+    ~TFMesh();
 
     const Mesh& GetMesh() const;
     Mesh&       GetMesh();

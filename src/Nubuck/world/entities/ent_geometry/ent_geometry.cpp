@@ -147,8 +147,11 @@ void ENT_Geometry::BuildRenderList() {
     if(_isHidden) return;
 
     if(RenderMode::FACES & _renderMode && NULL != _mesh) {
+        /*
         TransformVertices();
         R::meshMgr.GetMesh(_mesh).Invalidate(&_tfverts[0]);
+        */
+        R::meshMgr.GetMesh(_tfmesh).SetTransform(GetTransformationMatrix());
 
         R::MeshJob rjob;
         rjob.layer      = _renderLayer;
