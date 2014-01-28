@@ -246,6 +246,9 @@
     <Filter Include="Private\operators\op_loadobj">
       <UniqueIdentifier>{31a9bfda-09a0-41d5-9905-7065eae2a4b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\mesh\cone">
+      <UniqueIdentifier>{fc44719c-cc26-4827-84e9-704fe5008a93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -610,6 +613,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.h">
       <Filter>Private\operators\op_loadobj</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\mesh\cone\cone.h">
+      <Filter>Private\renderer\mesh\cone</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -999,6 +1005,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.cpp">
       <Filter>Private\operators\op_loadobj</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\mesh\cone\cone.cpp">
+      <Filter>Private\renderer\mesh\cone</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

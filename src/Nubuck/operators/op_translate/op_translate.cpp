@@ -3,6 +3,7 @@
 #include <world\world.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <renderer\mesh\mesh.h>
+#include <renderer\mesh\cone\cone.h>
 #include "op_translate.h"
 
 namespace OP {
@@ -56,51 +57,28 @@ struct AxisMesh {
 };
 
 Translate::Translate() : _dragging(false) {
-    _arrowHeadSize = scalar_t(1) / scalar_t(8);
-    float off = _arrowHeadSize.to_float() + 0.8f;
-    _arrowHeadsOffsets[X] = M::Vector3(off, 0.0f, 0.0f);
-    _arrowHeadsOffsets[Y] = M::Vector3(0.0f, off, 0.0f);
-    _arrowHeadsOffsets[Z] = M::Vector3(0.0f, 0.0f, off);
-
     _cursorPos = M::Vector3::Zero;
+    _hidden = true;
 
     AxisMesh axisDesc(1.0f, 4, 0.4f, R::Color::Red, R::Color::Blue, R::Color::Green);
     _axisMesh = R::meshMgr.Create(axisDesc.GetDesc());
     _axisTFMesh = R::meshMgr.Create(_axisMesh);
-}
 
-void Translate::BuildArrowHead() {
-    leda::nb::RatPolyMesh mesh;
-    leda::list<point3_t> L;
-    const scalar_t& s = _arrowHeadSize;
-    L.push(point3_t( 0,  2 * s,  0));
-    L.push(point3_t(-s, -s, -s));
-    L.push(point3_t(-s, -s,  s));
-    L.push(point3_t( s, -s,  s));
-    L.push(point3_t( s, -s, -s));
-    leda::CONVEX_HULL(L, mesh);
-    mesh.compute_faces();
+    R::Cone arrowHead(0.1f, 0.5f, 20, R::Color::Red);
+    R::meshPtr_t meshPtr = _arrowHeadMeshes[0] = R::meshMgr.Create(R::Cone(0.1f, 0.5f, 20, R::Color::Red).GetDesc());
+    _arrowHeadTFMeshes[0] = R::meshMgr.Create(meshPtr);
+    _arrowHeadTF[0] = M::Mat4::Translate(1.0f, 0.0f, 0.0f) * M::Mat4::RotateY(-90.0f);
+    R::meshMgr.GetMesh(_arrowHeadTFMeshes[0]).SetTransform(_arrowHeadTF[0]);
 
-    for(int i = 0; i < 3; ++i) {
-        _geom_arrowHeads[i] = _nb.world->CreateGeometry();
-        _geom_arrowHeads[i]->GetRatPolyMesh() = mesh;
-        _geom_arrowHeads[i]->GetRatPolyMesh().compute_faces();
-        _geom_arrowHeads[i]->SetRenderMode(IGeometry::RenderMode::FACES);
-        _geom_arrowHeads[i]->SetRenderLayer(1);
+    meshPtr = _arrowHeadMeshes[1] = R::meshMgr.Create(R::Cone(0.1f, 0.5f, 20, R::Color::Blue).GetDesc());
+    _arrowHeadTFMeshes[1] = R::meshMgr.Create(meshPtr);
+    _arrowHeadTF[1] = M::Mat4::Translate(0.0f, 1.0f, 0.0f) * M::Mat4::RotateX( 90.0f);
+    R::meshMgr.GetMesh(_arrowHeadTFMeshes[1]).SetTransform(_arrowHeadTF[1]);
 
-        const M::Vector3& pos = _arrowHeadsOffsets[i];
-        _geom_arrowHeads[i]->SetPosition(pos.x, pos.y, pos.z);
-    }
-
-    leda::nb::set_color(_geom_arrowHeads[X]->GetRatPolyMesh(), R::Color::Red);
-    _geom_arrowHeads[X]->Rotate(-90.0f, 0.0f, 0.0f, 1.0f);
-
-    leda::nb::set_color(_geom_arrowHeads[Y]->GetRatPolyMesh(), R::Color::Blue);
-
-    leda::nb::set_color(_geom_arrowHeads[Z]->GetRatPolyMesh(), R::Color::Green);
-    _geom_arrowHeads[Z]->Rotate(90.0f, 1.0f, 0.0f, 0.0f);
-
-    for(int i = 0; i < 3; ++i) _geom_arrowHeads[i]->Update();
+    meshPtr = _arrowHeadMeshes[2] = R::meshMgr.Create(R::Cone(0.1f, 0.5f, 20, R::Color::Green).GetDesc());
+    _arrowHeadTFMeshes[2] = R::meshMgr.Create(meshPtr);
+    _arrowHeadTF[2] = M::Mat4::Translate(0.0f, 0.0f, 1.0f);
+    R::meshMgr.GetMesh(_arrowHeadTFMeshes[2]).SetTransform(_arrowHeadTF[2]);
 }
 
 void Translate::BuildBBoxes() {
@@ -112,18 +90,14 @@ void Translate::BuildBBoxes() {
 }
 
 void Translate::BuildCursor() {
-    BuildArrowHead();
-    BuildBBoxes();
 }
 
 void Translate::HideCursor() {
-    for(int i = 0; i < DIM; ++i)
-        _geom_arrowHeads[i]->Hide();
+    _hidden = true;
 }
 
 void Translate::ShowCursor() {
-    for(int i = 0; i < DIM; ++i)
-        _geom_arrowHeads[i]->Show();
+    _hidden = false;
 }
 
 void Translate::AlignWithCamera() {
@@ -163,13 +137,25 @@ void Translate::Invoke() {
 }
 
 void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
+    if(_hidden) return;
+
     R::MeshJob meshJob;
+
     meshJob.fx = "UnlitThickLines";
     meshJob.layer = 1;
     meshJob.material = R::Material::White;
     meshJob.primType = 0;
     meshJob.tfmesh = _axisTFMesh;
     meshJobs.push_back(meshJob);
+
+    meshJob.fx = "LitDirectional";
+    meshJob.layer = 1;
+    meshJob.material = R::Material::White;
+    meshJob.primType = 0;
+    for(int i = 0; i < 3; ++i) {
+        meshJob.tfmesh = _arrowHeadTFMeshes[i];
+        meshJobs.push_back(meshJob);
+    }
 }
 
 void Translate::OnGeometrySelected() {
@@ -251,10 +237,12 @@ bool Translate::OnMouseMove(const M::Vector2& mouseCoords) {
     if(!_dragging) {
         M::Ray ray = W::world.PickingRay(mouseCoords);
         for(int i = 0; i < DIM; ++i) {
+            /* TODO: color arrow heads
             if(M::IS::Intersects(ray, _bboxes[i])) {
                 leda::nb::set_color(_geom_arrowHeads[i]->GetRatPolyMesh(), R::BlendAddRGB(arrowHeadColors[i], R::Color::White));
             } else leda::nb::set_color(_geom_arrowHeads[i]->GetRatPolyMesh(), arrowHeadColors[i]);
             _geom_arrowHeads[i]->Update();
+            */
         }
     }
 

@@ -27,13 +27,12 @@ private:
     R::tfmeshPtr_t  _axisTFMesh;
 
     enum { X = 0, Y, Z, DIM };
-    IGeometry*  _geom_arrowHeads[DIM];
-    scalar_t    _arrowHeadSize;
-    M::Vector3  _arrowHeadsOffsets[DIM];
+    R::meshPtr_t    _arrowHeadMeshes[3];
+    R::tfmeshPtr_t  _arrowHeadTFMeshes[3];
+    M::Matrix4      _arrowHeadTF[3];
 
     M::Box _bboxes[DIM];
 
-    void BuildArrowHead();
     void BuildBBoxes();
     void BuildCursor();
     void ShowCursor();
@@ -49,9 +48,10 @@ private:
     void SetPosition(const M::Vector3& pos) {
         M::Matrix4 T = M::Mat4::Translate(pos);
         R::meshMgr.GetMesh(_axisTFMesh).SetTransform(T);
+        for(int i = 0; i < DIM; ++i) {
+            R::meshMgr.GetMesh(_arrowHeadTFMeshes[i]).SetTransform(T * _arrowHeadTF[i]);
+        }
         for(unsigned i = 0; i < DIM; ++i) {
-            const M::Vector3& off = _arrowHeadsOffsets[i];
-            _geom_arrowHeads[i]->SetPosition(off.x + pos.x, off.y + pos.y, off.z + pos.z);
             SetCenterPosition(_bboxes[i], pos);
     const float l = 1.2f;
     const float w = 0.2f;
@@ -62,6 +62,7 @@ private:
     }
 
     M::Vector3  _cursorPos;
+    bool        _hidden;
 
     bool        _dragging;
     int         _dragAxis;
