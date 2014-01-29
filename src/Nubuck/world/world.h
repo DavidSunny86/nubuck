@@ -103,7 +103,8 @@ namespace W {
         M::Matrix4 GetCameraMatrix() const { return _camArcball.GetWorldMatrix(); }
         M::Matrix4 GetModelView() const { return _camArcball.GetWorldMatrix(); }
 
-        M::Ray PickingRay(const M::Vector2& mouseCoords);
+        M::Ray  PickingRay(const M::Vector2& mouseCoords);
+        bool    Trace(const M::Ray& ray, ENT_Geometry** geom);
 
 		unsigned SpawnPolyhedron(graph_t* const G, leda::node_map<bool>* cachedNodes, leda::edge_map<bool>* cachedEdges);
         unsigned SpawnMesh(R::meshPtr_t meshPtr);

@@ -175,9 +175,8 @@ void Translate::OnCameraChanged() {
 static float tmp;
 
 bool Translate::OnMouseDown(const M::Vector2& mouseCoords) {
+    M::Ray ray = W::world.PickingRay(mouseCoords);
     if(!_dragging && NULL != W::world.SelectedGeometry()) {
-        M::Ray ray = W::world.PickingRay(mouseCoords);
-
         M::Matrix3 M = M::RotationOf(W::world.GetModelView());
         float det = M::Det(M);
         if(M::AlmostEqual(0.0f, det)) printf("OMGOMGOMG\n");
@@ -208,6 +207,11 @@ bool Translate::OnMouseDown(const M::Vector2& mouseCoords) {
         if(_dragging) {
             printf("N = %f %f %f\n", _dragPlane.n.x, _dragPlane.n.y, _dragPlane.n.z);
             return true;
+        } else {
+            W::ENT_Geometry* geom;
+            if(W::world.Trace(ray, &geom)) {
+                W::world.SelectGeometry(geom);
+            }
         }
         return false;
     }

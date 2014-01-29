@@ -4,6 +4,7 @@
 #include <common\common.h>
 #include <algdriver\algdriver.h>
 #include <system\locks\scoped_lock.h>
+#include <math\intersections.h>
 #include <renderer\mesh\plane\plane.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\cylinder\cylinder.h>
@@ -627,6 +628,33 @@ namespace W {
         ray.direction = UnprojectPoint(projectionMat, _camArcball.GetWorldMatrix(), screenWidth, screenHeight, mouseCoords);
         ray.direction.Normalize();
         return ray;
+    }
+
+    static void SetCenterPosition(M::Box& box, const M::Vector3& center) {
+        const M::Vector3 oldCenter = 0.5f * (box.max - box.min) + box.min;
+        const M::Vector3 d = (center - oldCenter);
+        box.min += d;
+        box.max += d;
+    }
+
+    static M::Vector3 GetCenterPosition(const M::Box& box) {
+        return 0.5f * (box.max - box.min) + box.min;
+    }
+
+    bool World::Trace(const M::Ray& ray, ENT_Geometry** ret) {
+        for(unsigned i = 0; i < _entities.size(); ++i) {
+            GEN::Pointer<Entity> entity = _entities[i];
+            if(EntityType::ENT_GEOMETRY == entity->GetType()) {
+                ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
+                M::Box bbox = geom.GetBoundingBox();
+                SetCenterPosition(bbox, M::Transform(geom.GetTransformationMatrix(), GetCenterPosition(bbox)));
+                if(M::IS::Intersects(ray, bbox)) {
+                    *ret = &geom;
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 	unsigned World::SpawnPolyhedron(graph_t* const G, leda::node_map<bool>* cachedNodes, leda::edge_map<bool>* cachedEdges) {
