@@ -30,6 +30,20 @@ void ENT_Geometry::ComputeCenter() {
     _center *= 1.0f / _ratPolyMesh.number_of_nodes();
 }
 
+void ENT_Geometry::ComputeBoundingBox() {
+    _bbox.min = _bbox.max = ToVector(_ratPolyMesh.position_of(_ratPolyMesh.first_node()));
+    leda::node v;
+    forall_nodes(v, _ratPolyMesh) {
+        M::Vector3 p = ToVector(_ratPolyMesh.position_of(v));
+        _bbox.min.x = M::Min(_bbox.min.x, p.x);
+        _bbox.min.y = M::Min(_bbox.min.y, p.y);
+        _bbox.min.z = M::Min(_bbox.min.z, p.z);
+        _bbox.max.x = M::Max(_bbox.max.x, p.x);
+        _bbox.max.y = M::Max(_bbox.max.y, p.y);
+        _bbox.max.z = M::Max(_bbox.max.z, p.z);
+    }
+}
+
 ENT_Geometry::ENT_Geometry() : 
 _edgeRenderer(NULL),
 _mesh(NULL), 
@@ -69,6 +83,7 @@ void ENT_Geometry::Update() {
     _edgeRenderer->Rebuild();
 
     ComputeCenter();
+    ComputeBoundingBox();
 
     _vertices.clear();
     _indices.clear();

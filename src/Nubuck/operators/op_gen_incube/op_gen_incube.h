@@ -79,6 +79,7 @@ private:
         }
 
         _cloud->Update();
+        _nb.world->SelectGeometry(_cloud);
     }
 
     void Update() {

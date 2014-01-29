@@ -2,6 +2,7 @@
 
 #include <Nubuck\nubuck.h>
 #include <Nubuck\polymesh.h>
+#include <math\box.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>
@@ -35,10 +36,12 @@ private:
     ShadingMode::Enum   _shadingMode;
     R::RenderList       _renderList;
 
-    M::Vector3          _center; // untransformed center
+    M::Vector3          _center;    // untransformed center
+    M::Box              _bbox;      // untransformed bounding box
 
     void TransformVertices();
     void ComputeCenter();
+    void ComputeBoundingBox();
 public:
     ENT_Geometry();
 
@@ -52,6 +55,8 @@ public:
 
     const M::Vector3& GetLocalCenter() const { return _center; }
     M::Vector3 GetGlobalCenter() { return Transform(_center); }
+
+    const M::Box& GetBoundingBox() const { return _bbox; }
 
     float GetPosX() const override { return GetTransform().position.x; }
     float GetPosY() const override { return GetTransform().position.y; }

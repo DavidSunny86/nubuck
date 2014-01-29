@@ -65,6 +65,11 @@ namespace W {
         void        Grid_Build();
         R::MeshJob  Grid_GetRenderJob();
 
+        R::meshPtr_t        _bboxMesh;
+        R::tfmeshPtr_t      _bboxTFMesh;
+        void                BBox_Build();
+        R::MeshJob          BBox_GetRenderJob();
+
 #pragma region EventHandlers
         void Event_Apocalypse(const EV::Event& event);
         void Event_LinkEntity(const EV::Event& event);

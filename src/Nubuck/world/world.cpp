@@ -22,6 +22,57 @@
 #include "entity.h"
 #include "world.h"
 
+namespace {
+
+struct WireframeBox {
+private:
+    std::vector<R::Mesh::Vertex>    _vertices;
+    std::vector<R::Mesh::Index>     _indices;
+public:
+    explicit WireframeBox(const M::Box& box) {
+        M::Vector3 pos[] = {
+            M::Vector3(box.min.x, box.min.y, box.max.z),
+            M::Vector3(box.max.x, box.min.y, box.max.z),
+            M::Vector3(box.max.x, box.max.y, box.max.z),
+            M::Vector3(box.min.x, box.max.y, box.max.z),
+            M::Vector3(box.min.x, box.min.y, box.min.z),
+            M::Vector3(box.max.x, box.min.y, box.min.z),
+            M::Vector3(box.max.x, box.max.y, box.min.z),
+            M::Vector3(box.min.x, box.max.y, box.min.z),
+        };
+        unsigned numVertices = 8;
+        R::Mesh::Index indices[] = {
+            0, 1, 1, 2, 2, 3, 3, 0, // front
+            4, 5, 5, 6, 6, 7, 7, 4, // back
+            3, 7, 2, 6,             // top
+            0, 4, 1, 5              // bottom
+        };
+        unsigned numIndices = sizeof(indices) / sizeof(R::Mesh::Index);
+        R::Mesh::Vertex vert;
+        vert.color = R::Color::White;
+        for(unsigned i = 0; i < 8; ++i) {
+            vert.position = pos[i];
+            _vertices.push_back(vert);
+        }
+        for(unsigned i = 0; i < numIndices; ++i)
+            _indices.push_back(indices[i]);
+    }
+
+    R::Mesh::Desc GetDesc() {
+        R::Mesh::Desc desc;
+        desc.vertices       = &_vertices[0];
+        desc.numVertices    = _vertices.size();
+        desc.indices        = &_indices[0];
+        desc.numIndices     = _indices.size();
+        desc.primType       = GL_LINES;
+        return desc;
+    }
+};
+
+
+
+} // unnamed namespace
+
 namespace W {
 
     static SYS::SpinLock entIdCntMtx;
@@ -534,6 +585,26 @@ namespace W {
         return meshJob;
     }
 
+    void World::BBox_Build() {
+        if(_bboxMesh) R::meshMgr.Destroy(_bboxMesh);
+        if(_bboxTFMesh) R::meshMgr.Destroy(_bboxTFMesh);
+
+        ENT_Geometry* geom = (ENT_Geometry*)SelectedGeometry();
+        WireframeBox meshDesc(geom->GetBoundingBox());
+        _bboxMesh   = R::meshMgr.Create(meshDesc.GetDesc());
+        _bboxTFMesh = R::meshMgr.Create(_bboxMesh);
+    }
+
+    R::MeshJob World::BBox_GetRenderJob() {
+        R::MeshJob rjob;
+        rjob.fx         = "Unlit";
+        rjob.layer      = 0;
+        rjob.material   = R::Material::White;
+        rjob.primType   = 0;
+        rjob.tfmesh     = _bboxTFMesh;
+        return rjob;
+    }
+
 	World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
         _isGrabbing = false;
 
@@ -706,6 +777,13 @@ namespace W {
 
         renderList.meshJobs.push_back(Grid_GetRenderJob());
 
+        if(NULL != SelectedGeometry()) {
+            assert(NULL != _bboxTFMesh);
+            ENT_Geometry* geom = (ENT_Geometry*)SelectedGeometry();
+            R::meshMgr.GetMesh(_bboxTFMesh).SetTransform(geom->GetTransformationMatrix());
+            renderList.meshJobs.push_back(BBox_GetRenderJob());
+        }
+
         for(unsigned i = 0; i < _entities.size(); ++i) {
             if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {
                 ENT_Polyhedron& ph = static_cast<ENT_Polyhedron&>(*_entities[i]);
@@ -780,6 +858,7 @@ namespace W {
     void World::SelectGeometry(IGeometry* geom) { 
         _selection.geometry = geom; 
         OP::g_operators.SelectGeometry();
+        BBox_Build();
     }
 
     DWORD World::Thread_Func(void) {
