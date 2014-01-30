@@ -84,10 +84,10 @@ public:
         }
     }
 
-    bool OnMouseDown(const M::Vector2& mouseCoords) {
+    bool OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) {
         for(int i = _activeOps.size() - 1; 0 <= i; --i) {
             Operator* op = _activeOps[i];
-            if(op->OnMouseDown(mouseCoords)) {
+            if(op->OnMouseDown(mouseCoords, shiftKey)) {
                 UI::OperatorPanel::Instance()->Clear();
                 unsigned N = _activeOps.size() - 1 - i;
                 for(unsigned j = 0; j < N; ++j) {

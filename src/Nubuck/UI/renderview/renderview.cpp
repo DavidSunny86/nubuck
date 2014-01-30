@@ -49,7 +49,8 @@ namespace UI {
         args.x = qevent->x();
         args.y = qevent->y();
 
-        if(!OP::g_operators.OnMouseDown(M::Vector2(args.x, args.y)))
+        bool shiftKey = qevent->modifiers() & Qt::ShiftModifier;
+        if(!OP::g_operators.OnMouseDown(M::Vector2(args.x, args.y), shiftKey))
             W::world.Send(EV::def_Mouse.Create(args));
     }
 

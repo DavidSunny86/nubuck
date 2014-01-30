@@ -25,7 +25,7 @@ public:
     virtual void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) { }
     virtual void OnGeometrySelected() { }
     virtual void OnCameraChanged() { }
-    virtual bool OnMouseDown(const M::Vector2& mouseCoords) { return false; }
+    virtual bool OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) { return false; }
     virtual bool OnMouseUp(const M::Vector2& mouseCoords)  { return false; }
     virtual bool OnMouseMove(const M::Vector2& mouseCoords) { return false; }
 };

@@ -121,7 +121,7 @@ void Translate::Register(const Nubuck& nb, Invoker& invoker) {
 
     BuildCursor();
 
-    if(!W::world.SelectedGeometry()) HideCursor();
+    if(!W::world.GetSelection().GetGeometryList().empty()) HideCursor();
 }
 
 static M::Vector3 Axis(int i) {
@@ -159,8 +159,7 @@ void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
 }
 
 void Translate::OnGeometrySelected() {
-    W::ENT_Geometry* geom = (W::ENT_Geometry*)W::world.SelectedGeometry();
-    _cursorPos = geom->GetTransform().position;
+    _cursorPos = W::world.GetSelection().GetGlobalCenter();
     SetPosition(_cursorPos);
 
     AlignWithCamera();
@@ -168,15 +167,15 @@ void Translate::OnGeometrySelected() {
 }
 
 void Translate::OnCameraChanged() {
-    if(NULL != W::world.SelectedGeometry()) // ie. cursor is visible
+    if(!W::world.GetSelection().GetGeometryList().empty()) // ie. cursor is visible
         AlignWithCamera();
 }
 
 static float tmp;
 
-bool Translate::OnMouseDown(const M::Vector2& mouseCoords) {
+bool Translate::OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) {
     M::Ray ray = W::world.PickingRay(mouseCoords);
-    if(!_dragging && NULL != W::world.SelectedGeometry()) {
+    if(!_dragging && !W::world.GetSelection().GetGeometryList().empty()) {
         M::Matrix3 M = M::RotationOf(W::world.GetModelView());
         float det = M::Det(M);
         if(M::AlmostEqual(0.0f, det)) printf("OMGOMGOMG\n");
@@ -200,6 +199,9 @@ bool Translate::OnMouseDown(const M::Vector2& mouseCoords) {
                 bool is = M::IS::Intersects(ray, _dragPlane, &inf);
                 assert(is);
                 tmp = _cursorPos.vec[_dragAxis];
+                const std::vector<IGeometry*>& geomList = W::world.GetSelection().GetGeometryList();
+                _oldPos.resize(geomList.size());
+                for(unsigned i = 0; i < _oldPos.size(); ++i) _oldPos[i] = ((const W::ENT_Geometry*)geomList[i])->Transform(M::Vector3::Zero);
                 _dragOrig = inf.where;
                 _dragging = true;
             }
@@ -210,7 +212,8 @@ bool Translate::OnMouseDown(const M::Vector2& mouseCoords) {
         } else {
             W::ENT_Geometry* geom;
             if(W::world.Trace(ray, &geom)) {
-                W::world.SelectGeometry(geom);
+                if(shiftKey) W::world.AddToSelection(geom);
+                else W::world.SelectGeometry(geom);
             }
         }
         return false;
@@ -263,8 +266,13 @@ bool Translate::OnMouseMove(const M::Vector2& mouseCoords) {
         printf("COORD = %f\n", _cursorPos.vec[_dragAxis]);
         SetPosition(_cursorPos);
 
-        IGeometry* geom = W::world.SelectedGeometry();
-        geom->SetPosition(_cursorPos.x, _cursorPos.y, _cursorPos.z);
+        const std::vector<IGeometry*>& geomList = W::world.GetSelection().GetGeometryList();
+        for(unsigned i = 0; i < geomList.size(); ++i) {
+            IGeometry* geom = geomList[i];
+            M::Vector3 pos = _oldPos[i];
+            pos.vec[_dragAxis] = _oldPos[i].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
+            geom->SetPosition(pos.x, pos.y, pos.z);
+        }
 
         AlignWithCamera();
         return true;

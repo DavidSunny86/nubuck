@@ -84,6 +84,26 @@ namespace W {
 
     World world;
 
+    // Selection impl
+    void World::Selection::ComputeCenter() {
+        center = M::Vector3::Zero;
+        for(unsigned i = 0; i < geomList.size(); ++i) {
+            ENT_Geometry* geom = (ENT_Geometry*)geomList[i];
+            center += geom->GetGlobalCenter();
+        }
+        center /= geomList.size();
+    }
+
+    void World::Selection::Set(IGeometry* geom) {
+        geomList.clear();
+        Add(geom);
+    }
+
+    void World::Selection::Add(IGeometry* geom) {
+        geomList.push_back(geom);
+        ComputeCenter();
+    }
+
     BEGIN_EVENT_HANDLER(World)
         EVENT_HANDLER(EV::def_Apocalypse,           &World::Event_Apocalypse)
         EVENT_HANDLER(EV::def_LinkEntity,           &World::Event_LinkEntity)
@@ -586,24 +606,47 @@ namespace W {
         return meshJob;
     }
 
-    void World::BBox_Build() {
-        if(_bboxMesh) R::meshMgr.Destroy(_bboxMesh);
-        if(_bboxTFMesh) R::meshMgr.Destroy(_bboxTFMesh);
-
-        ENT_Geometry* geom = (ENT_Geometry*)SelectedGeometry();
-        WireframeBox meshDesc(geom->GetBoundingBox());
-        _bboxMesh   = R::meshMgr.Create(meshDesc.GetDesc());
-        _bboxTFMesh = R::meshMgr.Create(_bboxMesh);
+    void World::BoundingBox::Destroy() {
+        if(mesh) {
+            R::meshMgr.Destroy(mesh);
+            mesh = NULL;
+        }
+        if(tfmesh) {
+            R::meshMgr.Destroy(tfmesh);
+            tfmesh = NULL;
+        }
     }
 
-    R::MeshJob World::BBox_GetRenderJob() {
+    World::BoundingBox::BoundingBox(const ENT_Geometry* geom) : geom(geom) {
+        WireframeBox meshDesc(geom->GetBoundingBox());
+        mesh = R::meshMgr.Create(meshDesc.GetDesc());
+        tfmesh = R::meshMgr.Create(mesh);
+        Transform();
+    }
+
+    void World::BoundingBox::Transform() {
+        R::meshMgr.GetMesh(tfmesh).SetTransform(geom->GetTransformationMatrix());
+    }
+
+    void World::BBoxes_BuildFromSelection() {
+        _bboxes.clear();
+        const std::vector<IGeometry*>& geomList = _selection.GetGeometryList();
+        for(unsigned i = 0; i < geomList.size(); ++i) {
+            _bboxes.push_back(GEN::MakePtr(new BoundingBox((const ENT_Geometry*)geomList[i])));
+        }
+    }
+
+    void World::BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
         R::MeshJob rjob;
         rjob.fx         = "Unlit";
         rjob.layer      = 0;
         rjob.material   = R::Material::White;
         rjob.primType   = 0;
-        rjob.tfmesh     = _bboxTFMesh;
-        return rjob;
+        for(unsigned i = 0; i < _bboxes.size(); ++i) {
+            _bboxes[i]->Transform();
+            rjob.tfmesh = _bboxes[i]->tfmesh;
+            rjobs.push_back(rjob);
+        }
     }
 
 	World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
@@ -805,12 +848,7 @@ namespace W {
 
         renderList.meshJobs.push_back(Grid_GetRenderJob());
 
-        if(NULL != SelectedGeometry()) {
-            assert(NULL != _bboxTFMesh);
-            ENT_Geometry* geom = (ENT_Geometry*)SelectedGeometry();
-            R::meshMgr.GetMesh(_bboxTFMesh).SetTransform(geom->GetTransformationMatrix());
-            renderList.meshJobs.push_back(BBox_GetRenderJob());
-        }
+        BBoxes_GetRenderJobs(renderList.meshJobs);
 
         for(unsigned i = 0; i < _entities.size(); ++i) {
             if(EntityType::ENT_POLYHEDRON == _entities[i]->GetType()) {
@@ -884,9 +922,15 @@ namespace W {
 
 
     void World::SelectGeometry(IGeometry* geom) { 
-        _selection.geometry = geom; 
+        _selection.Set(geom);
         OP::g_operators.SelectGeometry();
-        BBox_Build();
+        BBoxes_BuildFromSelection();
+    }
+
+    void World::AddToSelection(IGeometry* geom) {
+        _selection.Add(geom);
+        OP::g_operators.SelectGeometry();
+        BBoxes_BuildFromSelection();
     }
 
     DWORD World::Thread_Func(void) {

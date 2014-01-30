@@ -37,8 +37,16 @@ namespace W {
         DECLARE_EVENT_HANDLER(World)
     private:
         struct Selection {
-            IGeometry*   geometry;
-            Selection() : geometry(NULL) { }
+            std::vector<IGeometry*> geomList;
+            M::Vector3              center; // in world space
+
+            void ComputeCenter();
+
+            void Set(IGeometry* geom);
+            void Add(IGeometry* geom);
+
+            const M::Vector3&               GetGlobalCenter() const { return center; }
+            const std::vector<IGeometry*>&  GetGeometryList() const { return geomList; }
         } _selection;
 
         std::vector<GEN::Pointer<Entity> > _entities;
@@ -65,10 +73,21 @@ namespace W {
         void        Grid_Build();
         R::MeshJob  Grid_GetRenderJob();
 
-        R::meshPtr_t        _bboxMesh;
-        R::tfmeshPtr_t      _bboxTFMesh;
-        void                BBox_Build();
-        R::MeshJob          BBox_GetRenderJob();
+        struct BoundingBox {
+            const ENT_Geometry*     geom;
+            R::meshPtr_t            mesh;
+            R::tfmeshPtr_t          tfmesh;
+
+            void Destroy();
+
+            BoundingBox() : geom(NULL), mesh(NULL), tfmesh(NULL) { }
+            BoundingBox(const ENT_Geometry* geom);
+            ~BoundingBox() { Destroy(); }
+            void Transform();
+        };
+        std::vector<GEN::Pointer<BoundingBox> > _bboxes;
+        void                        BBoxes_BuildFromSelection();
+        void                        BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs);
 
 #pragma region EventHandlers
         void Event_Apocalypse(const EV::Event& event);
@@ -120,7 +139,8 @@ namespace W {
         IMesh* CreateCylinderMesh(const CylinderDesc& desc) override;
 
         void SelectGeometry(IGeometry* geom) override;
-        IGeometry* SelectedGeometry() override { return _selection.geometry; }
+        void AddToSelection(IGeometry* geom);
+        Selection& GetSelection() { return _selection; }
 
         // thread interface
         DWORD Thread_Func(void);

@@ -61,8 +61,11 @@ private:
         }
     }
 
+    M::Vector3  _oldCursorPos;
     M::Vector3  _cursorPos;
     bool        _hidden;
+
+    std::vector<M::Vector3> _oldPos;
 
     bool        _dragging;
     int         _dragAxis;
@@ -80,7 +83,7 @@ public:
     void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) override;
     void OnGeometrySelected() override;
     void OnCameraChanged() override;
-    bool OnMouseDown(const M::Vector2& mouseCoords) override;
+    bool OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) override;
     bool OnMouseUp(const M::Vector2& mouseCoords) override;
     bool OnMouseMove(const M::Vector2& mouseCoords) override;
 };

@@ -36,7 +36,7 @@ public:
     const EntTransform& GetTransform() const { return _transform; }
 
     EntTransform&       GetTransform() { return _transform; }
-    M::Vector3          Transform(const M::Vector3& v);
+    M::Vector3          Transform(const M::Vector3& v) const;
     M::Matrix4          GetTransformationMatrix() const;
 
     void                SetType(EntityType::Enum type) { _type = type; }

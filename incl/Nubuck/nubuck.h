@@ -127,7 +127,6 @@ struct IWorld {
     virtual IMesh*          CreateCylinderMesh(const CylinderDesc& desc) = 0;
 
     virtual void SelectGeometry(IGeometry* geometry) = 0;
-    virtual IGeometry* SelectedGeometry() = 0;
 };
 
 struct ILog {

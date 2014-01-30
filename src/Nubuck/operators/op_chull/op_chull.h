@@ -27,7 +27,7 @@ public:
     void Invoke() override {
         _nb.ui->SetOperatorName("Convex Hull");
 
-        IGeometry* cloud = _nb.world->SelectedGeometry();
+        IGeometry* cloud = ((W::World*)_nb.world)->GetSelection().GetGeometryList().front();
         assert(cloud);
 
         leda::nb::RatPolyMesh& cloudMesh = cloud->GetRatPolyMesh();
