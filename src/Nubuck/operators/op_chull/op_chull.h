@@ -20,7 +20,7 @@ public:
     void Register(const Nubuck& nb, Invoker& invoker) override {
         _nb = nb;
 
-        QAction* action = _nb.ui->GetSceneMenu()->addAction("Convex Hull");
+        QAction* action = _nb.ui->GetObjectMenu()->addAction("Convex Hull");
         QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
     }
 

@@ -7,7 +7,7 @@ namespace OP {
 void Delete::Register(const Nubuck& nb, Invoker& invoker) {
     _nb = nb;
 
-    QAction* action = _nb.ui->GetSceneMenu()->addAction("Delete");
+    QAction* action = _nb.ui->GetObjectMenu()->addAction("Delete");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 

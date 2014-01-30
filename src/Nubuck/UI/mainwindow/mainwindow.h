@@ -26,6 +26,7 @@ namespace UI {
 		MainWindow(void);
 
         QMenu* GetSceneMenu() override { return _ui.menuScene; }
+        QMenu* GetObjectMenu() override { return _ui.menuObject; }
         void SetOperatorName(const char* name) override;
         void SetOperatorPanel(QWidget* widget) override;
 	};

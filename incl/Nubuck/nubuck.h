@@ -139,6 +139,7 @@ struct IMainWindow {
     virtual ~IMainWindow() { }
 
     virtual QMenu* GetSceneMenu() = 0;
+    virtual QMenu* GetObjectMenu() = 0;
     virtual void SetOperatorName(const char* name) = 0;
     virtual void SetOperatorPanel(QWidget* panel) = 0;
 };

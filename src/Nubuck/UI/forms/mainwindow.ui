@@ -36,8 +36,14 @@
     <addaction name="actShowRenderMetrics"/>
     <addaction name="actShowRenderConfig"/>
    </widget>
+   <widget class="QMenu" name="menuObject">
+    <property name="title">
+     <string>Object</string>
+    </property>
+   </widget>
    <addaction name="menuScene"/>
    <addaction name="menuView"/>
+   <addaction name="menuObject"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actRandomPoints">

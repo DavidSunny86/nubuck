@@ -116,8 +116,11 @@ void Translate::AlignWithCamera() {
 void Translate::Register(const Nubuck& nb, Invoker& invoker) {
     _nb = nb;
 
+    /*
+    no need for explicit invokation
     QAction* action = _nb.ui->GetSceneMenu()->addAction("Translate");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
+    */
 
     BuildCursor();
 
