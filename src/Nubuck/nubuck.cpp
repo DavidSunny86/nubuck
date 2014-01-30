@@ -23,6 +23,7 @@
 #include <operators\op_translate\op_translate.h>
 #include <operators\op_loadobj\op_loadobj.h>
 #include <operators\op_join\op_join.h>
+#include <operators\op_delete\op_delete.h>
 
 Nubuck nubuck;
 
@@ -99,6 +100,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     OP::g_operators.Register(new OP::ConvexHull());
     OP::g_operators.Register(new OP::LoadOBJ());
     OP::g_operators.Register(new OP::Join());
+    OP::g_operators.Register(new OP::Delete());
     unsigned op = OP::g_operators.Register(new OP::Translate());
     OP::g_operators.SetInitOp(op);
 

@@ -84,6 +84,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
     </CustomBuild>
     <ClInclude Include="..\..\src\Nubuck\operators\op_chull\op_chull.h" />
+    <ClInclude Include="..\..\src\Nubuck\operators\op_delete\op_delete.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_join\op_join.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_translate\op_translate.h" />
@@ -300,6 +301,7 @@
     <ClCompile Include="..\..\src\Nubuck\nubuck.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\operators.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_chull\op_chull.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\operators\op_delete\op_delete.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_join\op_join.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.cpp" />

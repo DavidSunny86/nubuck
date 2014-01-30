@@ -140,6 +140,7 @@ namespace W {
 
         void SelectGeometry(IGeometry* geom) override;
         void AddToSelection(IGeometry* geom);
+        void ClearSelection();
         Selection& GetSelection() { return _selection; }
 
         // thread interface

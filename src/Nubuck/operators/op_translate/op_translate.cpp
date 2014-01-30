@@ -159,11 +159,14 @@ void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
 }
 
 void Translate::OnGeometrySelected() {
-    _cursorPos = W::world.GetSelection().GetGlobalCenter();
-    SetPosition(_cursorPos);
+    if(W::world.GetSelection().GetGeometryList().empty()) HideCursor();
+    else {
+        _cursorPos = W::world.GetSelection().GetGlobalCenter();
+        SetPosition(_cursorPos);
 
-    AlignWithCamera();
-    ShowCursor();
+        AlignWithCamera();
+        ShowCursor();
+    }
 }
 
 void Translate::OnCameraChanged() {
@@ -175,45 +178,49 @@ static float tmp;
 
 bool Translate::OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) {
     M::Ray ray = W::world.PickingRay(mouseCoords);
-    if(!_dragging && !W::world.GetSelection().GetGeometryList().empty()) {
-        M::Matrix3 M = M::RotationOf(W::world.GetModelView());
-        float det = M::Det(M);
-        if(M::AlmostEqual(0.0f, det)) printf("OMGOMGOMG\n");
-        M::Matrix3 invM = M::Inverse(M, det);
+    if(!_dragging) {
+        if(!W::world.GetSelection().GetGeometryList().empty()) {
+            M::Matrix3 M = M::RotationOf(W::world.GetModelView());
+            float det = M::Det(M);
+            if(M::AlmostEqual(0.0f, det)) printf("OMGOMGOMG\n");
+            M::Matrix3 invM = M::Inverse(M, det);
 
-        M::Vector3 eyeZ = M::Transform(invM, M::Vector3(0.0f, 0.0f, 1.0f)); // z axis of eye space in world space
-        printf("eyeZ = %f %f %f\n", eyeZ.x, eyeZ.y, eyeZ.z);
+            M::Vector3 eyeZ = M::Transform(invM, M::Vector3(0.0f, 0.0f, 1.0f)); // z axis of eye space in world space
+            printf("eyeZ = %f %f %f\n", eyeZ.x, eyeZ.y, eyeZ.z);
 
-        for(int i = 0; i < DIM; ++i) {
-            if(M::IS::Intersects(ray, _bboxes[i])) {
-                _dragAxis = i;
-                _dragPlane = M::Plane::FromPointSpan(_cursorPos, M::Cross(eyeZ, Axis(i)), Axis(i));
-                printf("Cross: %f %f %f, Axis(i): %f %f %f\n",
-                    M::Cross(eyeZ, Axis(i)).x,
-                    M::Cross(eyeZ, Axis(i)).y,
-                    M::Cross(eyeZ, Axis(i)).z,
-                    Axis(i).x,
-                    Axis(i).y,
-                    Axis(i).z);
-                M::IS::Info inf;
-                bool is = M::IS::Intersects(ray, _dragPlane, &inf);
-                assert(is);
-                tmp = _cursorPos.vec[_dragAxis];
-                const std::vector<IGeometry*>& geomList = W::world.GetSelection().GetGeometryList();
-                _oldPos.resize(geomList.size());
-                for(unsigned i = 0; i < _oldPos.size(); ++i) _oldPos[i] = ((const W::ENT_Geometry*)geomList[i])->Transform(M::Vector3::Zero);
-                _dragOrig = inf.where;
-                _dragging = true;
+            for(int i = 0; i < DIM; ++i) {
+                if(M::IS::Intersects(ray, _bboxes[i])) {
+                    _dragAxis = i;
+                    _dragPlane = M::Plane::FromPointSpan(_cursorPos, M::Cross(eyeZ, Axis(i)), Axis(i));
+                    printf("Cross: %f %f %f, Axis(i): %f %f %f\n",
+                        M::Cross(eyeZ, Axis(i)).x,
+                        M::Cross(eyeZ, Axis(i)).y,
+                        M::Cross(eyeZ, Axis(i)).z,
+                        Axis(i).x,
+                        Axis(i).y,
+                        Axis(i).z);
+                    M::IS::Info inf;
+                    bool is = M::IS::Intersects(ray, _dragPlane, &inf);
+                    assert(is);
+                    tmp = _cursorPos.vec[_dragAxis];
+                    const std::vector<IGeometry*>& geomList = W::world.GetSelection().GetGeometryList();
+                    _oldPos.resize(geomList.size());
+                    for(unsigned i = 0; i < _oldPos.size(); ++i) _oldPos[i] = ((const W::ENT_Geometry*)geomList[i])->Transform(M::Vector3::Zero);
+                    _dragOrig = inf.where;
+                    _dragging = true;
+                }
             }
-        }
-        if(_dragging) {
-            printf("N = %f %f %f\n", _dragPlane.n.x, _dragPlane.n.y, _dragPlane.n.z);
-            return true;
-        } else {
+            if(_dragging) {
+                printf("N = %f %f %f\n", _dragPlane.n.x, _dragPlane.n.y, _dragPlane.n.z);
+                return true;
+            } 
+        } 
+        if(!_dragging) {
             W::ENT_Geometry* geom;
             if(W::world.Trace(ray, &geom)) {
                 if(shiftKey) W::world.AddToSelection(geom);
                 else W::world.SelectGeometry(geom);
+                return false; // move camera anyways
             }
         }
         return false;

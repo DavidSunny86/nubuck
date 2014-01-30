@@ -932,6 +932,12 @@ namespace W {
         OP::g_operators.SelectGeometry();
         BBoxes_BuildFromSelection();
     }
+    
+    void World::ClearSelection() {
+        _selection.geomList.clear();
+        OP::g_operators.SelectGeometry();
+        BBoxes_BuildFromSelection();
+    }
 
     DWORD World::Thread_Func(void) {
         Polyhedron_InitResources();

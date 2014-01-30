@@ -252,6 +252,9 @@
     <Filter Include="Private\operators\op_join">
       <UniqueIdentifier>{5f95febc-0f8d-4328-9c2d-876d1edae63e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_delete">
+      <UniqueIdentifier>{ef3ece81-8f64-4346-b8d4-f962b7270789}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -622,6 +625,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\operators\op_join\op_join.h">
       <Filter>Private\operators\op_join</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_delete\op_delete.h">
+      <Filter>Private\operators\op_delete</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1017,6 +1023,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\operators\op_join\op_join.cpp">
       <Filter>Private\operators\op_join</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_delete\op_delete.cpp">
+      <Filter>Private\operators\op_delete</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
