@@ -249,6 +249,9 @@
     <Filter Include="Private\renderer\mesh\cone">
       <UniqueIdentifier>{fc44719c-cc26-4827-84e9-704fe5008a93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_join">
+      <UniqueIdentifier>{5f95febc-0f8d-4328-9c2d-876d1edae63e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -616,6 +619,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\cone\cone.h">
       <Filter>Private\renderer\mesh\cone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_join\op_join.h">
+      <Filter>Private\operators\op_join</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1008,6 +1014,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\cone\cone.cpp">
       <Filter>Private\renderer\mesh\cone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_join\op_join.cpp">
+      <Filter>Private\operators\op_join</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

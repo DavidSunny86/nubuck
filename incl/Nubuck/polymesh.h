@@ -29,6 +29,8 @@ public:
 
     PolyMesh& operator=(const PolyMesh& other);
 
+    void join(PolyMesh& other);
+
     const VEC3& position_of(const node v);
 
     bool            is_visible(const face f) const;
@@ -63,6 +65,15 @@ inline PolyMesh<VEC3>& PolyMesh<VEC3>::operator=(const PolyMesh& other) {
         _faceAttribs.init(*this);
     }
     return *this;
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::join(PolyMesh& other) {
+    if(&other != this) {
+        base_t::join(other);
+        compute_faces();
+        _faceAttribs.init(*this);
+    }
 }
 
 template<typename VEC3>

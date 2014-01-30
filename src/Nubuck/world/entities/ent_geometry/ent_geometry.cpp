@@ -133,6 +133,26 @@ void ENT_Geometry::Update() {
     _meshCompiled = false;
 }
 
+static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
+    return leda::d3_rat_point(leda::d3_point(v.x, v.y, v.z));
+}
+
+void ENT_Geometry::ApplyTransformation() {
+    leda::node n;
+    forall_nodes(n, _ratPolyMesh) {
+        M::Vector3 pos = Transform(ToVector(_ratPolyMesh.position_of(n)));
+        _ratPolyMesh.set_position(n, ToRatPoint(pos));
+    }
+
+    EntTransform transform;
+    transform.position = M::Vector3::Zero;
+    transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
+    transform.rotation = M::Mat3::Identity();
+    SetTransform(transform);
+
+    ComputeCenter();
+}
+
 void ENT_Geometry::CompileMesh() {
     if(_meshCompiled) return;
 

@@ -53,6 +53,8 @@ public:
     leda::nb::RatPolyMesh& GetRatPolyMesh() override { return _ratPolyMesh; }
     void Update() override;
 
+    void ApplyTransformation();
+
     const M::Vector3& GetLocalCenter() const { return _center; }
     M::Vector3 GetGlobalCenter() { return Transform(_center); }
 
