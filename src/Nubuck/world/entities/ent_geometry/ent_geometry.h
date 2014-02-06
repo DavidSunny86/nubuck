@@ -36,7 +36,6 @@ private:
     ShadingMode::Enum   _shadingMode;
     R::RenderList       _renderList;
 
-    M::Vector3          _center;    // untransformed center
     M::Box              _bbox;      // untransformed bounding box
 
     void TransformVertices();
@@ -55,8 +54,8 @@ public:
 
     void ApplyTransformation();
 
-    const M::Vector3& GetLocalCenter() const { return _center; }
-    M::Vector3 GetGlobalCenter() { return Transform(_center); }
+    const M::Vector3& GetLocalCenter() const { return _bbox.min + 0.5f * (_bbox.max - _bbox.min); }
+    M::Vector3 GetGlobalCenter() { return Transform(GetLocalCenter()); }
 
     const M::Box& GetBoundingBox() const { return _bbox; }
 

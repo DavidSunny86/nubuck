@@ -19,17 +19,6 @@ void ENT_Geometry::TransformVertices() {
     }
 }
 
-void ENT_Geometry::ComputeCenter() {
-    leda::node_array<M::Vector3> fpos(_ratPolyMesh);
-
-    _center = M::Vector3::Zero;
-    leda::node v;
-    forall_nodes(v, _ratPolyMesh) {
-        _center += ToVector(_ratPolyMesh.position_of(v));
-    }
-    _center *= 1.0f / _ratPolyMesh.number_of_nodes();
-}
-
 void ENT_Geometry::ComputeBoundingBox() {
     _bbox.min = _bbox.max = ToVector(_ratPolyMesh.position_of(_ratPolyMesh.first_node()));
     leda::node v;
@@ -82,7 +71,6 @@ void ENT_Geometry::Update() {
     }
     _edgeRenderer->Rebuild();
 
-    ComputeCenter();
     ComputeBoundingBox();
 
     _vertices.clear();
@@ -149,8 +137,6 @@ void ENT_Geometry::ApplyTransformation() {
     transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
     transform.rotation = M::Mat3::Identity();
     SetTransform(transform);
-
-    ComputeCenter();
 }
 
 void ENT_Geometry::CompileMesh() {
