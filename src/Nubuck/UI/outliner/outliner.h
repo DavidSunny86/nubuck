@@ -18,50 +18,35 @@
 
 namespace UI {
 
-struct PolyhedronOutline : QObject {
-    Q_OBJECT
-public slots:
-    void OnEdgeColorChanged(float r, float g, float b);
-    void OnEdgeRadiusChanged(double value);
-    void OnHullAlphaChanged(int value);
+class Outliner : public QWidget {
 public:
-    unsigned            entId;
-    QDoubleSpinBox*     sbEdgeRadius;
-    ColorButton*        btnEdgeColor;
-};
-
-class Outliner : public QWidget, public EV::EventHandler<Outliner> {
-    DECLARE_EVENT_HANDLER(Outliner);
+    struct Item {
+        QPushButton*    header;
+        QWidget*        content;
+	};
 private:
-    struct EntityOutline {
-        W::EntityType::Enum     type;
-        unsigned    		    entId;
-        QPushButton*            headerWidget;
-        QWidget*            	widget;
-        QGridLayout*        	layout;
-        PolyhedronOutline*  	polyhedron;
-    };
+    struct LinkedItem : Item {
+        LinkedItem *prev, *next;
+        QTreeWidgetItem* headerIt;
+        QTreeWidgetItem* contentIt;
+	};
 
-    void EntityOutline_Init(EntityOutline& outln);
-    void PolyhedronOutline_Init(EntityOutline& outln);
-
-    std::vector<EntityOutline>  _outlines;
-    QTreeWidget*                _treeWidget;
-
-    EntityOutline* FindByEntityID(unsigned entId);
-
-#pragma region EventHandlers
-    void Event_SpawnPolyhedron(const EV::Event& event);
-    void Event_SetName(const EV::Event& event);
-    void Event_EntityInfo(const EV::Event& event);
-// region EventHandlers
-#pragma endregion
+    LinkedItem*     _items;
+    QTreeWidget*    _treeWidget;
 public:
+    typedef LinkedItem* itemHandle_t;
+
     Outliner(QWidget* parent = NULL);
 
-    static Outliner* Instance(void);
+    itemHandle_t AddItem(const QString& name, QWidget* content);
+    void RemoveItem(itemHandle_t item);
 
-    void Update(void) { HandleEvents(); }
+	Item& GetItem(itemHandle_t item) { return *item; }
+    void UpdateItem(itemHandle_t item) {
+    _treeWidget->setItemWidget(item->contentIt, 0, item->content);
+	}
+
+    static Outliner* Instance(void);
 }; // class Outliner
 
 } // namespace UI

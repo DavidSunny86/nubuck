@@ -369,15 +369,6 @@ namespace W {
         Polyhedron_Update(*ph, G);
         _entities.push_back(ph);
 
-        UI::Outliner::Instance()->Send(event);
-
-        EntityInf* inf = new EntityInf;
-        GetInfo(*ph, *inf);
-        EV::Params_EntityInfo infArgs;
-        infArgs.entType = EntityType::ENT_POLYHEDRON;
-        infArgs.inf = inf;
-        UI::Outliner::Instance()->Send(EV::def_EntityInfo.Create(infArgs));
-
         event.Accept();
     }
 
@@ -435,8 +426,6 @@ namespace W {
         GEN::Pointer<Entity> entity = FindByEntityID(args.entId);
         assert(entity.IsValid());
         entity->SetName(args.name);
-
-        UI::Outliner::Instance()->Send(event);
     }
 
     void World::Event_SetPosition(const EV::Event& event) {

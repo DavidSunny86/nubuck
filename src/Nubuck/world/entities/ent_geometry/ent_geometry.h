@@ -9,11 +9,13 @@
 #include <renderer\nodes\r_nodes.h>
 #include <renderer\edges\r_cylinder_edges.h>
 #include <renderer\edges\r_line_edges.h>
+#include <UI\outliner\outliner.h>
 #include <world\entity.h>
 
 namespace W {
 
-class ENT_Geometry : public IGeometry, public Entity {
+class ENT_Geometry : public QObject, public IGeometry, public Entity {
+    Q_OBJECT
 private:
     leda::nb::RatPolyMesh _ratPolyMesh;
 
@@ -21,6 +23,8 @@ private:
     R::CylinderEdges                _cylinderEdges;
     R::LineEdges                    _lineEdges;
     R::EdgeRenderer*                _edgeRenderer;
+
+    void RebuildEdges();
 
     std::vector<R::Mesh::Vertex>    _vertices;
     std::vector<R::Mesh::Vertex>    _tfverts;
@@ -30,6 +34,9 @@ private:
     R::tfmeshPtr_t                  _tfmesh;
     bool                            _meshCompiled; // TODO: might be a race cond
 
+    float       _edgeRadius;
+    R::Color    _edgeColor;
+
     bool                _isHidden;
     int                 _renderMode;
     unsigned            _renderLayer;
@@ -38,21 +45,56 @@ private:
 
     M::Box              _bbox;      // untransformed bounding box
 
+    struct {
+		UI::Outliner::itemHandle_t  item;
+
+        QDoubleSpinBox*             sbEdgeRadius;
+        UI::ColorButton*    		btnEdgeColor;
+        QSlider*            		sldHullAlpha;
+	} _outln;
+
+    void InitOutline();
+
     void TransformVertices();
     void ComputeCenter();
     void ComputeBoundingBox();
+private slots:
+    void OnEdgeRadiusChanged(double value);
+    void OnEdgeColorChanged(float r, float g, float b);
 public:
     ENT_Geometry();
 
     bool IsMeshCompiled() const { return _meshCompiled; }
     void CompileMesh();
 
-    void Destroy() override { Entity::Destroy(); }
+    void Destroy() override { 
+        if(_outln.item) {
+			UI::Outliner::Instance()->RemoveItem(_outln.item);
+			_outln.item = NULL;
+		}
+		Entity::Destroy(); 
+	}
 
     leda::nb::RatPolyMesh& GetRatPolyMesh() override { return _ratPolyMesh; }
     void Update() override;
 
     void ApplyTransformation();
+
+    void SetEdgeRadius(float edgeRadius) {
+        _edgeRadius = edgeRadius;
+		_outln.sbEdgeRadius->blockSignals(true);
+		_outln.sbEdgeRadius->setValue(_edgeRadius);
+		_outln.sbEdgeRadius->blockSignals(false);
+        RebuildEdges();
+	}
+
+    void SetEdgeColor(const R::Color& color) {
+        _edgeColor = color;
+		_outln.btnEdgeColor->blockSignals(true);
+		_outln.btnEdgeColor->SetColor(_edgeColor.r, _edgeColor.g, _edgeColor.b);
+		_outln.btnEdgeColor->blockSignals(false);
+        RebuildEdges();
+	}
 
     const M::Vector3& GetLocalCenter() const { return _bbox.min + 0.5f * (_bbox.max - _bbox.min); }
     M::Vector3 GetGlobalCenter() { return Transform(GetLocalCenter()); }

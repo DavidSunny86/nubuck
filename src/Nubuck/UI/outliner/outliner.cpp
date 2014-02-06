@@ -5,34 +5,7 @@
 
 namespace UI {
 
-void Outliner::EntityOutline_Init(EntityOutline& outln) {
-    outln.widget = new QWidget();
-    outln.layout = new QGridLayout();
-    outln.widget->setLayout(outln.layout);
-}
-
-void PolyhedronOutline::OnEdgeColorChanged(float r, float g, float b) {
-    EV::Params_SetEdgeBaseColor args;
-    args.entId  = entId;
-    args.color  = R::Color(r, g, b);
-    W::world.Send(EV::def_SetEdgeBaseColor.Create(args));
-}
-
-void PolyhedronOutline::OnEdgeRadiusChanged(double value) {
-    EV::Params_SetEdgeRadius args;
-    args.entId  = entId;
-    args.radius = value;
-    W::world.Send(EV::def_SetEdgeRadius.Create(args));
-}
-
-void PolyhedronOutline::OnHullAlphaChanged(int value) {
-    float alpha = value / 100.0f;
-    EV::Params_SetHullAlpha args;
-    args.entId  = entId;
-    args.alpha  = alpha;
-    W::world.Send(EV::def_SetHullAlpha.Create(args));
-}
-
+/*
 void Outliner::PolyhedronOutline_Init(EntityOutline& outln) {
     outln.polyhedron = new PolyhedronOutline;
 
@@ -69,65 +42,43 @@ void Outliner::PolyhedronOutline_Init(EntityOutline& outln) {
     connect(sbEdgeRadius, SIGNAL(valueChanged(double)), outln.polyhedron, SLOT(OnEdgeRadiusChanged(double)));
     connect(sldHullAlpha, SIGNAL(valueChanged(int)), outln.polyhedron, SLOT(OnHullAlphaChanged(int)));
 }
+*/
 
-Outliner::EntityOutline* Outliner::FindByEntityID(unsigned entId) {
-    for(unsigned i = 0; i < _outlines.size(); ++i) {
-        if(entId == _outlines[i].entId) return &_outlines[i];
-    }
-    return NULL;
-}
-
-BEGIN_EVENT_HANDLER(Outliner)
-    EVENT_HANDLER(EV::def_SpawnPolyhedron,  &Outliner::Event_SpawnPolyhedron)
-    EVENT_HANDLER(EV::def_SetName,          &Outliner::Event_SetName)
-    EVENT_HANDLER(EV::def_EntityInfo,       &Outliner::Event_EntityInfo)
-END_EVENT_HANDLER
-
-void Outliner::Event_SpawnPolyhedron(const EV::Event& event) {
-    const EV::Params_SpawnPolyhedron& args =  EV::def_SpawnPolyhedron.GetArgs(event);
-    EntityOutline outln;
-    outln.entId = args.entId;
-    EntityOutline_Init(outln);
-    outln.type = W::EntityType::ENT_POLYHEDRON;
-    PolyhedronOutline_Init(outln);
+Outliner::itemHandle_t Outliner::AddItem(const QString& name, QWidget* content) {
+    LinkedItem* item = new LinkedItem();
 
     QTreeWidgetItem* headerIt = new QTreeWidgetItem;
     _treeWidget->insertTopLevelItem(0, headerIt);
-    QPushButton* button = new QPushButton(QString("Polyhedron %1").arg(args.entId));
+    QPushButton* button = new QPushButton(QString("Polyhedron %1").arg(0));
     button->setStyleSheet("text-align: left");
     _treeWidget->setItemWidget(headerIt, 0, button);
-    outln.headerWidget = button;
+	item->headerIt = headerIt;
+    item->header = button;
 
     QTreeWidgetItem* contentIt = new QTreeWidgetItem;
     headerIt->addChild(contentIt);
-    _treeWidget->setItemWidget(contentIt, 0, outln.widget);
+    content = new QWidget;
+    _treeWidget->setItemWidget(contentIt, 0, content);
+	item->contentIt = contentIt;
+	item->content = content;
 
-    _outlines.push_back(outln);
+	item->prev = NULL;
+	item->next = _items;
+	if(item->next) item->next->prev = item;
+    _items = item;
+
+    return item;
 }
 
-void Outliner::Event_SetName(const EV::Event& event) {
-    const EV::Params_SetName& args = EV::def_SetName.GetArgs(event);
-    EntityOutline* outln = FindByEntityID(args.entId);
-    assert(outln);
-    outln->headerWidget->setText(QString("Polyhedron %1 \"%2\"").arg(args.entId).arg(args.name));
+void Outliner::RemoveItem(itemHandle_t item) {
+	if(item->next) item->next->prev = item->prev;
+	if(item->prev) item->prev->next = item->next;
+	if(_items == item) _items = item->next;
+	delete item->headerIt;
+    delete item;
 }
 
-void Outliner::Event_EntityInfo(const EV::Event& event) {
-    const EV::Params_EntityInfo& args = EV::def_EntityInfo.GetArgs(event);
-
-    W::EntityInf* inf = args.inf;
-    EntityOutline* outln = FindByEntityID(inf->entId);
-    assert(outln);
-    assert(outln->type == args.entType);
-
-    if(W::EntityType::ENT_POLYHEDRON == args.entType) {
-        W::INF_Polyhedron* phInf = (W::INF_Polyhedron*)inf->inf;
-        outln->polyhedron->sbEdgeRadius->setValue(phInf->edgeRadius);
-        outln->polyhedron->btnEdgeColor->SetColor(phInf->edgeColor.r, phInf->edgeColor.g, phInf->edgeColor.b);
-    }
-}
-
-Outliner::Outliner(QWidget* parent) : QWidget(parent) {
+Outliner::Outliner(QWidget* parent) : QWidget(parent), _items(NULL) {
     _treeWidget = new QTreeWidget(this);
     _treeWidget->setHeaderHidden(true);
     

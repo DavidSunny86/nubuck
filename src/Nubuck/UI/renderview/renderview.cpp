@@ -124,7 +124,6 @@ namespace UI {
 
     void RenderView::Update(void) {
         updateGL();
-        Outliner::Instance()->Update();
     }
 
     QLabel* RenderView::FpsLabel(void) {

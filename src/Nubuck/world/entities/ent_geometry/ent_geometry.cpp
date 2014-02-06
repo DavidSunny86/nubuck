@@ -1,6 +1,10 @@
 #include <world\world.h>
 #include "ent_geometry.h"
 
+// removeme
+#include <UI\outliner\outliner.h>
+#include <QLabel>
+
 namespace {
 
 M::Vector3 ToVector(const leda::d3_rat_point& p) {
@@ -43,8 +47,28 @@ _renderMode(0),
 _renderLayer(0),
 _shadingMode(ShadingMode::NICE)
 { 
-    // _edgeRenderer = &_cylinderEdges;
-    _edgeRenderer = &_lineEdges;
+    _edgeRenderer = &_cylinderEdges;
+    // _edgeRenderer = &_lineEdges;
+
+    _edgeRadius = 0.02f;
+    _edgeColor = R::Color(0.3f, 0.3f, 0.3f);
+
+    _outln.item = UI::Outliner::Instance()->AddItem("nil", new QLabel("test"));
+    InitOutline();
+}
+
+void ENT_Geometry::RebuildEdges() {
+    _edgeRenderer->Clear();
+    R::EdgeRenderer::Edge re;
+    re.radius = _edgeRadius;
+    leda::edge e;
+    forall_edges(e, _ratPolyMesh) {
+        re.color = _edgeColor;
+        re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
+        re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
+        _edgeRenderer->Push(re);
+    }
+    _edgeRenderer->Rebuild();
 }
 
 void ENT_Geometry::Update() {
@@ -60,16 +84,7 @@ void ENT_Geometry::Update() {
     }
     _nodes.Rebuild();
 
-    _edgeRenderer->Clear();
-    R::EdgeRenderer::Edge re;
-    re.radius = 0.02f;
-    forall_edges(e, _ratPolyMesh) {
-        re.color = R::Color(0.3f, 0.3f, 0.3f);
-        re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
-        re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
-        _edgeRenderer->Push(re);
-    }
-    _edgeRenderer->Rebuild();
+    RebuildEdges();
 
     ComputeBoundingBox();
 

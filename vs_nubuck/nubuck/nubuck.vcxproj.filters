@@ -560,9 +560,6 @@
     <ClInclude Include="..\..\incl\Nubuck\polymesh.h">
       <Filter>Public\polymesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.h">
-      <Filter>Private\world\entities\ent_geometry</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\polymesh_fwd.h">
       <Filter>Public\polymesh</Filter>
     </ClInclude>
@@ -886,12 +883,6 @@
     <ClCompile Include="..\..\src\Nubuck\events\event_defs.cpp">
       <Filter>Private\events</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_outliner.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_outliner.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\UI\colorbutton\colorbutton.cpp">
       <Filter>Private\UI\colorbutton</Filter>
     </ClCompile>
@@ -1033,6 +1024,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_op_loadobj.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_outln.cpp">
+      <Filter>Private\world\entities\ent_geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ent_geometry.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ent_geometry.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1100,6 +1100,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\forms\op_loadobj.ui">
       <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.h">
+      <Filter>Private\world\entities\ent_geometry</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
