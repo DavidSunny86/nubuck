@@ -35,6 +35,14 @@ namespace UI {
         }
         _numFrames++;
         _rtimer.Start();
+
+        _renderList.Clear();
+        W::world.Render(_renderList);
+        OP::g_operators.GetMeshJobs(_renderList.meshJobs);
+
+        _renderer.BeginFrame();
+        _renderer.Render(_renderList);
+        _renderer.EndFrame();
     }
 
     void RenderView::enterEvent(QEvent* event) {
@@ -117,14 +125,6 @@ namespace UI {
     void RenderView::Update(void) {
         updateGL();
         Outliner::Instance()->Update();
-
-        _renderList.Clear();
-        W::world.Render(_renderList);
-        OP::g_operators.GetMeshJobs(_renderList.meshJobs);
-
-        _renderer.BeginFrame();
-        _renderer.Render(_renderList);
-        _renderer.EndFrame();
     }
 
     QLabel* RenderView::FpsLabel(void) {
