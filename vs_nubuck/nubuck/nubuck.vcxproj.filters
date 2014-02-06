@@ -617,9 +617,6 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\tfmesh.h">
       <Filter>Private\renderer\mesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.h">
-      <Filter>Private\operators\op_loadobj</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\cone\cone.h">
       <Filter>Private\renderer\mesh\cone</Filter>
     </ClInclude>
@@ -628,6 +625,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\operators\op_delete\op_delete.h">
       <Filter>Private\operators\op_delete</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_op_loadobj.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1027,6 +1027,12 @@
     <ClCompile Include="..\..\src\Nubuck\operators\op_delete\op_delete.cpp">
       <Filter>Private\operators\op_delete</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_op_loadobj.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_op_loadobj.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1088,6 +1094,12 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.h">
       <Filter>Private\operators\op_gen_incube</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.h">
+      <Filter>Private\operators\op_loadobj</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\op_loadobj.ui">
+      <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
