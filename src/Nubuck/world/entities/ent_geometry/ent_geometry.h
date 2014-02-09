@@ -24,15 +24,19 @@ private:
     R::LineEdges                    _lineEdges;
     R::EdgeRenderer*                _edgeRenderer;
 
-    void RebuildEdges();
+    void RebuildRenderNodes();
+    void RebuildRenderEdges();
 
+    std::vector<M::Vector3>         _fpos;
     std::vector<R::Mesh::Vertex>    _vertices;
-    std::vector<R::Mesh::Vertex>    _tfverts;
     std::vector<R::Mesh::Index>     _indices;
     R::Mesh::Desc                   _meshDesc;
     R::meshPtr_t                    _mesh;
     R::tfmeshPtr_t                  _tfmesh;
     bool                            _meshCompiled; // TODO: might be a race cond
+
+    void CacheFPos();
+    void RebuildRenderMesh();
 
     float       _edgeRadius;
     R::Color    _edgeColor;
@@ -55,7 +59,6 @@ private:
 
     void InitOutline();
 
-    void TransformVertices();
     void ComputeCenter();
     void ComputeBoundingBox();
 private slots:
@@ -64,48 +67,27 @@ private slots:
 public:
     ENT_Geometry();
 
-    bool IsMeshCompiled() const { return _meshCompiled; }
+    bool IsMeshCompiled() const;
     void CompileMesh();
 
-    void Destroy() override { 
-        if(_outln.item) {
-			UI::Outliner::Instance()->RemoveItem(_outln.item);
-			_outln.item = NULL;
-		}
-		Entity::Destroy(); 
-	}
+    void Destroy() override;
 
-    leda::nb::RatPolyMesh& GetRatPolyMesh() override { return _ratPolyMesh; }
+    leda::nb::RatPolyMesh& GetRatPolyMesh() override;
     void Update() override;
 
     void ApplyTransformation();
 
-    void SetEdgeRadius(float edgeRadius) {
-        _edgeRadius = edgeRadius;
-		_outln.sbEdgeRadius->blockSignals(true);
-		_outln.sbEdgeRadius->setValue(_edgeRadius);
-		_outln.sbEdgeRadius->blockSignals(false);
-        RebuildEdges();
-	}
+    void SetEdgeRadius(float edgeRadius);
+    void SetEdgeColor(const R::Color& color);
 
-    void SetEdgeColor(const R::Color& color) {
-        _edgeColor = color;
-		_outln.btnEdgeColor->blockSignals(true);
-		_outln.btnEdgeColor->SetColor(_edgeColor.r, _edgeColor.g, _edgeColor.b);
-		_outln.btnEdgeColor->blockSignals(false);
-        RebuildEdges();
-	}
+    const M::Vector3& GetLocalCenter() const;
+    M::Vector3 GetGlobalCenter();
 
-    const M::Vector3& GetLocalCenter() const { return _bbox.min + 0.5f * (_bbox.max - _bbox.min); }
-    M::Vector3 GetGlobalCenter() { return Transform(GetLocalCenter()); }
+    const M::Box& GetBoundingBox() const;
 
-    const M::Box& GetBoundingBox() const { return _bbox; }
+    void GetPosition(float& x, float& y, float& z) const override;
 
-    float GetPosX() const override { return GetTransform().position.x; }
-    float GetPosY() const override { return GetTransform().position.y; }
-    float GetPosZ() const override { return GetTransform().position.z; }
-
-    void SetPosition(float x, float y, float z) override { GetTransform().position = M::Vector3(x, y, z); }
+    void SetPosition(float x, float y, float z) override;
     void Rotate(float ang, float x, float y, float z) override;
 
     void Show() override { _isHidden = false; }

@@ -42,9 +42,8 @@ public:
         chullMesh.compute_faces();
         chull->Update();
 
-        float x = cloud->GetPosX();
-        float y = cloud->GetPosY();
-        float z = cloud->GetPosZ();
+        float x, y, z;
+        cloud->GetPosition(x, y, z);
         chull->SetPosition(x, y, z);
 
         cloud->Destroy();

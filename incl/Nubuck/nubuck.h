@@ -80,9 +80,7 @@ struct IGeometry {
         };
     };
 
-    virtual float GetPosX() const = 0;
-    virtual float GetPosY() const = 0;
-    virtual float GetPosZ() const = 0;
+    virtual void GetPosition(float& x, float& y, float& z) const = 0;
 
     virtual void SetPosition(float x, float y, float z) = 0;
     virtual void Rotate(float ang, float x, float y, float z) = 0;

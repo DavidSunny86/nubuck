@@ -16,18 +16,60 @@ M::Vector3 ToVector(const leda::d3_rat_point& p) {
 
 namespace W {
 
-void ENT_Geometry::TransformVertices() {
-    _tfverts = _vertices;
-    for(unsigned i = 0; i < _vertices.size(); ++i) {
-        _tfverts[i].position = Transform(_vertices[i].position);
-    }
+void ENT_Geometry::CacheFPos() {
+    leda::node v;
+    _fpos.resize(_ratPolyMesh.max_node_index() + 1);
+    forall_nodes(v, _ratPolyMesh) _fpos[v->id()] = ToVector(_ratPolyMesh.position_of(v));
+}
+
+void ENT_Geometry::RebuildRenderMesh() {
+    _vertices.clear();
+    _indices.clear();
+
+    if(0 == _ratPolyMesh.number_of_faces()) return;
+
+    unsigned idxCnt = 0;
+
+    leda::face f;
+    forall_faces(f, _ratPolyMesh) {
+        if(!_ratPolyMesh.is_visible(f)) continue;
+
+        leda::edge e = _ratPolyMesh.first_face_edge(f);
+
+        leda::edge n = _ratPolyMesh.face_cycle_succ(e);
+        const M::Vector3& p0 = _fpos[leda::source(e)->id()];
+        const M::Vector3& p1 = _fpos[leda::target(e)->id()];
+        const M::Vector3& p2 = _fpos[leda::target(n)->id()];
+        const M::Vector3 normal = M::Normalize(M::Cross(p1 - p0, p2 - p0));
+
+        R::Mesh::Vertex vert;
+        vert.normal = normal;
+        vert.color = _ratPolyMesh.color_of(f);
+
+        leda::edge it = e;
+        do {
+            vert.position = _fpos[leda::source(it)->id()];
+            _vertices.push_back(vert);
+            _indices.push_back(idxCnt++);
+            it = _ratPolyMesh.face_cycle_succ(it);
+        } while(e != it);
+        _indices.push_back(R::Mesh::RESTART_INDEX);
+    } // forall_faces
+
+    _meshDesc.vertices = &_vertices[0];
+    _meshDesc.numVertices = _vertices.size();
+    _meshDesc.indices = &_indices[0];
+    _meshDesc.numIndices = _indices.size();
+    _meshDesc.primType = GL_TRIANGLE_FAN;
+         
+    _meshCompiled = false;
 }
 
 void ENT_Geometry::ComputeBoundingBox() {
-    _bbox.min = _bbox.max = ToVector(_ratPolyMesh.position_of(_ratPolyMesh.first_node()));
+    _bbox.min = _bbox.max = _fpos[_ratPolyMesh.first_node()->id()];
     leda::node v;
     forall_nodes(v, _ratPolyMesh) {
-        M::Vector3 p = ToVector(_ratPolyMesh.position_of(v));
+        M::Vector3 p = _fpos[v->id()];
         _bbox.min.x = M::Min(_bbox.min.x, p.x);
         _bbox.min.y = M::Min(_bbox.min.y, p.y);
         _bbox.min.z = M::Min(_bbox.min.z, p.z);
@@ -57,7 +99,22 @@ _shadingMode(ShadingMode::NICE)
     InitOutline();
 }
 
-void ENT_Geometry::RebuildEdges() {
+bool ENT_Geometry::IsMeshCompiled() const { return _meshCompiled; }
+
+void ENT_Geometry::RebuildRenderNodes() {
+    leda::node v;
+
+    _nodes.Clear();
+    forall_nodes(v, _ratPolyMesh) {
+        R::Nodes::Node rnode;
+        rnode.position = _fpos[v->id()];
+        rnode.color = R::Color(0.3f, 0.3f, 0.3f);
+        _nodes.Push(rnode);
+    }
+    _nodes.Rebuild();
+}
+
+void ENT_Geometry::RebuildRenderEdges() {
     _edgeRenderer->Clear();
     R::EdgeRenderer::Edge re;
     re.radius = _edgeRadius;
@@ -72,68 +129,11 @@ void ENT_Geometry::RebuildEdges() {
 }
 
 void ENT_Geometry::Update() {
-    leda::node v;
-    leda::edge e;
-
-    _nodes.Clear();
-    forall_nodes(v, _ratPolyMesh) {
-        R::Nodes::Node rnode;
-        rnode.position = ToVector(_ratPolyMesh.position_of(v));
-        rnode.color = R::Color(0.3f, 0.3f, 0.3f);
-        _nodes.Push(rnode);
-    }
-    _nodes.Rebuild();
-
-    RebuildEdges();
-
+    CacheFPos();
+    RebuildRenderNodes();
+    RebuildRenderEdges();
+    RebuildRenderMesh();
     ComputeBoundingBox();
-
-    _vertices.clear();
-    _indices.clear();
-
-    if(0 == _ratPolyMesh.number_of_faces()) return;
-
-    unsigned idxCnt = 0;
-
-    leda::node_array<M::Vector3> fpos(_ratPolyMesh);
-
-    forall_nodes(v, _ratPolyMesh) {
-        fpos[v] = ToVector(_ratPolyMesh.position_of(v));
-    }
-
-    leda::face f;
-    forall_faces(f, _ratPolyMesh) {
-        if(!_ratPolyMesh.is_visible(f)) continue;
-
-        leda::edge e = _ratPolyMesh.first_face_edge(f);
-
-        leda::edge n = _ratPolyMesh.face_cycle_succ(e);
-        const M::Vector3& p0 = fpos[leda::source(e)];
-        const M::Vector3& p1 = fpos[leda::target(e)];
-        const M::Vector3& p2 = fpos[leda::target(n)];
-        const M::Vector3 normal = M::Normalize(M::Cross(p1 - p0, p2 - p0));
-
-        R::Mesh::Vertex vert;
-        vert.normal = normal;
-        vert.color = _ratPolyMesh.color_of(f);
-
-        leda::edge it = e;
-        do {
-            vert.position = fpos[leda::source(it)];
-            _vertices.push_back(vert);
-            _indices.push_back(idxCnt++);
-            it = _ratPolyMesh.face_cycle_succ(it);
-        } while(e != it);
-        _indices.push_back(R::Mesh::RESTART_INDEX);
-    } // forall_faces
-
-    _meshDesc.vertices = &_vertices[0];
-    _meshDesc.numVertices = _vertices.size();
-    _meshDesc.indices = &_indices[0];
-    _meshDesc.numIndices = _indices.size();
-    _meshDesc.primType = GL_TRIANGLE_FAN;
-         
-    _meshCompiled = false;
 }
 
 static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
@@ -154,6 +154,40 @@ void ENT_Geometry::ApplyTransformation() {
     SetTransform(transform);
 }
 
+void ENT_Geometry::SetEdgeRadius(float edgeRadius) {
+    _edgeRadius = edgeRadius;
+    _outln.sbEdgeRadius->blockSignals(true);
+    _outln.sbEdgeRadius->setValue(_edgeRadius);
+    _outln.sbEdgeRadius->blockSignals(false);
+    RebuildRenderEdges();
+}
+
+void ENT_Geometry::SetEdgeColor(const R::Color& color) {
+    _edgeColor = color;
+    _outln.btnEdgeColor->blockSignals(true);
+    _outln.btnEdgeColor->SetColor(_edgeColor.r, _edgeColor.g, _edgeColor.b);
+    _outln.btnEdgeColor->blockSignals(false);
+    RebuildRenderEdges();
+}
+
+const M::Vector3& ENT_Geometry::GetLocalCenter() const { 
+    return _bbox.min + 0.5f * (_bbox.max - _bbox.min); 
+}
+
+M::Vector3 ENT_Geometry::GetGlobalCenter() { 
+    return Transform(GetLocalCenter()); 
+}
+
+const M::Box& ENT_Geometry::GetBoundingBox() const { return _bbox; }
+
+void ENT_Geometry::GetPosition(float& x, float& y, float& z) const {
+    x = GetTransform().position.x;
+    y = GetTransform().position.y;
+    z = GetTransform().position.z;
+}
+
+void ENT_Geometry::SetPosition(float x, float y, float z) { GetTransform().position = M::Vector3(x, y, z); }
+
 void ENT_Geometry::CompileMesh() {
     if(_meshCompiled) return;
 
@@ -162,10 +196,20 @@ void ENT_Geometry::CompileMesh() {
 
     if(NULL != _tfmesh) R::meshMgr.Destroy(_tfmesh);
     _tfmesh = R::meshMgr.Create(_mesh);
-    R::meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
+    R::meshMgr.GetMesh(_tfmesh).SetTransform(GetTransformationMatrix());
 
     _meshCompiled = true;
 }
+
+void ENT_Geometry::Destroy() { 
+    if(_outln.item) {
+        UI::Outliner::Instance()->RemoveItem(_outln.item);
+        _outln.item = NULL;
+    }
+    Entity::Destroy(); 
+}
+
+leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() { return _ratPolyMesh; }
 
 void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
     GetTransform().rotation = M::RotationOf(M::Mat4::RotateAxis(M::Normalize(M::Vector3(x, y, z)), ang)) * GetTransform().rotation;
@@ -183,10 +227,6 @@ void ENT_Geometry::BuildRenderList() {
     if(_isHidden) return;
 
     if(RenderMode::FACES & _renderMode && NULL != _mesh) {
-        /*
-        TransformVertices();
-        R::meshMgr.GetMesh(_mesh).Invalidate(&_tfverts[0]);
-        */
         R::meshMgr.GetMesh(_tfmesh).SetTransform(GetTransformationMatrix());
 
         R::MeshJob rjob;
