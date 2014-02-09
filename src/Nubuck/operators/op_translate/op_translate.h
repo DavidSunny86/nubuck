@@ -7,7 +7,7 @@
 #include <Nubuck\nubuck.h>
 #include <math\box.h>
 #include <math\plane.h>
-#include <operators\operator.h>
+#include <Nubuck\operators\operator.h>
 #include <operators\operators.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>

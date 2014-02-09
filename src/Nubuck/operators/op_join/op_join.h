@@ -1,6 +1,6 @@
 #pragma once
 
-#include <operators\operator.h>
+#include <Nubuck\operators\operator.h>
 #include <operators\operators.h>
 
 namespace OP {

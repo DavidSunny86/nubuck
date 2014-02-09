@@ -4,7 +4,7 @@
 #include <QMenu>
 
 #include <Nubuck\nubuck.h>
-#include <operators\operator.h>
+#include <Nubuck\operators\operator.h>
 #include <operators\operators.h>
 
 #include <LEDA\geo\d3_hull.h>

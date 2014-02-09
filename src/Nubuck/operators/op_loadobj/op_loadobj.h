@@ -2,7 +2,7 @@
 
 #include <QWidget>
 #include <Nubuck\nubuck.h>
-#include <operators\operator.h>
+#include <Nubuck\operators\operator.h>
 #include <operators\operators.h>
 #include "ui_op_loadobj.h"
 

@@ -5,7 +5,7 @@
 
 #include <Nubuck\nubuck.h>
 #include <Nubuck\polymesh.h>
-#include <operators\operator.h>
+#include <Nubuck\operators\operator.h>
 #include <operators\operators.h>
 #include <UI\simple_panel\simple_panel.h>
 

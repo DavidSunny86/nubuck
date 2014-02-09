@@ -5,9 +5,9 @@
 #include <QObject>
 
 #include <vector>
+#include <Nubuck\operators\operator.h>
 #include <UI\operatorpanel\operatorpanel.h>
 #include <renderer\renderer.h>
-#include "operator.h"
 
 namespace OP {
 

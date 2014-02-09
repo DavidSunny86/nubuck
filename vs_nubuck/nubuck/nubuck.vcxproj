@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\incl\Nubuck\nubuck.h" />
+    <ClInclude Include="..\..\incl\Nubuck\operators\operator.h" />
     <ClInclude Include="..\..\incl\Nubuck\polymesh.h" />
     <ClInclude Include="..\..\incl\Nubuck\polymesh_fwd.h" />
     <ClInclude Include="..\..\incl\Nubuck\renderer\color\color.h" />
@@ -62,7 +63,6 @@
     <ClInclude Include="..\..\src\Nubuck\math\vector3_op_inl.h" />
     <ClInclude Include="..\..\src\Nubuck\math\view_frustrum.h" />
     <ClInclude Include="..\..\src\Nubuck\nubuck_private.h" />
-    <ClInclude Include="..\..\src\Nubuck\operators\operator.h" />
     <CustomBuild Include="..\..\src\Nubuck\operators\operators.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing operators.h...</Message>

@@ -255,6 +255,9 @@
     <Filter Include="Private\operators\op_delete">
       <UniqueIdentifier>{ef3ece81-8f64-4346-b8d4-f962b7270789}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\operators">
+      <UniqueIdentifier>{fc8c66d4-7f38-479c-b532-c4950ba444a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -566,9 +569,6 @@
     <ClInclude Include="..\..\src\Nubuck\UI\operatorpanel\operatorpanel.h">
       <Filter>Private\UI\operatorpanel</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\operators\operator.h">
-      <Filter>Private\operators</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\UI\simple_panel\simple_panel.h">
       <Filter>Private\UI\simple_panel</Filter>
     </ClInclude>
@@ -625,6 +625,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_op_loadobj.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\operators\operator.h">
+      <Filter>Public\operators</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
