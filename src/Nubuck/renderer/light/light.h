@@ -2,7 +2,7 @@
 
 #include <Nubuck\renderer\color\color.h>
 
-#include <math\vector3.h>
+#include <Nubuck\math\vector3.h>
 
 namespace R {
 

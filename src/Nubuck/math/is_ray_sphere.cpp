@@ -1,6 +1,6 @@
-#include "ray.h"
-#include "sphere.h"
-#include "intersections.h"
+#include <Nubuck\math\ray.h>
+#include <Nubuck\math\sphere.h>
+#include <Nubuck\math\intersections.h>
 
 namespace M {
 namespace IS {

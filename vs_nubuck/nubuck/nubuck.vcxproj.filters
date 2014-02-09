@@ -56,9 +56,6 @@
     <Filter Include="Private\renderer\color">
       <UniqueIdentifier>{7fb5ce12-07b5-413e-92f3-5215542687ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\math">
-      <UniqueIdentifier>{3c07f34d-2e2a-43d4-8ebf-4eea32704bf9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\renderer\mesh">
       <UniqueIdentifier>{5559252f-6c7b-48c3-bc81-d03b8ee4c099}</UniqueIdentifier>
     </Filter>
@@ -258,6 +255,12 @@
     <Filter Include="Public\operators">
       <UniqueIdentifier>{fc8c66d4-7f38-479c-b532-c4950ba444a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\math">
+      <UniqueIdentifier>{bb81bb28-a58c-4f21-af2c-b3c9d6d3170e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\math">
+      <UniqueIdentifier>{a931bd0d-0974-411d-b66f-99c8f14ada6b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -292,51 +295,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\program\program.h">
       <Filter>Private\renderer\program</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\line_mem_inl.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\math.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\math_inl.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\matrix3.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\matrix4.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\quaternion.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\quaternion_mem_inl.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\quaternion_op_inl.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\transform.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\vector2.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\vector2_mem_inl.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\vector2_op_inl.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\vector3.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\vector3_mem_inl.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\vector3_op_inl.h">
-      <Filter>Private\math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\pass.h">
       <Filter>Private\renderer\effects</Filter>
@@ -442,12 +400,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.h">
       <Filter>Private\renderer\mesh\polygon</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\line3.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\line2.h">
-      <Filter>Private\math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\skin\skin.h">
       <Filter>Private\renderer\skin</Filter>
@@ -590,24 +542,6 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges.h">
       <Filter>Private\renderer\edges</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\box.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\ray.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\sphere.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\intersections.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\plane.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\math\view_frustrum.h">
-      <Filter>Private\math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\grid\grid.h">
       <Filter>Private\renderer\mesh\grid</Filter>
     </ClInclude>
@@ -628,6 +562,75 @@
     </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\operators\operator.h">
       <Filter>Public\operators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\math_inl.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\matrix3.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\matrix4.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\plane.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\quaternion.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\quaternion_mem_inl.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\quaternion_op_inl.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\ray.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\sphere.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\transform.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\vector2.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\vector2_mem_inl.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\vector2_op_inl.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\vector3.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\vector3_mem_inl.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\vector3_op_inl.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\view_frustrum.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\box.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\intersections.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\line_mem_inl.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\line2.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\line3.h">
+      <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math\math.h">
+      <Filter>Public\math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -654,30 +657,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\color\color.cpp">
       <Filter>Private\renderer\color</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\math.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\matrix3_mem.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\matrix3_op.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\matrix4_mem.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\matrix4_op.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\quaternion_mem.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\vector3_mem.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\vector3_op.cpp">
-      <Filter>Private\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\pass.cpp">
       <Filter>Private\renderer\effects</Filter>
@@ -793,12 +772,6 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\polygon\polygon.cpp">
       <Filter>Private\renderer\mesh\polygon</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\line3.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\line2.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\skin\skinmgr.cpp">
       <Filter>Private\renderer\skin</Filter>
     </ClCompile>
@@ -816,12 +789,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\skin\skin.cpp">
       <Filter>Private\renderer\skin</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\vector2_mem.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\vector2_op.cpp">
-      <Filter>Private\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\metrics\metrics.cpp">
       <Filter>Private\renderer\metrics</Filter>
@@ -988,21 +955,6 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges.cpp">
       <Filter>Private\renderer\edges</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\box.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\is_ray_sphere.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\is_ray_box.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\is_ray_plane.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\math\view_frustrum.cpp">
-      <Filter>Private\math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\grid\grid.cpp">
       <Filter>Private\renderer\mesh\grid</Filter>
     </ClCompile>
@@ -1035,6 +987,57 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_ent_geometry.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\box.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\is_ray_box.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\is_ray_plane.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\is_ray_sphere.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\line2.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\line3.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\math.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\matrix3_mem.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\matrix3_op.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\matrix4_mem.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\matrix4_op.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\quaternion_mem.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\vector2_mem.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\vector2_op.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\vector3_mem.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\vector3_op.cpp">
+      <Filter>Private\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math\view_frustrum.cpp">
+      <Filter>Private\math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

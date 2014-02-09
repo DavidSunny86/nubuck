@@ -1,7 +1,7 @@
 #pragma once
 
-#include <math\vector3.h>
-#include <math\quaternion.h>
+#include <Nubuck\math\vector3.h>
+#include <Nubuck\math\quaternion.h>
 
 namespace M {
 

@@ -7,8 +7,8 @@
 
 #include <common\config\config.h>
 #include <common\types.h>
-#include <math\matrix3.h>
-#include <math\vector3.h>
+#include <Nubuck\math\matrix3.h>
+#include <Nubuck\math\vector3.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\bezier\bezier.h>
 #include <world\entity.h>

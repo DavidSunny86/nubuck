@@ -1,4 +1,4 @@
-#include "vector2.h"
+#include <Nubuck\math\vector2.h>
 
 namespace M {
 

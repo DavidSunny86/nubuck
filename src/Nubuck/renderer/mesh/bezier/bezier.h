@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include <math\vector2.h>
+#include <Nubuck\math\vector2.h>
 #include "..\mesh.h"
 
 namespace R {

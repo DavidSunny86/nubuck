@@ -5,9 +5,9 @@
 #include <Windows.h> // defines MAX_INT
 #include <LEDA\core\list.h>
 
-#include <math\vector2.h>
-#include <math\matrix3.h>
-#include <math\matrix4.h>
+#include <Nubuck\math\vector2.h>
+#include <Nubuck\math\matrix3.h>
+#include <Nubuck\math\matrix4.h>
 
 #include "..\mesh.h"
 

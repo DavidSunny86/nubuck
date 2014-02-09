@@ -1,4 +1,4 @@
-#include "line3.h"
+#include <Nubuck\math\line3.h>
 
 namespace M {
 

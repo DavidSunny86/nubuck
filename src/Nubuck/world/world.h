@@ -12,8 +12,8 @@
 #include <system\locks\spinlock.h>
 #include <system\locks\semaphore.h>
 #include <common\types.h>
-#include <math\vector2.h>
-#include <math\ray.h>
+#include <Nubuck\math\vector2.h>
+#include <Nubuck\math\ray.h>
 #include <renderer\renderer.h>
 #include <camera\arcball_camera.h>
 #include <events\events.h>

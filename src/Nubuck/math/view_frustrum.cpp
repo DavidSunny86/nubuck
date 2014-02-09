@@ -1,6 +1,6 @@
 #include <math.h>
-#include "math.h"
-#include "view_frustrum.h"
+#include <Nubuck\math\math.h>
+#include <Nubuck\math\view_frustrum.h>
 
 namespace M {
 

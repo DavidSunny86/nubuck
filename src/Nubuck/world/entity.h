@@ -1,7 +1,7 @@
 #pragma once
 
-#include <math\vector3.h>
-#include <math\matrix3.h>
+#include <Nubuck\math\vector3.h>
+#include <Nubuck\math\matrix3.h>
 
 namespace W {
 

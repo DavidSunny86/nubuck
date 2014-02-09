@@ -2,7 +2,7 @@
 
 #include <Nubuck\renderer\color\color.h>
 
-#include <math\math.h>
+#include <Nubuck\math\math.h>
 
 static float RandomIn01(void) {
     const unsigned range = 1000;

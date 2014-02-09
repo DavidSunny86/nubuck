@@ -3,8 +3,8 @@
 #include <vector>
 
 #include <Nubuck\renderer\color\color.h>
-#include <math\vector3.h>
-#include <math\matrix4.h>
+#include <Nubuck\math\vector3.h>
+#include <Nubuck\math\matrix4.h>
 #include <renderer\renderer.h>
 
 namespace R {

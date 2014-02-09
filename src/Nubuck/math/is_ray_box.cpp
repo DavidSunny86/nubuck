@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <limits>
-#include "ray.h"
-#include "box.h"
-#include "intersections.h"
+#include <Nubuck\math\ray.h>
+#include <Nubuck\math\box.h>
+#include <Nubuck\math\intersections.h>
 
 namespace M {
 namespace IS {

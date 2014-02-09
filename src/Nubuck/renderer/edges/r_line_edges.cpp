@@ -1,4 +1,4 @@
-#include <math\matrix3.h>
+#include <Nubuck\math\matrix3.h>
 #include <renderer\renderer_local.h>
 #include <renderer\mesh\meshmgr.h>
 #include "r_line_edges.h"

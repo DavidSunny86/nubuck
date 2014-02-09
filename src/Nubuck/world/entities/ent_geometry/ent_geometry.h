@@ -2,7 +2,7 @@
 
 #include <Nubuck\nubuck.h>
 #include <Nubuck\polymesh.h>
-#include <math\box.h>
+#include <Nubuck\math\box.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>

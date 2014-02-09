@@ -1,6 +1,6 @@
-#include "ray.h"
-#include "plane.h"
-#include "intersections.h"
+#include <Nubuck\math\ray.h>
+#include <Nubuck\math\plane.h>
+#include <Nubuck\math\intersections.h>
 
 namespace M {
 namespace IS {

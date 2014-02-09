@@ -1,4 +1,4 @@
-#include "matrix3.h"
+#include <Nubuck\math\matrix3.h>
 
 namespace M {
 

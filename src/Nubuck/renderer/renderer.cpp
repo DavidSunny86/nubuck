@@ -5,8 +5,8 @@
 
 #include <common\common.h>
 #include <common\config\config.h>
-#include <math\matrix3.h>
-#include <math\matrix4.h>
+#include <Nubuck\math\matrix3.h>
+#include <Nubuck\math\matrix4.h>
 #include <renderer\glew\glew.h>
 #include <renderer\glcall.h>
 #include <renderer\effects\effect.h>

@@ -4,7 +4,7 @@
 #include <common\common.h>
 #include <algdriver\algdriver.h>
 #include <system\locks\scoped_lock.h>
-#include <math\intersections.h>
+#include <Nubuck\math\intersections.h>
 #include <renderer\mesh\plane\plane.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\cylinder\cylinder.h>

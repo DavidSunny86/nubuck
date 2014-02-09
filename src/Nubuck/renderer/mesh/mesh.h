@@ -10,9 +10,9 @@
 #include <generic\uncopyable.h>
 
 #include <renderer\glew\glew.h>
-#include <math\vector3.h>
-#include <math\vector2.h>
-#include <math\matrix4.h>
+#include <Nubuck\math\vector3.h>
+#include <Nubuck\math\vector2.h>
+#include <Nubuck\math\matrix4.h>
 #include <renderer\mesh\staticbuffer.h>
 #include <system\locks\spinlock.h>
 

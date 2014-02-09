@@ -1,5 +1,5 @@
 #include <Nubuck\polymesh.h>
-#include <math\intersections.h>
+#include <Nubuck\math\intersections.h>
 #include <world\world.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <renderer\mesh\mesh.h>

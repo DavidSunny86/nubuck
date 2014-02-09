@@ -7,7 +7,7 @@
 #include <system\locks\spinlock.h>
 #include <system\locks\semaphore.h>
 #include <system\timer\timer.h>
-#include <math\matrix4.h>
+#include <Nubuck\math\matrix4.h>
 #include "material\material.h"
 #include "mesh\meshmgr_fwd.h"
 #include "skin\skinmgr.h"

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <math\vector3.h>
-#include <math\matrix4.h>
-#include <math\quaternion.h>
-#include <math\transform.h>
+#include <Nubuck\math\vector3.h>
+#include <Nubuck\math\matrix4.h>
+#include <Nubuck\math\quaternion.h>
+#include <Nubuck\math\transform.h>
 
 class ArcballCamera {
 private:

@@ -5,8 +5,8 @@
 #include <QMenu>
 
 #include <Nubuck\nubuck.h>
-#include <math\box.h>
-#include <math\plane.h>
+#include <Nubuck\math\box.h>
+#include <Nubuck\math\plane.h>
 #include <Nubuck\operators\operator.h>
 #include <operators\operators.h>
 #include <renderer\mesh\mesh.h>

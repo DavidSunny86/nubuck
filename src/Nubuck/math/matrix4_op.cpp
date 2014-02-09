@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <common\common.h>
-#include "vector3.h"
-#include "matrix3.h"
-#include "quaternion.h"
-#include "matrix4.h"
+#include <Nubuck\math\vector3.h>
+#include <Nubuck\math\matrix3.h>
+#include <Nubuck\math\quaternion.h>
+#include <Nubuck\math\matrix4.h>
 
 namespace M {
 

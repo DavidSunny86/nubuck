@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <algorithm>
-#include <math\line2.h>
+#include <Nubuck\math\line2.h>
 #include "polygon.h"
 
 namespace R {

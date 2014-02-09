@@ -1,4 +1,4 @@
-#include "vector3.h"
+#include <Nubuck\math\vector3.h>
 
 namespace M {
 
