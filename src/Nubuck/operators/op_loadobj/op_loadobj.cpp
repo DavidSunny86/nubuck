@@ -5,6 +5,7 @@
 
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <Nubuck\polymesh.h>
+#include <Nubuck\operators\operator_invoker.h>
 #include "op_loadobj.h"
 
 namespace OP {

@@ -1039,6 +1039,12 @@
     <ClCompile Include="..\..\src\Nubuck\math\view_frustrum.cpp">
       <Filter>Private\math</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_operator_invoker.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_operator_invoker.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1109,6 +1115,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.h">
       <Filter>Private\world\entities\ent_geometry</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\incl\Nubuck\operators\operator_invoker.h">
+      <Filter>Public\operators</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

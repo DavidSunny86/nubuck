@@ -41,9 +41,16 @@
      <string>Object</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actLoadOperatorPlugin"/>
+   </widget>
    <addaction name="menuScene"/>
    <addaction name="menuView"/>
    <addaction name="menuObject"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actRandomPoints">
@@ -59,6 +66,11 @@
   <action name="actShowRenderConfig">
    <property name="text">
     <string>Render Config</string>
+   </property>
+  </action>
+  <action name="actLoadOperatorPlugin">
+   <property name="text">
+    <string>Load Operator Plugin</string>
    </property>
   </action>
  </widget>
@@ -112,10 +124,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actLoadOperatorPlugin</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OnLoadOperatorPlugin()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>OnRandomPoints()</slot>
   <slot>OnShowRenderMetrics()</slot>
   <slot>OnShowRenderConfig()</slot>
+  <slot>OnLoadOperatorPlugin()</slot>
  </slots>
 </ui>

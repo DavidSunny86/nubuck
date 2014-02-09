@@ -22,6 +22,7 @@ namespace UI {
         void OnShowRenderMetrics(void);
         void OnShowRenderConfig(void);
         void OnShowOutliner(void) { }
+        void OnLoadOperatorPlugin();
     public:
 		MainWindow(void);
 

@@ -1,4 +1,5 @@
 #include <QMenu>
+#include <Nubuck\operators\operator_invoker.h>
 #include <world\world.h>
 #include "op_delete.h"
 

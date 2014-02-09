@@ -1,9 +1,12 @@
+#include <QFileDialog>
 #include <QScrollArea>
 #include <QDockWidget>
 
 #include <nubuck_private.h>
 #include <algdriver\algdriver.h>
 #include <events\event_defs.h>
+#include <Nubuck\operators\operator.h>
+#include <operators\operators.h>
 #include <UI\renderview\renderview.h>
 #include <UI\rendermetrics\rendermetrics.h>
 #include <UI\randompoints\randompoints.h>
@@ -50,6 +53,27 @@ namespace UI {
     void MainWindow::OnShowRenderConfig(void) {
         _renderConfig->show();
     }
+
+	void MainWindow::OnLoadOperatorPlugin() {
+        QString filename = QFileDialog::getOpenFileName(
+            this,
+            "Choose an operator plugin file",
+			QDir::currentPath(),
+			"Operator Plugins (*.dll)");
+		if(!filename.isNull()) {
+			HMODULE lib = LoadLibraryA(filename.toAscii());
+            if(!lib) {
+				printf("ERROR: unable to load '%s'\n", filename.toAscii());
+			}
+			typedef OP::Operator* (*createOperator_t)();
+            createOperator_t func = (createOperator_t)GetProcAddress(lib, "CreateOperator");
+            if(!func) printf("ERROR - unable to load createoperator() function\n");
+			else {
+				OP::Operator* op = func();
+				OP::g_operators.Register(op, lib);
+			}
+		}
+	}
 
     MainWindow::MainWindow(void) {
         _ui.setupUi(this);

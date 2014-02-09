@@ -1,5 +1,6 @@
 #include <QMenu>
 #include <Nubuck\polymesh.h>
+#include <Nubuck\operators\operator_invoker.h>
 #include <world\world.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include "op_join.h"
