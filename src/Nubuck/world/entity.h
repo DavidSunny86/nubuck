@@ -13,9 +13,7 @@ struct EntTransform {
 
 struct EntityType {
     enum Enum {
-        ENT_POLYHEDRON  = 0,
-        ENT_MESH,
-        ENT_GEOMETRY
+        ENT_GEOMETRY = 0
     };
 };
 

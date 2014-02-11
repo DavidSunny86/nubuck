@@ -1,6 +1,5 @@
 #include <events\event_defs.h>
 #include <UI\logwidget\logwidget.h>
-#include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include "outliner.h"
 
 namespace UI {

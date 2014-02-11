@@ -156,23 +156,14 @@
     <Filter Include="Private\renderer\mesh\sphere">
       <UniqueIdentifier>{681efa7c-1f00-4a65-af58-2590c53f35da}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\world\entities\ent_polyhedron">
-      <UniqueIdentifier>{7340b45c-e95b-4810-a3fe-f1c3549ab4d0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\renderer\mesh\cylinder">
       <UniqueIdentifier>{fc9c3fbb-3558-4100-b384-c2df5b50b9b2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Private\UI\renderconfig">
       <UniqueIdentifier>{d82575ec-0fda-4022-bed0-366025105d4e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\world\proxies">
-      <UniqueIdentifier>{977d2860-1bd1-446d-a49e-4e8940d9f5d7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\renderer\mesh\plane">
       <UniqueIdentifier>{6ea6f262-5be1-4140-b052-34f618390db7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\world\entities\ent_mesh">
-      <UniqueIdentifier>{b6d8a54c-fd70-495e-a38a-91bd9a91a9df}</UniqueIdentifier>
     </Filter>
     <Filter Include="Private\renderer\giantbuffer">
       <UniqueIdentifier>{df709011-cfb4-4d42-b27a-fd4821ea76d8}</UniqueIdentifier>
@@ -434,26 +425,14 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.h">
       <Filter>Private\renderer\mesh\sphere</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.h">
-      <Filter>Private\world\entities\ent_polyhedron</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\cylinder\cylinder.h">
       <Filter>Private\renderer\mesh\cylinder</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_renderconfig.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.h">
-      <Filter>Private\world\proxies</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\plane\plane.h">
       <Filter>Private\renderer\mesh\plane</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\proxies\proxy_mesh.h">
-      <Filter>Private\world\proxies</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_mesh\ent_mesh.h">
-      <Filter>Private\world\entities\ent_mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.h">
       <Filter>Private\renderer\giantbuffer</Filter>
@@ -808,9 +787,6 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\sphere\sphere.cpp">
       <Filter>Private\renderer\mesh\sphere</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron.cpp">
-      <Filter>Private\world\entities\ent_polyhedron</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\material\material.cpp">
       <Filter>Private\renderer\material</Filter>
     </ClCompile>
@@ -829,17 +805,8 @@
     <ClCompile Include="GeneratedFiles\Release\moc_renderconfig.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\proxies\proxy_polyhedron.cpp">
-      <Filter>Private\world\proxies</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\plane\plane.cpp">
       <Filter>Private\renderer\mesh\plane</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\proxies\proxy_mesh.cpp">
-      <Filter>Private\world\proxies</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_mesh\ent_mesh.cpp">
-      <Filter>Private\world\entities\ent_mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.cpp">
       <Filter>Private\renderer\giantbuffer</Filter>
@@ -903,9 +870,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\system\locks\shared_resources.cpp">
       <Filter>Private\system\locks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_polyhedron\ent_polyhedron_printsize.cpp">
-      <Filter>Private\world\entities\ent_polyhedron</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\polymesh\polymesh.cpp">
       <Filter>Private\polymesh</Filter>

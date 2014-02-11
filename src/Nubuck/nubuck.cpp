@@ -8,7 +8,6 @@
 #include <common\common.h>
 #include <common\config\config.h>
 #include <world\world.h>
-#include <world\entities\ent_polyhedron\ent_polyhedron.h>
 #include <renderer\effects\effect.h>
 #include <algdriver\algdriver.h>
 #include <UI\mainwindow\mainwindow.h>
@@ -76,8 +75,6 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
         }
         i++;
     }
-
-    W::Polyhedron_InitResources();
 
     MainLoop mainLoop;
     mainLoop.Enter();

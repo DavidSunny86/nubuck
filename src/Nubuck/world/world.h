@@ -62,11 +62,6 @@ namespace W {
 
         GEN::Pointer<Entity> FindByEntityID(unsigned entId);
 
-        void GetInfo(Entity& ent, EntityInf& inf);
-
-        bool        _isGrabbing;
-        M::Vector3  _grabPivot;
-
         R::meshPtr_t    _gridMesh;
         R::tfmeshPtr_t  _gridTFMesh;
 
@@ -92,25 +87,7 @@ namespace W {
 #pragma region EventHandlers
         void Event_Apocalypse(const EV::Event& event);
         void Event_LinkEntity(const EV::Event& event);
-        void Event_SpawnPolyhedron(const EV::Event& event);
-        void Event_SpawnMesh(const EV::Event& event);
         void Event_DestroyEntity(const EV::Event& event);
-        void Event_Rebuild(const EV::Event& event);
-        void Event_SetVisible(const EV::Event& event);
-        void Event_SetName(const EV::Event& event);
-        void Event_SetPosition(const EV::Event& event);
-        void Event_SetScale(const EV::Event& event);
-        void Event_SetRotation(const EV::Event& event);
-        void Event_SetRenderFlags(const EV::Event& event);
-        void Event_SetPickable(const EV::Event& event);
-        void Event_SetNodeColor(const EV::Event& event);
-        void Event_SetEdgeColor(const EV::Event& event);
-        void Event_SetFaceColor(const EV::Event& event);
-        void Event_SetFaceVisibility(const EV::Event& event);
-        void Event_SetHullAlpha(const EV::Event& event);
-        void Event_SetEdgeBaseColor(const EV::Event& event);
-        void Event_SetEdgeRadius(const EV::Event& event);
-        void Event_SetEffect(const EV::Event& event);
         void Event_Resize(const EV::Event& event);
         void Event_Mouse(const EV::Event& event);
         void Event_Key(const EV::Event& event);
@@ -125,18 +102,11 @@ namespace W {
         M::Ray  PickingRay(const M::Vector2& mouseCoords);
         bool    Trace(const M::Ray& ray, ENT_Geometry** geom);
 
-		unsigned SpawnPolyhedron(graph_t* const G, leda::node_map<bool>* cachedNodes, leda::edge_map<bool>* cachedEdges);
-        unsigned SpawnMesh(R::meshPtr_t meshPtr);
-
         void Update(void);
         void Render(R::RenderList& renderList);
 
         // exported to client
-        IPolyhedron* CreatePolyhedron(void) override;
         IGeometry* CreateGeometry() override;
-        IMesh* CreatePlaneMesh(const PlaneDesc& desc) override;
-        IMesh* CreateSphereMesh(const SphereDesc& desc) override;
-        IMesh* CreateCylinderMesh(const CylinderDesc& desc) override;
 
         void SelectGeometry(IGeometry* geom) override;
         void AddToSelection(IGeometry* geom);

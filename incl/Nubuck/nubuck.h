@@ -23,42 +23,6 @@ struct ICommon {
     virtual void printf(const char* format, ...) = 0;
 };
 
-#define POLYHEDRON_RENDER_HULL      (1 << 0)
-#define POLYHEDRON_RENDER_NODES     (1 << 1)
-#define POLYHEDRON_RENDER_EDGES     (1 << 2)
-
-struct IPolyhedron {
-    virtual ~IPolyhedron(void) { }
-
-    virtual void Destroy(void) = 0;
-
-    virtual leda::GRAPH<leda::d3_rat_point, int>& GetGraph(void) = 0;
-
-    virtual void SetName(const std::string& name) = 0;
-    virtual void SetEffect(const char* fxName) = 0;
-    virtual void SetRenderFlags(int flags) = 0;
-    virtual void SetPickable(bool isPickable) = 0;
-    virtual void SetNodeColor(leda::node node, float r, float g, float b) = 0;
-    virtual void SetEdgeColor(leda::edge edge, float r, float g, float b) = 0;
-    virtual void SetFaceColor(leda::edge edge, float r, float g, float b) = 0;
-    virtual void SetFaceColor(leda::edge edge, float r, float g, float b, float a) = 0;
-    virtual void HideFace(leda::edge edge) = 0;
-    virtual void ShowFace(leda::edge edge) = 0;
-
-    virtual void Update(void) = 0;
-};
-
-struct IMesh {
-    virtual ~IMesh(void) { }
-
-    virtual void SetPosition(float x, float y, float z) = 0;
-    virtual void SetScale(float sx, float sy, float sz) = 0;
-    virtual void AlignZ(float x, float y, float z) = 0;
-    virtual void SetOrient(float x0, float y0, float z0, float x1, float y1, float z1) = 0;
-    virtual void SetEffect(const char* fxName) = 0;
-    virtual void SetVisible(bool isVisible) = 0;
-};
-
 struct IGeometry {
     virtual void Destroy() = 0;
 
@@ -118,11 +82,7 @@ struct IWorld {
         bool        caps;
     };
 
-    virtual IPolyhedron*    CreatePolyhedron(void) = 0;
-    virtual IGeometry*      CreateGeometry() = 0;
-    virtual IMesh*          CreatePlaneMesh(const PlaneDesc& desc) = 0;
-    virtual IMesh*          CreateSphereMesh(const SphereDesc& desc) = 0;
-    virtual IMesh*          CreateCylinderMesh(const CylinderDesc& desc) = 0;
+    virtual IGeometry* CreateGeometry() = 0;
 
     virtual void SelectGeometry(IGeometry* geometry) = 0;
 };
