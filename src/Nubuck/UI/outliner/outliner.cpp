@@ -1,4 +1,4 @@
-#include <events\event_defs.h>
+#include <UI\window_events.h>
 #include <UI\logwidget\logwidget.h>
 #include "outliner.h"
 

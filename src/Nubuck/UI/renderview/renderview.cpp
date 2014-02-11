@@ -2,7 +2,7 @@
 #include <QKeyEvent>
 
 #include <common\common.h>
-#include <events\event_defs.h>
+#include <UI\window_events.h>
 #include <UI\outliner\outliner.h>
 #include <world\world.h>
 #include <operators\operators.h>

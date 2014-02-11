@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <queue>
 #include <common\common.h>
+#include <common\string_hash.h>
 #include <system\locks\spinlock.h>
 #include <system\locks\condvar.h>
 #include <system\locks\shared_resources.h>
@@ -15,113 +16,91 @@
 
 namespace EV {
 
-    struct BlockingEvent {
-        SYS::SpinLock*          mtx;
-        SYS::ConditionVariable* cv;
-        bool                    sig;
-    };
+struct BlockingEvent {
+    SYS::SpinLock*          mtx;
+    SYS::ConditionVariable* cv;
+    bool                    sig;
+};
 
-    struct Event {
-        enum { ARGS_SIZE = 68 };
-        unsigned        id;
-        BlockingEvent*  block;
-        char            args[ARGS_SIZE]; 
+struct Event {
+    enum { ARGS_SIZE = 68 };
+    unsigned        id;
+    const char*     name;
+    BlockingEvent*  block;
+    char            args[ARGS_SIZE]; 
 
-        void Accept() const {
-            if(block) {
-                assert(block->mtx);
-                assert(block->cv);
-                block->mtx->Lock();
-                block->sig = true;
-                block->mtx->Unlock();
-                block->cv->Signal();
-            }
+    void Accept() const {
+        if(block) {
+            assert(block->mtx);
+            assert(block->cv);
+            block->mtx->Lock();
+            block->sig = true;
+            block->mtx->Unlock();
+            block->cv->Signal();
         }
-    };
-
-    class DefinitionBase { 
-    private:
-        unsigned            _id;
-        const char* 		_name;
-        DefinitionBase*     _next;
-
-        static DefinitionBase* defs;
-    public:
-        DefinitionBase(const char* name) : _id(0), _name(name), _next(NULL) {
-            extern unsigned evIdCnt;
-            _id = evIdCnt++;
-            _next = defs;
-            defs = this;
-        }
-
-        unsigned GetID(void) const { return _id; }
-
-        static const char* NameFromID(unsigned id) {
-            DefinitionBase* it = defs;
-            while(it) {
-                if(id == it->_id) return it->_name;
-                it = it->_next;
-            }
-            return "<unkown event>";
-        }
-    };
-
-    template<typename PARAMS>
-    struct Definition : DefinitionBase {
-        Definition(const char* name) : DefinitionBase(name) {
-            assert(Event::ARGS_SIZE >= sizeof(PARAMS));
-        }
-
-        Event Create(const PARAMS& params) {
-            Event event;
-            event.id = GetID();
-            event.block = NULL;
-            memcpy(event.args, &params, sizeof(PARAMS));
-            return event;
-        }
-
-        const PARAMS& GetArgs(const Event& event) {
-            assert(event.id == GetID());
-            return *(PARAMS*)event.args;
-        }
-    };
+    }
+};
 
 } // namespace EV
 
-#define BEGIN_EVENT_DEF(IDENT)                          \
-    namespace EV {                                      \
-        struct Params_##IDENT;                          \
-        extern Definition<Params_##IDENT> def_##IDENT;  \
+namespace EV {
+
+template<typename PARAMS>
+class EventDefinition {
+private:
+    const char* _eventName;
+    unsigned    _eventID;
+public:
+    EventDefinition(const char* name) : _eventName(name), _eventID(COM::StringHash(name)) { }
+
+    unsigned GetEventID() const { return _eventID; }
+
+    Event Create(const PARAMS& params) {
+        Event event;
+        event.block = NULL;
+        event.id = _eventID;
+        event.name = _eventName;
+        memcpy(event.args, &params, sizeof(PARAMS));
+        return event;
+    }
+
+    const PARAMS& GetArgs(const Event& event) {
+        assert(event.id == _eventID);
+        return *(PARAMS*)event.args;
+    }
+};
+
+} // namespace EV
+
+#define BEGIN_EVENT_DEF(IDENT)                                      \
+    namespace EV {              									\
+        struct Params_##IDENT;                                      \
+        static EventDefinition<Params_##IDENT> def_##IDENT(#IDENT); \
         struct Params_##IDENT {
 
-#define END_EVENT_DEF                                   \
-        }; /* struct Params */                          \
-    } /* namespace EV */
-
-#define ALLOC_EVENT_DEF(IDENT)                          \
-    namespace EV {                                      \
-        Definition<Params_##IDENT> def_##IDENT(#IDENT); \
+#define END_EVENT_DEF                                               \
+        }; /* struct Params_##IDENT */                              \
     } /* namespace EV */
 
 namespace EV {
 
 template<typename TYPE>
 class EventHandler {
-protected:
+public:
     struct EventHandlerMapItem;
 private:
     std::queue<EV::Event>               _ev_events;
     SYS::SpinLock                       _ev_eventsMtx;
-    std::vector<EventHandlerMapItem>    _ev_cache;
-protected:
+public:
     typedef void (TYPE::*eventHandlerFunc_t)(const EV::Event& event);
     struct EventHandlerMapItem {
-        EV::DefinitionBase* def;
-        eventHandlerFunc_t func;
+        bool                valid;
+        unsigned            eventID;
+        eventHandlerFunc_t  func;
     };
 
     void _EV_HandleEvents(TYPE* instance, const char* className, EventHandlerMapItem eventHandlerMap[]) {                               
-        static EventHandlerMapItem invIt = { NULL, NULL };
+        EventHandlerMapItem invIt = { false, 0, NULL };
         bool done = false;                                  
         while(!done) {                                      
             EV::Event event;                                
@@ -133,23 +112,19 @@ protected:
             }                                               
             _ev_eventsMtx.Unlock();                         
             if(done) break;                                 
-            if(_ev_cache.size() <= event.id) _ev_cache.resize(event.id + 1, invIt);
-            if(!_ev_cache[event.id].def) {
-                EventHandlerMapItem* it = eventHandlerMap;
-                while(NULL != it->def) {                         
-                    if(event.id == it->def->GetID()) {           
-                        _ev_cache[event.id] = *it;
-                        break;
-                    }                                           
-                    it++;
-                }                                               
-            }
-            if(_ev_cache[event.id].def) {
-                assert(_ev_cache[event.id].func);
-                (instance->*(_ev_cache[event.id].func))(event);
-            } else {
+            EventHandlerMapItem* it = eventHandlerMap;
+            eventHandlerFunc_t func = NULL;
+            while(it->valid) {                         
+                if(event.id == it->eventID) {           
+                    func = it->func;
+                    break;
+                }                                           
+                it++;
+            }                                               
+            if(func) (instance->*(func))(event);
+            else {
                 common.printf("WARNING - unhandled event '%s' (id = '%d') in class '%s'.\n",
-                    DefinitionBase::NameFromID(event.id), event.id, className);
+                    event.name, event.id, className);
             }
         } /* while(!done) */                                
     }
@@ -183,22 +158,25 @@ public:
 
 } // namespace EV
 
-#define DECLARE_EVENT_HANDLER(CLASS)                                    \
-private:                                                                \
-    static const char*          _ev_className;                          \
-    static EventHandlerMapItem  _ev_eventHandlerMap[];                  \
-                                                                        \
-    void HandleEvents(void) {                                           \
-        _EV_HandleEvents(this, _ev_className, _ev_eventHandlerMap);     \
-    }
+#define DECLARE_EVENT_HANDLER(CLASS)                                                \
+private:                                                                			\
+    static const char*          _ev_className;                          			\
+    static EV::EventHandler<CLASS>::EventHandlerMapItem  _ev_eventHandlerMap[];     \
+    EV::EventHandler<CLASS>         _ev_handler;                            		\
+                                                                        			\
+    void HandleEvents(void) {                                           			\
+        _ev_handler._EV_HandleEvents(this, _ev_className, _ev_eventHandlerMap);     \
+    }                                                                               \
+    public: void Send(const EV::Event& event) { _ev_handler.Send(event); }          \
+    void SendAndWait(const EV::Event& event) { _ev_handler.SendAndWait(event); }
 
-#define BEGIN_EVENT_HANDLER(CLASS)                                      \
-    const char* CLASS::_ev_className = #CLASS;                          \
-    CLASS::EventHandlerMapItem CLASS::_ev_eventHandlerMap[] = {
+#define BEGIN_EVENT_HANDLER(CLASS)                                                  \
+    const char* CLASS::_ev_className = #CLASS;                                      \
+    EV::EventHandler<CLASS>::EventHandlerMapItem CLASS::_ev_eventHandlerMap[] = {
 
-#define EVENT_HANDLER(EVENT, HANDLER)   \
-        { &EVENT, HANDLER }, 
+#define EVENT_HANDLER(EVENTDEF, HANDLER)   \
+        { true, EVENTDEF.GetEventID(), HANDLER }, 
 
 #define END_EVENT_HANDLER               \
-        { NULL, NULL }                  \
+        { false, 0, NULL }              \
     }; /* eventHandlerMap */

@@ -33,7 +33,7 @@ namespace W {
         void*       inf;
     };
 
-    class World : public IWorld, public SYS::Thread, public EV::EventHandler<World> {
+    class World : public IWorld, public SYS::Thread {
         DECLARE_EVENT_HANDLER(World)
     private:
         struct Selection {

@@ -56,9 +56,10 @@
     <ClInclude Include="..\..\src\Nubuck\common\config\config.h" />
     <ClInclude Include="..\..\src\Nubuck\common\filehandle.h" />
     <ClInclude Include="..\..\src\Nubuck\common\filesystem\filesystem.h" />
+    <ClInclude Include="..\..\src\Nubuck\common\string_hash.h" />
     <ClInclude Include="..\..\src\Nubuck\common\types.h" />
     <ClInclude Include="..\..\src\Nubuck\events\events.h" />
-    <ClInclude Include="..\..\src\Nubuck\events\event_defs.h" />
+    <ClInclude Include="..\..\src\Nubuck\events\core_events.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\pointer.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\singleton.h" />
     <ClInclude Include="..\..\src\Nubuck\generic\uncopyable.h" />
@@ -225,6 +226,8 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
     </CustomBuild>
+    <ClInclude Include="..\..\src\Nubuck\UI\window_events.h" />
+    <ClInclude Include="..\..\src\Nubuck\world\world_events.h" />
     <ClInclude Include="GeneratedFiles\ui_op_loadobj.h" />
     <ClInclude Include="GeneratedFiles\ui_renderconfig.h" />
     <ClInclude Include="GeneratedFiles\ui_rendermetrics.h" />
@@ -309,8 +312,8 @@
     <ClCompile Include="..\..\src\Nubuck\common\common.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\config\config.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\filesystem\filesystem.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\common\string_hash.cpp" />
     <ClCompile Include="..\..\src\Nubuck\events\events.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\events\event_defs.cpp" />
     <ClCompile Include="..\..\src\Nubuck\mainloop\mainloop.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\box.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\is_ray_box.cpp" />

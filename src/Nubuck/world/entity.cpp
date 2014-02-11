@@ -1,5 +1,5 @@
 #include <common\common.h>
-#include <events\event_defs.h>
+#include <world\world_events.h>
 #include <world\world.h>
 #include "entity.h"
 

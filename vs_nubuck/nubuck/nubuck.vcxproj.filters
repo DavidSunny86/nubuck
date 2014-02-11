@@ -440,9 +440,6 @@
     <ClInclude Include="..\..\src\Nubuck\events\events.h">
       <Filter>Private\events</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\events\event_defs.h">
-      <Filter>Private\events</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\nfx_loader\nfx_loader.h">
       <Filter>Private\renderer\effects\nfx_loader</Filter>
     </ClInclude>
@@ -610,6 +607,18 @@
     </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\math\math.h">
       <Filter>Public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\common\string_hash.h">
+      <Filter>Private\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\events\core_events.h">
+      <Filter>Private\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\world_events.h">
+      <Filter>Private\world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\UI\window_events.h">
+      <Filter>Private\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -817,9 +826,6 @@
     <ClCompile Include="..\..\src\Nubuck\events\events.cpp">
       <Filter>Private\events</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\events\event_defs.cpp">
-      <Filter>Private\events</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\UI\colorbutton\colorbutton.cpp">
       <Filter>Private\UI\colorbutton</Filter>
     </ClCompile>
@@ -1008,6 +1014,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_operator_invoker.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\common\string_hash.cpp">
+      <Filter>Private\common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
 
 #include <nubuck_private.h>
 #include <algdriver\algdriver.h>
-#include <events\event_defs.h>
+#include <world\world_events.h>
 #include <Nubuck\operators\operator.h>
 #include <operators\operators.h>
 #include <UI\renderview\renderview.h>

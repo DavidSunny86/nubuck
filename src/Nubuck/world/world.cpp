@@ -12,11 +12,12 @@
 #include <renderer\edges\r_cylinder_edges.h>
 #include <renderer\edges\r_line_edges.h>
 #include <renderer\mesh\grid\grid.h>
-#include <events\event_defs.h>
 #include <UI\outliner\outliner.h>
+#include <UI\window_events.h>
 #include <operators\operators.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include "entity.h"
+#include "world_events.h"
 #include "world.h"
 
 namespace {
