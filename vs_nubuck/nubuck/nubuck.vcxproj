@@ -84,30 +84,6 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
     </CustomBuild>
-    <CustomBuild Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing op_gen_incube.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing op_gen_incube.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
-    </CustomBuild>
-    <ClInclude Include="..\..\src\Nubuck\operators\op_chull\op_chull.h" />
-    <ClInclude Include="..\..\src\Nubuck\operators\op_delete\op_delete.h" />
-    <ClInclude Include="..\..\src\Nubuck\operators\op_join\op_join.h" />
-    <CustomBuild Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing op_loadobj.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing op_loadobj.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
-    </CustomBuild>
-    <ClInclude Include="..\..\src\Nubuck\operators\op_translate\op_translate.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_line_edges.h" />
@@ -334,12 +310,6 @@
     <ClCompile Include="..\..\src\Nubuck\math\view_frustrum.cpp" />
     <ClCompile Include="..\..\src\Nubuck\nubuck.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\operators.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\operators\op_chull\op_chull.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\operators\op_delete\op_delete.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\operators\op_join\op_join.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\operators\op_translate\op_translate.cpp" />
     <ClCompile Include="..\..\src\Nubuck\polymesh\polymesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\color\color.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.cpp" />
@@ -434,12 +404,6 @@
     <ClCompile Include="GeneratedFiles\Debug\moc_operator_invoker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_op_gen_incube.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_op_loadobj.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_randompoints.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -480,12 +444,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_operator_invoker.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_op_gen_incube.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_op_loadobj.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_randompoints.cpp">

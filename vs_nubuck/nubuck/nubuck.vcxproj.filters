@@ -210,17 +210,8 @@
     <Filter Include="Private\operators">
       <UniqueIdentifier>{adb65b1b-9e91-4a09-bcc2-c2783d9614cb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\operators\op_gen_incube">
-      <UniqueIdentifier>{a7539c82-fe7d-480a-9ec1-602933c965ed}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\UI\simple_panel">
       <UniqueIdentifier>{f37dedb2-9459-4887-aee5-838fb25ee20d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\operators\op_chull">
-      <UniqueIdentifier>{a3ce9a9d-33f5-4a97-a495-0113b837f2b7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\operators\op_translate">
-      <UniqueIdentifier>{11dbda2c-5f2e-435e-baac-b2b295912593}</UniqueIdentifier>
     </Filter>
     <Filter Include="Public\renderer">
       <UniqueIdentifier>{c70f0992-5327-40aa-ba25-b9156690e2ef}</UniqueIdentifier>
@@ -231,17 +222,8 @@
     <Filter Include="Private\renderer\mesh\grid">
       <UniqueIdentifier>{851ab214-9a34-4625-bfa9-c71f14f14fbf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\operators\op_loadobj">
-      <UniqueIdentifier>{31a9bfda-09a0-41d5-9905-7065eae2a4b6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\renderer\mesh\cone">
       <UniqueIdentifier>{fc44719c-cc26-4827-84e9-704fe5008a93}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\operators\op_join">
-      <UniqueIdentifier>{5f95febc-0f8d-4328-9c2d-876d1edae63e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Private\operators\op_delete">
-      <UniqueIdentifier>{ef3ece81-8f64-4346-b8d4-f962b7270789}</UniqueIdentifier>
     </Filter>
     <Filter Include="Public\operators">
       <UniqueIdentifier>{fc8c66d4-7f38-479c-b532-c4950ba444a0}</UniqueIdentifier>
@@ -500,12 +482,6 @@
     <ClInclude Include="..\..\src\Nubuck\UI\simple_panel\simple_panel.h">
       <Filter>Private\UI\simple_panel</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\operators\op_chull\op_chull.h">
-      <Filter>Private\operators\op_chull</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\operators\op_translate\op_translate.h">
-      <Filter>Private\operators\op_translate</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\renderer\color\color.h">
       <Filter>Public\renderer\color</Filter>
     </ClInclude>
@@ -526,12 +502,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\cone\cone.h">
       <Filter>Private\renderer\mesh\cone</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\operators\op_join\op_join.h">
-      <Filter>Private\operators\op_join</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\operators\op_delete\op_delete.h">
-      <Filter>Private\operators\op_delete</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_op_loadobj.h">
       <Filter>Generated Files</Filter>
@@ -898,9 +868,6 @@
     <ClCompile Include="..\..\src\Nubuck\operators\operators.cpp">
       <Filter>Private\operators</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.cpp">
-      <Filter>Private\operators\op_gen_incube</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_operators.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -909,18 +876,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\UI\simple_panel\simple_panel.cpp">
       <Filter>Private\UI\simple_panel</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_op_gen_incube.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_op_gen_incube.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\operators\op_chull\op_chull.cpp">
-      <Filter>Private\operators\op_chull</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\operators\op_translate\op_translate.cpp">
-      <Filter>Private\operators\op_translate</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges.cpp">
       <Filter>Private\renderer\edges</Filter>
@@ -931,23 +886,8 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\tfmesh.cpp">
       <Filter>Private\renderer\mesh</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.cpp">
-      <Filter>Private\operators\op_loadobj</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\cone\cone.cpp">
       <Filter>Private\renderer\mesh\cone</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\operators\op_join\op_join.cpp">
-      <Filter>Private\operators\op_join</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\operators\op_delete\op_delete.cpp">
-      <Filter>Private\operators\op_delete</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_op_loadobj.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_op_loadobj.cpp">
-      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_outln.cpp">
       <Filter>Private\world\entities\ent_geometry</Filter>
@@ -1076,12 +1016,6 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\operators\operators.h">
       <Filter>Private\operators</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.h">
-      <Filter>Private\operators\op_gen_incube</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.h">
-      <Filter>Private\operators\op_loadobj</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\forms\op_loadobj.ui">
       <Filter>Form Files</Filter>

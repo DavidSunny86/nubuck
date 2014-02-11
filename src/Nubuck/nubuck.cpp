@@ -15,15 +15,6 @@
 #include <mainloop\mainloop.h>
 #include "nubuck_private.h"
 
-// REMOVEME
-#include <operators\operators.h>
-#include <operators\op_gen_incube\op_gen_incube.h>
-#include <operators\op_chull\op_chull.h>
-#include <operators\op_translate\op_translate.h>
-#include <operators\op_loadobj\op_loadobj.h>
-#include <operators\op_join\op_join.h>
-#include <operators\op_delete\op_delete.h>
-
 Nubuck nubuck;
 
 namespace {
@@ -91,15 +82,6 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     nubuck.world    = &W::world;
     nubuck.log      = UI::LogWidget::Instance();
     nubuck.ui       = &mainWindow;
-
-    // REMOVEME
-    OP::g_operators.Register(new OP::GEN::InCube());
-    OP::g_operators.Register(new OP::ConvexHull());
-    OP::g_operators.Register(new OP::LoadOBJ());
-    OP::g_operators.Register(new OP::Join());
-    OP::g_operators.Register(new OP::Delete());
-    unsigned op = OP::g_operators.Register(new OP::Translate());
-    OP::g_operators.SetInitOp(op);
 
     mainWindow.show();
     return app.exec();
