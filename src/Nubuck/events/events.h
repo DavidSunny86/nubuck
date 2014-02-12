@@ -102,26 +102,46 @@ struct Blocking {
 } // namespace EventHandlerPolicies
 
 template<
-    typename TYPE, 
     typename POLICY = EventHandlerPolicies::Nonblocking
 >
 class EventHandler {
 protected:
-    struct EventHandlerMapItem;
+    struct AbstractHandler;
 private:
-    std::queue<EV::Event>               _ev_events;
-    SYS::SpinLock                       _ev_eventsMtx;
-    POLICY                              _ev_policy;
+    std::queue<EV::Event>                           _ev_events;
+    SYS::SpinLock                       			_ev_eventsMtx;
+    POLICY                              			_ev_policy;
+    std::vector<GEN::Pointer<AbstractHandler> >     _ev_handlers;
 protected:
-    typedef void (TYPE::*eventHandlerFunc_t)(const EV::Event& event);
-    struct EventHandlerMapItem {
-        bool                valid;
-        unsigned            eventID;
-        eventHandlerFunc_t  func;
+    struct AbstractHandler {
+        unsigned    eventID;
+        virtual void Call(const Event& event) = 0;
     };
 
-    void _EV_HandleEvents(TYPE* instance, const char* className, EventHandlerMapItem eventHandlerMap[]) {                               
-        EventHandlerMapItem invIt = { false, 0, NULL };
+    template<typename TYPE>
+    struct ConcreteHandler : AbstractHandler {
+        typedef void (TYPE::*Memfunc)(const Event& event);
+        TYPE*   instance;
+        Memfunc memfunc;
+
+        void Call(const EV::Event& event) override {
+            (instance->*memfunc)(event);
+        }
+    };
+public:
+    template<typename PARAMS, typename TYPE>
+    void AddEventHandler(const EventDefinition<PARAMS>& eventDef, TYPE* instance, typename ConcreteHandler<TYPE>::Memfunc memfunc) {
+        assert(instance);
+        assert(memfunc);
+        GEN::Pointer<ConcreteHandler<TYPE> > item(new ConcreteHandler<TYPE>());
+        item->eventID = eventDef.GetEventID();
+        item->memfunc = memfunc;
+        item->instance = instance;
+        _ev_handlers.push_back(item);
+    }
+protected:
+    template<typename TYPE>
+    void _EV_HandleEvents(TYPE* instance, const char* className) {                               
         bool done = false;                                  
         while(!done) {                                      
             _ev_policy.WaitEvent();
@@ -134,22 +154,18 @@ protected:
             }                                               
             _ev_eventsMtx.Unlock();                         
             if(done) break;                                 
-            EventHandlerMapItem* it = eventHandlerMap;
-            eventHandlerFunc_t func = NULL;
-            while(it->valid) {                         
-                if(event.id == it->eventID) {           
-                    func = it->func;
-                    break;
-                }                                           
-                it++;
-            }                                               
-            if(func) (instance->*(func))(event);
-            else Event_Default(event);
+            bool called = false;
+            for(unsigned i = 0; i < _ev_handlers.size(); ++i) {
+                if(_ev_handlers[i]->eventID == event.id) {
+                    _ev_handlers[i]->Call(event);
+                    called = true;
+                }
+            }
+            if(!called) Event_Default(event, className);
         } /* while(!done) */                                
     }
 
-    virtual void Event_Default(const EV::Event& event) { 
-        const char* className = "TODO";
+    virtual void Event_Default(const EV::Event& event, const char* className) { 
         common.printf("WARNING - unhandled event '%s' (id = '%d') in class '%s'.\n",
             event.name, event.id, className);
     }
@@ -187,22 +203,4 @@ public:
 
 } // namespace EV
 
-#define DECLARE_EVENT_HANDLER(CLASS)                                                \
-private:                                                                			\
-    static const char*          _ev_className;                          			\
-    static EventHandlerMapItem  _ev_eventHandlerMap[];                              \
-                                                                        			\
-    void HandleEvents(void) {                                           			\
-        _EV_HandleEvents(this, _ev_className, _ev_eventHandlerMap);                 \
-    }
-
-#define BEGIN_EVENT_HANDLER(CLASS)                                                  \
-    const char* CLASS::_ev_className = #CLASS;                                      \
-    CLASS::EventHandlerMapItem CLASS::_ev_eventHandlerMap[] = {
-
-#define EVENT_HANDLER(EVENTDEF, HANDLER)   \
-        { true, EVENTDEF.GetEventID(), HANDLER }, 
-
-#define END_EVENT_HANDLER               \
-        { false, 0, NULL }              \
-    }; /* eventHandlerMap */
+#define DECL_HANDLE_EVENTS(CLASS) void HandleEvents(void) { _EV_HandleEvents(this, #CLASS); }

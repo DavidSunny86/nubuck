@@ -15,10 +15,11 @@ namespace OP {
 
 class Driver;
 
-class Operators : public QObject, public EV::EventHandler<Operators> {
+class Operators : public QObject, public EV::EventHandler<> {
     Q_OBJECT
-    DECLARE_EVENT_HANDLER(Operators)
 private:
+    DECL_HANDLE_EVENTS(Operators)
+
     struct OperatorDesc {
         unsigned    id;
         Operator*   op;

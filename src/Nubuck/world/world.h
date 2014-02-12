@@ -33,9 +33,10 @@ namespace W {
         void*       inf;
     };
 
-    class World : public IWorld, public SYS::Thread, public EV::EventHandler<World> {
-        DECLARE_EVENT_HANDLER(World)
+    class World : public IWorld, public SYS::Thread, public EV::EventHandler<> {
     private:
+        DECL_HANDLE_EVENTS(World)
+
         struct Selection {
             std::vector<IGeometry*> geomList;
             M::Vector3              center; // in world space

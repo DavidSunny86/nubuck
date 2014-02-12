@@ -7,15 +7,16 @@ namespace OP {
 
 class Operator;
 
-class Driver : public SYS::Thread, public EV::EventHandler<Driver, EV::EventHandlerPolicies::Blocking> {
-    DECLARE_EVENT_HANDLER(Driver)
+class Driver : public SYS::Thread, public EV::EventHandler<EV::EventHandlerPolicies::Blocking> {
 private:
+    DECL_HANDLE_EVENTS(Driver)
+
     std::vector<Operator*>& _activeOps;
     SYS::ConditionVariable& _activeOpsMtx;
 
     void Event_SetOperator(const EV::Event& event);
 protected:
-    void Event_Default(const EV::Event& event);
+    void Event_Default(const EV::Event& event, const char* className) override;
 public:
     Driver(std::vector<Operator*>& activeOps, SYS::ConditionVariable& activeOpsMtx);
 

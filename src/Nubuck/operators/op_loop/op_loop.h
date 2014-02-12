@@ -14,14 +14,15 @@ END_EVENT_DEF
 
 namespace OP {
 
-struct LoopPanel : public QWidget, public EV::EventHandler<LoopPanel> {
+struct LoopPanel : public QWidget, public EV::EventHandler<> {
     Q_OBJECT
-    DECLARE_EVENT_HANDLER(LoopPanel)
 public slots:
     void OnButtonClicked() {
         g_operators.InvokeAction(EV::def_OP_Loop_Start.Create(EV::Params_OP_Loop_Start()));
     }
 public:
+    DECL_HANDLE_EVENTS(LoopPanel)
+
     LoopPanel(QWidget* parent = NULL) : QWidget(parent) { 
         QPushButton* button = new QPushButton("Start Loop");
         QVBoxLayout* layout = new QVBoxLayout;

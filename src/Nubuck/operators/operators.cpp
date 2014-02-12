@@ -8,10 +8,6 @@ namespace OP {
 
 Operators g_operators;
 
-BEGIN_EVENT_HANDLER(Operators)
-    EVENT_HANDLER(EV::def_OP_ActionFinished, &Operators::Event_ActionFinished)
-END_EVENT_HANDLER
-
 void Operators::UnloadModules() {
 	for(unsigned i = 0; i < _ops.size(); ++i) {
         OperatorDesc& desc = _ops[i];
@@ -42,6 +38,8 @@ void Operators::OnInvokeOperator(unsigned id) {
 }
 
 Operators::Operators() : _actionsPending(0) {
+    AddEventHandler(EV::def_OP_ActionFinished, this, &Operators::Event_ActionFinished);
+
     _driver = GEN::MakePtr(new Driver(_activeOps, _activeOpsMtx));
     _driver->Thread_StartAsync();
 }

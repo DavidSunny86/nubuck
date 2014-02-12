@@ -99,15 +99,6 @@ void World::Selection::Add(IGeometry* geom) {
     ComputeCenter();
 }
 
-BEGIN_EVENT_HANDLER(World)
-    EVENT_HANDLER(EV::def_Apocalypse,           &World::Event_Apocalypse)
-    EVENT_HANDLER(EV::def_LinkEntity,           &World::Event_LinkEntity)
-    EVENT_HANDLER(EV::def_DestroyEntity,        &World::Event_DestroyEntity)
-    EVENT_HANDLER(EV::def_Resize,               &World::Event_Resize)
-    EVENT_HANDLER(EV::def_Mouse,                &World::Event_Mouse)
-    EVENT_HANDLER(EV::def_Key,                  &World::Event_Key)
-END_EVENT_HANDLER
-
 static M::Vector3 Transform(const M::Matrix4& mat, const M::Vector3& vec, float w) {
     M::Vector3 ret;
     for(int i = 0; i < 3; ++i) {
@@ -322,6 +313,13 @@ void World::BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
 }
 
 World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
+    AddEventHandler(EV::def_Apocalypse,           this, &World::Event_Apocalypse);
+    AddEventHandler(EV::def_LinkEntity,           this, &World::Event_LinkEntity);
+    AddEventHandler(EV::def_DestroyEntity,        this, &World::Event_DestroyEntity);
+    AddEventHandler(EV::def_Resize,               this, &World::Event_Resize);
+    AddEventHandler(EV::def_Mouse,                this, &World::Event_Mouse);
+    AddEventHandler(EV::def_Key,                  this, &World::Event_Key);
+
     Grid_Build();
 
     // set default camera position
