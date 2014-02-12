@@ -12,7 +12,8 @@ void Driver::Event_SetOperator(const EV::Event& event) {
 
 void Driver::Event_Default(const EV::Event& event, const char* className) {
     printf("OP::Driver: default event. forwarding\n");
-    _activeOps.back()->DoAction(event);
+    _activeOps.back()->Send(event);
+    _activeOps.back()->HandleEvents();
 }
 
 Driver::Driver(std::vector<Operator*>& activeOps, SYS::ConditionVariable& activeOpsMtx) : _activeOps(activeOps), _activeOpsMtx(activeOpsMtx) { }

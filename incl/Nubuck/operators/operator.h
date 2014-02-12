@@ -17,14 +17,15 @@ namespace OP {
 
 class Invoker;
 
-class Operator {
+class Operator : public EV::EventHandler<> {
 public:
+    DECL_HANDLE_EVENTS(Operator);
+
     virtual ~Operator() { }
 
     virtual void Register(const Nubuck& nb, Invoker& invoker) = 0;
     virtual void Invoke() = 0;
     virtual void Finish() = 0;
-    virtual void DoAction(const EV::Event& event) { }
 
     virtual void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) { }
     virtual void OnGeometrySelected() { }
