@@ -3,6 +3,8 @@
 #include <vector>
 #include <Nubuck\math\vector2.h>
 
+#include <events\events.h>
+
 struct Nubuck;
 
 namespace R {
@@ -22,6 +24,7 @@ public:
     virtual void Register(const Nubuck& nb, Invoker& invoker) = 0;
     virtual void Invoke() = 0;
     virtual void Finish() = 0;
+    virtual void DoAction(const EV::Event& event) { }
 
     virtual void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) { }
     virtual void OnGeometrySelected() { }

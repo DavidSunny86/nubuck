@@ -70,7 +70,7 @@ namespace UI {
             if(!func) printf("ERROR - unable to load createoperator() function\n");
 			else {
 				OP::Operator* op = func();
-				OP::g_operators.Register(op, lib);
+				OP::g_operators.Register(NULL, op, lib);
 			}
 		}
 	}

@@ -1,10 +1,16 @@
 #include <nubuck_private.h>
 #include <Nubuck\operators\operator_invoker.h>
+#include "operator_events.h"
+#include "operator_driver.h"
 #include "operators.h"
 
 namespace OP {
 
 Operators g_operators;
+
+BEGIN_EVENT_HANDLER(Operators)
+    EVENT_HANDLER(EV::def_OP_ActionFinished, &Operators::Event_ActionFinished)
+END_EVENT_HANDLER
 
 void Operators::UnloadModules() {
 	for(unsigned i = 0; i < _ops.size(); ++i) {
@@ -14,6 +20,10 @@ void Operators::UnloadModules() {
 			desc.module = NULL;
 		}
 	}
+}
+
+void Operators::Event_ActionFinished(const EV::Event& event) {
+    _actionsPending--;
 }
 
 void Operators::OnInvokeOperator(unsigned id) {
@@ -27,30 +37,47 @@ void Operators::OnInvokeOperator(unsigned id) {
     UI::OperatorPanel::Instance()->Clear();
     op = _ops[id].op;
     _activeOps.push_back(op);
+    nubuck.ui->SetOperatorPanel(_ops[id].panel);
     op->Invoke();
+}
+
+Operators::Operators() : _actionsPending(0) {
+    _driver = GEN::MakePtr(new Driver(_activeOps, _activeOpsMtx));
+    _driver->Thread_StartAsync();
 }
 
 Operators::~Operators() {
     UnloadModules();
 }
 
-unsigned Operators::Register(Operator* op, HMODULE module) {
+void Operators::FrameUpdate() {
+    HandleEvents();
+}
+
+unsigned Operators::Register(QWidget* panel, Operator* op, HMODULE module) {
     unsigned id = _ops.size();
 
     Invoker* invoker = new Invoker(id);
-    QObject::connect(invoker, SIGNAL(SigInvokeOperator(unsigned)), this, SLOT(OnInvokeOperator(unsigned)));
+    connect(invoker, SIGNAL(SigInvokeOperator(unsigned)), this, SLOT(OnInvokeOperator(unsigned)));
 
     op->Register(nubuck, *invoker);
 
     OperatorDesc desc;
     desc.id = id;
-    desc.invoker = invoker;
     desc.op = op;
+    desc.invoker = invoker;
 	desc.module = module;
+    desc.panel = panel;
 
     _ops.push_back(desc);
 
     return id;
+}
+
+void Operators::InvokeAction(const EV::Event& event) {
+    _actionsPending++;
+    printf("Operators::InvokeAction\n");
+    _driver->Send(event);
 }
 
 void Operators::SetInitOp(unsigned id) {
@@ -77,6 +104,8 @@ void Operators::SelectGeometry() {
 }
 
 void Operators::OnCameraChanged() {
+    if(IsActiveOperatorBusy()) return;
+
     for(std::vector<Operator*>::reverse_iterator it(_activeOps.rbegin());
         _activeOps.rend() != it; ++it)
     {
@@ -85,6 +114,8 @@ void Operators::OnCameraChanged() {
 }
 
 bool Operators::OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) {
+    if(IsActiveOperatorBusy()) return false;
+
     for(int i = _activeOps.size() - 1; 0 <= i; --i) {
         Operator* op = _activeOps[i];
         if(op->OnMouseDown(mouseCoords, shiftKey)) {
@@ -102,6 +133,8 @@ bool Operators::OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) {
 }
 
 bool Operators::OnMouseMove(const M::Vector2& mouseCoords) {
+    if(IsActiveOperatorBusy()) return false;
+
     for(int i = _activeOps.size() - 1; 0 <= i; --i) {
         Operator* op = _activeOps[i];
         if(op->OnMouseMove(mouseCoords)) {
@@ -119,6 +152,8 @@ bool Operators::OnMouseMove(const M::Vector2& mouseCoords) {
 }
 
 bool Operators::OnMouseUp(const M::Vector2& mouseCoords) {
+    if(IsActiveOperatorBusy()) return false;
+
     for(int i = _activeOps.size() - 1; 0 <= i; --i) {
         Operator* op = _activeOps[i];
         if(op->OnMouseUp(mouseCoords)) {

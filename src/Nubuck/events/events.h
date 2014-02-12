@@ -6,6 +6,7 @@
 #include <common\string_hash.h>
 #include <system\locks\spinlock.h>
 #include <system\locks\condvar.h>
+#include <system\locks\semaphore.h>
 #include <system\locks\shared_resources.h>
 
 // events are sent and received between threads. a thread queues it's received events
@@ -84,14 +85,34 @@ public:
 
 namespace EV {
 
-template<typename TYPE>
+namespace EventHandlerPolicies {
+
+struct Nonblocking {
+    void WaitEvent() { }
+    void SignalEvent() { }
+};
+
+struct Blocking {
+    SYS::Semaphore _sem;
+    Blocking() : _sem(0) { }
+    void WaitEvent() { _sem.Wait(); }
+    void SignalEvent() { _sem.Signal(); }
+};
+
+} // namespace EventHandlerPolicies
+
+template<
+    typename TYPE, 
+    typename POLICY = EventHandlerPolicies::Nonblocking
+>
 class EventHandler {
-public:
+protected:
     struct EventHandlerMapItem;
 private:
     std::queue<EV::Event>               _ev_events;
     SYS::SpinLock                       _ev_eventsMtx;
-public:
+    POLICY                              _ev_policy;
+protected:
     typedef void (TYPE::*eventHandlerFunc_t)(const EV::Event& event);
     struct EventHandlerMapItem {
         bool                valid;
@@ -103,6 +124,7 @@ public:
         EventHandlerMapItem invIt = { false, 0, NULL };
         bool done = false;                                  
         while(!done) {                                      
+            _ev_policy.WaitEvent();
             EV::Event event;                                
             _ev_eventsMtx.Lock();                           
             if(_ev_events.empty()) done = true;             
@@ -122,18 +144,24 @@ public:
                 it++;
             }                                               
             if(func) (instance->*(func))(event);
-            else {
-                common.printf("WARNING - unhandled event '%s' (id = '%d') in class '%s'.\n",
-                    event.name, event.id, className);
-            }
+            else Event_Default(event);
         } /* while(!done) */                                
     }
+
+    virtual void Event_Default(const EV::Event& event) { 
+        const char* className = "TODO";
+        common.printf("WARNING - unhandled event '%s' (id = '%d') in class '%s'.\n",
+            event.name, event.id, className);
+    }
 public:
+    virtual ~EventHandler() { }
+
     void Send(const EV::Event& event) { // nonblocking
         assert(NULL == event.block);
         _ev_eventsMtx.Lock();
         _ev_events.push(event);
         _ev_eventsMtx.Unlock();
+        _ev_policy.SignalEvent();
     }
 
     void SendAndWait(EV::Event event) { // blocking
@@ -149,6 +177,7 @@ public:
         _ev_eventsMtx.Lock();
         _ev_events.push(event);
         _ev_eventsMtx.Unlock();
+        _ev_policy.SignalEvent();
 
         block.mtx->Lock();
         while(!block.sig) block.cv->Wait(*block.mtx);
@@ -161,18 +190,15 @@ public:
 #define DECLARE_EVENT_HANDLER(CLASS)                                                \
 private:                                                                			\
     static const char*          _ev_className;                          			\
-    static EV::EventHandler<CLASS>::EventHandlerMapItem  _ev_eventHandlerMap[];     \
-    EV::EventHandler<CLASS>         _ev_handler;                            		\
+    static EventHandlerMapItem  _ev_eventHandlerMap[];                              \
                                                                         			\
     void HandleEvents(void) {                                           			\
-        _ev_handler._EV_HandleEvents(this, _ev_className, _ev_eventHandlerMap);     \
-    }                                                                               \
-    public: void Send(const EV::Event& event) { _ev_handler.Send(event); }          \
-    void SendAndWait(const EV::Event& event) { _ev_handler.SendAndWait(event); }
+        _EV_HandleEvents(this, _ev_className, _ev_eventHandlerMap);                 \
+    }
 
 #define BEGIN_EVENT_HANDLER(CLASS)                                                  \
     const char* CLASS::_ev_className = #CLASS;                                      \
-    EV::EventHandler<CLASS>::EventHandlerMapItem CLASS::_ev_eventHandlerMap[] = {
+    CLASS::EventHandlerMapItem CLASS::_ev_eventHandlerMap[] = {
 
 #define EVENT_HANDLER(EVENTDEF, HANDLER)   \
         { true, EVENTDEF.GetEventID(), HANDLER }, 

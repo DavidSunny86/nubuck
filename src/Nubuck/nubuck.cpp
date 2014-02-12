@@ -15,6 +15,10 @@
 #include <mainloop\mainloop.h>
 #include "nubuck_private.h"
 
+// REMOVEME
+#include <operators\operators.h>
+#include <operators\op_loop\op_loop.h>
+
 Nubuck nubuck;
 
 namespace {
@@ -82,6 +86,9 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     nubuck.world    = &W::world;
     nubuck.log      = UI::LogWidget::Instance();
     nubuck.ui       = &mainWindow;
+
+    // REMOVEME
+    OP::g_operators.Register(new OP::LoopPanel, new OP::Loop);
 
     mainWindow.show();
     return app.exec();

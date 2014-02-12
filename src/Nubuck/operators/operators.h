@@ -7,31 +7,49 @@
 #include <vector>
 #include <Nubuck\operators\operator.h>
 #include <UI\operatorpanel\operatorpanel.h>
+#include <events\events.h>
 #include <renderer\renderer.h>
+#include <system\thread\thread.h>
 
 namespace OP {
 
-class Operators : public QObject {
+class Driver;
+
+class Operators : public QObject, public EV::EventHandler<Operators> {
     Q_OBJECT
+    DECLARE_EVENT_HANDLER(Operators)
 private:
     struct OperatorDesc {
         unsigned    id;
         Operator*   op;
         Invoker*    invoker;
+        QWidget*    panel;
         HMODULE     module;
     };
 
     std::vector<OperatorDesc>   _ops;       // all registered operators
     std::vector<Operator*>      _activeOps; // active operators
+    SYS::ConditionVariable      _activeOpsMtx;
+    unsigned                    _actionsPending;
+
+    GEN::Pointer<Driver>        _driver;
+
+    bool IsActiveOperatorBusy() const { return 0 <_actionsPending; }
 
     void UnloadModules();
+
+    void Event_ActionFinished(const EV::Event& event);
 public slots:
     void OnInvokeOperator(unsigned id);
 public:
-    Operators() { }
+    Operators();
     ~Operators();
 
-    unsigned Register(Operator* op, HMODULE module = NULL);
+    void FrameUpdate();
+
+    unsigned Register(QWidget* panel, Operator* op, HMODULE module = NULL);
+
+    void InvokeAction(const EV::Event& event);
 
     void SetInitOp(unsigned id);
 

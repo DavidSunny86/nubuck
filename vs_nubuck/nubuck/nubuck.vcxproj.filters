@@ -234,6 +234,9 @@
     <Filter Include="Private\math">
       <UniqueIdentifier>{a931bd0d-0974-411d-b66f-99c8f14ada6b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_loop">
+      <UniqueIdentifier>{72aaef09-493a-44f1-a76a-6c94612cfd55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -589,6 +592,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\UI\window_events.h">
       <Filter>Private\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\operator_driver.h">
+      <Filter>Private\operators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\operator_events.h">
+      <Filter>Private\operators</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -958,6 +967,18 @@
     <ClCompile Include="..\..\src\Nubuck\common\string_hash.cpp">
       <Filter>Private\common</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_loop\op_loop.cpp">
+      <Filter>Private\operators\op_loop</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_op_loop.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_op_loop.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\operator_driver.cpp">
+      <Filter>Private\operators</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1025,6 +1046,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\incl\Nubuck\operators\operator_invoker.h">
       <Filter>Public\operators</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_loop\op_loop.h">
+      <Filter>Private\operators\op_loop</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
