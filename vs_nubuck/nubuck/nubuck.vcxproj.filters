@@ -479,9 +479,6 @@
     <ClInclude Include="..\..\incl\Nubuck\polymesh_fwd.h">
       <Filter>Public\polymesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\UI\operatorpanel\operatorpanel.h">
-      <Filter>Private\UI\operatorpanel</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\UI\simple_panel\simple_panel.h">
       <Filter>Private\UI\simple_panel</Filter>
     </ClInclude>
@@ -598,6 +595,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\operators\operator_events.h">
       <Filter>Private\operators</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_operatorpanelheader.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1049,6 +1049,12 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\operators\op_loop\op_loop.h">
       <Filter>Private\operators\op_loop</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\operatorpanelheader.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\operatorpanel\operatorpanel.h">
+      <Filter>Private\UI\operatorpanel</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

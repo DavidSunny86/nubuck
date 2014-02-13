@@ -102,7 +102,7 @@ namespace UI {
     }
 
     void MainWindow::SetOperatorName(const char* name) {
-        OperatorPanel::Instance()->setWindowTitle(QString("Operator ") + name);
+        OperatorPanel::Instance()->SetOperatorName(name);
     }
 
     void MainWindow::SetOperatorPanel(QWidget* panel) {

@@ -8,8 +8,8 @@
 namespace OP {
 
 void Loop::Event_OP_Loop_Start(const EV::Event& event) {
-    while(true) {
-        printf("OP::LOOP, Doing some action!\n");
+    for(unsigned i = 0; i < 50; ++i) {
+        printf("OP::LOOP %8d, Doing some action!\n", i);
         Sleep(100);
     }
 }

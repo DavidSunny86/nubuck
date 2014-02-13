@@ -30,7 +30,7 @@ private:
 
     std::vector<OperatorDesc>   _ops;       // all registered operators
     std::vector<Operator*>      _activeOps; // active operators
-    SYS::ConditionVariable      _activeOpsMtx;
+    SYS::SpinLock               _activeOpsMtx;
     unsigned                    _actionsPending;
 
     GEN::Pointer<Driver>        _driver;
