@@ -8,6 +8,7 @@
 #include <operators\operators.h>
 
 #include <Nubuck\operators\operator.h>
+#include <world\entities\ent_geometry\ent_geometry.h>
 
 BEGIN_EVENT_DEF(OP_Loop_Start)
 END_EVENT_DEF
@@ -36,6 +37,7 @@ public:
 class Loop : public Operator {
 private:
     Nubuck _nb;
+    W::ENT_Geometry* _geom;
 
     void Event_OP_Loop_Start(const EV::Event& event);
 public:

@@ -11,13 +11,18 @@
 namespace OP {
 
 void Loop::Event_OP_Loop_Start(const EV::Event& event) {
+    if(_geom) {
+        _geom->SetEdgeRadius(0.25);
+        _geom->SetEdgeColor(R::Color::Red);
+	}
+
     for(unsigned i = 0; i < 50; ++i) {
         printf("OP::LOOP %8d, Doing some action!\n", i);
         Sleep(100);
     }
 }
 
-Loop::Loop() {
+Loop::Loop() : _geom(NULL) {
     AddEventHandler(EV::def_OP_Loop_Start, this, &Loop::Event_OP_Loop_Start);
 }
 
@@ -40,12 +45,12 @@ void Loop::Invoke() {
 	L.push_back(leda::d3_rat_point( 1,  1, -1));
 	L.push_back(leda::d3_rat_point( 1,  1,  1));
 
-	IGeometry* geom = _nb.world->CreateGeometry();
-	geom->SetRenderMode(IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES);
-	leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+	_geom = (W::ENT_Geometry*)_nb.world->CreateGeometry();
+	_geom->SetRenderMode(IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES);
+	leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
 	leda::CONVEX_HULL(L, mesh);
 	mesh.compute_faces();
-	geom->Update();
+	_geom->Update();
 }
 
 } // namespace OP

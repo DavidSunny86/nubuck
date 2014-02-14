@@ -117,7 +117,7 @@ namespace GEN {
     template<typename TYPE, typename REFCNT>
     template<typename IMPLICIT>
     inline Pointer<TYPE, REFCNT>& Pointer<TYPE, REFCNT>::operator=(const Pointer<IMPLICIT, REFCNT>& other) {
-        if(this != &other) {
+        if((void*)this != (void*)&other) {
             Drop();
             if((_raw = other._raw) && (_cnt = other._cnt)) _cnt->Inc();
         }

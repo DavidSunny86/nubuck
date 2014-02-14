@@ -18,6 +18,9 @@ private:
     QSlider*            _sldHullAlpha;
 
     void InitOutline();
+
+    void Event_EdgeRadiusChanged(const EV::Event& event);
+    void Event_EdgeColorChanged(const EV::Event& event);
 private slots:
     void OnEdgeRadiusChanged(double value);
     void OnEdgeColorChanged(float r, float g, float b);
@@ -25,6 +28,8 @@ public:
     ENT_GeometryOutln(ENT_Geometry& subject);
 
     DECL_HANDLE_EVENTS(ENT_GeometryOutln);
+
+	void InitUI() override { InitOutline(); }
 };
 
 } // namespace W

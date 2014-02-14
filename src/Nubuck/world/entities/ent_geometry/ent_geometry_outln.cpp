@@ -11,15 +11,20 @@
 namespace W {
 
 void ENT_GeometryOutln::OnEdgeRadiusChanged(double value) {
-    // SetEdgeRadius((float)value);
+	EV::Params_ENT_Geometry_EdgeRadiusChanged args;
+	args.edgeRadius = (float)value;
+	_subject.Send(EV::def_ENT_Geometry_EdgeRadiusChanged.Create(args));
 }
 
 void ENT_GeometryOutln::OnEdgeColorChanged(float r, float g, float b) {
-    // SetEdgeColor(R::Color(r, g, b));
+	EV::Params_ENT_Geometry_EdgeColorChanged args;
+	args.edgeColor = R::Color(r, g, b);
+	_subject.Send(EV::def_ENT_Geometry_EdgeColorChanged.Create(args));
 }
 
 ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) {
-    InitOutline();
+	AddEventHandler(EV::def_ENT_Geometry_EdgeRadiusChanged, this, &ENT_GeometryOutln::Event_EdgeRadiusChanged);
+	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_GeometryOutln::Event_EdgeColorChanged);
 }
 
 void ENT_GeometryOutln::InitOutline() {
@@ -30,11 +35,12 @@ void ENT_GeometryOutln::InitOutline() {
     _sbEdgeRadius->setMinimum(0.05f);
     _sbEdgeRadius->setMaximum(5.00f);
     _sbEdgeRadius->setSingleStep(0.1f);
-	// _sbEdgeRadius->setValue(_edgeRadius);
+	_sbEdgeRadius->setValue(_subject.GetEdgeRadius());
 
     QLabel* lblEdgeColor = new QLabel("edge color:");
     _btnEdgeColor = new UI::ColorButton;
-	// _btnEdgeColor->SetColor(_edgeColor.r, _edgeColor.g, _edgeColor.b);
+	R::Color edgeColor = _subject.GetEdgeColor();
+	_btnEdgeColor->SetColor(edgeColor.r, edgeColor.g, edgeColor.b);
 
     QLabel* lblHullAlpha = new QLabel("hull alpha:");
     _sldHullAlpha = new QSlider(Qt::Horizontal);
@@ -59,6 +65,20 @@ void ENT_GeometryOutln::InitOutline() {
     /*
     connect(sldHullAlpha, SIGNAL(valueChanged(int)), outln.polyhedron, SLOT(OnHullAlphaChanged(int)));
     */
+}
+
+void ENT_GeometryOutln::Event_EdgeRadiusChanged(const EV::Event& event) {
+	const EV::Params_ENT_Geometry_EdgeRadiusChanged& args = EV::def_ENT_Geometry_EdgeRadiusChanged.GetArgs(event);
+	_sbEdgeRadius->blockSignals(true);
+	_sbEdgeRadius->setValue(args.edgeRadius);
+	_sbEdgeRadius->blockSignals(false);
+}
+
+void ENT_GeometryOutln::Event_EdgeColorChanged(const EV::Event& event) {
+	const EV::Params_ENT_Geometry_EdgeColorChanged& args = EV::def_ENT_Geometry_EdgeColorChanged.GetArgs(event);
+	_btnEdgeColor->blockSignals(true);
+	_btnEdgeColor->SetColor(args.edgeColor.r, args.edgeColor.g, args.edgeColor.b);
+	_btnEdgeColor->blockSignals(false);
 }
 
 } // namespace W

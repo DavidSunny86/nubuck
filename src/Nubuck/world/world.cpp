@@ -219,6 +219,12 @@ void World::Event_Apocalypse(const EV::Event& event) {
 void World::Event_LinkEntity(const EV::Event& event) {
     const EV::Params_LinkEntity& args = EV::def_LinkEntity.GetArgs(event);
     GEN::Pointer<Entity> entity(args.entity);
+	if(W::EntityType::ENT_GEOMETRY == entity->GetType()) {
+        ENT_Geometry& geom = (ENT_Geometry&)*entity;
+		GEN::Pointer<UI::Outliner::View> view = geom.GetOutlinerView();
+		view->InitUI();
+		UI::Outliner::Instance()->AddItem("Polyhedron", view);
+	}
     _entities.push_back(entity);
 }
 
@@ -381,6 +387,7 @@ void World::Update(void) {
         GEN::Pointer<Entity> entity = _entities[i];
         if(EntityType::ENT_GEOMETRY == entity->GetType()) {
             ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
+			geom.HandleEvents();
             geom.CompileMesh();
             geom.FrameUpdate();
             geom.BuildRenderList();

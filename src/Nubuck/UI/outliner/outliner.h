@@ -35,6 +35,8 @@ public:
         bool IsDead() const { return _isDead; }
 
         DECL_HANDLE_EVENTS(View);
+
+        virtual void InitUI() = 0;
     };
 
     struct Item {
@@ -54,6 +56,8 @@ public:
     typedef LinkedItem* itemHandle_t;
 
     Outliner(QWidget* parent = NULL);
+
+    void HandleEvents();
 
     itemHandle_t AddItem(const QString& name, const GEN::Pointer<View>& view);
     void RemoveItem(itemHandle_t item);

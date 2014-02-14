@@ -47,6 +47,14 @@ Outliner::View::View() : _isDead(false) {
     AddEventHandler(EV::def_Outliner_DeleteOutline, this, &Outliner::View::Event_DeleteOutline);
 }
 
+void Outliner::HandleEvents() {
+    LinkedItem* it = _items;
+    while(it) {
+		it->view->HandleEvents();
+		it = it->next;
+	}
+}
+
 Outliner::itemHandle_t Outliner::AddItem(const QString& name, const GEN::Pointer<View>& view) {
     LinkedItem* item = new LinkedItem();
 
