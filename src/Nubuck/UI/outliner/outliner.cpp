@@ -43,7 +43,11 @@ void Outliner::PolyhedronOutline_Init(EntityOutline& outln) {
 }
 */
 
-Outliner::itemHandle_t Outliner::AddItem(const QString& name, QWidget* content) {
+Outliner::View::View() : _isDead(false) {
+    AddEventHandler(EV::def_Outliner_DeleteOutline, this, &Outliner::View::Event_DeleteOutline);
+}
+
+Outliner::itemHandle_t Outliner::AddItem(const QString& name, const GEN::Pointer<View>& view) {
     LinkedItem* item = new LinkedItem();
 
     QTreeWidgetItem* headerIt = new QTreeWidgetItem;
@@ -56,10 +60,10 @@ Outliner::itemHandle_t Outliner::AddItem(const QString& name, QWidget* content) 
 
     QTreeWidgetItem* contentIt = new QTreeWidgetItem;
     headerIt->addChild(contentIt);
-    content = new QWidget;
-    _treeWidget->setItemWidget(contentIt, 0, content);
+    item->view = view;
+    _treeWidget->setItemWidget(contentIt, 0, item->view.Raw());
 	item->contentIt = contentIt;
-	item->content = content;
+
 
 	item->prev = NULL;
 	item->next = _items;

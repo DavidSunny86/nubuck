@@ -107,7 +107,7 @@ namespace W {
         void Render(R::RenderList& renderList);
 
         // exported to client
-        IGeometry* CreateGeometry() override;
+        IGeometry* CreateGeometry() override; // thread-safe
 
         void SelectGeometry(IGeometry* geom) override;
         void AddToSelection(IGeometry* geom);

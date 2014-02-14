@@ -16,13 +16,30 @@
 #include <world\world.h>
 #include <world\entity.h>
 
+BEGIN_EVENT_DEF(Outliner_DeleteOutline)
+END_EVENT_DEF
+
 namespace UI {
 
 class Outliner : public QWidget {
 public:
+    struct View : public QWidget, public EV::EventHandler<> {
+    private:
+        bool    _isDead;
+
+        void Event_DeleteOutline(const EV::Event& event) { _isDead = true; }
+    public:
+        View();
+        virtual ~View() { }
+
+        bool IsDead() const { return _isDead; }
+
+        DECL_HANDLE_EVENTS(View);
+    };
+
     struct Item {
-        QPushButton*    header;
-        QWidget*        content;
+        QPushButton*        header;
+        GEN::Pointer<View>  view; 
 	};
 private:
     struct LinkedItem : Item {
@@ -38,12 +55,13 @@ public:
 
     Outliner(QWidget* parent = NULL);
 
-    itemHandle_t AddItem(const QString& name, QWidget* content);
+    itemHandle_t AddItem(const QString& name, const GEN::Pointer<View>& view);
     void RemoveItem(itemHandle_t item);
 
 	Item& GetItem(itemHandle_t item) { return *item; }
+
     void UpdateItem(itemHandle_t item) {
-    _treeWidget->setItemWidget(item->contentIt, 0, item->content);
+        _treeWidget->setItemWidget(item->contentIt, 0, item->view.Raw());
 	}
 
     static Outliner* Instance(void);

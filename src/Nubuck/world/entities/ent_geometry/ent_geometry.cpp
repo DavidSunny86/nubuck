@@ -1,9 +1,6 @@
 #include <world\world.h>
+#include "ent_geometry_outln.h"
 #include "ent_geometry.h"
-
-// removeme
-#include <UI\outliner\outliner.h>
-#include <QLabel>
 
 namespace {
 
@@ -94,9 +91,10 @@ _shadingMode(ShadingMode::NICE)
 
     _edgeRadius = 0.02f;
     _edgeColor = R::Color(0.3f, 0.3f, 0.3f);
+}
 
-    _outln.item = UI::Outliner::Instance()->AddItem("nil", new QLabel("test"));
-    InitOutline();
+GEN::Pointer<UI::Outliner::View> ENT_Geometry::GetOutlinerView() {
+    return GEN::MakePtr(new ENT_GeometryOutln(*this));
 }
 
 bool ENT_Geometry::IsMeshCompiled() const { return _meshCompiled; }
@@ -156,17 +154,11 @@ void ENT_Geometry::ApplyTransformation() {
 
 void ENT_Geometry::SetEdgeRadius(float edgeRadius) {
     _edgeRadius = edgeRadius;
-    _outln.sbEdgeRadius->blockSignals(true);
-    _outln.sbEdgeRadius->setValue(_edgeRadius);
-    _outln.sbEdgeRadius->blockSignals(false);
     RebuildRenderEdges();
 }
 
 void ENT_Geometry::SetEdgeColor(const R::Color& color) {
     _edgeColor = color;
-    _outln.btnEdgeColor->blockSignals(true);
-    _outln.btnEdgeColor->SetColor(_edgeColor.r, _edgeColor.g, _edgeColor.b);
-    _outln.btnEdgeColor->blockSignals(false);
     RebuildRenderEdges();
 }
 
@@ -202,10 +194,6 @@ void ENT_Geometry::CompileMesh() {
 }
 
 void ENT_Geometry::Destroy() { 
-    if(_outln.item) {
-        UI::Outliner::Instance()->RemoveItem(_outln.item);
-        _outln.item = NULL;
-    }
     Entity::Destroy(); 
 }
 

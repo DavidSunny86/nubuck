@@ -14,8 +14,7 @@
 
 namespace W {
 
-class ENT_Geometry : public QObject, public IGeometry, public Entity {
-    Q_OBJECT
+class ENT_Geometry : public IGeometry, public Entity {
 private:
     leda::nb::RatPolyMesh _ratPolyMesh;
 
@@ -49,23 +48,12 @@ private:
 
     M::Box              _bbox;      // untransformed bounding box
 
-    struct {
-		UI::Outliner::itemHandle_t  item;
-
-        QDoubleSpinBox*             sbEdgeRadius;
-        UI::ColorButton*    		btnEdgeColor;
-        QSlider*            		sldHullAlpha;
-	} _outln;
-
-    void InitOutline();
-
     void ComputeCenter();
     void ComputeBoundingBox();
-private slots:
-    void OnEdgeRadiusChanged(double value);
-    void OnEdgeColorChanged(float r, float g, float b);
 public:
     ENT_Geometry();
+
+    GEN::Pointer<UI::Outliner::View> GetOutlinerView();
 
     bool IsMeshCompiled() const;
     void CompileMesh();
