@@ -33,11 +33,12 @@ public:
 
     virtual bool IsEmpty() const = 0;
 
-    virtual void Clear() = 0;
-    virtual void Push(const Edge& edge) = 0;
-    virtual void Rebuild() = 0;
+    virtual void Rebuild(const std::vector<Edge>& edges) = 0;
 
     virtual void SetTransform(const M::Matrix4& transform, const M::Matrix4& modelView) = 0;
+
+    virtual void BuildRenderMesh() = 0;
+    virtual void DestroyRenderMesh() = 0;
 
     virtual MeshJob GetRenderJob() const = 0;
 };

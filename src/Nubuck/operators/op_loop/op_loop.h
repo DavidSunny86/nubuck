@@ -35,12 +35,14 @@ public:
 
 class Loop : public Operator {
 private:
+    Nubuck _nb;
+
     void Event_OP_Loop_Start(const EV::Event& event);
 public:
     Loop();
 
     void Register(const Nubuck& nb, Invoker& invoker) override;
-    void Invoke() override { }
+    void Invoke() override;
     void Finish() override { }
 };
 

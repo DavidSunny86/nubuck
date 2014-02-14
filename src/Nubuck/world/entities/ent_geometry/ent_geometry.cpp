@@ -1,3 +1,4 @@
+#include <system\locks\scoped_lock.h>
 #include <world\world.h>
 #include "ent_geometry_outln.h"
 #include "ent_geometry.h"
@@ -102,18 +103,19 @@ bool ENT_Geometry::IsMeshCompiled() const { return _meshCompiled; }
 void ENT_Geometry::RebuildRenderNodes() {
     leda::node v;
 
-    _nodes.Clear();
+	std::vector<R::Nodes::Node> nodes;
     forall_nodes(v, _ratPolyMesh) {
         R::Nodes::Node rnode;
         rnode.position = _fpos[v->id()];
         rnode.color = R::Color(0.3f, 0.3f, 0.3f);
-        _nodes.Push(rnode);
+		nodes.push_back(rnode);
     }
-    _nodes.Rebuild();
+    _nodes.Rebuild(nodes);
 }
 
 void ENT_Geometry::RebuildRenderEdges() {
-    _edgeRenderer->Clear();
+    // TODO: don't draw reversal edges!
+	std::vector<R::EdgeRenderer::Edge> edges;
     R::EdgeRenderer::Edge re;
     re.radius = _edgeRadius;
     leda::edge e;
@@ -121,12 +123,14 @@ void ENT_Geometry::RebuildRenderEdges() {
         re.color = _edgeColor;
         re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
         re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
-        _edgeRenderer->Push(re);
+		edges.push_back(re);
     }
-    _edgeRenderer->Rebuild();
+    _edgeRenderer->Rebuild(edges);
 }
 
 void ENT_Geometry::Update() {
+	SYS::ScopedLock lock(_mtx);
+
     CacheFPos();
     RebuildRenderNodes();
     RebuildRenderEdges();
@@ -139,6 +143,8 @@ static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
 }
 
 void ENT_Geometry::ApplyTransformation() {
+	SYS::ScopedLock lock(_mtx);
+
     leda::node n;
     forall_nodes(n, _ratPolyMesh) {
         M::Vector3 pos = Transform(ToVector(_ratPolyMesh.position_of(n)));
@@ -153,34 +159,47 @@ void ENT_Geometry::ApplyTransformation() {
 }
 
 void ENT_Geometry::SetEdgeRadius(float edgeRadius) {
+	SYS::ScopedLock lock(_mtx);
     _edgeRadius = edgeRadius;
     RebuildRenderEdges();
 }
 
 void ENT_Geometry::SetEdgeColor(const R::Color& color) {
+	SYS::ScopedLock lock(_mtx);
     _edgeColor = color;
     RebuildRenderEdges();
 }
 
 const M::Vector3& ENT_Geometry::GetLocalCenter() const { 
+	SYS::ScopedLock lock(_mtx);
     return _bbox.min + 0.5f * (_bbox.max - _bbox.min); 
 }
 
 M::Vector3 ENT_Geometry::GetGlobalCenter() { 
+	SYS::ScopedLock lock(_mtx);
     return Transform(GetLocalCenter()); 
 }
 
-const M::Box& ENT_Geometry::GetBoundingBox() const { return _bbox; }
+const M::Box& ENT_Geometry::GetBoundingBox() const { 
+	SYS::ScopedLock lock(_mtx);
+	return _bbox; 
+}
 
 void ENT_Geometry::GetPosition(float& x, float& y, float& z) const {
+	SYS::ScopedLock lock(_mtx);
     x = GetTransform().position.x;
     y = GetTransform().position.y;
     z = GetTransform().position.z;
 }
 
-void ENT_Geometry::SetPosition(float x, float y, float z) { GetTransform().position = M::Vector3(x, y, z); }
+void ENT_Geometry::SetPosition(float x, float y, float z) { 
+	SYS::ScopedLock lock(_mtx);
+	GetTransform().position = M::Vector3(x, y, z);
+}
 
 void ENT_Geometry::CompileMesh() {
+	SYS::ScopedLock lock(_mtx);
+
     if(_meshCompiled) return;
 
     if(NULL != _mesh) R::meshMgr.Destroy(_mesh);
@@ -194,22 +213,53 @@ void ENT_Geometry::CompileMesh() {
 }
 
 void ENT_Geometry::Destroy() { 
+	SYS::ScopedLock lock(_mtx);
+	_nodes.DestroyRenderMesh();
+	_edgeRenderer->DestroyRenderMesh();
     Entity::Destroy(); 
 }
 
 leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() { return _ratPolyMesh; }
 
 void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
+	SYS::ScopedLock lock(_mtx);
     GetTransform().rotation = M::RotationOf(M::Mat4::RotateAxis(M::Normalize(M::Vector3(x, y, z)), ang)) * GetTransform().rotation;
 }
 
+void ENT_Geometry::Show() { 
+	SYS::ScopedLock lock(_mtx);
+	_isHidden = false; 
+}
+
+void ENT_Geometry::Hide() { 
+	SYS::ScopedLock lock(_mtx);
+	_isHidden = true; 
+}
+
+void ENT_Geometry::SetRenderMode(int flags) { 
+	SYS::ScopedLock lock(_mtx);
+	_renderMode = flags; 
+}
+
+void ENT_Geometry::SetRenderLayer(unsigned layer) { 
+	SYS::ScopedLock lock(_mtx);
+	_renderLayer = layer; 
+}
+
+void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) { 
+	SYS::ScopedLock lock(_mtx);
+	_shadingMode = mode; 
+}
+
 void ENT_Geometry::FrameUpdate() {
+	SYS::ScopedLock lock(_mtx);
     M::Matrix4 tf = M::Mat4::FromRigidTransform(GetTransform().rotation, GetTransform().position);
     _nodes.Transform(world.GetCameraMatrix() * tf);
     _edgeRenderer->SetTransform(tf, world.GetCameraMatrix());
 }
 
 void ENT_Geometry::BuildRenderList() {
+	SYS::ScopedLock lock(_mtx);
     _renderList.meshJobs.clear();
 
     if(_isHidden) return;
@@ -227,12 +277,14 @@ void ENT_Geometry::BuildRenderList() {
     }
 
     if(RenderMode::NODES & _renderMode && ShadingMode::NICE == _shadingMode && !_nodes.IsEmpty()) {
+	    _nodes.BuildRenderMesh();
         R::MeshJob rjob = _nodes.GetRenderJob();
         rjob.layer = _renderLayer;
         _renderList.meshJobs.push_back(rjob);
     }
 
     if(RenderMode::EDGES & _renderMode && ShadingMode::NICE == _shadingMode && !_edgeRenderer->IsEmpty()) {
+		_edgeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _edgeRenderer->GetRenderJob();
         rjob.layer = _renderLayer;
         _renderList.meshJobs.push_back(rjob);

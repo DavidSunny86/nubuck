@@ -16,12 +16,7 @@ void Nodes::DestroyMesh() {
 }
 
 Nodes::~Nodes() {
-    DestroyMesh();
-}
-
-void Nodes::Clear() {
-    _nodes.clear();
-    DestroyMesh();
+    // DestroyMesh();
 }
 
 // camera position at 0
@@ -48,7 +43,11 @@ static M::Matrix4 Billboard_FaceViewingPlane(const M::Matrix4& worldMat, const M
         0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-void Nodes::Rebuild() {
+void Nodes::Rebuild(const std::vector<Node>& nodes) {
+	SYS::ScopedLock lock(_mtx);
+
+    _nodes = nodes;
+
     unsigned numBillboards = _nodes.size();
     unsigned numBillboardIndices = 5 * numBillboards - 1;
 
@@ -77,28 +76,13 @@ void Nodes::Rebuild() {
     }
     assert(numBillboardIndices == _billboardIndices.size());
 
-
-    if(!_nodes.empty()) {
-        assert(NULL == _mesh);
-
-        Mesh::Desc meshDesc;
-        meshDesc.vertices = &_billboards[0].verts[0];
-        meshDesc.numVertices = 4 * numBillboards;
-        meshDesc.indices = &_billboardIndices[0];
-        meshDesc.numIndices = numBillboardIndices;
-        meshDesc.primType = GL_TRIANGLE_FAN;
-        
-        _mesh = meshMgr.Create(meshDesc);
-
-        assert(NULL == _tfmesh);
-
-        _tfmesh = meshMgr.Create(_mesh);
-        meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
-    }
+    _needsRebuild = true;
 }
 
 void Nodes::Transform(const M::Matrix4& modelView) {
-    if(IsEmpty()) return;
+	SYS::ScopedLock lock(_mtx);
+
+	if(_nodes.empty()) return;
 
 	float nodeSize = cvar_r_nodeSize;
     const M::Vector3 bbPositions[4] = {
@@ -114,11 +98,48 @@ void Nodes::Transform(const M::Matrix4& modelView) {
         }
     }
 
-    if(_mesh) meshMgr.GetMesh(_mesh).Invalidate(&_billboards[0].verts[0]);
+    _isInvalid = true;
+}
+
+void Nodes::BuildRenderMesh() {
+	SYS::ScopedLock lock(_mtx);
+
+    unsigned numBillboards = _nodes.size();
+    unsigned numBillboardIndices = 5 * numBillboards - 1;
+
+    if(_isInvalid && _mesh) {
+		meshMgr.GetMesh(_mesh).Invalidate(&_billboards[0].verts[0]);
+        _isInvalid = false;
+	}
+
+    if(_needsRebuild && !_nodes.empty()) {
+        if(_mesh) DestroyMesh();
+
+		if(!_nodes.empty()) {
+			Mesh::Desc meshDesc;
+			meshDesc.vertices = &_billboards[0].verts[0];
+			meshDesc.numVertices = 4 * numBillboards;
+			meshDesc.indices = &_billboardIndices[0];
+			meshDesc.numIndices = numBillboardIndices;
+			meshDesc.primType = GL_TRIANGLE_FAN;
+
+			_mesh = meshMgr.Create(meshDesc);
+			_tfmesh = meshMgr.Create(_mesh);
+			meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
+		}
+
+        _needsRebuild = false;
+    }
+}
+
+void Nodes::DestroyRenderMesh() {
+    DestroyMesh();
 }
 
 MeshJob Nodes::GetRenderJob() const {
-    assert(!IsEmpty());
+	SYS::ScopedLock lock(_mtx);
+
+	assert(!_nodes.empty());
 
     R::MeshJob meshJob;
     meshJob.fx = "NodeBillboard";

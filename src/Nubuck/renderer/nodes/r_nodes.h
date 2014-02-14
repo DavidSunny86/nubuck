@@ -20,24 +20,32 @@ public:
 private:
     struct Billboard { Mesh::Vertex verts[4]; };
 
+	mutable SYS::SpinLock _mtx;
+
     std::vector<Node>               _nodes;
     std::vector<Billboard>          _billboards;
     std::vector<Mesh::Index>        _billboardIndices;
     meshPtr_t                       _mesh;
     tfmeshPtr_t                     _tfmesh;
+    bool                            _needsRebuild;
+    bool                            _isInvalid;
 
     void DestroyMesh();
 public:
-    Nodes() : _mesh(NULL), _tfmesh(NULL) { }
+    Nodes() : _mesh(NULL), _tfmesh(NULL), _needsRebuild(false), _isInvalid(false) { }
     ~Nodes();
 
-    bool IsEmpty() const { return _nodes.empty(); }
+    bool IsEmpty() const { 
+		SYS::ScopedLock lock(_mtx);
+		return _nodes.empty(); 
+	}
 
-    void Clear();
-    void Push(const Node& node) { _nodes.push_back(node); }
-    void Rebuild();
+	void Rebuild(const std::vector<Node>& nodes);
 
     void Transform(const M::Matrix4& modelView);
+
+    void BuildRenderMesh();
+    void DestroyRenderMesh();
 
     R::MeshJob GetRenderJob() const;    
 };

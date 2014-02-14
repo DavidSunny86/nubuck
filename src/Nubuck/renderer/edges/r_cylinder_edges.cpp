@@ -64,16 +64,10 @@ void CylinderEdges::RebuildVertices(const M::Matrix4& transform) {
         }
     } // forall edges
 
-    if(_mesh) meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoxVertices[0]);
+    _isInvalid = true;
 }
 
 CylinderEdges::~CylinderEdges() {
-    DestroyMesh();
-}
-
-void CylinderEdges::Clear() {
-    _edges.clear();
-    DestroyMesh();
 }
 
 // rotates the coordinate space such that the new z axis coincides with the vector d.
@@ -100,7 +94,15 @@ static M::Matrix4 AlignZ(const M::Vector3& d) {
     }
 }
 
-void CylinderEdges::Rebuild() {
+void CylinderEdges::Rebuild(const std::vector<Edge>& edges) {
+	SYS::ScopedLock lock(_mtx);
+
+    _edges.clear();
+	for(unsigned i = 0; i < edges.size(); ++i)
+		_edges.push_back(FatEdge(edges[i]));
+
+    _needsRebuild = true;
+
     // RemoveDegeneratedEdges(_edges);
     if(_edges.empty()) return;
 
@@ -110,42 +112,61 @@ void CylinderEdges::Rebuild() {
         edge.Rt = M::Transpose(R);
     }
 
-    std::vector<Mesh::Index> edgeBBoxIndices;
+    _edgeBBoxIndices.clear();
     unsigned baseIdx = 0;
     for(unsigned i = 0; i < _edges.size(); ++i) {
         const unsigned numVertices = 8;
         Mesh::Index bboxIndices[] = { 3, 2, 6, 7, 4, 2, 0, 3, 1, 6, 5, 4, 1, 0 };
         const unsigned numIndices = 14;
-        for(unsigned i = 0; i < numIndices; ++i) edgeBBoxIndices.push_back(baseIdx + bboxIndices[i]);
-        edgeBBoxIndices.push_back(Mesh::RESTART_INDEX);
+        for(unsigned i = 0; i < numIndices; ++i) _edgeBBoxIndices.push_back(baseIdx + bboxIndices[i]);
+        _edgeBBoxIndices.push_back(Mesh::RESTART_INDEX);
         baseIdx += numVertices;
     }
 
     RebuildVertices(M::Mat4::Identity());
 
-    assert(NULL == _mesh);
-
-    Mesh::Desc meshDesc;
-    meshDesc.vertices = &_edgeBBoxVertices[0];
-    meshDesc.numVertices = _edgeBBoxVertices.size();
-    meshDesc.indices = &edgeBBoxIndices[0];
-    meshDesc.numIndices = edgeBBoxIndices.size();
-    meshDesc.primType = GL_TRIANGLE_STRIP;
-
-    _mesh = meshMgr.Create(meshDesc);
-
-    assert(NULL == _tfmesh);
-
-    _tfmesh = meshMgr.Create(_mesh);
-    meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
+    _meshDesc.vertices = &_edgeBBoxVertices[0];
+    _meshDesc.numVertices = _edgeBBoxVertices.size();
+    _meshDesc.indices = &_edgeBBoxIndices[0];
+    _meshDesc.numIndices = _edgeBBoxIndices.size();
+    _meshDesc.primType = GL_TRIANGLE_STRIP;
 }
 
 void CylinderEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4&) {
+	SYS::ScopedLock lock(_mtx);
+
     RebuildVertices(transform);
 }
 
+void CylinderEdges::BuildRenderMesh() {
+	SYS::ScopedLock lock(_mtx);
+
+    if(_needsRebuild) {
+        if(_mesh) DestroyMesh();
+
+		if(!_edges.empty()) {
+            _mesh = meshMgr.Create(_meshDesc);
+            _tfmesh = meshMgr.Create(_mesh);
+            meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
+		}
+
+        _needsRebuild = false;
+	}
+
+    if(_isInvalid && _mesh) {
+        meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoxVertices[0]);
+        _isInvalid = false;
+	}
+}
+
+void CylinderEdges::DestroyRenderMesh() {
+    DestroyMesh();
+}
+
 MeshJob CylinderEdges::GetRenderJob() const {
-    assert(!IsEmpty());
+	SYS::ScopedLock lock(_mtx);
+
+	assert(!_edges.empty());
 
     MeshJob meshJob;
     meshJob.fx = "EdgeBillboard";

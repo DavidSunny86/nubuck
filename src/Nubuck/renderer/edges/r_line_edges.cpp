@@ -17,15 +17,14 @@ void LineEdges::DestroyMesh() {
 }
 
 LineEdges::~LineEdges() {
-    DestroyMesh();
 }
 
-void LineEdges::Clear() {
-    _edges.clear();
-    DestroyMesh();
-}
+void LineEdges::Rebuild(const std::vector<Edge>& edges) {
+	SYS::ScopedLock lock(_mtx);
 
-void LineEdges::Rebuild() {
+    _edges = edges;
+    _needsRebuild = true;
+
     RemoveDegeneratedEdges(_edges);
     if(_edges.empty()) return;
 
@@ -41,33 +40,25 @@ void LineEdges::Rebuild() {
         }
     }
 
-    std::vector<Mesh::Index> edgeBBoardIndices;
+    _edgeBBoardIndices.clear();
     for(unsigned i = 0; i < 4 * numEdges; ++i) {
-        if(0 < i && 0 == i % 4) edgeBBoardIndices.push_back(Mesh::RESTART_INDEX);
-        edgeBBoardIndices.push_back(i);
+        if(0 < i && 0 == i % 4) _edgeBBoardIndices.push_back(Mesh::RESTART_INDEX);
+        _edgeBBoardIndices.push_back(i);
     }
     unsigned numBillboardIndices = M::Max(1u, 5 * numEdges) - 1; // max handles case size = 0
-    assert(numBillboardIndices == edgeBBoardIndices.size());
+    assert(numBillboardIndices == _edgeBBoardIndices.size());
 
-    assert(NULL == _mesh);
-
-    Mesh::Desc meshDesc;
-    meshDesc.vertices = &_edgeBBoards[0].verts[0];
-    meshDesc.numVertices = 4 * _edgeBBoards.size();
-    meshDesc.indices = &edgeBBoardIndices[0];
-    meshDesc.numIndices = edgeBBoardIndices.size();
-    meshDesc.primType = GL_TRIANGLE_FAN;
-
-    _mesh = meshMgr.Create(meshDesc);
-
-    assert(NULL == _tfmesh);
-
-    _tfmesh = meshMgr.Create(_mesh);
-    meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
+    _meshDesc.vertices = &_edgeBBoards[0].verts[0];
+    _meshDesc.numVertices = 4 * _edgeBBoards.size();
+    _meshDesc.indices = &_edgeBBoardIndices[0];
+    _meshDesc.numIndices = _edgeBBoardIndices.size();
+    _meshDesc.primType = GL_TRIANGLE_FAN;
 }
 
 void LineEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4& modelView) {
-    if(IsEmpty()) return;
+	SYS::ScopedLock lock(_mtx);
+
+    if(_edges.empty()) return;
 
     static const M::Vector3 vertPos[] = {
         M::Vector3(-0.5f,  1.0f, 0.0f),
@@ -98,11 +89,38 @@ void LineEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4& mode
         }
     }
 
-    if(_mesh) meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoards[0].verts[0]);
+    _isInvalid = true;
+}
+
+void LineEdges::BuildRenderMesh() {
+	SYS::ScopedLock lock(_mtx);
+
+    if(_needsRebuild) {
+        if(_mesh) DestroyMesh();
+
+		if(!_edges.empty()) {
+            _mesh = meshMgr.Create(_meshDesc);
+            _tfmesh = meshMgr.Create(_mesh);
+            meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
+		}
+
+        _needsRebuild = false;
+	}
+
+    if(_isInvalid && _mesh) {
+        meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoards[0].verts[0]);
+        _isInvalid = false;
+	}
+}
+
+void LineEdges::DestroyRenderMesh() {
+    DestroyMesh();
 }
 
 MeshJob LineEdges::GetRenderJob() const {
-    assert(!IsEmpty());
+	SYS::ScopedLock lock(_mtx);
+
+	assert(!_edges.empty());
 
     MeshJob meshJob;
     meshJob.fx = "EdgeLineBillboard";

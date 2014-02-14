@@ -3,6 +3,7 @@
 #include <Nubuck\nubuck.h>
 #include <Nubuck\polymesh.h>
 #include <Nubuck\math\box.h>
+#include <system\locks\spinlock.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>
@@ -17,6 +18,8 @@ namespace W {
 class ENT_Geometry : public IGeometry, public Entity {
 private:
     leda::nb::RatPolyMesh _ratPolyMesh;
+
+	mutable SYS::SpinLock _mtx;
 
     R::Nodes                        _nodes;
     R::CylinderEdges                _cylinderEdges;
@@ -78,12 +81,12 @@ public:
     void SetPosition(float x, float y, float z) override;
     void Rotate(float ang, float x, float y, float z) override;
 
-    void Show() override { _isHidden = false; }
-    void Hide() override { _isHidden = true; }
+    void Show() override;
+    void Hide() override;
 
-    void SetRenderMode(int flags) override { _renderMode = flags; }
-    void SetRenderLayer(unsigned layer) override { _renderLayer = layer; }
-    void SetShadingMode(ShadingMode::Enum mode) override { _shadingMode = mode; }
+    void SetRenderMode(int flags) override;
+    void SetRenderLayer(unsigned layer) override;
+    void SetShadingMode(ShadingMode::Enum mode) override;
 
     void FrameUpdate();
     void BuildRenderList();

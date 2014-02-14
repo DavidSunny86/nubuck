@@ -13,23 +13,33 @@ class LineEdges : private GEN::Uncopyable, public EdgeRenderer {
 private:
     struct Billboard { Mesh::Vertex verts[4]; };
 
-    std::vector<Edge>       _edges;
-    std::vector<Billboard>  _edgeBBoards;
-    meshPtr_t               _mesh;
-    tfmeshPtr_t             _tfmesh;
+    mutable SYS::SpinLock _mtx;
+
+    std::vector<Edge>           _edges;
+    std::vector<Billboard>      _edgeBBoards;
+    std::vector<Mesh::Index>    _edgeBBoardIndices;
+	Mesh::Desc                  _meshDesc;
+    meshPtr_t               	_mesh;
+    tfmeshPtr_t             	_tfmesh;
+    bool                    	_needsRebuild;
+    bool                    	_isInvalid;
 
     void DestroyMesh();
 public:
-    LineEdges() : _mesh(NULL), _tfmesh(NULL) { }
+    LineEdges() : _mesh(NULL), _tfmesh(NULL), _needsRebuild(false), _isInvalid(false) { }
     ~LineEdges();
 
-    bool IsEmpty() const override { return _edges.empty(); }
+    bool IsEmpty() const override { 
+	    SYS::ScopedLock lock(_mtx);
+		return _edges.empty(); 
+	}
 
-    void Clear() override;
-    void Push(const Edge& edge) override { _edges.push_back(edge); }
-    void Rebuild() override;
+    void Rebuild(const std::vector<Edge>& edges) override;
 
     void SetTransform(const M::Matrix4& transform, const M::Matrix4& modelView) override;
+
+    void BuildRenderMesh() override;
+    void DestroyRenderMesh() override;
 
     MeshJob GetRenderJob() const override;
 };
