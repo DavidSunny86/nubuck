@@ -107,13 +107,13 @@ _shadingMode(ShadingMode::NICE)
     _edgeRadius = 0.02f;
     _edgeColor = R::Color(0.3f, 0.3f, 0.3f);
 
-    _outlinerView = GEN::MakePtr(new ENT_GeometryOutln(*this));
-
 	AddEventHandler(EV::def_ENT_Geometry_EdgeRadiusChanged, this, &ENT_Geometry::Event_EdgeRadiusChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
 }
 
 GEN::Pointer<UI::Outliner::View> ENT_Geometry::GetOutlinerView() {
+	SYS::ScopedLock lock(_mtx);
+    _outlinerView = GEN::MakePtr(new ENT_GeometryOutln(*this));
     return _outlinerView;
 }
 
@@ -192,8 +192,10 @@ void ENT_Geometry::SetEdgeRadius(float edgeRadius) {
     _edgeRadius = edgeRadius;
     RebuildRenderEdges();
 
-	EV::Params_ENT_Geometry_EdgeRadiusChanged args = { _edgeRadius };
-	_outlinerView->Send(EV::def_ENT_Geometry_EdgeRadiusChanged.Create(args));
+	if(_outlinerView.IsValid()) {
+        EV::Params_ENT_Geometry_EdgeRadiusChanged args = { _edgeRadius };
+        _outlinerView->Send(EV::def_ENT_Geometry_EdgeRadiusChanged.Create(args));
+	}
 }
 
 void ENT_Geometry::SetEdgeColor(const R::Color& color) {
@@ -201,8 +203,10 @@ void ENT_Geometry::SetEdgeColor(const R::Color& color) {
     _edgeColor = color;
     RebuildRenderEdges();
 
-	EV::Params_ENT_Geometry_EdgeColorChanged args = { _edgeColor };
-	_outlinerView->Send(EV::def_ENT_Geometry_EdgeColorChanged.Create(args));
+	if(_outlinerView.IsValid()) {
+        EV::Params_ENT_Geometry_EdgeColorChanged args = { _edgeColor };
+        _outlinerView->Send(EV::def_ENT_Geometry_EdgeColorChanged.Create(args));
+	}
 }
 
 const M::Vector3& ENT_Geometry::GetLocalCenter() const { 

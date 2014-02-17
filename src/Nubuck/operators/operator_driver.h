@@ -14,7 +14,9 @@ private:
     std::vector<Operator*>& _activeOps;
     SYS::SpinLock&          _activeOpsMtx;
 
-    void Event_SetOperator(const EV::Event& event);
+    Operator* ActiveOperator();
+
+    void Event_Push(const EV::Event& event);
 protected:
     void Event_Default(const EV::Event& event, const char* className) override;
 public:

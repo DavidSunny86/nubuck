@@ -5,20 +5,35 @@
 
 namespace OP {
 
-void Driver::Event_SetOperator(const EV::Event& event) {
-    const EV::Params_OP_Driver_SetOperator& params = EV::def_OP_Driver_SetOperator.GetArgs(event);
-    printf("okay, changing operator!\n");
-    event.Accept();
+Operator* Driver::ActiveOperator() {
+    if(_activeOps.empty()) return NULL;
+    return _activeOps.back();
+}
+
+void Driver::Event_Push(const EV::Event& event) {
+    SYS::ScopedLock lock(_activeOpsMtx);
+	const EV::Params_OP_Push& args = EV::def_OP_Push.GetArgs(event);
+    Operator* op = ActiveOperator();
+    if(op) {
+        op->Finish();
+        if(1 < _activeOps.size()) _activeOps.pop_back();
+    }
+	_activeOps.push_back(args.op);
+	args.op->Invoke();
 }
 
 void Driver::Event_Default(const EV::Event& event, const char* className) {
     SYS::ScopedLock lock(_activeOpsMtx);
-    printf("OP::Driver: default event. forwarding\n");
-    _activeOps.back()->Send(event);
-    _activeOps.back()->HandleEvents();
+    Operator* op = ActiveOperator();
+    if(op) {
+        op->Send(event);
+        op->HandleEvents();
+	}
 }
 
-Driver::Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx) : _activeOps(activeOps), _activeOpsMtx(activeOpsMtx) { }
+Driver::Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx) : _activeOps(activeOps), _activeOpsMtx(activeOpsMtx) { 
+	AddEventHandler(EV::def_OP_Push, this, &Driver::Event_Push);
+}
 
 DWORD Driver::Thread_Func() {
     while(true) { 

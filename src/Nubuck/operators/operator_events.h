@@ -7,6 +7,6 @@ namespace OP { class Operator; }
 BEGIN_EVENT_DEF(OP_ActionFinished)
 END_EVENT_DEF
 
-BEGIN_EVENT_DEF(OP_Driver_SetOperator)
+BEGIN_EVENT_DEF(OP_Push)
     OP::Operator* op;
 END_EVENT_DEF

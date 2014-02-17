@@ -24,24 +24,20 @@ void Operators::Event_ActionFinished(const EV::Event& event) {
 
 void Operators::OnInvokeOperator(unsigned id) {
     printf("invoking operator with id = %d\n", id);
-    Operator* op = NULL;
-    op = ActiveOperator();
-    if(op) {
-        op->Finish();
-        if(1 < _activeOps.size()) _activeOps.pop_back();
-    }
     UI::OperatorPanel::Instance()->Clear();
-    op = _ops[id].op;
-    _activeOps.push_back(op);
+    Operator* op = _ops[id].op;
     nubuck.ui->SetOperatorPanel(_ops[id].panel);
-    op->Invoke();
+
+	if(!_driver.IsValid()) {
+        _driver = GEN::MakePtr(new Driver(_activeOps, _activeOpsMtx));
+        _driver->Thread_StartAsync();
+	}
+	EV::Params_OP_Push args = { op };
+	_driver->Send(EV::def_OP_Push.Create(args));
 }
 
 Operators::Operators() : _actionsPending(0) {
     AddEventHandler(EV::def_OP_ActionFinished, this, &Operators::Event_ActionFinished);
-
-    _driver = GEN::MakePtr(new Driver(_activeOps, _activeOpsMtx));
-    _driver->Thread_StartAsync();
 }
 
 Operators::~Operators() {
@@ -81,11 +77,6 @@ void Operators::InvokeAction(const EV::Event& event) {
 void Operators::SetInitOp(unsigned id) {
     assert(_activeOps.empty());
     OnInvokeOperator(id);
-}
-
-Operator* Operators::ActiveOperator() {
-    if(_activeOps.empty()) return NULL;
-    return _activeOps.back();
 }
 
 void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {

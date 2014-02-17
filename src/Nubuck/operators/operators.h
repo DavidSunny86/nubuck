@@ -54,8 +54,6 @@ public:
 
     void SetInitOp(unsigned id);
 
-    Operator* ActiveOperator();
-
     void GetMeshJobs(std::vector<R::MeshJob>& meshJobs);
 
     void SelectGeometry();
