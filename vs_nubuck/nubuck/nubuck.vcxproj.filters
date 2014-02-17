@@ -237,6 +237,9 @@
     <Filter Include="Private\operators\op_loop">
       <UniqueIdentifier>{72aaef09-493a-44f1-a76a-6c94612cfd55}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_gen_incube">
+      <UniqueIdentifier>{097bb690-6639-4c6c-9745-1af79b0b19fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -982,6 +985,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_ent_geometry_outln.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.cpp">
+      <Filter>Private\operators\op_gen_incube</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_op_gen_incube.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_op_gen_incube.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1061,6 +1073,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_outln.h">
       <Filter>Private\world\entities\ent_geometry</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.h">
+      <Filter>Private\operators\op_gen_incube</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
