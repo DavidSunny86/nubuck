@@ -12,8 +12,12 @@ namespace OP {
 
 void Loop::Event_OP_Loop_Start(const EV::Event& event) {
     if(_geom) {
+        /*
         _geom->SetEdgeRadius(0.25);
         _geom->SetEdgeColor(R::Color::Red);
+        */
+
+        _nb.world->GetSelection()->Set(_geom);
 	}
 
     for(unsigned i = 0; i < 50; ++i) {

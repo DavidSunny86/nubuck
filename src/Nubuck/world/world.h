@@ -37,17 +37,22 @@ namespace W {
     private:
         DECL_HANDLE_EVENTS(World)
 
-        struct Selection {
+        class Selection : public ISelection {
+        private:
+            mutable SYS::SpinLock _mtx;
+
             std::vector<IGeometry*> geomList;
             M::Vector3              center; // in world space
 
             void ComputeCenter();
+            void SignalChange();
+        public:
+            void Set(IGeometry* geom) override;
+            void Add(IGeometry* geom) override;
+            void Clear() override;
 
-            void Set(IGeometry* geom);
-            void Add(IGeometry* geom);
-
-            const M::Vector3&               GetGlobalCenter() const { return center; }
-            const std::vector<IGeometry*>&  GetGeometryList() const { return geomList; }
+            M::Vector3 GetGlobalCenter() const override;
+            std::vector<IGeometry*> GetList() const override;
         } _selection;
 
         std::vector<GEN::Pointer<Entity> > _entities;
@@ -89,6 +94,7 @@ namespace W {
         void Event_Apocalypse(const EV::Event& event);
         void Event_LinkEntity(const EV::Event& event);
         void Event_DestroyEntity(const EV::Event& event);
+        void Event_SelectionChanged(const EV::Event& event);
         void Event_Resize(const EV::Event& event);
         void Event_Mouse(const EV::Event& event);
         void Event_Key(const EV::Event& event);
@@ -107,12 +113,8 @@ namespace W {
         void Render(R::RenderList& renderList);
 
         // exported to client
+        ISelection* GetSelection() override { return &_selection; }
         IGeometry* CreateGeometry() override; // thread-safe
-
-        void SelectGeometry(IGeometry* geom) override;
-        void AddToSelection(IGeometry* geom);
-        void ClearSelection();
-        Selection& GetSelection() { return _selection; }
 
         // thread interface
         DWORD Thread_Func(void);

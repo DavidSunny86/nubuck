@@ -79,7 +79,8 @@ static int rlIdx = 1;
 
 World world;
 
-// Selection impl
+// Selection impl ---
+
 void World::Selection::ComputeCenter() {
     center = M::Vector3::Zero;
     for(unsigned i = 0; i < geomList.size(); ++i) {
@@ -89,15 +90,42 @@ void World::Selection::ComputeCenter() {
     center /= geomList.size();
 }
 
+void World::Selection::SignalChange() {
+    world.Send(EV::def_SelectionChanged.Create(EV::Params_SelectionChanged()));
+}
+
 void World::Selection::Set(IGeometry* geom) {
+    SYS::ScopedLock lock(_mtx);
     geomList.clear();
-    Add(geom);
+    geomList.push_back(geom);
+    ComputeCenter();
+    SignalChange();
 }
 
 void World::Selection::Add(IGeometry* geom) {
+    SYS::ScopedLock lock(_mtx);
     geomList.push_back(geom);
     ComputeCenter();
+    SignalChange();
 }
+
+void World::Selection::Clear() {
+    SYS::ScopedLock lock(_mtx);
+    geomList.clear();
+    SignalChange();
+}
+
+M::Vector3 World::Selection::GetGlobalCenter() const { 
+    SYS::ScopedLock lock(_mtx);
+    return center; 
+}
+
+std::vector<IGeometry*> World::Selection::GetList() const { 
+    SYS::ScopedLock lock(_mtx);
+    return geomList; 
+}
+
+// --- Selection Impl
 
 static M::Vector3 Transform(const M::Matrix4& mat, const M::Vector3& vec, float w) {
     M::Vector3 ret;
@@ -238,6 +266,10 @@ void World::Event_DestroyEntity(const EV::Event& event) {
     }
 }
 
+void World::Event_SelectionChanged(const EV::Event&) {
+    BBoxes_BuildFromSelection();
+}
+
 void World::Event_Resize(const EV::Event& event) {
     const EV::Params_Resize& args = EV::def_Resize.GetArgs(event);
     _camArcball.SetScreenSize(args.width, args.height);
@@ -287,7 +319,7 @@ void World::BoundingBox::Destroy() {
 }
 
 World::BoundingBox::BoundingBox(const ENT_Geometry* geom) : geom(geom) {
-    WireframeBox meshDesc(geom->GetBoundingBox());
+    WireframeBox meshDesc(M::Scale(geom->GetBoundingBox(), 1.2f));
     mesh = R::meshMgr.Create(meshDesc.GetDesc());
     tfmesh = R::meshMgr.Create(mesh);
     Transform();
@@ -299,7 +331,7 @@ void World::BoundingBox::Transform() {
 
 void World::BBoxes_BuildFromSelection() {
     _bboxes.clear();
-    const std::vector<IGeometry*>& geomList = _selection.GetGeometryList();
+    std::vector<IGeometry*> geomList = _selection.GetList();
     for(unsigned i = 0; i < geomList.size(); ++i) {
         _bboxes.push_back(GEN::MakePtr(new BoundingBox((const ENT_Geometry*)geomList[i])));
     }
@@ -322,6 +354,7 @@ World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
     AddEventHandler(EV::def_Apocalypse,           this, &World::Event_Apocalypse);
     AddEventHandler(EV::def_LinkEntity,           this, &World::Event_LinkEntity);
     AddEventHandler(EV::def_DestroyEntity,        this, &World::Event_DestroyEntity);
+    AddEventHandler(EV::def_SelectionChanged,     this, &World::Event_SelectionChanged);
     AddEventHandler(EV::def_Resize,               this, &World::Event_Resize);
     AddEventHandler(EV::def_Mouse,                this, &World::Event_Mouse);
     AddEventHandler(EV::def_Key,                  this, &World::Event_Key);
@@ -436,24 +469,6 @@ IGeometry* World::CreateGeometry() {
     Send(EV::def_LinkEntity.Create(args));
 
     return geom;
-}
-
-void World::SelectGeometry(IGeometry* geom) { 
-    _selection.Set(geom);
-    OP::g_operators.SelectGeometry();
-    BBoxes_BuildFromSelection();
-}
-
-void World::AddToSelection(IGeometry* geom) {
-    _selection.Add(geom);
-    OP::g_operators.SelectGeometry();
-    BBoxes_BuildFromSelection();
-}
-
-void World::ClearSelection() {
-    _selection.geomList.clear();
-    OP::g_operators.SelectGeometry();
-    BBoxes_BuildFromSelection();
 }
 
 DWORD World::Thread_Func(void) {

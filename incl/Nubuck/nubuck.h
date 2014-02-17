@@ -1,12 +1,14 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <Windows.h> // defines MAX_INT
 #include <LEDA/geo/d3_rat_point.h>
 #include <LEDA/graph/graph.h>
 
 #include <Nubuck\polymesh_fwd.h>
+#include <Nubuck\math\vector3.h>
 
 #ifdef NUBUCK_LIB
 #define NUBUCK_API __declspec(dllexport)
@@ -57,6 +59,17 @@ struct IGeometry {
     virtual void SetShadingMode(ShadingMode::Enum mode) = 0;
 };
 
+struct ISelection {
+    virtual ~ISelection() { }
+
+    virtual void Set(IGeometry* geom) = 0;
+    virtual void Add(IGeometry* geom) = 0;
+    virtual void Clear() = 0;
+
+    virtual M::Vector3 GetGlobalCenter() const = 0;
+    virtual std::vector<IGeometry*> GetList() const = 0;
+};
+
 struct IWorld {
     struct PlaneDesc {
         struct Sample2 { float x, y; };
@@ -82,9 +95,9 @@ struct IWorld {
         bool        caps;
     };
 
-    virtual IGeometry* CreateGeometry() = 0;
+    virtual ISelection* GetSelection() = 0;
 
-    virtual void SelectGeometry(IGeometry* geometry) = 0;
+    virtual IGeometry* CreateGeometry() = 0;
 };
 
 struct ILog {

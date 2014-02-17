@@ -14,3 +14,6 @@ END_EVENT_DEF
 BEGIN_EVENT_DEF(DestroyEntity)
     unsigned    entId;
 END_EVENT_DEF
+
+BEGIN_EVENT_DEF(SelectionChanged)
+END_EVENT_DEF

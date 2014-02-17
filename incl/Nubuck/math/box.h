@@ -21,4 +21,8 @@ struct Box {
     }
 };
 
+Vector3 CenterOf(const Box& b);
+Vector3 SizeOf(const Box& b);
+Box     Scale(const Box& b, float s);
+
 } // namespace M
