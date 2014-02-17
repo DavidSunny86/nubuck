@@ -1,6 +1,7 @@
 #include <Nubuck\operators\operator.h>
 #include <system\locks\scoped_lock.h>
 #include "operator_events.h"
+#include "operators.h"
 #include "operator_driver.h"
 
 namespace OP {
@@ -28,6 +29,8 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
     if(op) {
         op->Send(event);
         op->HandleEvents();
+
+		g_operators.Send(EV::def_OP_ActionFinished.Create(EV::Params_OP_ActionFinished()));
 	}
 }
 

@@ -23,6 +23,11 @@ void Operators::Event_ActionFinished(const EV::Event& event) {
 }
 
 void Operators::OnInvokeOperator(unsigned id) {
+    if(0 < _actionsPending) {
+		printf("op still busy...\n");
+        return;
+	}
+
     printf("invoking operator with id = %d\n", id);
     UI::OperatorPanel::Instance()->Clear();
     Operator* op = _ops[id].op;
@@ -69,6 +74,11 @@ unsigned Operators::Register(QWidget* panel, Operator* op, HMODULE module) {
 }
 
 void Operators::InvokeAction(const EV::Event& event) {
+    if(0 < _actionsPending) {
+		printf("op still busy...\n");
+        return;
+	}
+
     _actionsPending++;
     printf("Operators::InvokeAction\n");
     _driver->Send(event);
