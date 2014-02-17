@@ -252,10 +252,14 @@ void ENT_Geometry::CompileMesh() {
 }
 
 void ENT_Geometry::Destroy() { 
+    Entity::Destroy(); 
+}
+
+void ENT_Geometry::OnDestroy() {
 	SYS::ScopedLock lock(_mtx);
 	_nodes.DestroyRenderMesh();
 	_edgeRenderer->DestroyRenderMesh();
-    Entity::Destroy(); 
+	_renderMode &= ~(RenderMode::EDGES | RenderMode::NODES); // !!!
 }
 
 leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() { return _ratPolyMesh; }

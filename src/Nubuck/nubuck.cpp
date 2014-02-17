@@ -19,6 +19,7 @@
 #include <operators\operators.h>
 #include <operators\op_loop\op_loop.h>
 #include <operators\op_gen_incube\op_gen_incube.h>
+#include <operators\op_loadobj\op_loadobj.h>
 
 Nubuck nubuck;
 
@@ -91,6 +92,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     // REMOVEME
     OP::g_operators.Register(new OP::LoopPanel, new OP::Loop);
     OP::g_operators.Register(new OP::GEN::InCubePanel, new OP::GEN::InCube);
+	OP::g_operators.Register(new OP::LoadOBJPanel, new OP::LoadOBJ);
 
     mainWindow.show();
     return app.exec();

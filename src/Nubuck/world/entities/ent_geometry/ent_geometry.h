@@ -71,6 +71,7 @@ public:
     void CompileMesh();
 
     void Destroy() override;
+    void OnDestroy() override;
 
     leda::nb::RatPolyMesh& GetRatPolyMesh() override;
     void Update() override;

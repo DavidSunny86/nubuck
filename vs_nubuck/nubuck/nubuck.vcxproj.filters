@@ -240,6 +240,9 @@
     <Filter Include="Private\operators\op_gen_incube">
       <UniqueIdentifier>{097bb690-6639-4c6c-9745-1af79b0b19fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_loadobj">
+      <UniqueIdentifier>{cd0eb854-06d3-4204-b7c8-d933a7270e51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -994,6 +997,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_op_gen_incube.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.cpp">
+      <Filter>Private\operators\op_loadobj</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_op_loadobj.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_op_loadobj.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1076,6 +1088,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.h">
       <Filter>Private\operators\op_gen_incube</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.h">
+      <Filter>Private\operators\op_loadobj</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

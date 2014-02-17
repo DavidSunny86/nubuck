@@ -260,10 +260,12 @@ void World::Event_DestroyEntity(const EV::Event& event) {
     const EV::Params_DestroyEntity& args = EV::def_DestroyEntity.GetArgs(event);
     for(unsigned i = 0; i < _entities.size(); ++i) {
         if(_entities[i]->GetID() == args.entId) {
+			_entities[i]->OnDestroy();
             std::swap(_entities[i], _entities.back());
             _entities.erase(_entities.end() - 1);
         }
     }
+	event.Accept();
 }
 
 void World::Event_SelectionChanged(const EV::Event&) {
@@ -392,6 +394,7 @@ static M::Vector3 GetCenterPosition(const M::Box& box) {
 }
 
 bool World::Trace(const M::Ray& ray, ENT_Geometry** ret) {
+    SYS::ScopedLock lockEntities(_entitiesMtx);
     for(unsigned i = 0; i < _entities.size(); ++i) {
         GEN::Pointer<Entity> entity = _entities[i];
         if(EntityType::ENT_GEOMETRY == entity->GetType()) {
@@ -437,6 +440,8 @@ void World::Render(R::RenderList& renderList) {
     renderList.meshJobs.push_back(Grid_GetRenderJob());
 
     BBoxes_GetRenderJobs(renderList.meshJobs);
+
+    SYS::ScopedLock lockEntities(_entitiesMtx);
 
     for(unsigned i = 0; i < _entities.size(); ++i) {
         if(EntityType::ENT_GEOMETRY == _entities[i]->GetType()) {

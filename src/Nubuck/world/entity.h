@@ -44,6 +44,7 @@ public:
     void                SetTransform(const EntTransform& t) { _transform = t; }
 
     void                Destroy();
+	virtual void        OnDestroy() { }
 };
 
 } // namespace W
