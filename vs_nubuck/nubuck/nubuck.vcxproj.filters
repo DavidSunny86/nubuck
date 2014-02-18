@@ -243,6 +243,9 @@
     <Filter Include="Private\operators\op_loadobj">
       <UniqueIdentifier>{cd0eb854-06d3-4204-b7c8-d933a7270e51}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_chull">
+      <UniqueIdentifier>{5d7fccc2-9cba-49d7-b074-9c8d3279ad04}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -607,6 +610,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_events.h">
       <Filter>Private\world\entities\ent_geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_chull\op_chull.h">
+      <Filter>Private\operators\op_chull</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1005,6 +1011,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_op_loadobj.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_chull\op_chull.cpp">
+      <Filter>Private\operators\op_chull</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
