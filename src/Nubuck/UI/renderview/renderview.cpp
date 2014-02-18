@@ -56,10 +56,10 @@ namespace UI {
         args.mods = qevent->modifiers();
         args.x = qevent->x();
         args.y = qevent->y();
+		args.ret = NULL;
 
-        bool shiftKey = qevent->modifiers() & Qt::ShiftModifier;
-        if(!OP::g_operators.OnMouseDown(M::Vector2(args.x, args.y), shiftKey))
-            W::world.Send(EV::def_Mouse.Create(args));
+        EV::Event event = EV::def_Mouse.Create(args);
+        if(!OP::g_operators.MouseEvent(event)) W::world.Send(event);
     }
 
     void RenderView::mouseReleaseEvent(QMouseEvent* qevent) {
@@ -69,9 +69,10 @@ namespace UI {
         args.mods = qevent->modifiers();
         args.x = qevent->x();
         args.y = qevent->y();
+		args.ret = NULL;
 
-        if(!OP::g_operators.OnMouseUp(M::Vector2(args.x, args.y)))
-            W::world.Send(EV::def_Mouse.Create(args));
+        EV::Event event = EV::def_Mouse.Create(args);
+        if(!OP::g_operators.MouseEvent(event)) W::world.Send(event);
     }
 
     void RenderView::mouseMoveEvent(QMouseEvent* qevent) {
@@ -81,9 +82,10 @@ namespace UI {
         args.mods = qevent->modifiers();
         args.x = qevent->x();
         args.y = qevent->y();
+		args.ret = NULL;
 
-        if(!OP::g_operators.OnMouseMove(M::Vector2(args.x, args.y)))
-            W::world.Send(EV::def_Mouse.Create(args));
+        EV::Event event = EV::def_Mouse.Create(args);
+        if(!OP::g_operators.MouseEvent(event)) W::world.Send(event);
     }
 
     void RenderView::wheelEvent(QWheelEvent* qevent) {

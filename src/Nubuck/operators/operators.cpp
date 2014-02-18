@@ -1,5 +1,8 @@
 #include <nubuck_private.h>
+#include <system\locks\scoped_lock.h>
 #include <Nubuck\operators\operator_invoker.h>
+#include <UI\window_events.h>
+#include <world\world_events.h>
 #include "operator_events.h"
 #include "operator_driver.h"
 #include "operators.h"
@@ -34,7 +37,7 @@ void Operators::OnInvokeOperator(unsigned id) {
     nubuck.ui->SetOperatorPanel(_ops[id].panel);
 
 	if(!_driver.IsValid()) {
-        _driver = GEN::MakePtr(new Driver(_activeOps, _activeOpsMtx));
+        _driver = GEN::MakePtr(new Driver(_activeOps, _activeOpsMtx, _meshJobs, _meshJobsMtx));
         _driver->Thread_StartAsync();
 	}
 	EV::Params_OP_Push args = { op };
@@ -84,88 +87,45 @@ void Operators::InvokeAction(const EV::Event& event) {
     _driver->Send(event);
 }
 
+void Operators::InvokeEvent(const EV::Event& event) {
+	_driver->Send(event);
+}
+
 void Operators::SetInitOp(unsigned id) {
     assert(_activeOps.empty());
     OnInvokeOperator(id);
 }
 
 void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
-    for(unsigned i = 0; i < _activeOps.size(); ++i)
-        _activeOps[i]->GetMeshJobs(meshJobs);
-}
-
-void Operators::SelectGeometry() {
-    for(std::vector<Operator*>::reverse_iterator it(_activeOps.rbegin());
-        _activeOps.rend() != it; ++it)
-    {
-        (*it)->OnGeometrySelected();
-    }
+	SYS::ScopedLock lockJobs(_meshJobsMtx);
+    SYS::ScopedLock lockOps(_activeOpsMtx);
+	_meshJobs.clear();
+	for(unsigned i = 0; i < _activeOps.size(); ++i)
+		_activeOps[i]->GetMeshJobs(_meshJobs);
+	meshJobs.insert(meshJobs.end(), _meshJobs.begin(), _meshJobs.end());
 }
 
 void Operators::OnCameraChanged() {
-    if(IsActiveOperatorBusy()) return;
-
-    for(std::vector<Operator*>::reverse_iterator it(_activeOps.rbegin());
-        _activeOps.rend() != it; ++it)
-    {
-        (*it)->OnCameraChanged();
-    }
+	_driver->Send(EV::def_CameraChanged.Create(EV::Params_CameraChanged()));
 }
 
-bool Operators::OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) {
-    if(IsActiveOperatorBusy()) return false;
-
-    for(int i = _activeOps.size() - 1; 0 <= i; --i) {
-        Operator* op = _activeOps[i];
-        if(op->OnMouseDown(mouseCoords, shiftKey)) {
-            UI::OperatorPanel::Instance()->Clear();
-            unsigned N = _activeOps.size() - 1 - i;
-            for(unsigned j = 0; j < N; ++j) {
-                _activeOps.back()->Finish();
-                _activeOps.pop_back();
-            }
-            if(i != _activeOps.size() - 1) op->Invoke();
-            return true;
-        }
-    }
-    return false;
-}
-
-bool Operators::OnMouseMove(const M::Vector2& mouseCoords) {
-    if(IsActiveOperatorBusy()) return false;
-
-    for(int i = _activeOps.size() - 1; 0 <= i; --i) {
-        Operator* op = _activeOps[i];
-        if(op->OnMouseMove(mouseCoords)) {
-            UI::OperatorPanel::Instance()->Clear();
-            unsigned N = _activeOps.size() - 1 - i;
-            for(unsigned j = 0; j < N; ++j) {
-                _activeOps.back()->Finish();
-                _activeOps.pop_back();
-            }
-            if(i != _activeOps.size() - 1) op->Invoke();
-            return true;
-        }
-    }
-    return false;
-}
-
-bool Operators::OnMouseUp(const M::Vector2& mouseCoords) {
-    if(IsActiveOperatorBusy()) return false;
-
-    for(int i = _activeOps.size() - 1; 0 <= i; --i) {
-        Operator* op = _activeOps[i];
-        if(op->OnMouseUp(mouseCoords)) {
-            UI::OperatorPanel::Instance()->Clear();
-            unsigned N = _activeOps.size() - 1 - i;
-            for(unsigned j = 0; j < N; ++j) {
-                _activeOps.back()->Finish();
-                _activeOps.pop_back();
-            }
-            if(i != _activeOps.size() - 1) op->Invoke();
-            return true;
-        }
-    }
+bool Operators::MouseEvent(const EV::Event& event) {
+    int ret = 0;
+	EV::Params_Mouse args = EV::def_Mouse.GetArgs(event);
+	args.ret = &ret;
+	Operator* oldOp = _driver->GetActiveOperator();
+	EV::Event ev2 = EV::def_Mouse.Create(args);
+	_driver->SendAndWait(ev2);
+	if(ret) {
+		UI::OperatorPanel::Instance()->Clear();
+        int id = -1;
+		for(int i = 0; i < _ops.size(); ++i) {
+			if(_ops[i].op == _driver->GetActiveOperator()) id = i;
+		} 
+        assert(0 <= id);
+		if(oldOp != _ops[id].op) nubuck.ui->SetOperatorPanel(_ops[id].panel);
+        return true;
+	}
     return false;
 }
 

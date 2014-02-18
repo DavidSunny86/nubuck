@@ -33,6 +33,9 @@ private:
     SYS::SpinLock               _activeOpsMtx;
     unsigned                    _actionsPending;
 
+	std::vector<R::MeshJob>     _meshJobs;
+    SYS::SpinLock               _meshJobsMtx;
+
     GEN::Pointer<Driver>        _driver;
 
     bool IsActiveOperatorBusy() const { return 0 <_actionsPending; }
@@ -51,17 +54,14 @@ public:
     unsigned Register(QWidget* panel, Operator* op, HMODULE module = NULL);
 
     void InvokeAction(const EV::Event& event);
+    void InvokeEvent(const EV::Event& event);
 
     void SetInitOp(unsigned id);
 
     void GetMeshJobs(std::vector<R::MeshJob>& meshJobs);
 
-    void SelectGeometry();
-
     void OnCameraChanged();
-    bool OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey);
-    bool OnMouseMove(const M::Vector2& mouseCoords);
-    bool OnMouseUp(const M::Vector2& mouseCoords);
+    bool MouseEvent(const EV::Event& event);
 };
 
 extern Operators g_operators;

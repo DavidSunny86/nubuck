@@ -18,6 +18,7 @@ BEGIN_EVENT_DEF(Mouse)
         MODIFIER_SHIFT = 0x02000000 // == Qt::ShiftModifier
     };
     int type, button, mods, delta, x, y;
+    int* ret;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(Key)

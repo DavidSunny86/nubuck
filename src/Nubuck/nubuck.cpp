@@ -21,6 +21,7 @@
 #include <operators\op_gen_incube\op_gen_incube.h>
 #include <operators\op_loadobj\op_loadobj.h>
 #include <operators\op_chull\op_chull.h>
+#include <operators\op_translate\op_translate.h>
 
 Nubuck nubuck;
 
@@ -91,10 +92,12 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     nubuck.ui       = &mainWindow;
 
     // REMOVEME
+	OP::g_operators.Register(new OP::TranslatePanel, new OP::Translate);
     OP::g_operators.Register(new OP::LoopPanel, new OP::Loop);
     OP::g_operators.Register(new OP::GEN::InCubePanel, new OP::GEN::InCube);
 	OP::g_operators.Register(new OP::LoadOBJPanel, new OP::LoadOBJ);
 	OP::g_operators.Register(new OP::ConvexHullPanel, new OP::ConvexHull);
+	OP::g_operators.OnInvokeOperator(0); // call OP::Translate
 
     mainWindow.show();
     return app.exec();
