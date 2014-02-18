@@ -249,6 +249,9 @@
     <Filter Include="Private\operators\op_translate">
       <UniqueIdentifier>{40f27c7e-1951-46ce-bb71-75d96fd4c95e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_join">
+      <UniqueIdentifier>{a4800578-9b93-48cb-b52e-07f07d4b36e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -619,6 +622,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\operators\op_translate\op_translate.h">
       <Filter>Private\operators\op_translate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_join\op_join.h">
+      <Filter>Private\operators\op_join</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1023,6 +1029,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\operators\op_translate\op_translate.cpp">
       <Filter>Private\operators\op_translate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_join\op_join.cpp">
+      <Filter>Private\operators\op_join</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
