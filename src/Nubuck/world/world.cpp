@@ -97,7 +97,13 @@ void World::Selection::SignalChange() {
 
 void World::Selection::Set(IGeometry* geom) {
     SYS::ScopedLock lock(_mtx);
+	for(unsigned i = 0; i < geomList.size(); ++i) {
+        ENT_Geometry* geom = (ENT_Geometry*)geomList[i];
+		geom->Deselect();
+	}
     geomList.clear();
+    ENT_Geometry* ent = (ENT_Geometry*)geom;
+    ent->Select();
     geomList.push_back(geom);
     ComputeCenter();
     SignalChange();
@@ -109,6 +115,8 @@ void World::Selection::Add(IGeometry* geom) {
 	for(unsigned i = 0; !sel && i < geomList.size(); ++i)
         if(geomList[i] == geom) sel = true;
     if(!sel) {
+        ENT_Geometry* ent = (ENT_Geometry*)geom;
+		ent->Select();
 		geomList.push_back(geom);
         ComputeCenter();
         SignalChange();
@@ -117,6 +125,10 @@ void World::Selection::Add(IGeometry* geom) {
 
 void World::Selection::Clear() {
     SYS::ScopedLock lock(_mtx);
+	for(unsigned i = 0; i < geomList.size(); ++i) {
+        ENT_Geometry* geom = (ENT_Geometry*)geomList[i];
+		geom->Deselect();
+	}
     geomList.clear();
     SignalChange();
 }
@@ -427,7 +439,12 @@ void World::Update(void) {
 
     for(unsigned i = 0; i < _entities.size(); ++i) {
         GEN::Pointer<Entity> entity = _entities[i];
-        if(EntityType::ENT_GEOMETRY == entity->GetType()) {
+		if(entity->IsDead() && !entity->IsSelected()) {
+			_entities[i]->OnDestroy();
+            std::swap(_entities[i], _entities.back());
+            _entities.erase(_entities.end() - 1);
+		}
+        else if(EntityType::ENT_GEOMETRY == entity->GetType()) {
             ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
 			geom.HandleEvents();
             geom.CompileMesh();

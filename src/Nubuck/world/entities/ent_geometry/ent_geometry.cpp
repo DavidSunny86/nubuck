@@ -251,10 +251,6 @@ void ENT_Geometry::CompileMesh() {
     _meshCompiled = true;
 }
 
-void ENT_Geometry::Destroy() { 
-    Entity::Destroy(); 
-}
-
 void ENT_Geometry::OnDestroy() {
 	SYS::ScopedLock lock(_mtx);
 	_nodes.DestroyRenderMesh();

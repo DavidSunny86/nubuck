@@ -19,13 +19,31 @@ struct EntityType {
 
 class Entity {
 private:
+    struct Tags {
+        enum Enum {
+            IS_DEAD     = (1 << 0),
+            IS_SELECTED = (1 << 1)
+		};
+	};
+
+	mutable SYS::SpinLock _mtx;
+
+    int _tags;
+
     EntityType::Enum    _type;
     unsigned            _entId;
     std::string         _name;
     std::string     	_fxName;
     EntTransform       	_transform;
 public:
+    Entity();
     virtual ~Entity() { }
+
+    void Select();
+    void Deselect();
+    bool IsSelected() const;
+
+    bool IsDead() const;
 
     EntityType::Enum    GetType() const { return _type; }
     unsigned            GetID() const { return _entId; }

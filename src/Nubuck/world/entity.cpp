@@ -1,9 +1,30 @@
 #include <common\common.h>
+#include <system\locks\scoped_lock.h>
 #include <world\world_events.h>
 #include <world\world.h>
 #include "entity.h"
 
 namespace W {
+
+Entity::Entity() : _tags(0) { }
+
+void Entity::Select() {
+    SYS::ScopedLock lock(_mtx);
+	_tags |= Tags::IS_SELECTED;
+}
+
+void Entity::Deselect() {
+    SYS::ScopedLock lock(_mtx);
+	_tags &= ~Tags::IS_SELECTED;
+}
+
+bool Entity::IsSelected() const {
+	return _tags & Tags::IS_SELECTED;
+}
+
+bool Entity::IsDead() const {
+	return _tags & Tags::IS_DEAD;
+}
 
 M::Vector3 Entity::Transform(const M::Vector3& v) const {
     M::Vector3 r;
@@ -20,9 +41,8 @@ M::Matrix4 Entity::GetTransformationMatrix() const {
 }
 
 void Entity::Destroy() {
-    EV::Params_DestroyEntity args;
-    args.entId = GetID();
-    W::world.Send(EV::def_DestroyEntity.Create(args));
+    // no lock necessary!
+    _tags |= Tags::IS_DEAD;
 }
 
 } // namespace W

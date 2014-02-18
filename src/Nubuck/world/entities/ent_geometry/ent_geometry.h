@@ -70,7 +70,7 @@ public:
     bool IsMeshCompiled() const;
     void CompileMesh();
 
-    void Destroy() override;
+	void Destroy() override { Entity::Destroy(); }
     void OnDestroy() override;
 
     leda::nb::RatPolyMesh& GetRatPolyMesh() override;
