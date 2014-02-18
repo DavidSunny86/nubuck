@@ -22,7 +22,7 @@ M::Matrix4 Entity::GetTransformationMatrix() const {
 void Entity::Destroy() {
     EV::Params_DestroyEntity args;
     args.entId = GetID();
-    W::world.SendAndWait(EV::def_DestroyEntity.Create(args));
+    W::world.Send(EV::def_DestroyEntity.Create(args));
 }
 
 } // namespace W
