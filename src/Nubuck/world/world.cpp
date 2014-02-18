@@ -105,9 +105,14 @@ void World::Selection::Set(IGeometry* geom) {
 
 void World::Selection::Add(IGeometry* geom) {
     SYS::ScopedLock lock(_mtx);
-    geomList.push_back(geom);
-    ComputeCenter();
-    SignalChange();
+    bool sel = 0;
+	for(unsigned i = 0; !sel && i < geomList.size(); ++i)
+        if(geomList[i] == geom) sel = true;
+    if(!sel) {
+		geomList.push_back(geom);
+        ComputeCenter();
+        SignalChange();
+	}
 }
 
 void World::Selection::Clear() {
