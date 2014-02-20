@@ -10,6 +10,7 @@
 #include <events\events.h>
 #include <renderer\renderer.h>
 #include <system\thread\thread.h>
+#include <system\locks\scoped_lock.h>
 
 namespace OP {
 
@@ -18,6 +19,39 @@ class Driver;
 class Operators : public QObject, public EV::EventHandler<> {
     Q_OBJECT
 private:
+    struct RenderThread : SYS::Thread {
+        std::vector<Operator*>&     activeOps;
+        SYS::SpinLock&          	activeOpsMtx;
+        std::vector<R::MeshJob>&    meshJobs;
+        SYS::SpinLock&              meshJobsMtx;
+
+        RenderThread(
+			std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx,
+            std::vector<R::MeshJob>& meshJobs, SYS::SpinLock& meshJobsMtx) : 
+		    activeOps(activeOps), activeOpsMtx(activeOpsMtx),
+			meshJobs(meshJobs), meshJobsMtx(meshJobsMtx) { }
+
+        DWORD Thread_Func() {
+            int cnt = 0;
+            while(true) {
+				{
+                    /*
+	                printf("########## %8d RenderThread::Begin GetMeshJobs\n", cnt);
+					SYS::ScopedLock lockOps(activeOpsMtx);
+					SYS::ScopedLock lockJobs(meshJobsMtx);
+					meshJobs.clear();
+					for(unsigned i = 0; i < activeOps.size(); ++i)
+						activeOps[i]->GetMeshJobs(meshJobs);
+					printf("########## %8d RenderThread::End GetMeshJobs\n", cnt);
+					cnt++;
+                    */
+				}
+                Sleep(100);
+			}
+		}
+	};
+    GEN::Pointer<RenderThread> _renderThread;
+
     DECL_HANDLE_EVENTS(Operators)
 
     struct OperatorDesc {

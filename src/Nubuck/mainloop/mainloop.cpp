@@ -6,7 +6,7 @@
 void MainLoop::Update() { 
 	W::world.Update(); 
 	OP::g_operators.FrameUpdate();
-	UI::Outliner::Instance()->HandleEvents();
+	// UI::Outliner::Instance()->HandleEvents();
 }
 
 MainLoop::MainLoop() { connect(&_timer, SIGNAL(timeout()), this, SLOT(Update())); }

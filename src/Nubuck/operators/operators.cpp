@@ -97,23 +97,29 @@ void Operators::SetInitOp(unsigned id) {
 }
 
 void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
+	if(!_renderThread.IsValid()) {
+        _renderThread = GEN::MakePtr(new RenderThread(_activeOps, _activeOpsMtx, _meshJobs, _meshJobsMtx));
+        _renderThread->Thread_StartAsync();
+	}
+    
+    /*
     static int cnt = 0;
-	printf("########## %8d Begin GetMeshJobs\n", cnt);
-	SYS::ScopedLock lockJobs(_meshJobsMtx);
-    SYS::ScopedLock lockOps(_activeOpsMtx);
-	_meshJobs.clear();
-	for(unsigned i = 0; i < _activeOps.size(); ++i)
-		_activeOps[i]->GetMeshJobs(_meshJobs);
+	printf("########## %8d Operators::GetMeshJobs::Begin GetMeshJobs\n", cnt);
+	// SYS::ScopedLock lockJobs(_meshJobsMtx);
 	meshJobs.insert(meshJobs.end(), _meshJobs.begin(), _meshJobs.end());
-	printf("########## %8d End GetMeshJobs\n", cnt);
+	printf("########## %8d Operators::GetMeshJobs::End GetMeshJobs\n", cnt);
     cnt++;
+    */
 }
 
 void Operators::OnCameraChanged() {
+    return; // !!!
 	_driver->Send(EV::def_CameraChanged.Create(EV::Params_CameraChanged()));
 }
 
 bool Operators::MouseEvent(const EV::Event& event) {
+    return false; // !!!
+
     int ret = 0;
 	EV::Params_Mouse args = EV::def_Mouse.GetArgs(event);
 	args.ret = &ret;

@@ -62,18 +62,20 @@ template<typename VEC3>
 inline PolyMesh<VEC3>& PolyMesh<VEC3>::operator=(const PolyMesh& other) {
     if(&other != this) {
         base_t::operator=(other);
-        _faceAttribs.init(*this);
+        // _faceAttribs.init(*this);
     }
     return *this;
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::join(PolyMesh& other) {
+    /*
     if(&other != this) {
         base_t::join(other);
         compute_faces();
         _faceAttribs.init(*this);
     }
+    */
 }
 
 template<typename VEC3>

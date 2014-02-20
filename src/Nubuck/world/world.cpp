@@ -372,9 +372,11 @@ void World::BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
 
 World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
     AddEventHandler(EV::def_Apocalypse,           this, &World::Event_Apocalypse);
+    /*
     AddEventHandler(EV::def_LinkEntity,           this, &World::Event_LinkEntity);
     AddEventHandler(EV::def_DestroyEntity,        this, &World::Event_DestroyEntity);
     AddEventHandler(EV::def_SelectionChanged,     this, &World::Event_SelectionChanged);
+    */
     AddEventHandler(EV::def_Resize,               this, &World::Event_Resize);
     AddEventHandler(EV::def_Mouse,                this, &World::Event_Mouse);
     AddEventHandler(EV::def_Key,                  this, &World::Event_Key);
@@ -437,6 +439,7 @@ void World::Update(void) {
 
     HandleEvents();
 
+    /*
     for(unsigned i = 0; i < _entities.size(); ++i) {
         GEN::Pointer<Entity> entity = _entities[i];
 		if(entity->IsDead() && !entity->IsSelected()) {
@@ -452,6 +455,7 @@ void World::Update(void) {
             geom.BuildRenderList();
         }
     }
+    */
 }
 
 void World::Render(R::RenderList& renderList) {
@@ -466,6 +470,7 @@ void World::Render(R::RenderList& renderList) {
 
     SYS::ScopedLock lockEntities(_entitiesMtx);
 
+    /*
     for(unsigned i = 0; i < _entities.size(); ++i) {
         if(EntityType::ENT_GEOMETRY == _entities[i]->GetType()) {
             ENT_Geometry& geom = static_cast<ENT_Geometry&>(*_entities[i]);
@@ -474,6 +479,7 @@ void World::Render(R::RenderList& renderList) {
                 geom.GetRenderList().meshJobs.end());
         }
     }
+    */
 }
 
 IGeometry* World::CreateGeometry() {

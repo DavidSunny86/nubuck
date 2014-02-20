@@ -3,6 +3,8 @@
 #include <QLabel>
 #include <QHBoxLayout>
 
+#include <LEDA\graph\graph_gen.h>
+
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <Nubuck\polymesh.h>
 #include <Nubuck\operators\operator_invoker.h>
@@ -38,6 +40,8 @@ LoadOBJPanel::LoadOBJPanel(QWidget* parent) : QWidget(parent) {
 
 // --- LoadOBJPanel impl
 
+static leda::nb::RatPolyMesh preload;
+
 void LoadOBJ::Event_Load(const EV::Event& event) {
 	const EV::Params_OP_LoadOBJ_Load& args = EV::def_OP_LoadOBJ_Load.GetArgs(event);
 
@@ -56,24 +60,46 @@ void LoadOBJ::Event_Load(const EV::Event& event) {
 }
 
 void LoadOBJ::Event_LoadScene(const EV::Event& event) {
-    const int renderAll = IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES;
-    const char* filename = "C:\\Libraries\\LEDA\\LEDA-6.4\\vs_nubuck\\demo_flipclip0\\laurana_hp.obj";
-	W::ENT_Geometry* geom = (W::ENT_Geometry*)_nb.world->CreateGeometry();
-    geom->SetRenderMode(renderAll);
-    
-	leda::nb::RatPolyMesh& mesh0 = geom->GetRatPolyMesh();
-	mesh0.FromObj(filename);
-	leda::nb::RatPolyMesh mesh1 = mesh0;
-
-	leda::node v;
-	forall_nodes(v, mesh0) mesh0.set_position(v, mesh0.position_of(v).translate(leda::d3_rat_point(-10, 0, 0).to_vector()));
-	forall_nodes(v, mesh1) mesh1.set_position(v, mesh1.position_of(v).translate(leda::d3_rat_point( 10, 0, 0).to_vector()));
-
+    /*
+    printf(">>>>>>>> LoadOBJ: beginning loading scene\n");
+	leda::nb::RatPolyMesh mesh0;
+	mesh0 = preload;
+	mesh0 = preload;
+	mesh0 = preload;
+	leda::nb::RatPolyMesh mesh1;
+	mesh1 = preload;
 	mesh0.join(mesh1);
-
-	geom->Update();
-	_nb.world->GetSelection()->Set(geom);
     printf(">>>>>>>> LoadOBJ: finished loading scene\n");
+    */
+
+	leda::GRAPH<leda::d3_rat_point, int> G[3];
+	// leda::nb::RatPolyMesh G[3];
+    leda::list<leda::edge> E;
+	leda::face_map<int> M;
+    printf(">>>>>>>> LoadOBJ: beginning loading scene\n");
+    for(int i = 0; i < 3; ++i) {
+		leda::maximal_planar_graph(G[i], 100000);
+		G[i].make_bidirected(E);
+		G[i].make_planar_map();
+		G[i].compute_faces();
+		M.init(G[i]);
+	}
+	G[0].join(G[1]);
+	M.init(G[0]);
+	G[0].join(G[2]);
+	M.init(G[0]);
+    printf(">>>>>>>> LoadOBJ: finished loading scene\n");
+
+    /*
+    unsigned sum = 0;
+    for(unsigned j = 0; j < 10000000; ++j) {
+        for(unsigned i = 0; i < 10000; ++i) {
+            sum += i * j;
+        }
+        printf("working...%d", j);
+	}
+    printf("sum = %d\n", sum);
+    */
 }
 
 LoadOBJ::LoadOBJ() : _geom(NULL) {
@@ -83,6 +109,10 @@ LoadOBJ::LoadOBJ() : _geom(NULL) {
 
 void LoadOBJ::Register(const Nubuck& nb, Invoker& invoker) {
     _nb = nb;
+
+    printf("LoadOBJ: preloading mesh\n");
+    const char* filename = "C:\\Libraries\\LEDA\\LEDA-6.4\\vs_nubuck\\demo_flipclip0\\laurana_hp.obj";
+	preload.FromObj(filename);
 
     QAction* action = _nb.ui->GetSceneMenu()->addAction("Load .obj file");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
