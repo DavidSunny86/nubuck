@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 
 #include <LEDA\graph\graph_gen.h>
+#include <LEDA\graph\planar_map.h>
 
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <Nubuck\polymesh.h>
@@ -59,47 +60,59 @@ void LoadOBJ::Event_Load(const EV::Event& event) {
 	delete args.filename;
 }
 
-void LoadOBJ::Event_LoadScene(const EV::Event& event) {
-    /*
-    printf(">>>>>>>> LoadOBJ: beginning loading scene\n");
-	leda::nb::RatPolyMesh mesh0;
-	mesh0 = preload;
-	mesh0 = preload;
-	mesh0 = preload;
-	leda::nb::RatPolyMesh mesh1;
-	mesh1 = preload;
-	mesh0.join(mesh1);
-    printf(">>>>>>>> LoadOBJ: finished loading scene\n");
-    */
+struct TypeA { int val; };
+struct TypeB { int val0; bool val1; };
 
-	leda::GRAPH<leda::d3_rat_point, int> G[3];
-	// leda::nb::RatPolyMesh G[3];
+template<typename FTYPE>
+class MyGraph : public leda::GRAPH<leda::d3_rat_point, int> { 
+	typedef leda::GRAPH<leda::d3_rat_point, int> base_t;
+
+	leda::edge_map<FTYPE> _attribs;
+public:
+	MyGraph() { 
+		_attribs.init(*this);
+	}
+
+    ~MyGraph() {
+        // ...
+	}
+
+    MyGraph& operator=(const MyGraph& other) {
+        base_t::operator=(other);
+        return *this;
+	}
+};
+
+template<typename FTYPE>
+void DoSomeWork() {
+	MyGraph<FTYPE> G[3];
     leda::list<leda::edge> E;
-	leda::face_map<int> M;
-    printf(">>>>>>>> LoadOBJ: beginning loading scene\n");
+    printf(">>>>>>>> DoSomeWork: BEGIN\n");
     for(int i = 0; i < 3; ++i) {
-		leda::maximal_planar_graph(G[i], 100000);
+		leda::maximal_planar_graph(G[i], 10000);
 		G[i].make_bidirected(E);
 		G[i].make_planar_map();
 		G[i].compute_faces();
-		M.init(G[i]);
+		printf("|E| = %d\n", E.size());
 	}
 	G[0].join(G[1]);
-	M.init(G[0]);
 	G[0].join(G[2]);
-	M.init(G[0]);
-    printf(">>>>>>>> LoadOBJ: finished loading scene\n");
+    printf(">>>>>>>> DoSomeWork: END\n");
+}
 
-    /*
-    unsigned sum = 0;
-    for(unsigned j = 0; j < 10000000; ++j) {
-        for(unsigned i = 0; i < 10000; ++i) {
-            sum += i * j;
-        }
-        printf("working...%d", j);
-	}
-    printf("sum = %d\n", sum);
-    */
+void LoadOBJ::Event_LoadScene(const EV::Event& event) {
+	SYS::Timer timer;
+    float secsPassed = 0.0f;
+
+	timer.Start();
+    DoSomeWork<TypeA>();
+	secsPassed = timer.Stop();
+	printf("#### TypeA: %fs\n", secsPassed);
+
+	timer.Start();
+    DoSomeWork<TypeB>();
+	secsPassed = timer.Stop();
+	printf("#### TypeB: %fs\n", secsPassed);
 }
 
 LoadOBJ::LoadOBJ() : _geom(NULL) {
