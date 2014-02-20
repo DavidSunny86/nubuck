@@ -40,6 +40,10 @@ M::Matrix4 Entity::GetTransformationMatrix() const {
     return T * R;
 }
 
+void Entity::Translate(const M::Vector3& v) {
+	_transform.position += v;
+}
+
 void Entity::Destroy() {
     // no lock necessary!
     _tags |= Tags::IS_DEAD;

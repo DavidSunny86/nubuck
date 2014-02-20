@@ -26,9 +26,14 @@ void LoadOBJPanel::OnChooseFilename() {
 	}
 }
 
+void LoadOBJPanel::OnLoadScene() {
+	g_operators.InvokeAction(EV::def_OP_LoadOBJ_LoadScene.Create(EV::Params_OP_LoadOBJ_LoadScene()));
+}
+
 LoadOBJPanel::LoadOBJPanel(QWidget* parent) : QWidget(parent) {
 	_ui.setupUi(this);
 	QObject::connect(_ui.btnChooseFile, SIGNAL(clicked()), this, SLOT(OnChooseFilename()));
+	QObject::connect(_ui.btnLoadScene, SIGNAL(clicked()), this, SLOT(OnLoadScene()));
 }
 
 // --- LoadOBJPanel impl
@@ -50,8 +55,30 @@ void LoadOBJ::Event_Load(const EV::Event& event) {
 	delete args.filename;
 }
 
+void LoadOBJ::Event_LoadScene(const EV::Event& event) {
+    const int renderAll = IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES;
+    const char* filename = "C:\\Libraries\\LEDA\\LEDA-6.4\\vs_nubuck\\demo_flipclip0\\laurana_hp.obj";
+	W::ENT_Geometry* geom = (W::ENT_Geometry*)_nb.world->CreateGeometry();
+    geom->SetRenderMode(renderAll);
+    
+	leda::nb::RatPolyMesh& mesh0 = geom->GetRatPolyMesh();
+	mesh0.FromObj(filename);
+	leda::nb::RatPolyMesh mesh1 = mesh0;
+
+	leda::node v;
+	forall_nodes(v, mesh0) mesh0.set_position(v, mesh0.position_of(v).translate(leda::d3_rat_point(-10, 0, 0).to_vector()));
+	forall_nodes(v, mesh1) mesh1.set_position(v, mesh1.position_of(v).translate(leda::d3_rat_point( 10, 0, 0).to_vector()));
+
+	mesh0.join(mesh1);
+
+	geom->Update();
+	_nb.world->GetSelection()->Set(geom);
+    printf(">>>>>>>> LoadOBJ: finished loading scene\n");
+}
+
 LoadOBJ::LoadOBJ() : _geom(NULL) {
 	AddEventHandler(EV::def_OP_LoadOBJ_Load, this, &LoadOBJ::Event_Load);
+	AddEventHandler(EV::def_OP_LoadOBJ_LoadScene, this, &LoadOBJ::Event_LoadScene);
 }
 
 void LoadOBJ::Register(const Nubuck& nb, Invoker& invoker) {

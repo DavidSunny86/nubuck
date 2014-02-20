@@ -10,6 +10,9 @@ BEGIN_EVENT_DEF(OP_LoadOBJ_Load)
     QString* filename;
 END_EVENT_DEF
 
+BEGIN_EVENT_DEF(OP_LoadOBJ_LoadScene)
+END_EVENT_DEF
+
 namespace W {
 
 class ENT_Geometry;
@@ -24,6 +27,7 @@ private:
 	Ui::LoadOBJ _ui;
 private slots:
     void OnChooseFilename();
+    void OnLoadScene();
 public:
     LoadOBJPanel(QWidget* parent = NULL);
 };
@@ -34,6 +38,7 @@ private:
 	W::ENT_Geometry*    _geom;
 
     void Event_Load(const EV::Event& event);
+    void Event_LoadScene(const EV::Event& event);
 public:
 	LoadOBJ();
 

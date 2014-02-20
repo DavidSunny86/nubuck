@@ -55,6 +55,8 @@ public:
     M::Vector3          Transform(const M::Vector3& v) const;
     M::Matrix4          GetTransformationMatrix() const;
 
+    void                Translate(const M::Vector3& v);
+
     void                SetType(EntityType::Enum type) { _type = type; }
     void                SetID(unsigned id) { _entId = id; }
     void                SetName(const std::string& name) { _name = name; }

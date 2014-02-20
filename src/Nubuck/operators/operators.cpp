@@ -97,12 +97,16 @@ void Operators::SetInitOp(unsigned id) {
 }
 
 void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
+    static int cnt = 0;
+	printf("########## %8d Begin GetMeshJobs\n", cnt);
 	SYS::ScopedLock lockJobs(_meshJobsMtx);
     SYS::ScopedLock lockOps(_activeOpsMtx);
 	_meshJobs.clear();
 	for(unsigned i = 0; i < _activeOps.size(); ++i)
 		_activeOps[i]->GetMeshJobs(_meshJobs);
 	meshJobs.insert(meshJobs.end(), _meshJobs.begin(), _meshJobs.end());
+	printf("########## %8d End GetMeshJobs\n", cnt);
+    cnt++;
 }
 
 void Operators::OnCameraChanged() {

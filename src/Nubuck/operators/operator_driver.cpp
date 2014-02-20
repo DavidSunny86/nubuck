@@ -23,6 +23,7 @@ void Driver::Event_Push(const EV::Event& event) {
     }
 	_activeOps.push_back(args.op);
 	args.op->Invoke();
+    printf(">>>>>>>>>> OP::Driver finished\n");
 }
 
 void Driver::Event_SelectionChanged(const EV::Event& event) {
