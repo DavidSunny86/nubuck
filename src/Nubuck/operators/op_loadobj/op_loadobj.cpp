@@ -60,59 +60,25 @@ void LoadOBJ::Event_Load(const EV::Event& event) {
 	delete args.filename;
 }
 
-struct TypeA { int val; };
-struct TypeB { int val0; bool val1; };
-
-template<typename FTYPE>
-class MyGraph : public leda::GRAPH<leda::d3_rat_point, int> { 
-	typedef leda::GRAPH<leda::d3_rat_point, int> base_t;
-
-	leda::edge_map<FTYPE> _attribs;
-public:
-	MyGraph() { 
-		_attribs.init(*this);
-	}
-
-    ~MyGraph() {
-        // ...
-	}
-
-    MyGraph& operator=(const MyGraph& other) {
-        base_t::operator=(other);
-        return *this;
-	}
-};
-
-template<typename FTYPE>
-void DoSomeWork() {
-	MyGraph<FTYPE> G[3];
-    leda::list<leda::edge> E;
-    printf(">>>>>>>> DoSomeWork: BEGIN\n");
-    for(int i = 0; i < 3; ++i) {
-		leda::maximal_planar_graph(G[i], 10000);
-		G[i].make_bidirected(E);
-		G[i].make_planar_map();
-		G[i].compute_faces();
-		printf("|E| = %d\n", E.size());
-	}
-	G[0].join(G[1]);
-	G[0].join(G[2]);
-    printf(">>>>>>>> DoSomeWork: END\n");
-}
-
 void LoadOBJ::Event_LoadScene(const EV::Event& event) {
-	SYS::Timer timer;
-    float secsPassed = 0.0f;
+    leda::nb::RatPolyMesh mesh0, mesh1;
+    mesh0 = mesh1 = preload;
 
-	timer.Start();
-    DoSomeWork<TypeA>();
-	secsPassed = timer.Stop();
-	printf("#### TypeA: %fs\n", secsPassed);
+    leda::node v;
+    forall_nodes(v, mesh0) mesh0.set_position(v, mesh0.position_of(v).translate(-10, 0, 0));
+    forall_nodes(v, mesh1) mesh1.set_position(v, mesh1.position_of(v).translate( 10, 0, 0));
 
-	timer.Start();
-    DoSomeWork<TypeB>();
-	secsPassed = timer.Stop();
-	printf("#### TypeB: %fs\n", secsPassed);
+    mesh0.join(mesh1);
+
+    const int renderAll = IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES;
+    W::ENT_Geometry* geom = (W::ENT_Geometry*)_nb.world->CreateGeometry();
+    geom->SetRenderMode(renderAll);
+    geom->GetRatPolyMesh() = mesh0;
+    geom->Update();
+
+    _nb.world->GetSelection()->Set(geom);
+
+    printf("### LoadOBJ: loading scene finished\n");
 }
 
 LoadOBJ::LoadOBJ() : _geom(NULL) {

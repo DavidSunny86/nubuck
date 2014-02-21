@@ -102,23 +102,16 @@ void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
         _renderThread->Thread_StartAsync();
 	}
     
-    /*
-    static int cnt = 0;
-	printf("########## %8d Operators::GetMeshJobs::Begin GetMeshJobs\n", cnt);
-	// SYS::ScopedLock lockJobs(_meshJobsMtx);
+	SYS::ScopedLock lockJobs(_meshJobsMtx);
 	meshJobs.insert(meshJobs.end(), _meshJobs.begin(), _meshJobs.end());
-	printf("########## %8d Operators::GetMeshJobs::End GetMeshJobs\n", cnt);
-    cnt++;
-    */
 }
 
 void Operators::OnCameraChanged() {
-    return; // !!!
 	_driver->Send(EV::def_CameraChanged.Create(EV::Params_CameraChanged()));
 }
 
 bool Operators::MouseEvent(const EV::Event& event) {
-    return false; // !!!
+    if(0 < _actionsPending) return false;
 
     int ret = 0;
 	EV::Params_Mouse args = EV::def_Mouse.GetArgs(event);

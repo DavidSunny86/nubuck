@@ -35,16 +35,11 @@ private:
             int cnt = 0;
             while(true) {
 				{
-                    /*
-	                printf("########## %8d RenderThread::Begin GetMeshJobs\n", cnt);
 					SYS::ScopedLock lockOps(activeOpsMtx);
 					SYS::ScopedLock lockJobs(meshJobsMtx);
 					meshJobs.clear();
 					for(unsigned i = 0; i < activeOps.size(); ++i)
 						activeOps[i]->GetMeshJobs(meshJobs);
-					printf("########## %8d RenderThread::End GetMeshJobs\n", cnt);
-					cnt++;
-                    */
 				}
                 Sleep(100);
 			}
