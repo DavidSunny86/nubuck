@@ -14,14 +14,12 @@ class PolyMesh : public GRAPH<VEC3, int> {
 private:
     typedef GRAPH<VEC3, int> base_t;
 
-    struct FaceAttribs {
-        int         visible;
-        R::Color    color;
+    leda::face_map<int>     _fatt_visible;
+    leda::face_map<float>   _fatt_colorR;
+    leda::face_map<float>   _fatt_colorG;
+    leda::face_map<float>   _fatt_colorB;
 
-        FaceAttribs() : visible(true), color(R::Color::White) { }
-    };
-
-    leda::face_map<FaceAttribs> _faceAttribs;
+    void InitFaceAttributes();
 public:
     PolyMesh();
 
@@ -54,15 +52,23 @@ void set_color(PolyMesh<VEC3>& mesh, const R::Color& color) {
 }
 
 template<typename VEC3>
+inline void PolyMesh<VEC3>::InitFaceAttributes() {
+    _fatt_visible.init(*this, 1);
+    _fatt_colorR.init(*this, 1.0f);
+    _fatt_colorG.init(*this, 1.0f);
+    _fatt_colorB.init(*this, 1.0f);
+}
+
+template<typename VEC3>
 inline PolyMesh<VEC3>::PolyMesh() {
-    _faceAttribs.init(*this);
+    InitFaceAttributes();
 }
 
 template<typename VEC3>
 inline PolyMesh<VEC3>& PolyMesh<VEC3>::operator=(const PolyMesh& other) {
     if(&other != this) {
         base_t::operator=(other);
-        _faceAttribs.init(*this);
+        InitFaceAttributes();
     }
     return *this;
 }
@@ -72,7 +78,7 @@ inline void PolyMesh<VEC3>::join(PolyMesh& other) {
     if(&other != this) {
         base_t::join(other);
         compute_faces();
-        _faceAttribs.init(*this);
+        InitFaceAttributes();
     }
 }
 
@@ -83,12 +89,12 @@ inline const VEC3& PolyMesh<VEC3>::position_of(const node v) {
 
 template<typename VEC3>
 inline bool PolyMesh<VEC3>::is_visible(const face f) const {
-    return _faceAttribs[f].visible;
+    return _fatt_visible[f];
 }
 
 template<typename VEC3>
 inline const R::Color& PolyMesh<VEC3>::color_of(const face f) const {
-    return _faceAttribs[f].color;
+    return R::Color(_fatt_colorR[f], _fatt_colorG[f], _fatt_colorB[f]);
 }
 
 template<typename VEC3>
@@ -98,7 +104,9 @@ inline void PolyMesh<VEC3>::set_position(const node v, const VEC3& p) {
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_color(const face f, const R::Color& color) {
-    _faceAttribs[f].color = color;
+    _fatt_colorR[f] = color.r;
+    _fatt_colorG[f] = color.g;
+    _fatt_colorB[f] = color.b;
 }
 
 template<typename VEC3>
@@ -132,8 +140,8 @@ edge PolyMesh<VEC3>::make_triangle(const VEC3& p0, const VEC3& p1, const VEC3& p
 
     compute_faces();
 
-    _faceAttribs[face_of(f[0])].visible = true;
-    _faceAttribs[face_of(b[0])].visible = false;
+    _fatt_visible[face_of(f[0])] = true;
+    _fatt_visible[face_of(b[0])] = false;
 
     return f[0];
 }
