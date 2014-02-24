@@ -1,6 +1,6 @@
 #include <fstream>
 
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <renderer\shader\shader.h>
 #include "pass.h"
 

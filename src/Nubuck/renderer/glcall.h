@@ -1,6 +1,6 @@
 #pragma once
 
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 
 #ifdef NUBUCK_GLCALL
 #define GL_CALL(x) \

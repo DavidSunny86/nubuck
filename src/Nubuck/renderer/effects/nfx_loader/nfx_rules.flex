@@ -10,7 +10,7 @@
 
 %{
 #include <stdlib.h>
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include "nfx_local.h"
 %}
 

@@ -11,18 +11,24 @@ class QPushButton;
 
 namespace OP {
 
-class D3_Delaunay : public QObject, public Operator {
+class D3_DelaunayPanel : public QWidget {
     Q_OBJECT
 private:
-    Nubuck _nb;
-    unsigned _nameIdx;
-    QPushButton* _button;
-    QWidget* _panel;
+    unsigned        _nameIdx;
+    QPushButton*    _button;
+    QWidget*        _panel;
     void BuildPanelWidget();
 private slots:
     void OnChangeButtonName();
 public:
-	D3_Delaunay() : _nameIdx(0), _panel(NULL) { }
+	D3_DelaunayPanel(QWidget* parent = NULL) : QWidget(parent) { }
+};
+
+class D3_Delaunay : public Operator {
+private:
+    Nubuck _nb;
+public:
+	D3_Delaunay() { }
 
     void Register(const Nubuck& nb, Invoker& invoker);
     void Invoke();
@@ -31,4 +37,5 @@ public:
 
 } // namespace OP
 
+extern "C" NUBUCK_API QWidget*      CreateOperatorPanel();
 extern "C" NUBUCK_API OP::Operator* CreateOperator();

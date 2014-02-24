@@ -7,7 +7,7 @@
 
 #include <Nubuck\renderer\color\color.h>
 
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <Nubuck\math\vector3.h>
 #include <Nubuck\math\matrix3.h>
 #include <Nubuck\math\matrix4.h>

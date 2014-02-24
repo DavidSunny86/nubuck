@@ -3,12 +3,12 @@
 #include <queue>
 
 #include <Nubuck\nubuck.h>
-#include <generic\pointer.h>
-#include <generic\singleton.h>
+#include <Nubuck\generic\pointer.h>
+#include <Nubuck\generic\singleton.h>
 #include <common\types.h>
 #include <system\thread\thread.h>
-#include <system\locks\spinlock.h>
-#include <system\locks\semaphore.h>
+#include <Nubuck\system\locks\spinlock.h>
+#include <Nubuck\system\locks\semaphore.h>
 
 namespace ALG {
 

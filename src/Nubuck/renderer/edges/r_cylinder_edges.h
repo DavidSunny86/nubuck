@@ -1,6 +1,6 @@
 #pragma once
 
-#include <generic\uncopyable.h>
+#include <Nubuck\generic\uncopyable.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\meshmgr_fwd.h>
 #include "r_edges.h"

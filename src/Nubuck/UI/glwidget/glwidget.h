@@ -1,8 +1,8 @@
 #pragma once
 
 #include <QWidget>
-#include <generic\pointer.h>
-#include <generic\uncopyable.h>
+#include <Nubuck\generic\pointer.h>
+#include <Nubuck\generic\uncopyable.h>
 
 namespace SYS {
 

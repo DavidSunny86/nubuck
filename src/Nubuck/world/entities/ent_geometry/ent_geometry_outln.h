@@ -1,7 +1,7 @@
 #pragma once
 
 #include <UI\outliner\outliner.h>
-#include <events\events.h>
+#include <Nubuck\events\events.h>
 #include "ent_geometry_events.h"
 
 namespace W {

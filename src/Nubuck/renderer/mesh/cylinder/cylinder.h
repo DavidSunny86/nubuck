@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <generic\uncopyable.h>
+#include <Nubuck\generic\uncopyable.h>
 #include "..\mesh.h"
 
 namespace R {

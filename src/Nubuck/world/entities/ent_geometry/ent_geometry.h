@@ -3,7 +3,7 @@
 #include <Nubuck\nubuck.h>
 #include <Nubuck\polymesh.h>
 #include <Nubuck\math\box.h>
-#include <system\locks\spinlock.h>
+#include <Nubuck\system\locks\spinlock.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>

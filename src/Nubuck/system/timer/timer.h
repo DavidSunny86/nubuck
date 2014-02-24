@@ -3,7 +3,7 @@
 #include <exception>
 #include <Windows.h>
 
-#include <generic\uncopyable.h>
+#include <Nubuck\generic\uncopyable.h>
 
 struct PerformanceCounterException : std::exception {
 	const char* what(void) throw() {

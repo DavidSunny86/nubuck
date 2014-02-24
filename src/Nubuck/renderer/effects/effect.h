@@ -3,7 +3,7 @@
 #include <vector>
 #include <map>
 
-#include <generic\singleton.h>
+#include <Nubuck\generic\singleton.h>
 #include "pass.h"
 
 namespace R {

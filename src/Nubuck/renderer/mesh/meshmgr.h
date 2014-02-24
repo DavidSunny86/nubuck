@@ -1,7 +1,7 @@
 #pragma once
 
-#include <generic\pointer.h>
-#include <system\locks\spinlock.h>
+#include <Nubuck\generic\pointer.h>
+#include <Nubuck\system\locks\spinlock.h>
 #include "meshmgr_fwd.h"
 #include "mesh.h"
 #include "tfmesh.h"

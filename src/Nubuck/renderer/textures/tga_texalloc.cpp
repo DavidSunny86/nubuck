@@ -1,4 +1,4 @@
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include "texture.h"
 
 #define TYPE_UNCOMPRESSED_RGB24 2

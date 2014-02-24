@@ -1,7 +1,7 @@
-#include <common\common.h>
+#include <Nubuck\common\common.h>
+#include <Nubuck\system\locks\spinlock.h>
+#include <Nubuck\system\locks\condvar.h>
 #include <system\winerror.h>
-#include <system\locks\spinlock.h>
-#include "condvar.h"
 
 namespace SYS {
 

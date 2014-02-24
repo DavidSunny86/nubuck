@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include <generic\pointer.h>
-#include <generic\uncopyable.h>
+#include <Nubuck\generic\pointer.h>
+#include <Nubuck\generic\uncopyable.h>
 #include <renderer\shader\shader.h>
 #include <renderer\program\program.h>
 #include <renderer\effects\state.h>

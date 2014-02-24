@@ -1,4 +1,4 @@
-#include "string_hash.h"
+#include <Nubuck\common\string_hash.h>
 
 namespace COM {
 

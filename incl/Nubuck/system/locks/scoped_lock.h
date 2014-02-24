@@ -1,7 +1,7 @@
 #pragma once
 
-#include <generic\uncopyable.h>
-#include <system\locks\spinlock.h>
+#include <Nubuck\generic\uncopyable.h>
+#include <Nubuck\system\locks\spinlock.h>
 
 namespace SYS {
 

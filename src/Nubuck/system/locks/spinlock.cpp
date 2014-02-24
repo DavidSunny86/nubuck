@@ -1,6 +1,6 @@
-#include <common\common.h>
+#include <Nubuck\common\common.h>
+#include <Nubuck\system\locks\spinlock.h>
 #include <system\winerror.h>
-#include "spinlock.h"
 
 namespace SYS {
 

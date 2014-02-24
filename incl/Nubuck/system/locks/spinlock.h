@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Windows.h>
-#include <generic\uncopyable.h>
+#include <Nubuck\generic\uncopyable.h>
 
 namespace SYS {
 

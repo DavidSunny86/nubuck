@@ -3,7 +3,7 @@
 #include <functional>
 #include <algorithm>
 
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <common\config\config.h>
 #include <Nubuck\math\matrix3.h>
 #include <Nubuck\math\matrix4.h>

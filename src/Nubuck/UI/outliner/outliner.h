@@ -12,7 +12,7 @@
 #include <QVBoxLayout>
 
 #include <UI\colorbutton\colorbutton.h>
-#include <events\events.h>
+#include <Nubuck\events\events.h>
 #include <world\world.h>
 #include <world\entity.h>
 

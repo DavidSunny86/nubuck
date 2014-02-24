@@ -1,7 +1,7 @@
 #include <assert.h>
 
 #include <QResizeEvent>
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <system\opengl\opengl.h>
 #include "glwidget.h"
 

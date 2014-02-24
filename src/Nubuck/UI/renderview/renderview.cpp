@@ -1,7 +1,7 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <UI\window_events.h>
 #include <UI\outliner\outliner.h>
 #include <world\world.h>

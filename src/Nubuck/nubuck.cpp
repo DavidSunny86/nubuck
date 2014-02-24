@@ -5,7 +5,7 @@
 #include <QGLWidget>
 
 #include <Nubuck\nubuck.h>
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <common\config\config.h>
 #include <world\world.h>
 #include <renderer\effects\effect.h>

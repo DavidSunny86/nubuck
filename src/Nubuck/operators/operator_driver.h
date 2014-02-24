@@ -1,7 +1,7 @@
 #pragma once
 
 #include <system\thread\thread.h>
-#include <events\events.h>
+#include <Nubuck\events\events.h>
 #include <renderer\renderer.h>
 
 namespace OP {

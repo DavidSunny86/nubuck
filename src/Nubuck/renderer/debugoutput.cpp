@@ -1,5 +1,5 @@
 #include <renderer\glew\glew.h>
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include "renderer.h"
 
 #define CASE_ENUM_STR(x) case x: return #x 

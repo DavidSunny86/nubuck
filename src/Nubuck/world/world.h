@@ -6,17 +6,17 @@
 #include <queue>
 
 #include <Nubuck\nubuck.h>
-#include <generic\pointer.h>
+#include <Nubuck\generic\pointer.h>
 #include <system\timer\timer.h>
 #include <system\thread\thread.h>
-#include <system\locks\spinlock.h>
-#include <system\locks\semaphore.h>
+#include <Nubuck\system\locks\spinlock.h>
+#include <Nubuck\system\locks\semaphore.h>
 #include <common\types.h>
 #include <Nubuck\math\vector2.h>
 #include <Nubuck\math\ray.h>
 #include <renderer\renderer.h>
 #include <camera\arcball_camera.h>
-#include <events\events.h>
+#include <Nubuck\events\events.h>
 #include "entity.h"
 
 namespace W {

@@ -1,6 +1,6 @@
-#include <common\common.h>
-#include "..\winerror.h"
-#include "semaphore.h"
+#include <Nubuck\common\common.h>
+#include <Nubuck\system\locks\semaphore.h>
+#include <system\winerror.h>
 
 namespace SYS {
 

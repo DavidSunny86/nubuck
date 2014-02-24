@@ -1,4 +1,4 @@
-#include <system\locks\scoped_lock.h>
+#include <Nubuck\system\locks\scoped_lock.h>
 #include <world\world.h>
 #include "ent_geometry_outln.h"
 #include "ent_geometry.h"

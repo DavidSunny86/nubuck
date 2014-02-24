@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <Nubuck\math\vector3.h>
 #include <Nubuck\math\matrix3.h>
 #include <Nubuck\math\quaternion.h>

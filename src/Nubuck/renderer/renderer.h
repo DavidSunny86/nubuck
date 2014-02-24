@@ -2,10 +2,10 @@
 
 #include <vector>
 
-#include <generic\pointer.h>
+#include <Nubuck\generic\pointer.h>
 #include <common\config\config.h>
-#include <system\locks\spinlock.h>
-#include <system\locks\semaphore.h>
+#include <Nubuck\system\locks\spinlock.h>
+#include <Nubuck\system\locks\semaphore.h>
 #include <system\timer\timer.h>
 #include <Nubuck\math\matrix4.h>
 #include "material\material.h"

@@ -1,5 +1,5 @@
 #include <Windows.h>
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <renderer\effects\nfx_loader\nfx_loader.h>
 #include "effectmgr.h"
 #include "effect.h"

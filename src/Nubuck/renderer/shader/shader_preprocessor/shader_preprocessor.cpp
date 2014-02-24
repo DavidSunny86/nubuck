@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <vector>
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include "shader_preprocessor_local.h"
 
 static int g_nextToken = R::SPP::Tokens::TOK_UNKNOWN;

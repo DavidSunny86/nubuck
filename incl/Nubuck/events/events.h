@@ -2,12 +2,12 @@
 
 #include <assert.h>
 #include <queue>
-#include <common\common.h>
-#include <common\string_hash.h>
-#include <system\locks\spinlock.h>
-#include <system\locks\condvar.h>
-#include <system\locks\semaphore.h>
-#include <system\locks\shared_resources.h>
+#include <Nubuck\common\common.h>
+#include <Nubuck\common\string_hash.h>
+#include <Nubuck\system\locks\spinlock.h>
+#include <Nubuck\system\locks\condvar.h>
+#include <Nubuck\system\locks\semaphore.h>
+#include <Nubuck\system\locks\shared_resources.h>
 
 // events are sent and received between threads. a thread queues it's received events
 // and processes them in order.

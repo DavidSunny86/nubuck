@@ -1,9 +1,9 @@
 #include <functional>
 #include <algorithm>
 
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <algdriver\algdriver.h>
-#include <system\locks\scoped_lock.h>
+#include <Nubuck\system\locks\scoped_lock.h>
 #include <Nubuck\math\intersections.h>
 #include <renderer\mesh\plane\plane.h>
 #include <renderer\mesh\sphere\sphere.h>

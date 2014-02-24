@@ -38,9 +38,6 @@
     <Filter Include="Private\UI\renderview">
       <UniqueIdentifier>{fe7dcee8-8160-4e02-bde6-15ad16e0845a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\generic">
-      <UniqueIdentifier>{02fd699d-1a32-4c74-a58b-703c5192a5ea}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\renderer\effects">
       <UniqueIdentifier>{086e3747-c671-415c-8dc2-1ed97aea6a42}</UniqueIdentifier>
     </Filter>
@@ -171,9 +168,6 @@
     <Filter Include="Private\UI\outliner">
       <UniqueIdentifier>{d2c0fc38-27fa-430c-aad7-98374bcad8cc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\events">
-      <UniqueIdentifier>{dea5b76f-1b3d-482f-99c6-75b5c393aff1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\UI\colorbutton">
       <UniqueIdentifier>{bb899979-99a9-4fea-9231-1b9df1cc3fe7}</UniqueIdentifier>
     </Filter>
@@ -255,6 +249,21 @@
     <Filter Include="Private\operators\op_delete">
       <UniqueIdentifier>{94e48b4d-6acb-4a25-bcd7-decc6e76ed7a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\events">
+      <UniqueIdentifier>{6c130f4f-484e-4c44-a534-b276c1d80bfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\system">
+      <UniqueIdentifier>{83b032f1-1b2a-4897-af1b-71d86bb7e01c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\system\locks">
+      <UniqueIdentifier>{fe59c9a8-55bd-457a-9078-8fca3b7e0f13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\common">
+      <UniqueIdentifier>{268a8c9e-57a8-4c01-bc05-6f45e9feaa27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\generic">
+      <UniqueIdentifier>{0303b11f-ca8a-43be-bf07-777128af40d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -271,18 +280,6 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_mainwindow.h">
       <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\generic\pointer.h">
-      <Filter>Private\generic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\generic\singleton.h">
-      <Filter>Private\generic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\generic\uncopyable.h">
-      <Filter>Private\generic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\common\common.h">
-      <Filter>Private\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader.h">
       <Filter>Private\renderer\shader</Filter>
@@ -359,9 +356,6 @@
     <ClInclude Include="..\..\src\Nubuck\algdriver\algdriver.h">
       <Filter>Private\algdriver</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\system\locks\spinlock.h">
-      <Filter>Private\system\locks</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\system\thread\thread.h">
       <Filter>Private\system\thread</Filter>
     </ClInclude>
@@ -376,9 +370,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\meshmgr.h">
       <Filter>Private\renderer\mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\system\locks\semaphore.h">
-      <Filter>Private\system\locks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\effectmgr.h">
       <Filter>Private\renderer\effects</Filter>
@@ -440,9 +431,6 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.h">
       <Filter>Private\renderer\giantbuffer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\events\events.h">
-      <Filter>Private\events</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\nfx_loader\nfx_loader.h">
       <Filter>Private\renderer\effects\nfx_loader</Filter>
     </ClInclude>
@@ -481,15 +469,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\common\filehandle.h">
       <Filter>Private\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\system\locks\condvar.h">
-      <Filter>Private\system\locks</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\system\locks\shared_resources.h">
-      <Filter>Private\system\locks</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\system\locks\scoped_lock.h">
-      <Filter>Private\system\locks</Filter>
     </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\polymesh.h">
       <Filter>Public\polymesh</Filter>
@@ -596,12 +575,6 @@
     <ClInclude Include="..\..\incl\Nubuck\math\math.h">
       <Filter>Public\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\common\string_hash.h">
-      <Filter>Private\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\events\core_events.h">
-      <Filter>Private\events</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\world\world_events.h">
       <Filter>Private\world</Filter>
     </ClInclude>
@@ -631,6 +604,42 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\operators\op_delete\op_delete.h">
       <Filter>Private\operators\op_delete</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\events\core_events.h">
+      <Filter>Public\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\events\events.h">
+      <Filter>Public\events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\system\locks\condvar.h">
+      <Filter>Public\system\locks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\system\locks\scoped_lock.h">
+      <Filter>Public\system\locks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\system\locks\semaphore.h">
+      <Filter>Public\system\locks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\system\locks\shared_resources.h">
+      <Filter>Public\system\locks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\system\locks\spinlock.h">
+      <Filter>Public\system\locks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\common\common.h">
+      <Filter>Public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\common\string_hash.h">
+      <Filter>Public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\generic\pointer.h">
+      <Filter>Public\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\generic\singleton.h">
+      <Filter>Public\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\generic\uncopyable.h">
+      <Filter>Public\generic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -834,9 +843,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\UI\outliner\outliner.cpp">
       <Filter>Private\UI\outliner</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\events\events.cpp">
-      <Filter>Private\events</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\UI\colorbutton\colorbutton.cpp">
       <Filter>Private\UI\colorbutton</Filter>

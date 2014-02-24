@@ -1,7 +1,7 @@
 #include <renderer\glew\glew.h>
 #include <renderer\glew\wglew.h>
 
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <renderer\glcall.h>
 
 #include <system\winerror.h>

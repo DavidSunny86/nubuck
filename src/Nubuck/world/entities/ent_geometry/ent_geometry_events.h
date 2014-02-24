@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Nubuck\renderer\color\color.h>
-#include <events\events.h>
+#include <Nubuck\events\events.h>
 
 BEGIN_EVENT_DEF(ENT_Geometry_EdgeRadiusChanged)
     float edgeRadius;

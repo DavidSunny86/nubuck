@@ -3,8 +3,8 @@
 #include <string>
 #include <map>
 #include <cstdio>
-#include <generic\pointer.h>
-#include <generic\singleton.h>
+#include <Nubuck\generic\pointer.h>
+#include <Nubuck\generic\singleton.h>
 
 namespace FS {
 

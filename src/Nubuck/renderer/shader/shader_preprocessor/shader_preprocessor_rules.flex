@@ -9,7 +9,7 @@
 %option yylineno
 
 %{
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <common\filehandle.h>
 #include "shader_preprocessor.h"
 #include "shader_preprocessor_local.h"

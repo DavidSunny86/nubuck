@@ -1,6 +1,6 @@
 #pragma once
 
-#include <system\locks\scoped_lock.h>
+#include <Nubuck\system\locks\scoped_lock.h>
 #include "meshmgr.h"
 
 namespace R {

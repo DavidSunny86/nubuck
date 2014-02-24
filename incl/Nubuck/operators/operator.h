@@ -3,7 +3,7 @@
 #include <vector>
 #include <Nubuck\math\vector2.h>
 
-#include <events\events.h>
+#include <Nubuck\events\events.h>
 
 struct Nubuck;
 

@@ -1,5 +1,5 @@
 #include <nubuck_private.h>
-#include <system\locks\scoped_lock.h>
+#include <Nubuck\system\locks\scoped_lock.h>
 #include <Nubuck\operators\operator_invoker.h>
 #include <UI\window_events.h>
 #include <world\world_events.h>

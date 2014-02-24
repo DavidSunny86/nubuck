@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <vector>
 
-#include <generic\pointer.h>
-#include <common\common.h>
+#include <Nubuck\generic\pointer.h>
+#include <Nubuck\common\common.h>
 #include <renderer\glcall.h>
 #include <renderer\metrics\metrics.h>
 #include <renderer\mesh\staticbuffer.h>

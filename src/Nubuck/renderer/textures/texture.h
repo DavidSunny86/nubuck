@@ -5,7 +5,7 @@
 
 #include <renderer\glew\glew.h>
 
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 #include <common\filesystem\filesystem.h>
 
 namespace R {

@@ -5,7 +5,7 @@
 #include <string>
 
 #include <system\winerror.h>
-#include "common.h"
+#include <Nubuck\common\common.h>
 
 int COM_Tokenize(ctoken_t** tokens, const char* string, char term) {
 	ctoken_t* token;

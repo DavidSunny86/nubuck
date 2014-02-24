@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdio.h>
-#include <generic\uncopyable.h>
+#include <Nubuck\generic\uncopyable.h>
 
 namespace COM {
 

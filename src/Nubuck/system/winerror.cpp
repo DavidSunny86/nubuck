@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <strsafe.h>
 
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 
 // NOTE: from http://msdn.microsoft.com/en-us/library/windows/desktop/ms680582(v=vs.85).aspx
 void ErrorExit(LPTSTR lpszFunction, const char* file, int line) 

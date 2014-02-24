@@ -1,6 +1,6 @@
 #pragma once
 
-#include <generic\pointer.h>
+#include <Nubuck\generic\pointer.h>
 
 #include "..\..\window\window.h"
 #include "..\opengl.h"

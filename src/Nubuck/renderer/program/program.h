@@ -2,7 +2,7 @@
 
 #include <string>
 #include <unordered_map>
-#include <generic\uncopyable.h>
+#include <Nubuck\generic\uncopyable.h>
 #include <renderer\glew\glew.h>
 #include <renderer\shader\shader.h>
 

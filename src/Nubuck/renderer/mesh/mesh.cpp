@@ -1,7 +1,7 @@
 #include <vector>
 #include <string.h>
 
-#include <system\locks\scoped_lock.h>
+#include <Nubuck\system\locks\scoped_lock.h>
 #include <renderer\giantbuffer\giant_buffer.h>
 #include "mesh.h"
 

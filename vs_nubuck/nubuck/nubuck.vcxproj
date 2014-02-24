@@ -11,6 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\incl\Nubuck\common\common.h" />
+    <ClInclude Include="..\..\incl\Nubuck\common\string_hash.h" />
+    <ClInclude Include="..\..\incl\Nubuck\events\core_events.h" />
+    <ClInclude Include="..\..\incl\Nubuck\events\events.h" />
+    <ClInclude Include="..\..\incl\Nubuck\generic\pointer.h" />
+    <ClInclude Include="..\..\incl\Nubuck\generic\singleton.h" />
+    <ClInclude Include="..\..\incl\Nubuck\generic\uncopyable.h" />
     <ClInclude Include="..\..\incl\Nubuck\math\box.h" />
     <ClInclude Include="..\..\incl\Nubuck\math\intersections.h" />
     <ClInclude Include="..\..\incl\Nubuck\math\line2.h" />
@@ -50,19 +57,17 @@
     <ClInclude Include="..\..\incl\Nubuck\polymesh_fwd.h" />
     <ClInclude Include="..\..\incl\Nubuck\renderer\color\color.h" />
     <ClInclude Include="..\..\incl\Nubuck\renderer\color\color_inl.h" />
+    <ClInclude Include="..\..\incl\Nubuck\system\locks\condvar.h" />
+    <ClInclude Include="..\..\incl\Nubuck\system\locks\scoped_lock.h" />
+    <ClInclude Include="..\..\incl\Nubuck\system\locks\semaphore.h" />
+    <ClInclude Include="..\..\incl\Nubuck\system\locks\shared_resources.h" />
+    <ClInclude Include="..\..\incl\Nubuck\system\locks\spinlock.h" />
     <ClInclude Include="..\..\src\Nubuck\algdriver\algdriver.h" />
     <ClInclude Include="..\..\src\Nubuck\camera\arcball_camera.h" />
-    <ClInclude Include="..\..\src\Nubuck\common\common.h" />
     <ClInclude Include="..\..\src\Nubuck\common\config\config.h" />
     <ClInclude Include="..\..\src\Nubuck\common\filehandle.h" />
     <ClInclude Include="..\..\src\Nubuck\common\filesystem\filesystem.h" />
-    <ClInclude Include="..\..\src\Nubuck\common\string_hash.h" />
     <ClInclude Include="..\..\src\Nubuck\common\types.h" />
-    <ClInclude Include="..\..\src\Nubuck\events\events.h" />
-    <ClInclude Include="..\..\src\Nubuck\events\core_events.h" />
-    <ClInclude Include="..\..\src\Nubuck\generic\pointer.h" />
-    <ClInclude Include="..\..\src\Nubuck\generic\singleton.h" />
-    <ClInclude Include="..\..\src\Nubuck\generic\uncopyable.h" />
     <CustomBuild Include="..\..\src\Nubuck\mainloop\mainloop.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing mainloop.h...</Message>
@@ -168,11 +173,6 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\skin\skinmgr.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\textures\texallocs.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\textures\texture.h" />
-    <ClInclude Include="..\..\src\Nubuck\system\locks\condvar.h" />
-    <ClInclude Include="..\..\src\Nubuck\system\locks\scoped_lock.h" />
-    <ClInclude Include="..\..\src\Nubuck\system\locks\semaphore.h" />
-    <ClInclude Include="..\..\src\Nubuck\system\locks\shared_resources.h" />
-    <ClInclude Include="..\..\src\Nubuck\system\locks\spinlock.h" />
     <ClInclude Include="..\..\src\Nubuck\system\opengl\glwindow\glwindow.h" />
     <ClInclude Include="..\..\src\Nubuck\system\opengl\opengl.h" />
     <ClInclude Include="..\..\src\Nubuck\system\thread\thread.h" />
@@ -358,7 +358,6 @@
     <ClCompile Include="..\..\src\Nubuck\common\config\config.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\filesystem\filesystem.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\string_hash.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\events\events.cpp" />
     <ClCompile Include="..\..\src\Nubuck\mainloop\mainloop.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\box.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\is_ray_box.cpp" />

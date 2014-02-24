@@ -4,17 +4,17 @@
 
 #include <Nubuck\renderer\color\color.h>
 
-#include <common\common.h>
+#include <Nubuck\common\common.h>
 
-#include <generic\pointer.h>
-#include <generic\uncopyable.h>
+#include <Nubuck\generic\pointer.h>
+#include <Nubuck\generic\uncopyable.h>
 
 #include <renderer\glew\glew.h>
 #include <Nubuck\math\vector3.h>
 #include <Nubuck\math\vector2.h>
 #include <Nubuck\math\matrix4.h>
 #include <renderer\mesh\staticbuffer.h>
-#include <system\locks\spinlock.h>
+#include <Nubuck\system\locks\spinlock.h>
 
 #ifndef NULL
 #define NULL 0

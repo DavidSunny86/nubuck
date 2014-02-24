@@ -7,10 +7,10 @@
 #include <vector>
 #include <Nubuck\operators\operator.h>
 #include <UI\operatorpanel\operatorpanel.h>
-#include <events\events.h>
+#include <Nubuck\events\events.h>
 #include <renderer\renderer.h>
 #include <system\thread\thread.h>
-#include <system\locks\scoped_lock.h>
+#include <Nubuck\system\locks\scoped_lock.h>
 
 namespace OP {
 

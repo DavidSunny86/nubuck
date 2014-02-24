@@ -1,6 +1,6 @@
 #pragma once
 
-#include <system\locks\spinlock.h>
+#include <Nubuck\system\locks\spinlock.h>
 
 #include "skin.h"
 

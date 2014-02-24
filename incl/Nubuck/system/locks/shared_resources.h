@@ -1,9 +1,9 @@
 #pragma once
 
 #include <list>
-#include <generic\pointer.h>
-#include <generic\singleton.h>
-#include <system\locks\spinlock.h>
+#include <Nubuck\generic\pointer.h>
+#include <Nubuck\generic\singleton.h>
+#include <Nubuck\system\locks\spinlock.h>
 
 namespace SYS {
 

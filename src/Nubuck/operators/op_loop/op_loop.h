@@ -4,7 +4,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 
-#include <events\events.h>
+#include <Nubuck\events\events.h>
 #include <operators\operators.h>
 
 #include <Nubuck\operators\operator.h>

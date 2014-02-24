@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-#include <generic\uncopyable.h>
+#include <Nubuck\generic\uncopyable.h>
 #include <renderer\glew\glew.h>
 
 namespace R {

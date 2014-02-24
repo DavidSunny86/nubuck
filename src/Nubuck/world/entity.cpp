@@ -1,5 +1,5 @@
-#include <common\common.h>
-#include <system\locks\scoped_lock.h>
+#include <Nubuck\common\common.h>
+#include <Nubuck\system\locks\scoped_lock.h>
 #include <world\world_events.h>
 #include <world\world.h>
 #include "entity.h"
