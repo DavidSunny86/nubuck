@@ -105,9 +105,6 @@
     <Filter Include="Private\renderer\material">
       <UniqueIdentifier>{d4fef104-4ebd-44a0-be59-d17ac18acad1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\UI\algorithmwidget">
-      <UniqueIdentifier>{3f6dbbd9-6d3e-43ac-adf0-553b99407542}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\algdriver">
       <UniqueIdentifier>{8ce06f9d-99e8-45b1-aaee-019d1cf47783}</UniqueIdentifier>
     </Filter>
@@ -263,6 +260,9 @@
     </Filter>
     <Filter Include="Public\generic">
       <UniqueIdentifier>{0303b11f-ca8a-43be-bf07-777128af40d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\operators\panels">
+      <UniqueIdentifier>{20ef2257-a833-49c2-ac5f-c6b7bff15312}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -644,6 +644,9 @@
     <ClInclude Include="..\..\incl\Nubuck\nubuck_api.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\operators\standard_algorithm.h">
+      <Filter>Public\operators</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -734,15 +737,6 @@
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_renderview.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\UI\algorithmwidget\algorithmwidget.cpp">
-      <Filter>Private\UI\algorithmwidget</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_algorithmwidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_algorithmwidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\algdriver\algdriver.cpp">
@@ -1070,9 +1064,6 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\forms\algorithm.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\src\Nubuck\UI\algorithmwidget\algorithmwidget.h">
-      <Filter>Private\UI\algorithmwidget</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\logwidget\logwidget.h">
       <Filter>Private\UI\logwidget</Filter>

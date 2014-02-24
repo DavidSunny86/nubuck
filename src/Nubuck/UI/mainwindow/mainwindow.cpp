@@ -10,7 +10,6 @@
 #include <UI\renderview\renderview.h>
 #include <UI\rendermetrics\rendermetrics.h>
 #include <UI\randompoints\randompoints.h>
-#include <UI\algorithmwidget\algorithmwidget.h>
 #include <UI\logwidget\logwidget.h>
 #include <UI\outliner\outliner.h>
 #include <UI\operatorpanel\operatorpanel.h>
@@ -85,14 +84,8 @@ namespace UI {
         statusBar()->addWidget(renderView->FpsLabel());
         setCentralWidget(renderView);
 
-        AlgorithmWidget* algorithmWidget = new AlgorithmWidget();
-        QDockWidget* algorithmDock = ScrollableDockWidget("Algorithm", algorithmWidget);
-        addDockWidget(Qt::RightDockWidgetArea, algorithmDock);
-
         _outlinerDock = ScrollableDockWidget("Outliner", Outliner::Instance());
         addDockWidget(Qt::RightDockWidgetArea, _outlinerDock);
-
-        tabifyDockWidget(_outlinerDock, algorithmDock);
 
         UI::LogWidget* logWidget = UI::LogWidget::Instance();
         addDockWidget(Qt::RightDockWidgetArea, ScrollableDockWidget("LogWidget", logWidget));

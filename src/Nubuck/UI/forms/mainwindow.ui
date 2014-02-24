@@ -47,9 +47,15 @@
     </property>
     <addaction name="actLoadOperatorPlugin"/>
    </widget>
+   <widget class="QMenu" name="menuAlgorithms">
+    <property name="title">
+     <string>Algorithms</string>
+    </property>
+   </widget>
    <addaction name="menuScene"/>
    <addaction name="menuView"/>
    <addaction name="menuObject"/>
+   <addaction name="menuAlgorithms"/>
    <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

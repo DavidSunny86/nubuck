@@ -28,6 +28,7 @@ namespace UI {
 
         QMenu* GetSceneMenu() override { return _ui.menuScene; }
         QMenu* GetObjectMenu() override { return _ui.menuObject; }
+        QMenu* GetAlgorithmMenu() override { return _ui.menuAlgorithms; }
         void SetOperatorName(const char* name) override;
         void SetOperatorPanel(QWidget* widget) override;
 	};
