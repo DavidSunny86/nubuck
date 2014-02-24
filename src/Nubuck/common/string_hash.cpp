@@ -3,7 +3,7 @@
 namespace COM {
 
 // SDBM Hash, cnf. http://www.cse.yorku.ca/~oz/hash.html
-unsigned StringHash(const char* str) {
+NUBUCK_API unsigned StringHash(const char* str) {
     unsigned long hash = 0;
     int c;
     while (c = *str++)

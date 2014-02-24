@@ -7,14 +7,9 @@
 #include <LEDA/geo/d3_rat_point.h>
 #include <LEDA/graph/graph.h>
 
+#include <Nubuck\nubuck_api.h>
 #include <Nubuck\polymesh_fwd.h>
 #include <Nubuck\math\vector3.h>
-
-#ifdef NUBUCK_LIB
-#define NUBUCK_API __declspec(dllexport)
-#else
-#define NUBUCK_API __declspec(dllimport)
-#endif
 
 class QMenu;
 class QWidget;

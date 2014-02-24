@@ -35,4 +35,6 @@ public:
     virtual bool OnMouseMove(const M::Vector2& mouseCoords) { return false; }
 };
 
+NUBUCK_API void SendToOperator(const EV::Event& event);
+
 } // namespace OP

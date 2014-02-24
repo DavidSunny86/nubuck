@@ -641,6 +641,9 @@
     <ClInclude Include="..\..\incl\Nubuck\generic\uncopyable.h">
       <Filter>Public\generic</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\nubuck_api.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">

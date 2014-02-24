@@ -58,6 +58,8 @@ public:
     void printf(const char* format, ...) override;
 };
 
+NUBUCK_API void COM_printf(const char* format, ...);
+
 extern Common common;
 
 void Crash(void);

@@ -42,6 +42,7 @@
     <ClInclude Include="..\..\incl\Nubuck\math\vector3_op_inl.h" />
     <ClInclude Include="..\..\incl\Nubuck\math\view_frustrum.h" />
     <ClInclude Include="..\..\incl\Nubuck\nubuck.h" />
+    <ClInclude Include="..\..\incl\Nubuck\nubuck_api.h" />
     <ClInclude Include="..\..\incl\Nubuck\operators\operator.h" />
     <CustomBuild Include="..\..\incl\Nubuck\operators\operator_invoker.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
@@ -697,7 +698,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>NUBUCK_MT;PARANOID;UNICODE;WIN32;QT_DLL;GLEW_BUILD;LEDA_DLL;LEDA_MULTI_THREAD;QT_CORE_LIB;QT_OPENGL_LIB;NUBUCK_LIB;QT_GUI_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NUBUCK_LIB;NUBUCK_MT;PARANOID;UNICODE;WIN32;QT_DLL;GLEW_BUILD;LEDA_DLL;LEDA_MULTI_THREAD;QT_CORE_LIB;QT_OPENGL_LIB;NUBUCK_LIB;QT_GUI_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -722,7 +723,7 @@ copy $(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).dll $(MY_LIBS)\LE
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>NUBUCK_MT;PARANOID;UNICODE;WIN32;QT_DLL;GLEW_BUILD;LEDA_DLL;LEDA_MULTI_THREAD;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_OPENGL_LIB;NUBUCK_LIB;QT_GUI_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NUBUCK_LIB;NUBUCK_MT;PARANOID;UNICODE;WIN32;QT_DLL;GLEW_BUILD;LEDA_DLL;LEDA_MULTI_THREAD;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_OPENGL_LIB;NUBUCK_LIB;QT_GUI_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>

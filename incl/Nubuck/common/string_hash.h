@@ -1,7 +1,9 @@
 #pragma once
 
+#include <Nubuck\nubuck_api.h>
+
 namespace COM {
 
-unsigned StringHash(const char* str);
+NUBUCK_API unsigned StringHash(const char* str);
 
 } // namespace COM

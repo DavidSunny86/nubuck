@@ -132,4 +132,8 @@ bool Operators::MouseEvent(const EV::Event& event) {
     return false;
 }
 
+NUBUCK_API void SendToOperator(const EV::Event& event) {
+    g_operators.InvokeAction(event);
+}
+
 } // namespace OP

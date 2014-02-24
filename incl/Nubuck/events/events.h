@@ -166,7 +166,7 @@ protected:
     }
 
     virtual void Event_Default(const EV::Event& event, const char* className) { 
-        common.printf("WARNING - unhandled event '%s' (id = '%d') in class '%s'.\n",
+        COM_printf("WARNING - unhandled event '%s' (id = '%d') in class '%s'.\n",
             event.name, event.id, className);
     }
 public:

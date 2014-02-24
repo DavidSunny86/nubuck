@@ -156,6 +156,10 @@ void Common::printf(const char* format, ...) {
     }
 }
 
+void COM_printf(const char* format, ...) {
+    // ...
+}
+
 void Crash(void) {
     exit(-1);
 }
