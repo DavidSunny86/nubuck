@@ -25,6 +25,9 @@ void Operators::Event_ActionFinished(const EV::Event& event) {
     _actionsPending--;
 }
 
+void Operators::Event_Default(const EV::Event& event, const char*) {
+}
+
 void Operators::OnInvokeOperator(unsigned id) {
     if(0 < _actionsPending) {
 		printf("op still busy...\n");
@@ -41,6 +44,7 @@ void Operators::OnInvokeOperator(unsigned id) {
         _driver->Thread_StartAsync();
 	}
 	EV::Params_OP_Push args = { op };
+    _ops[id].panel->Invoke();
 	_driver->Send(EV::def_OP_Push.Create(args));
 }
 
@@ -56,7 +60,7 @@ void Operators::FrameUpdate() {
     HandleEvents();
 }
 
-unsigned Operators::Register(QWidget* panel, Operator* op, HMODULE module) {
+unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module) {
     unsigned id = _ops.size();
 
     Invoker* invoker = new Invoker(id);

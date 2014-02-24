@@ -5,9 +5,9 @@
 
 namespace OP {
 
-class DeletePanel : public QWidget {
+class DeletePanel : public OperatorPanel {
 public:
-	DeletePanel(QWidget* parent = NULL) : QWidget(parent) { }
+	DeletePanel(QWidget* parent = NULL) : OperatorPanel(parent) { }
 };
 
 class Delete : public Operator {

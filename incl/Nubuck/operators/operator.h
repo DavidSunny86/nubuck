@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <QWidget>
+
 #include <Nubuck\math\vector2.h>
 
 #include <Nubuck\events\events.h>
@@ -16,6 +18,14 @@ struct MeshJob;
 namespace OP {
 
 class Invoker;
+
+class OperatorPanel : public QWidget, public EV::EventHandler<> {
+public:
+    OperatorPanel(QWidget* parent = 0) : QWidget(parent) { }
+    virtual ~OperatorPanel() { }
+
+    virtual void Invoke() { }
+};
 
 class Operator : public EV::EventHandler<> {
 public:

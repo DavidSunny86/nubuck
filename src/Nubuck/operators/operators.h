@@ -50,11 +50,11 @@ private:
     DECL_HANDLE_EVENTS(Operators)
 
     struct OperatorDesc {
-        unsigned    id;
-        Operator*   op;
-        Invoker*    invoker;
-        QWidget*    panel;
-        HMODULE     module;
+        unsigned        id;
+        Operator*   	op;
+        Invoker*    	invoker;
+        OperatorPanel*  panel;
+        HMODULE         module;
     };
 
     std::vector<OperatorDesc>   _ops;       // all registered operators
@@ -72,6 +72,7 @@ private:
     void UnloadModules();
 
     void Event_ActionFinished(const EV::Event& event);
+    void Event_Default(const EV::Event& event, const char* className);
 public slots:
     void OnInvokeOperator(unsigned id);
 public:
@@ -80,7 +81,7 @@ public:
 
     void FrameUpdate();
 
-    unsigned Register(QWidget* panel, Operator* op, HMODULE module = NULL);
+    unsigned Register(OperatorPanel* panel, Operator* op, HMODULE module = NULL);
 
     void InvokeAction(const EV::Event& event);
     void InvokeEvent(const EV::Event& event);

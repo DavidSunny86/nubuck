@@ -33,10 +33,14 @@ void LoadOBJPanel::OnLoadScene() {
 	g_operators.InvokeAction(EV::def_OP_LoadOBJ_LoadScene.Create(EV::Params_OP_LoadOBJ_LoadScene()));
 }
 
-LoadOBJPanel::LoadOBJPanel(QWidget* parent) : QWidget(parent) {
+LoadOBJPanel::LoadOBJPanel(QWidget* parent) : OperatorPanel(parent) {
 	_ui.setupUi(this);
 	QObject::connect(_ui.btnChooseFile, SIGNAL(clicked()), this, SLOT(OnChooseFilename()));
 	QObject::connect(_ui.btnLoadScene, SIGNAL(clicked()), this, SLOT(OnLoadScene()));
+}
+
+void LoadOBJPanel::Invoke() {
+    _ui.lneFilename->setText("[...]");
 }
 
 // --- LoadOBJPanel impl

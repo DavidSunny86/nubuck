@@ -66,13 +66,13 @@ namespace UI {
 				printf("ERROR: unable to load '%s'\n", filename.toAscii());
 			}
 			typedef OP::Operator* (*createOperator_t)();
-            typedef QWidget* (*createPanel_t)();
+            typedef OP::OperatorPanel* (*createPanel_t)();
             createOperator_t opFunc = (createOperator_t)GetProcAddress(lib, "CreateOperator");
             createPanel_t panelFunc = (createPanel_t)GetProcAddress(lib, "CreateOperatorPanel");
             if(!opFunc || !panelFunc) printf("ERROR - unable to load createoperator() function\n");
 			else {
 				OP::Operator* op = opFunc();
-                QWidget* panel = panelFunc();
+                OP::OperatorPanel* panel = panelFunc();
 				OP::g_operators.Register(panel, op, lib);
 			}
 		}

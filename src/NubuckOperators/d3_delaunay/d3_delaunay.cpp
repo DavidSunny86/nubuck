@@ -26,7 +26,7 @@ void D3_DelaunayPanel::OnChangeButtonName() {
     SendToOperator(EV::def_D3_Delaunay_Action.Create(args));
 }
 
-D3_DelaunayPanel::D3_DelaunayPanel(QWidget* parent) : QWidget(parent) {
+D3_DelaunayPanel::D3_DelaunayPanel(QWidget* parent) : OperatorPanel(parent) {
     _nameIdx = 0;
     _names[0] = "Click Me!";
     _names[1] = "Me Click!";

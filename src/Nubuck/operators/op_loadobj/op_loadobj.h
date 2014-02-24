@@ -21,7 +21,7 @@ class ENT_Geometry;
 
 namespace OP {
 
-class LoadOBJPanel : public QWidget {
+class LoadOBJPanel : public OperatorPanel {
     Q_OBJECT
 private:
 	Ui::LoadOBJ _ui;
@@ -30,6 +30,8 @@ private slots:
     void OnLoadScene();
 public:
     LoadOBJPanel(QWidget* parent = NULL);
+
+    void Invoke() override;
 };
 
 class LoadOBJ : public Operator {

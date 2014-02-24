@@ -4,9 +4,11 @@
 #include <QSpinBox>
 #include <QWidget>
 
+#include <Nubuck\operators\operator.h>
+
 namespace UI {
 
-class SimplePanel : public QWidget {
+class SimplePanel : public OP::OperatorPanel {
 private:
     QGridLayout* _grid;
 public:

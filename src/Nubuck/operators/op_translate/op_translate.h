@@ -17,9 +17,9 @@
 
 namespace OP {
 
-class TranslatePanel : public QWidget {
+class TranslatePanel : public OperatorPanel {
 public:
-    TranslatePanel(QWidget* parent = NULL) : QWidget(parent) { }
+    TranslatePanel(QWidget* parent = NULL) : OperatorPanel(parent) { }
 };
 
 class Translate : public Operator {

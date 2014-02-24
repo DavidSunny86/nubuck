@@ -5,9 +5,9 @@
 
 namespace OP {
 
-class JoinPanel : public QWidget {
+class JoinPanel : public OperatorPanel {
 public:
-	JoinPanel(QWidget* parent = NULL) : QWidget(parent) { }
+	JoinPanel(QWidget* parent = NULL) : OperatorPanel(parent) { }
 };
 
 class Join : public Operator {

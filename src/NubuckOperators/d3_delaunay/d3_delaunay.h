@@ -14,7 +14,7 @@ class QPushButton;
 
 namespace OP {
 
-class D3_DelaunayPanel : public QWidget {
+class D3_DelaunayPanel : public OperatorPanel {
     Q_OBJECT
 private:
     QString         _names[2];

@@ -4,7 +4,7 @@
 
 namespace UI {
 
-SimplePanel::SimplePanel(QWidget* parent) : QWidget(parent) {
+SimplePanel::SimplePanel(QWidget* parent) : OperatorPanel(parent) {
     _grid = new QGridLayout();
 
     QVBoxLayout* vbox = new QVBoxLayout();
