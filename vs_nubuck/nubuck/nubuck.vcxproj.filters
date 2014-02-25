@@ -644,9 +644,6 @@
     <ClInclude Include="..\..\incl\Nubuck\nubuck_api.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\incl\Nubuck\operators\standard_algorithm.h">
-      <Filter>Public\operators</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -1045,6 +1042,15 @@
     <ClCompile Include="..\..\src\Nubuck\operators\op_delete\op_delete.cpp">
       <Filter>Private\operators\op_delete</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\standard_algorithm.cpp">
+      <Filter>Private\operators</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_standard_algorithm.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_standard_algorithm.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1127,6 +1133,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.h">
       <Filter>Private\operators\op_loadobj</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\incl\Nubuck\operators\standard_algorithm.h">
+      <Filter>Public\operators</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

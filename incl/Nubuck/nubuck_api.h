@@ -5,3 +5,5 @@
 #else
 #define NUBUCK_API __declspec(dllimport)
 #endif
+
+#define NUBUCK_OPERATOR extern "C" __declspec(dllexport)
