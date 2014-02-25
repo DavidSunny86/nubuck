@@ -12,6 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\alg_d3_merge.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\hull_xy_graham.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\shared.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DB26F0F5-75F7-4423-AD08-8BE3A644C4EE}</ProjectGuid>
@@ -51,7 +55,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>LEDA_DLL;UNICODE;WIN32;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;ALG_D3_MERGE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LEDA_DLL;LEDA_MULTI_THREAD;UNICODE;WIN32;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;ALG_D3_MERGE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -68,7 +72,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>LEDA_DLL;UNICODE;WIN32;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;ALG_D3_MERGE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LEDA_DLL;LEDA_MULTI_THREAD;UNICODE;WIN32;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;ALG_D3_MERGE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>
       </DebugInformationFormat>

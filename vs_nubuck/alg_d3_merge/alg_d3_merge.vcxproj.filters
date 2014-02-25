@@ -28,5 +28,13 @@
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\alg_d3_merge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\hull_xy_graham.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
