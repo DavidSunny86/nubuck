@@ -48,6 +48,8 @@ struct Phase0 : Phase {
         mesh_t& G = g.geom->GetRatPolyMesh();
         G.join(G0);
         G.join(G1);
+        G.set_color(H0[maxH0], R::Color::Red);
+        G.set_color(H1[minH1], R::Color::Blue);
         g.geom->Update();
 
         g.nb.world->GetSelection()->Clear();

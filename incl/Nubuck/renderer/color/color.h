@@ -1,11 +1,13 @@
 #pragma once
 
+#include <Nubuck\nubuck_api.h>
+
 namespace R {
 
     struct Color4ub { unsigned char r, g, b, a; };
     struct Color3ub { unsigned char r, g, b; };
 
-    struct Color {
+    struct NUBUCK_API Color {
         float r, g, b, a;
 
         Color(void) { }

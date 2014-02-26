@@ -126,7 +126,7 @@ void ENT_Geometry::RebuildRenderNodes() {
     forall_nodes(v, _ratPolyMesh) {
         R::Nodes::Node rnode;
         rnode.position = _fpos[v->id()];
-        rnode.color = R::Color(0.3f, 0.3f, 0.3f);
+        rnode.color = _ratPolyMesh.color_of(v);
 		nodes.push_back(rnode);
     }
     _nodes.Rebuild(nodes);

@@ -12,13 +12,22 @@ namespace nb {
 template<typename VEC3>
 class PolyMesh : public GRAPH<VEC3, int> {
 private:
+    static const R::Color defaultVertexColor;
+
     typedef GRAPH<VEC3, int> base_t;
 
+    // vertex attributes
+    leda::node_map<float>   _vatt_colorR;
+    leda::node_map<float>   _vatt_colorG;
+    leda::node_map<float>   _vatt_colorB;
+
+    // face attributes
     leda::face_map<int>     _fatt_visible;
     leda::face_map<float>   _fatt_colorR;
     leda::face_map<float>   _fatt_colorG;
     leda::face_map<float>   _fatt_colorB;
 
+    void InitVertexAttributes();
     void InitFaceAttributes();
 public:
     PolyMesh();
@@ -29,12 +38,14 @@ public:
 
     void join(PolyMesh& other);
 
-    const VEC3& position_of(const node v);
+    const VEC3&     position_of(const node v) const;
+    const R::Color& color_of(const node v) const;
 
     bool            is_visible(const face f) const;
     const R::Color& color_of(const face f) const;
 
     void set_position(const node v, const VEC3& p);
+    void set_color(const node v, const R::Color& color);
 
     void set_color(const face f, const R::Color& color);
 
@@ -46,9 +57,19 @@ typedef PolyMesh<d3_rat_point> RatPolyMesh;
 void D3_HULL(list<d3_rat_point> L, RatPolyMesh& mesh);
 
 template<typename VEC3>
+const R::Color PolyMesh<VEC3>::defaultVertexColor = R::Color(0.3f, 0.3f, 0.3f);
+
+template<typename VEC3>
 void set_color(PolyMesh<VEC3>& mesh, const R::Color& color) {
     leda::face f;
     forall_faces(f, mesh) mesh.set_color(f, color);
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::InitVertexAttributes() {
+    _vatt_colorR.init(*this, defaultVertexColor.r);
+    _vatt_colorG.init(*this, defaultVertexColor.g);
+    _vatt_colorB.init(*this, defaultVertexColor.b);
 }
 
 template<typename VEC3>
@@ -61,6 +82,7 @@ inline void PolyMesh<VEC3>::InitFaceAttributes() {
 
 template<typename VEC3>
 inline PolyMesh<VEC3>::PolyMesh() {
+    InitVertexAttributes();
     InitFaceAttributes();
 }
 
@@ -68,6 +90,7 @@ template<typename VEC3>
 inline PolyMesh<VEC3>& PolyMesh<VEC3>::operator=(const PolyMesh& other) {
     if(&other != this) {
         base_t::operator=(other);
+        InitVertexAttributes();
         InitFaceAttributes();
     }
     return *this;
@@ -78,13 +101,19 @@ inline void PolyMesh<VEC3>::join(PolyMesh& other) {
     if(&other != this) {
         base_t::join(other);
         compute_faces();
+        InitVertexAttributes();
         InitFaceAttributes();
     }
 }
 
 template<typename VEC3>
-inline const VEC3& PolyMesh<VEC3>::position_of(const node v) {
+inline const VEC3& PolyMesh<VEC3>::position_of(const node v) const {
     return LEDA_CONST_ACCESS(VEC3, entry(v));
+}
+
+template<typename VEC3>
+inline const R::Color& PolyMesh<VEC3>::color_of(const node v) const {
+    return R::Color(_vatt_colorR[v], _vatt_colorG[v], _vatt_colorB[v]);
 }
 
 template<typename VEC3>
@@ -100,6 +129,13 @@ inline const R::Color& PolyMesh<VEC3>::color_of(const face f) const {
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_position(const node v, const VEC3& p) {
     LEDA_ACCESS(VEC3, entry(v)) = p;
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::set_color(const node v, const R::Color& color) {
+    _vatt_colorR[v] = color.r;
+    _vatt_colorG[v] = color.g;
+    _vatt_colorB[v] = color.b;
 }
 
 template<typename VEC3>
