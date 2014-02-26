@@ -94,6 +94,8 @@ public:
     bool MouseEvent(const EV::Event& event);
 };
 
+void LoadOperators();
+
 extern Operators g_operators;
 
 } // namespace OP

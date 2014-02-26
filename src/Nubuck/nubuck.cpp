@@ -102,6 +102,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
 	OP::g_operators.Register(new OP::JoinPanel, new OP::Join);
 	OP::g_operators.Register(new OP::DeletePanel, new OP::Delete);
 	OP::g_operators.OnInvokeOperator(0); // call OP::Translate
+    OP::LoadOperators();
 
     mainWindow.show();
     return app.exec();

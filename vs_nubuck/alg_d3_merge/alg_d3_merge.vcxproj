@@ -69,6 +69,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>leda.lib;nubuck.lib;qtmaind.lib;QtCored4.lib;QtGuid4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).dll $(MY_LIBS)\LEDA\LEDA-6.4\res\Operators</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>copy operator .dll to resource directory (LEDA_DIR/res/Operators)</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
