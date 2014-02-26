@@ -264,6 +264,9 @@
     <Filter Include="Private\operators\panels">
       <UniqueIdentifier>{20ef2257-a833-49c2-ac5f-c6b7bff15312}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_gen_merge">
+      <UniqueIdentifier>{ef1f756d-5189-44ea-8086-fb6f23fba43e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -1051,6 +1054,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_standard_algorithm.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_gen_merge\op_gen_merge.cpp">
+      <Filter>Private\operators\op_gen_merge</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1136,6 +1142,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\incl\Nubuck\operators\standard_algorithm.h">
       <Filter>Public\operators</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_gen_merge\op_gen_merge.h">
+      <Filter>Private\operators\op_gen_merge</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

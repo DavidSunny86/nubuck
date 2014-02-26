@@ -19,6 +19,7 @@
 #include <operators\operators.h>
 #include <operators\op_loop\op_loop.h>
 #include <operators\op_gen_incube\op_gen_incube.h>
+#include <operators\op_gen_merge\op_gen_merge.h>
 #include <operators\op_loadobj\op_loadobj.h>
 #include <operators\op_chull\op_chull.h>
 #include <operators\op_translate\op_translate.h>
@@ -97,6 +98,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
 	OP::g_operators.Register(new OP::TranslatePanel, new OP::Translate);
     OP::g_operators.Register(new OP::LoopPanel, new OP::Loop);
     OP::g_operators.Register(new OP::GEN::InCubePanel, new OP::GEN::InCube);
+    OP::g_operators.Register(new OP::GEN::MergePanel, new OP::GEN::Merge);
 	OP::g_operators.Register(new OP::LoadOBJPanel, new OP::LoadOBJ);
 	OP::g_operators.Register(new OP::ConvexHullPanel, new OP::ConvexHull);
 	OP::g_operators.Register(new OP::JoinPanel, new OP::Join);
