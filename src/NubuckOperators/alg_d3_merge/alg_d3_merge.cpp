@@ -9,6 +9,7 @@ struct Globals {
 
     IGeometry* geom0;
     IGeometry* geom1;
+    IGeometry* geom; // union of geom0, geom1
 } g;
 
 struct Phase0 : Phase {
@@ -31,11 +32,27 @@ struct Phase0 : Phase {
         hull2_t H0, H1;
         leda::list_item maxH0, minH1;
 
-        const mesh_t& G0 = g.geom0->GetRatPolyMesh();
-        const mesh_t& G1 = g.geom1->GetRatPolyMesh();
+        mesh_t& G0 = g.geom0->GetRatPolyMesh();
+        mesh_t& G1 = g.geom1->GetRatPolyMesh();
 
         ConvexHullXY_Graham(G0, H0, NULL, &maxH0, true);
         ConvexHullXY_Graham(G1, H1, &minH1, NULL, true);
+
+        const int renderAll =
+            IGeometry::RenderMode::NODES |
+            IGeometry::RenderMode::EDGES |
+            IGeometry::RenderMode::FACES;
+
+        g.geom = g.nb.world->CreateGeometry();
+        g.geom->SetRenderMode(renderAll);
+        mesh_t& G = g.geom->GetRatPolyMesh();
+        G.join(G0);
+        G.join(G1);
+        g.geom->Update();
+
+        g.nb.world->GetSelection()->Clear();
+        g.geom0->Destroy();
+        g.geom1->Destroy();
     }
 };
 
