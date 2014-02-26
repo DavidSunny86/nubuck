@@ -2,6 +2,7 @@
 
 #include <QGridLayout>
 #include <QSpinBox>
+#include <QPushButton>
 #include <QWidget>
 
 #include <Nubuck\operators\operator.h>
@@ -14,8 +15,9 @@ private:
 public:
     SimplePanel(QWidget* parent = NULL);
 
-    void        AddLabel(const QString& str);
-    QSpinBox*   AddSpinBox(const QString& str, int min, int max);
+    void            AddLabel(const QString& str);
+    QSpinBox*   	AddSpinBox(const QString& str, int min, int max);
+    QPushButton*    AddPushButton(const QString& str);
 };
 
 } // namespace UI

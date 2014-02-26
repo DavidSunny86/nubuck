@@ -27,4 +27,11 @@ QSpinBox* SimplePanel::AddSpinBox(const QString& str, int min, int max) {
     return spinBox;
 }
 
+QPushButton* SimplePanel::AddPushButton(const QString& str) {
+    int r = _grid->rowCount();
+    QPushButton* button = new QPushButton(str);
+    _grid->addWidget(button, r, 0, 1, 2);
+    return button;
+}
+
 } // namespace UI
