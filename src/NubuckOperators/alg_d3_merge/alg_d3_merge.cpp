@@ -11,11 +11,30 @@ struct Globals {
     IGeometry* geom1;
     IGeometry* geom; // union of geom0, geom1
 
+    IGeometry* geom_suppEdge;
+    IGeometry* geom_activeEdge0;
+    IGeometry* geom_activeEdge1;
+
     Conf0 P0;
     Conf1 P1;
 } g;
 
 struct Phase0 : Phase {
+    IGeometry* CreateHighlightedEdgeGeometry(const point_t& p0, const point_t& p1) {
+		IGeometry* geom = g.nb.world->CreateGeometry();
+		geom->SetRenderMode(IGeometry::RenderMode::EDGES);
+		mesh_t& mesh = geom->GetRatPolyMesh();
+		leda::node v0 = mesh.new_node(), v1 = mesh.new_node();
+		mesh.set_position(v0, p0);
+		mesh.set_position(v1, p1);
+		mesh.set_reversal(mesh.new_edge(v0, v1), mesh.new_edge(v1, v0));
+		leda::edge e = mesh.first_adj_edge(v0);
+		mesh.set_color(e, R::Color::Red);
+		mesh.set_radius(e, 0.05f);
+		geom->Update();
+        return geom;
+	}
+
     void Enter() override {
         std::vector<IGeometry*> selection = g.nb.world->GetSelection()->GetList();
         if(2 != selection.size()) {
@@ -51,8 +70,6 @@ struct Phase0 : Phase {
         mesh_t& G = g.geom->GetRatPolyMesh();
         G.join(G0);
         G.join(G1);
-        G.set_color(H0[maxH0], R::Color::Red);
-        G.set_color(H1[minH1], R::Color::Blue);
         g.geom->Update();
 
         g.nb.world->GetSelection()->Clear();
@@ -65,14 +82,15 @@ struct Phase0 : Phase {
 		g.P0.first = g.P0.e = G.first_adj_edge(g.P0.term);
 		g.P1.first = g.P1.e = G.first_adj_edge(g.P1.term);
 
-		IGeometry* suppEdge = g.nb.world->CreateGeometry();
-		suppEdge->SetRenderMode(IGeometry::RenderMode::EDGES);
-		mesh_t& mesh = suppEdge->GetRatPolyMesh();
-		leda::node v0 = mesh.new_node(), v1 = mesh.new_node();
-		mesh.set_position(v0, G.position_of(g.P0.term));
-		mesh.set_position(v1, G.position_of(g.P1.term));
-		mesh.set_reversal(mesh.new_edge(v0, v1), mesh.new_edge(v1, v0));
-		suppEdge->Update();
+		g.geom_suppEdge = CreateHighlightedEdgeGeometry(G.position_of(g.P0.term), G.position_of(g.P1.term));
+
+		g.geom_activeEdge0 = CreateHighlightedEdgeGeometry(
+			G.position_of(leda::source(g.P0.e)),
+			G.position_of(leda::target(g.P0.e)));
+
+		g.geom_activeEdge1 = CreateHighlightedEdgeGeometry(
+			G.position_of(leda::source(g.P1.e)),
+			G.position_of(leda::target(g.P1.e)));
     }
 };
 

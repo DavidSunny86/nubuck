@@ -136,10 +136,10 @@ void ENT_Geometry::RebuildRenderEdges() {
     // TODO: don't draw reversal edges!
 	std::vector<R::EdgeRenderer::Edge> edges;
     R::EdgeRenderer::Edge re;
-    re.radius = _edgeRadius;
     leda::edge e;
     forall_edges(e, _ratPolyMesh) {
-        re.color = _edgeColor;
+		re.radius = _ratPolyMesh.radius_of(e);
+		re.color = _ratPolyMesh.color_of(e);
         re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
         re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
 		edges.push_back(re);

@@ -12,7 +12,9 @@ namespace nb {
 template<typename VEC3>
 class PolyMesh : public GRAPH<VEC3, int> {
 private:
-    static const R::Color defaultVertexColor;
+    static const R::Color   defaultVertexColor;
+    static const R::Color 	defaultEdgeColor;
+    static const float      defaultEdgeRadius;
 
     typedef GRAPH<VEC3, int> base_t;
 
@@ -21,6 +23,12 @@ private:
     leda::node_map<float>   _vatt_colorG;
     leda::node_map<float>   _vatt_colorB;
 
+    // edge attributes
+    leda::edge_map<float>   _eatt_colorR;
+    leda::edge_map<float>   _eatt_colorG;
+    leda::edge_map<float>   _eatt_colorB;
+    leda::edge_map<float>   _eatt_radius;
+
     // face attributes
     leda::face_map<int>     _fatt_visible;
     leda::face_map<float>   _fatt_colorR;
@@ -28,6 +36,7 @@ private:
     leda::face_map<float>   _fatt_colorB;
 
     void InitVertexAttributes();
+    void InitEdgeAttributes();
     void InitFaceAttributes();
 public:
     PolyMesh();
@@ -41,11 +50,17 @@ public:
     const VEC3&     position_of(const node v) const;
     const R::Color& color_of(const node v) const;
 
+    const float     radius_of(const edge e) const;
+    const R::Color& color_of(const edge e) const;
+
     bool            is_visible(const face f) const;
     const R::Color& color_of(const face f) const;
 
     void set_position(const node v, const VEC3& p);
     void set_color(const node v, const R::Color& color);
+
+    void set_radius(const edge e, const float radius);
+    void set_color(const edge e, const R::Color& color);
 
     void set_color(const face f, const R::Color& color);
 
@@ -58,6 +73,12 @@ void D3_HULL(list<d3_rat_point> L, RatPolyMesh& mesh);
 
 template<typename VEC3>
 const R::Color PolyMesh<VEC3>::defaultVertexColor = R::Color(0.3f, 0.3f, 0.3f);
+
+template<typename VEC3>
+const R::Color PolyMesh<VEC3>::defaultEdgeColor = R::Color(0.3f, 0.3f, 0.3f);
+
+template<typename VEC3>
+const float PolyMesh<VEC3>::defaultEdgeRadius = 0.02f;
 
 template<typename VEC3>
 void set_color(PolyMesh<VEC3>& mesh, const R::Color& color) {
@@ -73,6 +94,14 @@ inline void PolyMesh<VEC3>::InitVertexAttributes() {
 }
 
 template<typename VEC3>
+inline void PolyMesh<VEC3>::InitEdgeAttributes() {
+    _eatt_colorR.init(*this, defaultEdgeColor.r);
+    _eatt_colorG.init(*this, defaultEdgeColor.g);
+    _eatt_colorB.init(*this, defaultEdgeColor.b);
+    _eatt_radius.init(*this, defaultEdgeRadius);
+}
+
+template<typename VEC3>
 inline void PolyMesh<VEC3>::InitFaceAttributes() {
     _fatt_visible.init(*this, 1);
     _fatt_colorR.init(*this, 1.0f);
@@ -83,6 +112,7 @@ inline void PolyMesh<VEC3>::InitFaceAttributes() {
 template<typename VEC3>
 inline PolyMesh<VEC3>::PolyMesh() {
     InitVertexAttributes();
+    InitEdgeAttributes();
     InitFaceAttributes();
 }
 
@@ -91,6 +121,7 @@ inline PolyMesh<VEC3>& PolyMesh<VEC3>::operator=(const PolyMesh& other) {
     if(&other != this) {
         base_t::operator=(other);
         InitVertexAttributes();
+        InitEdgeAttributes();
         InitFaceAttributes();
     }
     return *this;
@@ -102,6 +133,7 @@ inline void PolyMesh<VEC3>::join(PolyMesh& other) {
         base_t::join(other);
         compute_faces();
         InitVertexAttributes();
+        InitEdgeAttributes();
         InitFaceAttributes();
     }
 }
@@ -114,6 +146,16 @@ inline const VEC3& PolyMesh<VEC3>::position_of(const node v) const {
 template<typename VEC3>
 inline const R::Color& PolyMesh<VEC3>::color_of(const node v) const {
     return R::Color(_vatt_colorR[v], _vatt_colorG[v], _vatt_colorB[v]);
+}
+
+template<typename VEC3>
+inline const float PolyMesh<VEC3>::radius_of(const edge e) const {
+    return _eatt_radius[e];
+}
+
+template<typename VEC3>
+inline const R::Color& PolyMesh<VEC3>::color_of(const edge e) const {
+    return R::Color(_eatt_colorR[e], _eatt_colorG[e], _eatt_colorB[e]);
 }
 
 template<typename VEC3>
@@ -136,6 +178,25 @@ inline void PolyMesh<VEC3>::set_color(const node v, const R::Color& color) {
     _vatt_colorR[v] = color.r;
     _vatt_colorG[v] = color.g;
     _vatt_colorB[v] = color.b;
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::set_radius(const edge e, const float radius) {
+    const edge r = reversal(e);
+    _eatt_radius[e] = _eatt_radius[r] = radius;
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::set_color(const edge e, const R::Color& color) {
+    const edge r = reversal(e);
+
+    _eatt_colorR[e] = color.r;
+    _eatt_colorG[e] = color.g;
+    _eatt_colorB[e] = color.b;
+
+    _eatt_colorR[r] = color.r;
+    _eatt_colorG[r] = color.g;
+    _eatt_colorB[r] = color.b;
 }
 
 template<typename VEC3>
