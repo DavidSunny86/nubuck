@@ -80,6 +80,10 @@ private:
 
     void AlignWithCamera();
 
+    bool OnMouseDown(const MouseEvent& event);
+    bool OnMouseUp(const MouseEvent& event);
+    bool OnMouseMove(const MouseEvent& event);
+
     void Event_SelectionChanged(const EV::Event& event) {
         OnGeometrySelected();
 	}
@@ -93,9 +97,7 @@ public:
     void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) override;
     void OnGeometrySelected() override;
     void OnCameraChanged() override;
-    bool OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) override;
-    bool OnMouseUp(const M::Vector2& mouseCoords) override;
-    bool OnMouseMove(const M::Vector2& mouseCoords) override;
+    bool OnMouse(const MouseEvent& event) override;
 };
 
 } // namespace OP

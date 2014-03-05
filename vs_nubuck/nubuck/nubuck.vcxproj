@@ -43,6 +43,7 @@
     <ClInclude Include="..\..\incl\Nubuck\math\view_frustrum.h" />
     <ClInclude Include="..\..\incl\Nubuck\nubuck.h" />
     <ClInclude Include="..\..\incl\Nubuck\nubuck_api.h" />
+    <ClInclude Include="..\..\incl\Nubuck\operators\mouse_event.h" />
     <ClInclude Include="..\..\incl\Nubuck\operators\operator.h" />
     <CustomBuild Include="..\..\incl\Nubuck\operators\operator_invoker.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

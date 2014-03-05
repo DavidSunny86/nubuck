@@ -5,6 +5,7 @@
 
 #include <Nubuck\math\vector2.h>
 
+#include <Nubuck\operators\mouse_event.h>
 #include <Nubuck\events\events.h>
 
 struct Nubuck;
@@ -40,9 +41,7 @@ public:
     virtual void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) { }
     virtual void OnGeometrySelected() { }
     virtual void OnCameraChanged() { }
-    virtual bool OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) { return false; }
-    virtual bool OnMouseUp(const M::Vector2& mouseCoords)  { return false; }
-    virtual bool OnMouseMove(const M::Vector2& mouseCoords) { return false; }
+	virtual bool OnMouse(const MouseEvent& mouseEvent) { return false; }
 };
 
 NUBUCK_API void SendToOperator(const EV::Event& event);

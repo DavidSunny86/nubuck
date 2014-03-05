@@ -44,19 +44,24 @@ void Driver::Event_CameraChanged(const EV::Event& event) {
     }
 }
 
+static MouseEvent ConvertMouseEvent(const EV::Params_Mouse& from) {
+    MouseEvent to;
+	to.type     = MouseEvent::Type(from.type);
+	to.button   = MouseEvent::Button(from.button);
+	to.mods     = from.mods;
+	to.delta    = from.delta;
+	to.coords   = M::Vector2(from.x, from.y);
+    return to;
+}
+
 void Driver::Event_Mouse(const EV::Event& event) {
     SYS::ScopedLock lock(_activeOpsMtx);
 	const EV::Params_Mouse& args = EV::def_Mouse.GetArgs(event);
-    M::Vector2 mouseCoords = M::Vector2(args.x, args.y);
 	bool shiftKey = args.mods & EV::Params_Mouse::MODIFIER_SHIFT;
     unsigned ret = 0;
     for(int i = _activeOps.size() - 1; !ret && 0 <= i; --i) {
         Operator* op = _activeOps[i];
-        bool accepted = false;
-		if(EV::Params_Mouse::MOUSE_DOWN == args.type) accepted = op->OnMouseDown(mouseCoords, shiftKey);
-		if(EV::Params_Mouse::MOUSE_UP == args.type) accepted = op->OnMouseUp(mouseCoords);
-		if(EV::Params_Mouse::MOUSE_MOVE == args.type) accepted = op->OnMouseMove(mouseCoords);
-        if(accepted) {
+		if(op->OnMouse(ConvertMouseEvent(args))) {
             unsigned N = _activeOps.size() - 1 - i;
             for(unsigned j = 0; j < N; ++j) {
                 _activeOps.back()->Finish();

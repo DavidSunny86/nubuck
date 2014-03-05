@@ -181,8 +181,10 @@ void Translate::OnCameraChanged() {
 
 static float tmp;
 
-bool Translate::OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) {
-    M::Ray ray = W::world.PickingRay(mouseCoords);
+bool Translate::OnMouseDown(const MouseEvent& event) {
+	if(MouseEvent::BUTTON_RIGHT != event.button) return false;
+
+    M::Ray ray = W::world.PickingRay(event.coords);
     if(!_dragging) {
         if(!W::world.GetSelection()->GetList().empty()) {
             M::Matrix3 M = M::RotationOf(W::world.GetModelView());
@@ -223,9 +225,9 @@ bool Translate::OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) {
         if(!_dragging) {
             W::ENT_Geometry* geom;
             if(W::world.Trace(ray, &geom)) {
-                if(shiftKey) W::world.GetSelection()->Add(geom);
+				if(MouseEvent::MODIFIER_SHIFT & event.mods) W::world.GetSelection()->Add(geom);
                 else W::world.GetSelection()->Set(geom);
-                return false; // move camera anyways
+                return true;
             }
         }
         return false;
@@ -233,7 +235,7 @@ bool Translate::OnMouseDown(const M::Vector2& mouseCoords, bool shiftKey) {
     return false;
 }
 
-bool Translate::OnMouseUp(const M::Vector2& mouseCoords) {
+bool Translate::OnMouseUp(const MouseEvent&) {
     if(_dragging) {
         _dragging = false;
         return true;
@@ -247,14 +249,14 @@ static inline M::Matrix4 SetZ(const M::Vector3& pos, float z) {
     return m;
 }
 
-bool Translate::OnMouseMove(const M::Vector2& mouseCoords) {
+bool Translate::OnMouseMove(const MouseEvent& event) {
     R::Color arrowHeadColors[] = {
         R::Color::Red,
         R::Color::Green,
         R::Color::Blue
     };
     if(!_dragging) {
-        M::Ray ray = W::world.PickingRay(mouseCoords);
+		M::Ray ray = W::world.PickingRay(event.coords);
         for(int i = 0; i < DIM; ++i) {
             /* TODO: color arrow heads
             if(M::IS::Intersects(ray, _bboxes[i])) {
@@ -266,7 +268,7 @@ bool Translate::OnMouseMove(const M::Vector2& mouseCoords) {
     }
 
     if(_dragging) {
-        M::Ray ray = W::world.PickingRay(mouseCoords);
+        M::Ray ray = W::world.PickingRay(event.coords);
         M::IS::Info inf;
         bool is = M::IS::Intersects(ray, _dragPlane, &inf);
         assert(is);
@@ -289,6 +291,15 @@ bool Translate::OnMouseMove(const M::Vector2& mouseCoords) {
         AlignWithCamera();
         return true;
     }
+    return false;
+}
+
+bool Translate::OnMouse(const MouseEvent& event) {
+	switch(event.type) {
+	case MouseEvent::MOUSE_DOWN:  return OnMouseDown(event);
+	case MouseEvent::MOUSE_UP:    return OnMouseUp(event);
+	case MouseEvent::MOUSE_MOVE:  return OnMouseMove(event);
+	}
     return false;
 }
 
