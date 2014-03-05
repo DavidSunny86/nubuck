@@ -13,8 +13,19 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\alg_d3_merge.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\hull_xy_graham.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_point.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\supp_xy.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_graph.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_graph_inl.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_point.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_point_inl.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\lmath.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\lmath_inl.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\matrix3.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\to_float_vec.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\vector_traits.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\shared.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

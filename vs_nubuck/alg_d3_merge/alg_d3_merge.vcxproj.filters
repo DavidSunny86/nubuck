@@ -23,6 +23,9 @@
       <Extensions>moc;h;cpp</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="lmath">
+      <UniqueIdentifier>{3a071266-469e-428e-8265-71d7555d8dd4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\alg_d3_merge.cpp">
@@ -31,10 +34,43 @@
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\hull_xy_graham.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\supp_xy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_point.cpp">
+      <Filter>lmath</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\shared.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_graph.h">
+      <Filter>lmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_graph_inl.h">
+      <Filter>lmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_point.h">
+      <Filter>lmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_point_inl.h">
+      <Filter>lmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\lmath.h">
+      <Filter>lmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\lmath_inl.h">
+      <Filter>lmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\matrix3.h">
+      <Filter>lmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\to_float_vec.h">
+      <Filter>lmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\vector_traits.h">
+      <Filter>lmath</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

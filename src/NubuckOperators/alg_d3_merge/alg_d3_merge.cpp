@@ -10,6 +10,9 @@ struct Globals {
     IGeometry* geom0;
     IGeometry* geom1;
     IGeometry* geom; // union of geom0, geom1
+
+    Conf0 P0;
+    Conf1 P1;
 } g;
 
 struct Phase0 : Phase {
@@ -55,6 +58,21 @@ struct Phase0 : Phase {
         g.nb.world->GetSelection()->Clear();
         g.geom0->Destroy();
         g.geom1->Destroy();
+
+		SuppEdgeXY(G, H0, H1,
+			maxH0, minH1, g.P0.term, g.P1.term);
+
+		g.P0.first = g.P0.e = G.first_adj_edge(g.P0.term);
+		g.P1.first = g.P1.e = G.first_adj_edge(g.P1.term);
+
+		IGeometry* suppEdge = g.nb.world->CreateGeometry();
+		suppEdge->SetRenderMode(IGeometry::RenderMode::EDGES);
+		mesh_t& mesh = suppEdge->GetRatPolyMesh();
+		leda::node v0 = mesh.new_node(), v1 = mesh.new_node();
+		mesh.set_position(v0, G.position_of(g.P0.term));
+		mesh.set_position(v1, G.position_of(g.P1.term));
+		mesh.set_reversal(mesh.new_edge(v0, v1), mesh.new_edge(v1, v0));
+		suppEdge->Update();
     }
 };
 
