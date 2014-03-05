@@ -40,6 +40,15 @@
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_point.cpp">
       <Filter>lmath</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\phase0.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\phase1_level0.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\shared.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\shared.h">
@@ -71,6 +80,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\vector_traits.h">
       <Filter>lmath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\phase0.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\phase1_level0.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

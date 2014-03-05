@@ -48,6 +48,23 @@ struct Conf1 : Conf {
 	}
 };
 
+struct Globals {
+    Nubuck nb;
+
+    IGeometry* geom0;
+    IGeometry* geom1;
+    IGeometry* geom; // union of geom0, geom1
+
+    IGeometry* geom_suppEdge;
+    IGeometry* geom_activeEdge0;
+    IGeometry* geom_activeEdge1;
+
+    Conf0 P0;
+    Conf1 P1;
+};
+
+extern Globals g;
+
 void ConvexHullXY_Graham(
     const mesh_t& G,
     hull2_t& H,
