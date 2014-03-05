@@ -41,16 +41,11 @@ struct Phase0 : Phase {
             printf("ERROR: invalid selection...\n");
             return;
         }
-
-        printf("Selecting stuff...\n");
         g.geom0 = selection[0];
         g.geom1 = selection[1];
-
-        printf("STEPPING...\n");
-        Step();
     }
 
-    void Step() {
+	StepRet::Enum Step() override {
         hull2_t H0, H1;
         leda::list_item maxH0, minH1;
 
@@ -91,7 +86,12 @@ struct Phase0 : Phase {
 		g.geom_activeEdge1 = CreateHighlightedEdgeGeometry(
 			G.position_of(leda::source(g.P1.e)),
 			G.position_of(leda::target(g.P1.e)));
+
+		return StepRet::DONE;
     }
+};
+
+struct Phase1_Level0 : Phase {
 };
 
 class D3_Merge : public StandardAlgorithm {
