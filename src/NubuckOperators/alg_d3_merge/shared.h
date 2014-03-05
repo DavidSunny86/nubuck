@@ -28,14 +28,14 @@ struct Conf {
 
     /*
     virtual const char* Name(void) const = 0;
-    virtual leda::edge Next(const graph_t& G, const leda::edge e) const = 0;
     */
+    virtual leda::edge Next(const mesh_t& G, const leda::edge e) const = 0;
 };
 
 struct Conf0 : Conf {
 	const char* Name(void) const { return "P0"; }
 
-	leda::edge Next(const mesh_t& G, const leda::edge e) const {
+	leda::edge Next(const mesh_t& G, const leda::edge e) const override {
 		return G.cyclic_adj_succ(e);
 	}
 };
@@ -43,13 +43,26 @@ struct Conf0 : Conf {
 struct Conf1 : Conf {
 	const char* Name(void) const { return "P1"; }
 
-	leda::edge Next(const mesh_t& G, const leda::edge e) const {
+	leda::edge Next(const mesh_t& G, const leda::edge e) const override {
 		return G.cyclic_adj_pred(e);
 	}
 };
 
+enum Color { 
+    BLUE, 
+    ORANGE,         // processed by Level0Winner
+    RED,            // non-optimal edges 
+    PURPLE, 		// optimal edges
+    YELLOW, 		// to be removed
+    VIVID_VIOLET,   // new mantle edges
+};
+
 struct Globals {
     Nubuck nb;
+
+	leda::edge_map<Color> edgeColors;
+
+    leda::edge activeEdge;
 
     IGeometry* geom0;
     IGeometry* geom1;
@@ -58,12 +71,22 @@ struct Globals {
     IGeometry* geom_suppEdge;
     IGeometry* geom_activeEdge0;
     IGeometry* geom_activeEdge1;
+    IGeometry* geom_activeEdge;
 
     Conf0 P0;
     Conf1 P1;
+
+	Globals() : activeEdge(NULL), geom_activeEdge(NULL) { }
 };
 
 extern Globals g;
+
+inline mesh_t& GetG() { return g.geom->GetRatPolyMesh(); }
+
+void UpdateActiveEdge();
+
+bool InHNeg(const leda::node v, const leda::node w);
+bool InHPos(const leda::node v, const leda::node w);
 
 void ConvexHullXY_Graham(
     const mesh_t& G,

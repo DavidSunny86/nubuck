@@ -48,6 +48,8 @@ Phase0::StepRet::Enum Phase0::Step() {
     G.join(G1);
     g.geom->Update();
 
+	g.edgeColors.init(G, BLUE);
+
     g.nb.world->GetSelection()->Clear();
     g.geom0->Destroy();
     g.geom1->Destroy();
@@ -72,5 +74,5 @@ Phase0::StepRet::Enum Phase0::Step() {
 }
 
 OP::ALG::Phase* Phase0::NextPhase() {
-    return new Phase1_Level0;
+	return new Phase1_Level0(g.P0);
 }

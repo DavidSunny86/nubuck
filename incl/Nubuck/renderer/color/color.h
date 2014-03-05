@@ -21,6 +21,7 @@ namespace R {
 		static Color Red;
 		static Color Green;
 		static Color Blue;
+        static Color Yellow;
     };
 
 	Color operator+(const Color& lhp, const Color& rhp);
