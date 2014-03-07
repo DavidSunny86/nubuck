@@ -16,6 +16,7 @@
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_point.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\phase0.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\phase1_level0.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\phase1_level1.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\shared.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\supp_xy.cpp" />
   </ItemGroup>
@@ -31,6 +32,7 @@
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\vector_traits.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\phase0.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\phase1_level0.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\phase1_level1.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\shared.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

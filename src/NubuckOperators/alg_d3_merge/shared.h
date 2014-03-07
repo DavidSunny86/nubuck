@@ -94,6 +94,7 @@ void UpdateActiveEdge();
 
 bool InHNeg(const leda::node v, const leda::node w);
 bool InHPos(const leda::node v, const leda::node w);
+bool Collinear(const leda::node v);
 
 void ConvexHullXY_Graham(
     const mesh_t& G,

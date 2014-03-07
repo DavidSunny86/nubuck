@@ -1,4 +1,5 @@
 #include "phase1_level0.h"
+#include "phase1_level1.h"
 #include "shared.h"
 
 Globals g;
@@ -8,6 +9,7 @@ void InitPhases() {
 	g.phase1_level0P1 = GEN::MakePtr(new Phase1_Level0(g.P1));
 
 	g.phase1_level0P0->SetNextPhase(g.phase1_level0P1);
+	g.phase1_level0P1->SetNextPhase(GEN::MakePtr(new Phase1_Level1));
 }
 
 void UpdateActiveEdge() {
@@ -46,4 +48,12 @@ bool InHPos(const leda::node v, const leda::node w) {
     const point_t& v1 = G[G.source(g.P1.e)];
 
     return 0 < leda::orientation(v0, v1, G[v], G[w]);
+}
+
+bool Collinear(const leda::node v) {
+    const mesh_t& G = GetG();
+    const point_t& v0 = G[G.source(g.P0.e)];
+    const point_t& v1 = G[G.source(g.P1.e)];
+
+    return leda::collinear(v0, v1, G[v]);
 }
