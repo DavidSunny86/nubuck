@@ -37,20 +37,21 @@ Phase::StepRet::Enum Phase::Step() {
 	return StepRet::DONE;
 }
 
-Phase* Phase::NextPhase() {
-    return new IdlePhase();
+GEN::Pointer<Phase> Phase::NextPhase() {
+	return GEN::MakePtr(new IdlePhase());
 }
 
 void StandardAlgorithm::SetPhase(const GEN::Pointer<Phase>& phase) {
 	if(_phase.IsValid()) {
     }
     _phase = phase;
+	COM_assert(_phase.IsValid());
     _phase->Enter();
 }
 
 void StandardAlgorithm::Event_Step(const EV::Event& event) {
 	if(Phase::StepRet::DONE == _phase->Step()) 
-		SetPhase(GEN::Pointer<Phase>(_phase->NextPhase()));
+		SetPhase(_phase->NextPhase());
 }
 
 StandardAlgorithm::StandardAlgorithm() { 

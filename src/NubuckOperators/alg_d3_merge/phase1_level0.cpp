@@ -60,6 +60,18 @@ static EdgeInfo GetEdgeInfo(Conf& conf, const leda::edge e) {
     return VALID;
 }
 
+Phase1_Level0::Phase1_Level0(Conf& conf) : conf(conf) {
+	nextPhase = Phase::NextPhase(); // default idle phase
+}
+
+void Phase1_Level0::SetNextPhase(const GEN::Pointer<Phase>& phase) { 
+	nextPhase = phase; 
+}
+
+void Phase1_Level0::Enter() {
+	std::cout << "Entering Phase1_Level0 on " <<  conf.Name() << std::endl;
+}
+
 Phase1_Level0::StepRet::Enum Phase1_Level0::Step() {
     const mesh_t& G = GetG();
 

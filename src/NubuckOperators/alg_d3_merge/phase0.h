@@ -8,6 +8,6 @@ struct Phase0 : OP::ALG::Phase {
 
     void            Enter() override;
 
-	StepRet::Enum   Step() override;
-    Phase*          NextPhase() override;
+	StepRet::Enum       Step() override;
+	GEN::Pointer<Phase> NextPhase() override;
 };

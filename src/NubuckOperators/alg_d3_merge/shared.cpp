@@ -1,6 +1,14 @@
+#include "phase1_level0.h"
 #include "shared.h"
 
 Globals g;
+
+void InitPhases() {
+	g.phase1_level0P0 = GEN::MakePtr(new Phase1_Level0(g.P0));
+	g.phase1_level0P1 = GEN::MakePtr(new Phase1_Level0(g.P1));
+
+	g.phase1_level0P0->SetNextPhase(g.phase1_level0P1);
+}
 
 void UpdateActiveEdge() {
     const mesh_t& G = GetG();

@@ -65,6 +65,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_LIB -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DLEDA_MULTI_THREAD -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
     </CustomBuild>
+    <ClInclude Include="..\..\incl\Nubuck\operators\standard_algorithm_fwd.h" />
     <ClInclude Include="..\..\incl\Nubuck\polymesh.h" />
     <ClInclude Include="..\..\incl\Nubuck\polymesh_fwd.h" />
     <ClInclude Include="..\..\incl\Nubuck\renderer\color\color.h" />

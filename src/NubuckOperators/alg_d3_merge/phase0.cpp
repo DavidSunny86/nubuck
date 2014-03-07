@@ -73,6 +73,6 @@ Phase0::StepRet::Enum Phase0::Step() {
     return StepRet::DONE;
 }
 
-OP::ALG::Phase* Phase0::NextPhase() {
-	return new Phase1_Level0(g.P0);
+GEN::Pointer<OP::ALG::Phase> Phase0::NextPhase() {
+	return g.phase1_level0P0;
 }

@@ -14,6 +14,7 @@ const char* D3_Merge::GetName() const {
 
 OP::ALG::Phase* D3_Merge::Init(const Nubuck& nb) {
     g.nb = nb;
+    InitPhases();
     return new Phase0;
 }
 

@@ -2,8 +2,10 @@
 
 #include <string>
 
+#include <Nubuck\generic\pointer.h>
 #include <Nubuck\operators\operator.h>
 #include <Nubuck\events\events.h>
+#include <Nubuck\operators\standard_algorithm_fwd.h>
 
 BEGIN_EVENT_DEF(ALG_Step) END_EVENT_DEF
 
@@ -26,8 +28,8 @@ struct NUBUCK_API Phase {
 
     struct StepRet { enum Enum { DONE = 0, CONTINUE }; };
 
-    virtual StepRet::Enum   Step();
-	virtual Phase*          NextPhase();
+    virtual StepRet::Enum       Step();
+	virtual GEN::Pointer<Phase> NextPhase();
 };
 
 class NUBUCK_API StandardAlgorithm : public Operator {

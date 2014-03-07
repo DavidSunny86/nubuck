@@ -650,6 +650,9 @@
     <ClInclude Include="..\..\incl\Nubuck\operators\mouse_event.h">
       <Filter>Public\operators</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\operators\standard_algorithm_fwd.h">
+      <Filter>Public\operators</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">

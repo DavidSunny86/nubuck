@@ -214,7 +214,7 @@ void World::Event_Mouse(const EV::Event& event) {
                 _camArcball.StartZooming(args.x, args.y);
             else _camArcball.StartDragging(args.x, args.y);
         }
-        if(EV::Params_Mouse::BUTTON_RIGHT == args.button) {
+		if(EV::Params_Mouse::BUTTON_MIDDLE == args.button) {
             _camArcball.StartPanning(args.x, args.y);
         }
     }
@@ -224,7 +224,7 @@ void World::Event_Mouse(const EV::Event& event) {
             _camArcball.StopDragging();
             _camArcball.StopZooming();
         }
-        if(EV::Params_Mouse::BUTTON_RIGHT == args.button)
+        if(EV::Params_Mouse::BUTTON_MIDDLE == args.button)
             _camArcball.StopPanning();
     }
 

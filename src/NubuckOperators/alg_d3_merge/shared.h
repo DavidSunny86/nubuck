@@ -1,11 +1,15 @@
 #pragma once
 
 #include <Nubuck\nubuck.h>
+#include <Nubuck\generic\pointer.h>
 #include <Nubuck\polymesh.h>
 
 typedef leda::d3_rat_point      point_t;
 typedef leda::nb::RatPolyMesh   mesh_t;
 typedef leda::list<leda::node>  hull2_t;
+
+// forward declarations
+struct Phase1_Level0;
 
 // configuration (state) of P0 and P1
 struct Conf { 
@@ -26,9 +30,7 @@ struct Conf {
 
     Conf(void) : adv(NULL), first(NULL), it(NULL), self(NULL) { }
 
-    /*
     virtual const char* Name(void) const = 0;
-    */
     virtual leda::edge Next(const mesh_t& G, const leda::edge e) const = 0;
 };
 
@@ -73,6 +75,10 @@ struct Globals {
     IGeometry* geom_activeEdge1;
     IGeometry* geom_activeEdge;
 
+    // reentered phases
+	GEN::Pointer<Phase1_Level0> phase1_level0P0;
+	GEN::Pointer<Phase1_Level0> phase1_level0P1;
+
     Conf0 P0;
     Conf1 P1;
 
@@ -83,6 +89,7 @@ extern Globals g;
 
 inline mesh_t& GetG() { return g.geom->GetRatPolyMesh(); }
 
+void InitPhases();
 void UpdateActiveEdge();
 
 bool InHNeg(const leda::node v, const leda::node w);
