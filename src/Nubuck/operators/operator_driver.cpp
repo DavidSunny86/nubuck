@@ -23,7 +23,6 @@ void Driver::Event_Push(const EV::Event& event) {
     }
 	_activeOps.push_back(args.op);
 	args.op->Invoke();
-    printf(">>>>>>>>>> OP::Driver finished\n");
 }
 
 void Driver::Event_SelectionChanged(const EV::Event& event) {
@@ -78,12 +77,10 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
     SYS::ScopedLock lock(_activeOpsMtx);
     Operator* op = ActiveOperator();
     if(op) {
-		printf("Driver: handling event %s\n", event.name);
         op->Send(event);
         op->HandleEvents();
 
 		g_operators.Send(EV::def_OP_ActionFinished.Create(EV::Params_OP_ActionFinished()));
-		printf("Driver: DONE handling event %s\n", event.name);
 	}
 }
 
@@ -106,7 +103,6 @@ Operator* Driver::GetActiveOperator() {
 
 DWORD Driver::Thread_Func() {
     while(true) { 
-        printf("Driver: entering loop!!!\n");
         HandleEvents(); 
     }
 }

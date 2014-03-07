@@ -87,7 +87,6 @@ void Operators::InvokeAction(const EV::Event& event) {
 	}
 
     _actionsPending++;
-    printf("Operators::InvokeAction\n");
     _driver->Send(event);
 }
 
