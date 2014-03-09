@@ -68,6 +68,10 @@ public:
     bool IsMeshCompiled() const;
     void CompileMesh();
 
+    const std::string& GetName() const override { return Entity::GetName(); }
+
+    void SetName(const std::string& name) override;
+
 	void Destroy() override { Entity::Destroy(); }
     void OnDestroy() override;
 

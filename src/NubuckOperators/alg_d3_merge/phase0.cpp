@@ -25,6 +25,9 @@ void Phase0::Enter() {
     }
     g.geom0 = selection[0];
     g.geom1 = selection[1];
+
+    g.geom0->SetName(std::string("(L) " + g.geom0->GetName()));
+    g.geom1->SetName(std::string("(R) " + g.geom1->GetName()));
 }
 
 Phase0::StepRet::Enum Phase0::Step() {
@@ -43,6 +46,7 @@ Phase0::StepRet::Enum Phase0::Step() {
         IGeometry::RenderMode::FACES;
 
     g.geom = g.nb.world->CreateGeometry();
+    g.geom->SetName("Hull");
     g.geom->SetRenderMode(renderAll);
     mesh_t& G = g.geom->GetRatPolyMesh();
     G.join(G0);

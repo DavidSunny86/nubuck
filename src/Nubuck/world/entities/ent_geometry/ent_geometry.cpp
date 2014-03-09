@@ -108,7 +108,9 @@ ENT_Geometry::ENT_Geometry()
     _edgeRadius = 0.02f;
     _edgeColor = R::Color(0.3f, 0.3f, 0.3f);
 
-    _outlinerItem = UI::Outliner::Instance()->AddItem("Polyhedron 0", this);
+    _outlinerItem = UI::Outliner::Instance()->AddItem("", this);
+
+    SetName("Mesh");
 
 	AddEventHandler(EV::def_ENT_Geometry_EdgeRadiusChanged, this, &ENT_Geometry::Event_EdgeRadiusChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
@@ -248,6 +250,11 @@ void ENT_Geometry::CompileMesh() {
     R::meshMgr.GetMesh(_tfmesh).SetTransform(GetTransformationMatrix());
 
     _meshCompiled = true;
+}
+
+void ENT_Geometry::SetName(const std::string& name) {
+    Entity::SetName(name);
+    UI::Outliner::Instance()->SetItemName(_outlinerItem, QString::fromStdString(name));
 }
 
 void ENT_Geometry::OnDestroy() {

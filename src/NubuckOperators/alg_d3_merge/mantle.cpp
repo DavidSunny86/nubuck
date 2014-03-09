@@ -2,6 +2,7 @@
 
 void Mantle::Init(const leda::node v0, const leda::node v1, const leda::node v2) {
     _geom = _nb.world->CreateGeometry(); 
+    _geom->SetName("Mantle");
     _geom->SetRenderMode(IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES);
     leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
     leda::edge e = mesh.make_triangle(_subj[v0], _subj[v1], _subj[v2]);

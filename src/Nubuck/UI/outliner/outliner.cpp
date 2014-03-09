@@ -31,6 +31,12 @@ void Outliner::Event_Hide(const EV::Event& event) {
     args.item->headerIt->setHidden(true);
 }
 
+void Outliner::Event_SetName(const EV::Event& event) {
+    const EV::Params_Outliner_SetName& args = EV::def_Outliner_SetName.GetArgs(event);
+    args.item->header->setText(*args.name);
+    delete args.name;
+}
+
 void Outliner::Event_Delete(const EV::Event& event) {
     SYS::ScopedLock lock(_itemsMtx);
 
@@ -73,6 +79,11 @@ void Outliner::HideItem(itemHandle_t item) {
     baseHandler_t::Send(EV::def_Outliner_Hide.Create(args));
 }
 
+void Outliner::SetItemName(itemHandle_t item, const QString& name) {
+    EV::Params_Outliner_SetName args = { item, new QString(name) };
+    baseHandler_t::Send(EV::def_Outliner_SetName.Create(args));
+}
+
 void Outliner::SendToView(itemHandle_t item, const EV::Event& event) {
     if(item->view) item->view->Send(event);
 }
@@ -87,6 +98,7 @@ Outliner::Outliner(QWidget* parent) : QWidget(parent), _items(NULL) {
 
     AddEventHandler(EV::def_Outliner_CreateView, this, &Outliner::Event_CreateView);
     AddEventHandler(EV::def_Outliner_Hide, this, &Outliner::Event_Hide);
+    AddEventHandler(EV::def_Outliner_SetName, this, &Outliner::Event_SetName);
     AddEventHandler(EV::def_Outliner_Delete, this, &Outliner::Event_Delete);
 }
 

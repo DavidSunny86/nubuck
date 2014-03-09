@@ -28,6 +28,7 @@ void ConvexHull::Invoke() {
 
     IGeometry* chull = _nb.world->CreateGeometry();
     chull->SetRenderMode(IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES);
+    chull->SetName(std::string("CH(") + cloud->GetName() + ")");
     leda::nb::RatPolyMesh& chullMesh = chull->GetRatPolyMesh();
     leda::CONVEX_HULL(L, chullMesh);
     chullMesh.compute_faces();

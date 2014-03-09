@@ -60,7 +60,7 @@ public:
 
     void                SetType(EntityType::Enum type) { _type = type; }
     void                SetID(unsigned id) { _entId = id; }
-    void                SetName(const std::string& name) { _name = name; }
+    virtual void        SetName(const std::string& name) { _name = name; }
     void                SetFxName(const std::string& fxName) { _fxName = fxName; }
     void                SetTransform(const EntTransform& t) { _transform = t; }
 

@@ -16,6 +16,7 @@ void UpdateActiveEdge() {
     const mesh_t& G = GetG();
 	if(!g.geom_activeEdge) {
 		g.geom_activeEdge = g.nb.world->CreateGeometry();
+        g.geom_activeEdge->SetName("active edge");
 		g.geom_activeEdge->SetRenderMode(IGeometry::RenderMode::EDGES);
 	}
 	mesh_t& mesh = g.geom_activeEdge->GetRatPolyMesh();

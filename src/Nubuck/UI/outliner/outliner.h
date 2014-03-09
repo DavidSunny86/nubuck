@@ -64,6 +64,7 @@ private:
 
     void Event_CreateView(const EV::Event& event);
     void Event_Hide(const EV::Event& event);
+    void Event_SetName(const EV::Event& event);
     void Event_Delete(const EV::Event& event);
 public:
     typedef LinkedItem* itemHandle_t;
@@ -77,6 +78,7 @@ public:
     itemHandle_t    AddItem(const QString& name, W::Entity* entity);
     void            DeleteItem(itemHandle_t item);
     void            HideItem(itemHandle_t item);
+    void            SetItemName(itemHandle_t item, const QString& name);
 
     void            SendToView(const itemHandle_t item, const EV::Event&);
 
@@ -90,6 +92,11 @@ END_EVENT_DEF
 
 BEGIN_EVENT_DEF(Outliner_Hide)
     UI::Outliner::itemHandle_t item;
+END_EVENT_DEF
+
+BEGIN_EVENT_DEF(Outliner_SetName)
+    UI::Outliner::itemHandle_t  item;
+    QString*                    name;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(Outliner_Delete)
