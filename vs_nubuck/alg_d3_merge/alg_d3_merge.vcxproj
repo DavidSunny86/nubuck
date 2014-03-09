@@ -14,6 +14,7 @@
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\alg_d3_merge.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\hull_xy_graham.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\d3_point.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\mantle.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\phase0.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\phase1_level0.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_d3_merge\phase1_level1.cpp" />
@@ -30,6 +31,7 @@
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\matrix3.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\to_float_vec.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\lmath\vector_traits.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\mantle.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\phase0.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\phase1_level0.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_d3_merge\phase1_level1.h" />

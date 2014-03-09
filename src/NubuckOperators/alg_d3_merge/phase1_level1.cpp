@@ -1,4 +1,5 @@
 #include "shared.h"
+#include "mantle.h"
 #include "phase1_level0.h"
 #include "phase1_level1.h"
 
@@ -70,6 +71,10 @@ Phase1_Level1::StepRet::Enum Phase1_Level1::Step() {
     // g.nodeColors[G.source(lConf->e)] = PURPLE; 
 
     // g.purpleEdges[G.source(wConf->e)] = wConf->e;
+
+    // construct new mantle face
+	if(!g.mantle.IsValid()) g.mantle = GEN::MakePtr(new Mantle(g.nb, G));
+	g.mantle->AddTriangle(G.source(g.P0.e), G.source(g.P1.e), G.target(wConf->e));
 
     if(g.P0.term == G.target(g.P0.e)) {
         leda::edge e = G.cyclic_adj_pred(G.reversal(g.P0.e));

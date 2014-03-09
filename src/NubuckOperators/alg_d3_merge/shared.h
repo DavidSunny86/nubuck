@@ -9,7 +9,8 @@ typedef leda::nb::RatPolyMesh   mesh_t;
 typedef leda::list<leda::node>  hull2_t;
 
 // forward declarations
-struct Phase1_Level0;
+class   Mantle;
+struct  Phase1_Level0;
 
 // configuration (state) of P0 and P1
 struct Conf { 
@@ -74,6 +75,8 @@ struct Globals {
     IGeometry* geom_activeEdge0;
     IGeometry* geom_activeEdge1;
     IGeometry* geom_activeEdge;
+
+	GEN::Pointer<Mantle> mantle;
 
     // reentered phases
 	GEN::Pointer<Phase1_Level0> phase1_level0P0;

@@ -47,6 +47,9 @@ public:
 
     void join(PolyMesh& other);
 
+    edge split(const edge e);
+    edge split(const edge e0, const edge e1);
+
     const VEC3&     position_of(const node v) const;
     const R::Color& color_of(const node v) const;
 
@@ -136,6 +139,16 @@ inline void PolyMesh<VEC3>::join(PolyMesh& other) {
         InitEdgeAttributes();
         InitFaceAttributes();
     }
+}
+
+template<typename VEC3>
+inline edge PolyMesh<VEC3>::split(const edge e) {
+    return base_t::split_map_edge(e);
+}
+
+template<typename VEC3>
+inline edge PolyMesh<VEC3>::split(const edge e0, const edge e1) {
+    return base_t::split_face(e0, e1);
 }
 
 template<typename VEC3>
