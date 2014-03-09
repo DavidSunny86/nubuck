@@ -21,7 +21,7 @@ private:
 
 	mutable SYS::SpinLock _mtx;
 
-	GEN::Pointer<UI::Outliner::View> _outlinerView;
+    UI::Outliner::itemHandle_t      _outlinerItem;
 
     R::Nodes                        _nodes;
     R::CylinderEdges                _cylinderEdges;
@@ -65,13 +65,13 @@ public:
 
     DECL_HANDLE_EVENTS(ENT_Geometry);
 
-    GEN::Pointer<UI::Outliner::View> GetOutlinerView();
-
     bool IsMeshCompiled() const;
     void CompileMesh();
 
 	void Destroy() override { Entity::Destroy(); }
     void OnDestroy() override;
+
+    UI::OutlinerView* CreateOutlinerView() override;
 
     leda::nb::RatPolyMesh& GetRatPolyMesh() override;
     void Update() override;
@@ -93,6 +93,8 @@ public:
 
     void SetPosition(float x, float y, float z) override;
     void Rotate(float ang, float x, float y, float z) override;
+
+    void HideOutline() override;
 
     void Show() override;
     void Hide() override;

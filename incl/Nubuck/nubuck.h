@@ -46,6 +46,8 @@ struct IGeometry {
     virtual void SetPosition(float x, float y, float z) = 0;
     virtual void Rotate(float ang, float x, float y, float z) = 0;
 
+    virtual void HideOutline() = 0;
+
     virtual void Hide() = 0;
     virtual void Show() = 0;
 

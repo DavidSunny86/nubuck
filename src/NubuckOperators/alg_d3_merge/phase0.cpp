@@ -4,6 +4,7 @@
 IGeometry* Phase0::CreateHighlightedEdgeGeometry(const point_t& p0, const point_t& p1) {
     IGeometry* geom = g.nb.world->CreateGeometry();
     geom->SetRenderMode(IGeometry::RenderMode::EDGES);
+    geom->HideOutline();
     mesh_t& mesh = geom->GetRatPolyMesh();
     leda::node v0 = mesh.new_node(), v1 = mesh.new_node();
     mesh.set_position(v0, p0);

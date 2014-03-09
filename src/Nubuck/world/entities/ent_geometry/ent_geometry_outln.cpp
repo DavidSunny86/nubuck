@@ -23,6 +23,8 @@ void ENT_GeometryOutln::OnEdgeColorChanged(float r, float g, float b) {
 }
 
 ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) {
+    InitOutline();
+
 	AddEventHandler(EV::def_ENT_Geometry_EdgeRadiusChanged, this, &ENT_GeometryOutln::Event_EdgeRadiusChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_GeometryOutln::Event_EdgeColorChanged);
 }
@@ -79,6 +81,11 @@ void ENT_GeometryOutln::Event_EdgeColorChanged(const EV::Event& event) {
 	_btnEdgeColor->blockSignals(true);
 	_btnEdgeColor->SetColor(args.edgeColor.r, args.edgeColor.g, args.edgeColor.b);
 	_btnEdgeColor->blockSignals(false);
+}
+
+void ENT_GeometryOutln::ExecEvents(const std::vector<EV::Event>& events) {
+    for(unsigned i = 0; i < events.size(); ++i) Send(events[i]);
+    HandleEvents();
 }
 
 } // namespace W

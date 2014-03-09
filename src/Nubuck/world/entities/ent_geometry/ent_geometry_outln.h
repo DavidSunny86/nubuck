@@ -8,7 +8,7 @@ namespace W {
 
 class ENT_Geometry;
 
-class ENT_GeometryOutln : public UI::Outliner::View {
+class ENT_GeometryOutln : public UI::OutlinerView {
     Q_OBJECT
 private:
     ENT_Geometry& _subject;
@@ -29,7 +29,9 @@ public:
 
     DECL_HANDLE_EVENTS(ENT_GeometryOutln);
 
-	void InitUI() override { InitOutline(); }
+	void InitUI() { InitOutline(); }
+
+    void ExecEvents(const std::vector<EV::Event>& events);
 };
 
 } // namespace W

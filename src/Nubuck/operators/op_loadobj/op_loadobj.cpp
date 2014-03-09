@@ -112,6 +112,7 @@ void LoadOBJ::Invoke() {
 		IGeometry::RenderMode::FACES;
 	IGeometry* geom = _nb.world->CreateGeometry();
 	geom->SetRenderMode(renderAll);
+    geom->HideOutline();
 	leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
 	leda::edge e0 = mesh.make_triangle(point_t(-1, -1, 0), point_t(1, -1, 0), point_t(1, 1, 0));
 	leda::edge e1 = mesh.face_cycle_pred(e0);

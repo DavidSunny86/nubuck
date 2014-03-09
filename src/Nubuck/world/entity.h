@@ -2,6 +2,7 @@
 
 #include <Nubuck\math\vector3.h>
 #include <Nubuck\math\matrix3.h>
+#include <UI\outliner\outliner_fwd.h>
 
 namespace W {
 
@@ -65,6 +66,8 @@ public:
 
     void                Destroy();
 	virtual void        OnDestroy() { }
+
+    virtual UI::OutlinerView* CreateOutlinerView() = 0;
 };
 
 } // namespace W

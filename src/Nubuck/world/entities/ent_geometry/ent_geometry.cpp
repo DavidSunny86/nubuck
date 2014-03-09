@@ -91,15 +91,16 @@ void ENT_Geometry::Event_EdgeColorChanged(const EV::Event& event) {
     RebuildRenderEdges();
 }
 
-ENT_Geometry::ENT_Geometry() : 
-_edgeRenderer(NULL),
-_mesh(NULL), 
-_tfmesh(NULL), 
-_meshCompiled(true), 
-_isHidden(false),
-_renderMode(0), 
-_renderLayer(0),
-_shadingMode(ShadingMode::NICE)
+ENT_Geometry::ENT_Geometry() 
+    : _outlinerItem(NULL)
+    , _edgeRenderer(NULL)
+    , _mesh(NULL)
+    , _tfmesh(NULL)
+    , _meshCompiled(true)
+    , _isHidden(false)
+    , _renderMode(0)
+    , _renderLayer(0)
+    , _shadingMode(ShadingMode::NICE)
 { 
     _edgeRenderer = &_cylinderEdges;
     // _edgeRenderer = &_lineEdges;
@@ -107,14 +108,14 @@ _shadingMode(ShadingMode::NICE)
     _edgeRadius = 0.02f;
     _edgeColor = R::Color(0.3f, 0.3f, 0.3f);
 
+    _outlinerItem = UI::Outliner::Instance()->AddItem("Polyhedron 0", this);
+
 	AddEventHandler(EV::def_ENT_Geometry_EdgeRadiusChanged, this, &ENT_Geometry::Event_EdgeRadiusChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
 }
 
-GEN::Pointer<UI::Outliner::View> ENT_Geometry::GetOutlinerView() {
-	SYS::ScopedLock lock(_mtx);
-    _outlinerView = GEN::MakePtr(new ENT_GeometryOutln(*this));
-    return _outlinerView;
+UI::OutlinerView* ENT_Geometry::CreateOutlinerView() {
+    return new ENT_GeometryOutln(*this);
 }
 
 bool ENT_Geometry::IsMeshCompiled() const { return _meshCompiled; }
@@ -192,10 +193,9 @@ void ENT_Geometry::SetEdgeRadius(float edgeRadius) {
     _edgeRadius = edgeRadius;
     RebuildRenderEdges();
 
-	if(_outlinerView.IsValid()) {
-        EV::Params_ENT_Geometry_EdgeRadiusChanged args = { _edgeRadius };
-        _outlinerView->Send(EV::def_ENT_Geometry_EdgeRadiusChanged.Create(args));
-	}
+    EV::Params_ENT_Geometry_EdgeRadiusChanged args = { _edgeRadius };
+    EV::Event event = EV::def_ENT_Geometry_EdgeRadiusChanged.Create(args);
+    UI::Outliner::Instance()->SendToView(_outlinerItem, event);
 }
 
 void ENT_Geometry::SetEdgeColor(const R::Color& color) {
@@ -203,10 +203,9 @@ void ENT_Geometry::SetEdgeColor(const R::Color& color) {
     _edgeColor = color;
     RebuildRenderEdges();
 
-	if(_outlinerView.IsValid()) {
-        EV::Params_ENT_Geometry_EdgeColorChanged args = { _edgeColor };
-        _outlinerView->Send(EV::def_ENT_Geometry_EdgeColorChanged.Create(args));
-	}
+    EV::Params_ENT_Geometry_EdgeColorChanged args = { _edgeColor };
+    EV::Event event = EV::def_ENT_Geometry_EdgeColorChanged.Create(args);
+    UI::Outliner::Instance()->SendToView(_outlinerItem, event);
 }
 
 const M::Vector3& ENT_Geometry::GetLocalCenter() const { 
@@ -256,6 +255,8 @@ void ENT_Geometry::OnDestroy() {
 	_nodes.DestroyRenderMesh();
 	_edgeRenderer->DestroyRenderMesh();
 	_renderMode &= ~(RenderMode::EDGES | RenderMode::NODES); // !!!
+
+    UI::Outliner::Instance()->DeleteItem(_outlinerItem);
 }
 
 leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() { return _ratPolyMesh; }
@@ -263,6 +264,11 @@ leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() { return _ratPolyMesh; }
 void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
 	SYS::ScopedLock lock(_mtx);
     GetTransform().rotation = M::RotationOf(M::Mat4::RotateAxis(M::Normalize(M::Vector3(x, y, z)), ang)) * GetTransform().rotation;
+}
+
+void ENT_Geometry::HideOutline() {
+    SYS::ScopedLock lock(_mtx);
+    UI::Outliner::Instance()->HideItem(_outlinerItem);
 }
 
 void ENT_Geometry::Show() { 

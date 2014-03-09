@@ -267,9 +267,6 @@ void World::Event_LinkEntity(const EV::Event& event) {
     GEN::Pointer<Entity> entity(args.entity);
 	if(W::EntityType::ENT_GEOMETRY == entity->GetType()) {
         ENT_Geometry& geom = (ENT_Geometry&)*entity;
-		GEN::Pointer<UI::Outliner::View> view = geom.GetOutlinerView();
-		view->InitUI();
-		UI::Outliner::Instance()->AddItem("Polyhedron", view);
 	}
     _entities.push_back(entity);
 }
