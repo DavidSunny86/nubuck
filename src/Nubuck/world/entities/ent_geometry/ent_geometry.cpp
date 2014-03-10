@@ -120,6 +120,10 @@ UI::OutlinerView* ENT_Geometry::CreateOutlinerView() {
     return new ENT_GeometryOutln(*this);
 }
 
+void ENT_Geometry::SetSolid(bool solid) {
+    _isSolid = solid;
+}
+
 bool ENT_Geometry::IsMeshCompiled() const { return _meshCompiled; }
 
 void ENT_Geometry::RebuildRenderNodes() {

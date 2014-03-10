@@ -55,6 +55,7 @@ struct IGeometry {
     virtual void Hide() = 0;
     virtual void Show() = 0;
 
+    virtual void SetSolid(bool solid) = 0;
     virtual void SetRenderMode(int flags) = 0;
     virtual void SetRenderLayer(unsigned layer) = 0;
     virtual void SetShadingMode(ShadingMode::Enum mode) = 0;

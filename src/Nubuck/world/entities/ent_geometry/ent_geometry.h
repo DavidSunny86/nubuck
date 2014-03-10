@@ -45,6 +45,7 @@ private:
     float       _edgeRadius;
     R::Color    _edgeColor;
 
+    bool                _isSolid; // detectable by raycast
     bool                _isHidden;
     int                 _renderMode;
     unsigned            _renderLayer;
@@ -64,6 +65,10 @@ public:
     ENT_Geometry();
 
     DECL_HANDLE_EVENTS(ENT_Geometry);
+
+    bool IsSolid() const { return _isSolid; }
+
+    void SetSolid(bool solid) override;
 
     bool IsMeshCompiled() const;
     void CompileMesh();

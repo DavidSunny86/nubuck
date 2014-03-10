@@ -416,7 +416,7 @@ bool World::Trace(const M::Ray& ray, ENT_Geometry** ret) {
             ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
             M::Box bbox = geom.GetBoundingBox();
             SetCenterPosition(bbox, M::Transform(geom.GetTransformationMatrix(), GetCenterPosition(bbox)));
-            if(M::IS::Intersects(ray, bbox)) {
+            if(geom.IsSolid() && M::IS::Intersects(ray, bbox)) {
                 *ret = &geom;
                 return true;
             }

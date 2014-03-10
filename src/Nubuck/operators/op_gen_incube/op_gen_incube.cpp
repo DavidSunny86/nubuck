@@ -92,6 +92,7 @@ void InCube::Invoke() {
     _nb.ui->SetOperatorName("Random Points in Cube");
 
     _bbox = _nb.world->CreateGeometry();
+    _bbox->SetSolid(false);
     _bbox->HideOutline();
     _bbox->SetRenderMode(IGeometry::RenderMode::EDGES);
     // _bbox->SetShadingMode(IGeometry::ShadingMode::FAST);
