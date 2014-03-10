@@ -42,11 +42,7 @@ namespace W {
             mutable SYS::SpinLock _mtx;
 
             std::vector<IGeometry*> geomList;
-
-            // center is the average center of all selected geometries.
-            // vcenter (visual center) is the average bounding box center of all selected geometries.
             M::Vector3              center; // in world space
-            M::Vector3              vcenter;
 
             void ComputeCenter();
             void SignalChange();
@@ -56,7 +52,6 @@ namespace W {
             void Clear() override;
 
             M::Vector3 GetGlobalCenter() const override;
-            M::Vector3 GetGlobalVisualCenter() const override;
             std::vector<IGeometry*> GetList() const override;
         } _selection;
 

@@ -166,7 +166,7 @@ void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
 void Translate::OnGeometrySelected() {
 	if(W::world.GetSelection()->GetList().empty()) HideCursor();
     else {
-        _cursorPos = W::world.GetSelection()->GetGlobalVisualCenter();
+        _cursorPos = W::world.GetSelection()->GetGlobalCenter();
         SetPosition(_cursorPos);
 
         AlignWithCamera();

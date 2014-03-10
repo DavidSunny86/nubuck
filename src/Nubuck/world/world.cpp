@@ -82,14 +82,12 @@ World world;
 // Selection impl ---
 
 void World::Selection::ComputeCenter() {
-    center = vcenter = M::Vector3::Zero;
+    center = M::Vector3::Zero;
     for(unsigned i = 0; i < geomList.size(); ++i) {
         ENT_Geometry* geom = (ENT_Geometry*)geomList[i];
         center += geom->GetGlobalCenter();
-        vcenter += geom->GetGlobalCenter() + M::CenterOf(geom->GetBoundingBox());
     }
     center /= geomList.size();
-    vcenter /= geomList.size();
 }
 
 void World::Selection::SignalChange() {
@@ -138,11 +136,6 @@ void World::Selection::Clear() {
 M::Vector3 World::Selection::GetGlobalCenter() const { 
     SYS::ScopedLock lock(_mtx);
     return center; 
-}
-
-M::Vector3 World::Selection::GetGlobalVisualCenter() const {
-    SYS::ScopedLock lock(_mtx);
-    return vcenter;
 }
 
 std::vector<IGeometry*> World::Selection::GetList() const { 

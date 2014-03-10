@@ -68,7 +68,6 @@ struct ISelection {
     virtual void Clear() = 0;
 
     virtual M::Vector3 GetGlobalCenter() const = 0;
-    virtual M::Vector3 GetGlobalVisualCenter() const = 0;
     virtual std::vector<IGeometry*> GetList() const = 0;
 };
 
