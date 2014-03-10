@@ -3,6 +3,7 @@
 #include <Nubuck\operators\operator_invoker.h>
 #include <UI\window_events.h>
 #include <world\world_events.h>
+#include <world\world.h>
 #include "operator_events.h"
 #include "operator_driver.h"
 #include "operators.h"
@@ -23,6 +24,18 @@ void Operators::UnloadModules() {
 
 void Operators::Event_ActionFinished(const EV::Event& event) {
     _actionsPending--;
+}
+
+void Operators::Event_SetPanel(const EV::Event& event) {
+    const EV::Params_OP_SetPanel& args = EV::def_OP_SetPanel.GetArgs(event);
+    Operator* op = args.op;
+    OperatorPanel* panel = NULL;
+    for(unsigned i = 0; !panel && i < _ops.size(); ++i) {
+        if(_ops[i].op == op) panel = _ops[i].panel;
+    }
+    assert(panel);
+	UI::OperatorPanel::Instance()->Clear();
+    nubuck.ui->SetOperatorPanel(panel);
 }
 
 void Operators::Event_Default(const EV::Event& event, const char*) {
@@ -50,6 +63,7 @@ void Operators::OnInvokeOperator(unsigned id) {
 
 Operators::Operators() : _actionsPending(0) {
     AddEventHandler(EV::def_OP_ActionFinished, this, &Operators::Event_ActionFinished);
+    AddEventHandler(EV::def_OP_SetPanel, this, &Operators::Event_SetPanel);
 }
 
 Operators::~Operators() {
@@ -110,29 +124,15 @@ void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
 }
 
 void Operators::OnCameraChanged() {
-	_driver->Send(EV::def_CameraChanged.Create(EV::Params_CameraChanged()));
+    if(!_actionsPending) {
+        _driver->Send(EV::def_CameraChanged.Create(EV::Params_CameraChanged()));
+    }
 }
 
 bool Operators::MouseEvent(const EV::Event& event) {
-    if(0 < _actionsPending) return false;
-
-    int ret = 0;
-	EV::Params_Mouse args = EV::def_Mouse.GetArgs(event);
-	args.ret = &ret;
-	Operator* oldOp = _driver->GetActiveOperator();
-	EV::Event ev2 = EV::def_Mouse.Create(args);
-	_driver->SendAndWait(ev2);
-	if(ret) {
-		UI::OperatorPanel::Instance()->Clear();
-        int id = -1;
-		for(int i = 0; i < _ops.size(); ++i) {
-			if(_ops[i].op == _driver->GetActiveOperator()) id = i;
-		} 
-        assert(0 <= id);
-		if(oldOp != _ops[id].op) nubuck.ui->SetOperatorPanel(_ops[id].panel);
-        return true;
-	}
-    return false;
+    if(0 < _actionsPending) W::world.Send(event);
+	else _driver->Send(event);
+    return true;
 }
 
 NUBUCK_API void SendToOperator(const EV::Event& event) {

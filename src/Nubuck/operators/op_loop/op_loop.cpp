@@ -38,6 +38,7 @@ void Loop::Register(const Nubuck& nb, Invoker& invoker) {
 
 void Loop::Invoke() {
     printf("OP::Loop::Invoke\n");
+    _nb.ui->SetOperatorName("Loop");
 
 	leda::list<leda::d3_rat_point> L;
 	L.push_back(leda::d3_rat_point(-1, -1, -1));

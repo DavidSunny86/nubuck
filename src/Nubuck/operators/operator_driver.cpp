@@ -1,6 +1,7 @@
 #include <Nubuck\operators\operator.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <world\world_events.h>
+#include <world\world.h>
 #include <UI\window_events.h>
 #include "operator_events.h"
 #include "operators.h"
@@ -19,7 +20,8 @@ void Driver::Event_Push(const EV::Event& event) {
     Operator* op = ActiveOperator();
     if(op) {
         op->Finish();
-        if(1 < _activeOps.size()) _activeOps.pop_back();
+        if(1 < _activeOps.size()) // keep OP::Translate in stack
+            _activeOps.pop_back();
     }
 	_activeOps.push_back(args.op);
 	args.op->Invoke();
@@ -66,9 +68,17 @@ void Driver::Event_Mouse(const EV::Event& event) {
                 _activeOps.back()->Finish();
                 _activeOps.pop_back();
             }
-            if(i != _activeOps.size() - 1) op->Invoke();
-			*args.ret = 1;
+            if(0 < N) {
+                EV::Params_OP_SetPanel args = { op };
+                g_operators.Send(EV::def_OP_SetPanel.Create(args));
+                op->Invoke();
+            }
+            ret = 1;
         }
+    }
+    if(!ret) {
+        // forward event
+        W::world.Send(event);
     }
 	event.Accept();
 }

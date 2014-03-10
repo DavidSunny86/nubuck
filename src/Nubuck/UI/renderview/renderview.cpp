@@ -95,7 +95,9 @@ namespace UI {
         args.delta = qevent->delta();
         args.x = qevent->x();
         args.y = qevent->y();
-        W::world.Send(EV::def_Mouse.Create(args));
+
+        EV::Event event = EV::def_Mouse.Create(args);
+        if(!OP::g_operators.MouseEvent(event)) W::world.Send(event);
     }
 
     void RenderView::keyPressEvent(QKeyEvent* qevent) {
