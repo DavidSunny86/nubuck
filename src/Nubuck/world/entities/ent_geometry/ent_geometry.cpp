@@ -210,14 +210,15 @@ void ENT_Geometry::SetEdgeColor(const R::Color& color) {
     UI::Outliner::Instance()->SendToView(_outlinerItem, event);
 }
 
-const M::Vector3& ENT_Geometry::GetLocalCenter() const { 
+M::Vector3 ENT_Geometry::GetLocalCenter() const { 
 	SYS::ScopedLock lock(_mtx);
     return _bbox.min + 0.5f * (_bbox.max - _bbox.min); 
 }
 
 M::Vector3 ENT_Geometry::GetGlobalCenter() { 
 	SYS::ScopedLock lock(_mtx);
-    return Transform(GetLocalCenter()); 
+    M::Vector3 localCenter = GetLocalCenter();
+    return Transform(localCenter); 
 }
 
 const M::Box& ENT_Geometry::GetBoundingBox() const { 

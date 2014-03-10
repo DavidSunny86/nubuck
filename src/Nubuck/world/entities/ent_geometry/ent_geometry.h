@@ -88,7 +88,7 @@ public:
     void SetEdgeRadius(float edgeRadius);
     void SetEdgeColor(const R::Color& color);
 
-    const M::Vector3& GetLocalCenter() const;
+    M::Vector3 GetLocalCenter() const;
     M::Vector3 GetGlobalCenter();
 
     const M::Box& GetBoundingBox() const;
