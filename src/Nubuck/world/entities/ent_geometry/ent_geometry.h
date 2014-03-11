@@ -64,6 +64,7 @@ private:
     void Event_EdgeRadiusChanged(const EV::Event& event);
     void Event_EdgeColorChanged(const EV::Event& event);
     void Event_TransparencyChanged(const EV::Event& event);
+    void Event_RenderModeChanged(const EV::Event& event);
 #pragma endregion
 public:
     ENT_Geometry();
@@ -117,6 +118,8 @@ public:
     void SetRenderMode(int flags) override;
     void SetRenderLayer(unsigned layer) override;
     void SetShadingMode(ShadingMode::Enum mode) override;
+
+    int GetRenderMode() const { return _renderMode; }
 
     void FrameUpdate();
     void BuildRenderList();

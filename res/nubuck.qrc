@@ -4,5 +4,8 @@
         <file>Images/arrow-down.png</file>
         <file>Images/arrow-down-hover.png</file>
         <file>Images/arrow-up-hover.png</file>
+        <file>Images/edges.png</file>
+        <file>Images/faces.png</file>
+        <file>Images/vertices.png</file>
     </qresource>
 </RCC>

@@ -17,6 +17,10 @@ private:
     UI::ColorButton*    _btnEdgeColor;
     QSlider*            _sldHullAlpha;
 
+    QPushButton*        _btnRenderVertices;
+    QPushButton*        _btnRenderEdges;
+    QPushButton*        _btnRenderFaces;
+
     void InitOutline();
 
     void Event_EdgeRadiusChanged(const EV::Event& event);
@@ -25,6 +29,7 @@ private slots:
     void OnEdgeRadiusChanged(double value);
     void OnEdgeColorChanged(float r, float g, float b);
     void OnTransparencyChanged(int value);
+    void OnRenderModeChanged(bool checked);
 public:
     ENT_GeometryOutln(ENT_Geometry& subject);
 

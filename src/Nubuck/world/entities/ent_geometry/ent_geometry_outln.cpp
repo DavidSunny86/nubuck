@@ -28,6 +28,16 @@ void ENT_GeometryOutln::OnTransparencyChanged(int value) {
     _subject.Send(EV::def_ENT_Geometry_TransparencyChanged.Create(args));
 }
 
+void ENT_GeometryOutln::OnRenderModeChanged(bool) {
+    EV::Params_ENT_Geometry_RenderModeChanged args;
+    int renderMode;
+    if(_btnRenderVertices->isChecked()) renderMode |= IGeometry::RenderMode::NODES;
+    if(_btnRenderEdges->isChecked()) renderMode |= IGeometry::RenderMode::EDGES;
+    if(_btnRenderFaces->isChecked()) renderMode |= IGeometry::RenderMode::FACES;
+    args.renderMode = renderMode;
+    _subject.Send(EV::def_ENT_Geometry_RenderModeChanged.Create(args));
+}
+
 ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) {
     InitOutline();
 
@@ -57,6 +67,21 @@ void ENT_GeometryOutln::InitOutline() {
     _sldHullAlpha->setMaximum(100);
     _sldHullAlpha->setValue(100);
 
+    QLabel* lblRenderMode = new QLabel("rendermode: ");
+    _btnRenderVertices = new QPushButton(QIcon(":/ui/Images/vertices.png"), "");
+    _btnRenderEdges = new QPushButton(QIcon(":/ui/Images/edges.png"), "");
+    _btnRenderFaces = new QPushButton(QIcon(":/ui/Images/faces.png"), "");
+    _btnRenderVertices->setCheckable(true);
+    _btnRenderEdges->setCheckable(true);
+    _btnRenderFaces->setCheckable(true);
+    _btnRenderVertices->setChecked(_subject.GetRenderMode() & IGeometry::RenderMode::NODES);
+    _btnRenderEdges->setChecked(_subject.GetRenderMode() & IGeometry::RenderMode::EDGES);
+    _btnRenderFaces->setChecked(_subject.GetRenderMode() & IGeometry::RenderMode::FACES);
+    QHBoxLayout* hboxLayout =  new QHBoxLayout;
+    hboxLayout->addWidget(_btnRenderVertices);
+    hboxLayout->addWidget(_btnRenderEdges);
+    hboxLayout->addWidget(_btnRenderFaces);
+
     layout->addWidget(lblEdgeRadius, 0, 0, 1, 1);
     layout->addWidget(_sbEdgeRadius, 0, 1, 1, 1);
 
@@ -66,11 +91,18 @@ void ENT_GeometryOutln::InitOutline() {
     layout->addWidget(lblHullAlpha, 2, 0, 1, 1);
     layout->addWidget(_sldHullAlpha, 2, 1, 1, 1);
 
+    layout->addWidget(lblRenderMode, 3, 0, 1, 1);
+    layout->addLayout(hboxLayout, 3, 1, 1, 1);
+
 	setLayout(layout);
 
     QObject::connect(_sbEdgeRadius, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeRadiusChanged(double)));
     QObject::connect(_btnEdgeColor, SIGNAL(SigColorChanged(float, float, float)), this, SLOT(OnEdgeColorChanged(float, float, float)));
     QObject::connect(_sldHullAlpha, SIGNAL(valueChanged(int)), this, SLOT(OnTransparencyChanged(int)));
+
+    QObject::connect(_btnRenderVertices, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
+    QObject::connect(_btnRenderEdges, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
+    QObject::connect(_btnRenderFaces, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
 }
 
 void ENT_GeometryOutln::Event_EdgeRadiusChanged(const EV::Event& event) {

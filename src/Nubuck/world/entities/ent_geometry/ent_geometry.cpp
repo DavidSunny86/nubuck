@@ -114,6 +114,12 @@ void ENT_Geometry::Event_TransparencyChanged(const EV::Event& event) {
     SetTransparency(args.transparency);
 }
 
+void ENT_Geometry::Event_RenderModeChanged(const EV::Event& event) {
+    const EV::Params_ENT_Geometry_RenderModeChanged& args = EV::def_ENT_Geometry_RenderModeChanged.GetArgs(event);
+    std::cout << "RECEIVED!" << std::endl;
+    SetRenderMode(args.renderMode);
+}
+
 ENT_Geometry::ENT_Geometry() 
     : _outlinerItem(NULL)
     , _edgeRenderer(NULL)
@@ -140,6 +146,7 @@ ENT_Geometry::ENT_Geometry()
 	AddEventHandler(EV::def_ENT_Geometry_EdgeRadiusChanged, this, &ENT_Geometry::Event_EdgeRadiusChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
     AddEventHandler(EV::def_ENT_Geometry_TransparencyChanged, this, &ENT_Geometry::Event_TransparencyChanged);
+    AddEventHandler(EV::def_ENT_Geometry_RenderModeChanged, this, &ENT_Geometry::Event_RenderModeChanged);
 }
 
 UI::OutlinerView* ENT_Geometry::CreateOutlinerView() {
