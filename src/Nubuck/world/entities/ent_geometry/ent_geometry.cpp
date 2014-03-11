@@ -158,16 +158,19 @@ void ENT_Geometry::RebuildRenderNodes() {
 }
 
 void ENT_Geometry::RebuildRenderEdges() {
-    // TODO: don't draw reversal edges!
+    leda::edge_array<bool> visited(_ratPolyMesh, false);
 	std::vector<R::EdgeRenderer::Edge> edges;
     R::EdgeRenderer::Edge re;
     leda::edge e;
     forall_edges(e, _ratPolyMesh) {
-		re.radius = _ratPolyMesh.radius_of(e);
-		re.color = _ratPolyMesh.color_of(e);
-        re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
-        re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
-		edges.push_back(re);
+        if(!visited[e]) {
+            re.radius = _ratPolyMesh.radius_of(e);
+            re.color = _ratPolyMesh.color_of(e);
+            re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
+            re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
+            edges.push_back(re);
+            visited[e] = visited[_ratPolyMesh.reversal(e)] = true;
+        }
     }
     _edgeRenderer->Rebuild(edges);
 }
