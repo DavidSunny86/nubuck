@@ -1,0 +1,7 @@
+// uses renderList.dirLights only
+fx LitDirectionalTwosided {
+  pass Pass0 {
+    vs = "#include <Shaders\lit_directional.vert>";
+    fs = "#include <Shaders\lit_directional_twosided.frag>";
+  }
+}
