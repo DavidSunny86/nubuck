@@ -52,6 +52,9 @@ private:
     ShadingMode::Enum   _shadingMode;
     R::RenderList       _renderList;
 
+    float               _transparency;
+    bool                _isTransparent;
+
     M::Box              _bbox;      // untransformed bounding box
 
     void ComputeCenter();
@@ -60,6 +63,7 @@ private:
 #pragma region EventHandlers
     void Event_EdgeRadiusChanged(const EV::Event& event);
     void Event_EdgeColorChanged(const EV::Event& event);
+    void Event_TransparencyChanged(const EV::Event& event);
 #pragma endregion
 public:
     ENT_Geometry();
@@ -69,6 +73,8 @@ public:
     bool IsSolid() const { return _isSolid; }
 
     void SetSolid(bool solid) override;
+
+    void SetTransparency(float transparency);
 
     bool IsMeshCompiled() const;
     void CompileMesh();

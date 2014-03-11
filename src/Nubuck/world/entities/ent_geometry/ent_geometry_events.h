@@ -11,3 +11,7 @@ BEGIN_EVENT_DEF(ENT_Geometry_EdgeColorChanged)
     R::Color edgeColor;
 END_EVENT_DEF
 
+BEGIN_EVENT_DEF(ENT_Geometry_TransparencyChanged)
+    float transparency;
+END_EVENT_DEF
+

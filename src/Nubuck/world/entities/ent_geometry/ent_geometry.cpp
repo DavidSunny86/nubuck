@@ -24,6 +24,8 @@ void ENT_Geometry::RebuildRenderMesh() {
     _vertices.clear();
     _indices.clear();
 
+    _isTransparent = false;
+
     if(0 == _ratPolyMesh.number_of_faces()) return;
 
     unsigned idxCnt = 0;
@@ -43,6 +45,8 @@ void ENT_Geometry::RebuildRenderMesh() {
         R::Mesh::Vertex vert;
         vert.normal = normal;
         vert.color = _ratPolyMesh.color_of(f);
+        vert.color.a *= _transparency;
+        if(1.0f > vert.color.a) _isTransparent = true;
 
         leda::edge it = e;
         do {
@@ -91,6 +95,11 @@ void ENT_Geometry::Event_EdgeColorChanged(const EV::Event& event) {
     RebuildRenderEdges();
 }
 
+void ENT_Geometry::Event_TransparencyChanged(const EV::Event& event) {
+    const EV::Params_ENT_Geometry_TransparencyChanged& args = EV::def_ENT_Geometry_TransparencyChanged.GetArgs(event);
+    SetTransparency(args.transparency);
+}
+
 ENT_Geometry::ENT_Geometry() 
     : _outlinerItem(NULL)
     , _edgeRenderer(NULL)
@@ -101,6 +110,8 @@ ENT_Geometry::ENT_Geometry()
     , _renderMode(0)
     , _renderLayer(0)
     , _shadingMode(ShadingMode::NICE)
+    , _transparency(1.0f)
+    , _isTransparent(false)
 { 
     _edgeRenderer = &_cylinderEdges;
     // _edgeRenderer = &_lineEdges;
@@ -114,6 +125,7 @@ ENT_Geometry::ENT_Geometry()
 
 	AddEventHandler(EV::def_ENT_Geometry_EdgeRadiusChanged, this, &ENT_Geometry::Event_EdgeRadiusChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
+    AddEventHandler(EV::def_ENT_Geometry_TransparencyChanged, this, &ENT_Geometry::Event_TransparencyChanged);
 }
 
 UI::OutlinerView* ENT_Geometry::CreateOutlinerView() {
@@ -122,6 +134,12 @@ UI::OutlinerView* ENT_Geometry::CreateOutlinerView() {
 
 void ENT_Geometry::SetSolid(bool solid) {
     _isSolid = solid;
+}
+
+void ENT_Geometry::SetTransparency(float transparency) {
+    SYS::ScopedLock lock(_mtx);
+    _transparency = transparency;
+    Update();
 }
 
 bool ENT_Geometry::IsMeshCompiled() const { return _meshCompiled; }
@@ -325,8 +343,11 @@ void ENT_Geometry::BuildRenderList() {
         R::meshMgr.GetMesh(_tfmesh).SetTransform(GetTransformationMatrix());
 
         R::MeshJob rjob;
+
+        if(_isTransparent) rjob.fx = "LitDirectionalTransparent";
+        else rjob.fx = "LitDirectional";
+
         rjob.layer      = _renderLayer;
-        rjob.fx         = "LitDirectional";
         rjob.material   = R::Material::White;
         rjob.tfmesh     = _tfmesh;
         rjob.primType   = 0;

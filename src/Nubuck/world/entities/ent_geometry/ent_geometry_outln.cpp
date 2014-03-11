@@ -22,6 +22,12 @@ void ENT_GeometryOutln::OnEdgeColorChanged(float r, float g, float b) {
 	_subject.Send(EV::def_ENT_Geometry_EdgeColorChanged.Create(args));
 }
 
+void ENT_GeometryOutln::OnTransparencyChanged(int value) {
+    EV::Params_ENT_Geometry_TransparencyChanged args;
+    args.transparency = (float)value / _sldHullAlpha->maximum();
+    _subject.Send(EV::def_ENT_Geometry_TransparencyChanged.Create(args));
+}
+
 ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) {
     InitOutline();
 
@@ -64,9 +70,7 @@ void ENT_GeometryOutln::InitOutline() {
 
     QObject::connect(_sbEdgeRadius, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeRadiusChanged(double)));
     QObject::connect(_btnEdgeColor, SIGNAL(SigColorChanged(float, float, float)), this, SLOT(OnEdgeColorChanged(float, float, float)));
-    /*
-    connect(sldHullAlpha, SIGNAL(valueChanged(int)), outln.polyhedron, SLOT(OnHullAlphaChanged(int)));
-    */
+    QObject::connect(_sldHullAlpha, SIGNAL(valueChanged(int)), this, SLOT(OnTransparencyChanged(int)));
 }
 
 void ENT_GeometryOutln::Event_EdgeRadiusChanged(const EV::Event& event) {

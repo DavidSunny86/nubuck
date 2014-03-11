@@ -24,6 +24,7 @@ private:
 private slots:
     void OnEdgeRadiusChanged(double value);
     void OnEdgeColorChanged(float r, float g, float b);
+    void OnTransparencyChanged(int value);
 public:
     ENT_GeometryOutln(ENT_Geometry& subject);
 
