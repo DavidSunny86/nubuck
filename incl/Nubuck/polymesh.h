@@ -24,6 +24,7 @@ private:
     leda::node_map<float>   _vatt_colorB;
 
     // edge attributes
+    leda::edge_map<int>     _eatt_mask;
     leda::edge_map<float>   _eatt_colorR;
     leda::edge_map<float>   _eatt_colorG;
     leda::edge_map<float>   _eatt_colorB;
@@ -55,6 +56,7 @@ public:
 
     const float     radius_of(const edge e) const;
     const R::Color& color_of(const edge e) const;
+    int             is_masked(const edge e) const;
 
     bool            is_visible(const face f) const;
     const R::Color& color_of(const face f) const;
@@ -64,6 +66,7 @@ public:
 
     void set_radius(const edge e, const float radius);
     void set_color(const edge e, const R::Color& color);
+    void set_masked(const edge e);
 
     void set_color(const face f, const R::Color& color);
 
@@ -98,6 +101,7 @@ inline void PolyMesh<VEC3>::InitVertexAttributes() {
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::InitEdgeAttributes() {
+    _eatt_mask.init(*this, 0);
     _eatt_colorR.init(*this, defaultEdgeColor.r);
     _eatt_colorG.init(*this, defaultEdgeColor.g);
     _eatt_colorB.init(*this, defaultEdgeColor.b);
@@ -172,6 +176,11 @@ inline const R::Color& PolyMesh<VEC3>::color_of(const edge e) const {
 }
 
 template<typename VEC3>
+int PolyMesh<VEC3>::is_masked(const edge e) const {
+    return _eatt_mask[e];
+}
+
+template<typename VEC3>
 inline bool PolyMesh<VEC3>::is_visible(const face f) const {
     return _fatt_visible[f];
 }
@@ -210,6 +219,11 @@ inline void PolyMesh<VEC3>::set_color(const edge e, const R::Color& color) {
     _eatt_colorR[r] = color.r;
     _eatt_colorG[r] = color.g;
     _eatt_colorB[r] = color.b;
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::set_masked(const edge e) {
+    _eatt_mask[e] = _eatt_mask[reversal(e)] = 1;
 }
 
 template<typename VEC3>

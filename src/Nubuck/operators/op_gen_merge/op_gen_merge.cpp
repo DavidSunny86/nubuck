@@ -25,7 +25,7 @@ void Merge::Invoke() {
     leda::list_item it;
 
     leda::list<point3_t> L;
-    leda::random_d3_rat_points_on_sphere(20, 4, L);
+    leda::random_d3_rat_points_on_sphere(80, 4, L);
 
     const int tl = 8;
     leda::list<point3_t> L0, L1;

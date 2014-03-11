@@ -12,6 +12,8 @@ typedef leda::list<leda::node>  hull2_t;
 class   Mantle;
 struct  Phase1_Level0;
 
+extern R::Color purple;
+
 // configuration (state) of P0 and P1
 struct Conf { 
     leda::edge e; // pivot edge

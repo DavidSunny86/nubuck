@@ -15,6 +15,8 @@ static void Winner(
         g.P1.adv = G.new_edge(g.P1.e, G.source(g.P0.e), 0, leda::behind);
         g.edgeColors[g.P0.adv] = g.edgeColors[g.P1.adv] = VIVID_VIOLET;
         G.set_reversal(g.P0.adv, g.P1.adv);
+        G.set_masked(g.P0.adv);
+        G.set_masked(g.P1.adv);
     }
 
     if(Collinear(G.target(g.P1.e)) || InHNeg(G.target(g.P0.e), G.target(g.P1.e))) 
@@ -41,6 +43,8 @@ static void Winner(
 
     g.edgeColors[g.P0.adv] = g.edgeColors[g.P1.adv] = VIVID_VIOLET;
     G.set_reversal(g.P0.adv, g.P1.adv);
+    G.set_masked(g.P0.adv);
+    G.set_masked(g.P1.adv);
 }
 
 // repaint adjacent orange edges blue
@@ -64,7 +68,11 @@ Phase1_Level1::StepRet::Enum Phase1_Level1::Step() {
 	Clean(G.source(wConf->e));
 
     g.edgeColors[wConf->e] = PURPLE;
+    G.set_color(wConf->e, purple);
+    G.set_radius(wConf->e, G.radius_of(wConf->e) * 1.5f);
+
     // g.nodeColors[G.target(wConf->e)] = PURPLE;
+    G.set_color(G.target(wConf->e), purple);
 
     // consider the case of one point that never wins itself, but
     // is connected to every new edge!
@@ -104,6 +112,8 @@ Phase1_Level1::StepRet::Enum Phase1_Level1::Step() {
         // wrapping completed
     }
 	else nextPhase = g.phase1_level0P0;
+
+    g.geom->Update();
 
     return StepRet::DONE;
 }

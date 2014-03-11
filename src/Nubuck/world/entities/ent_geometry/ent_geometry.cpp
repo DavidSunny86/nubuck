@@ -20,6 +20,19 @@ void ENT_Geometry::CacheFPos() {
     forall_nodes(v, _ratPolyMesh) _fpos[v->id()] = ToVector(_ratPolyMesh.position_of(v));
 }
 
+static leda::edge UnmaskedSucc(const leda::nb::RatPolyMesh& G, leda::edge e) {
+    // assumes NULL != e and at least one visible adjacent edge.
+    // if thats not the case you deserve to crash... 
+
+    const leda::edge eR = G.reversal(e);
+    leda::edge it = eR;
+    do {
+        it = G.cyclic_adj_pred(it);
+    } while(G.is_masked(it) && it != eR);
+
+    return it;
+}
+
 void ENT_Geometry::RebuildRenderMesh() {
     _vertices.clear();
     _indices.clear();
@@ -35,6 +48,7 @@ void ENT_Geometry::RebuildRenderMesh() {
         if(!_ratPolyMesh.is_visible(f)) continue;
 
         leda::edge e = _ratPolyMesh.first_face_edge(f);
+        if(_ratPolyMesh.is_masked(e)) continue;
 
         leda::edge n = _ratPolyMesh.face_cycle_succ(e);
         const M::Vector3& p0 = _fpos[leda::source(e)->id()];
@@ -53,7 +67,7 @@ void ENT_Geometry::RebuildRenderMesh() {
             vert.position = _fpos[leda::source(it)->id()];
             _vertices.push_back(vert);
             _indices.push_back(idxCnt++);
-            it = _ratPolyMesh.face_cycle_succ(it);
+            it = UnmaskedSucc(_ratPolyMesh, it);
         } while(e != it);
         _indices.push_back(R::Mesh::RESTART_INDEX);
     } // forall_faces
@@ -163,7 +177,7 @@ void ENT_Geometry::RebuildRenderEdges() {
     R::EdgeRenderer::Edge re;
     leda::edge e;
     forall_edges(e, _ratPolyMesh) {
-        if(!visited[e]) {
+        if(!visited[e] && !_ratPolyMesh.is_masked(e)) {
             re.radius = _ratPolyMesh.radius_of(e);
             re.color = _ratPolyMesh.color_of(e);
             re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));

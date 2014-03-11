@@ -73,7 +73,7 @@ void Phase1_Level0::Enter() {
 }
 
 Phase1_Level0::StepRet::Enum Phase1_Level0::Step() {
-    const mesh_t& G = GetG();
+    mesh_t& G = GetG();
 
 	if(!conf.it) conf.it = conf.e;
 
@@ -92,9 +92,12 @@ Phase1_Level0::StepRet::Enum Phase1_Level0::Step() {
 
     // theory guarantees that the iteration terminates eventually
 	g.edgeColors[conf.it] = RED;
+    if(PURPLE != g.edgeColors[G.reversal(conf.it)]) G.set_color(conf.it, R::Color::Red);
 	conf.it = conf.Next(G, conf.it);
 
     UpdateActiveEdge();
+
+    g.geom->Update();
 
     return StepRet::CONTINUE;
 }
