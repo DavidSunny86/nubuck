@@ -84,7 +84,7 @@ template<> struct ToGLEnum<int>         { enum { ENUM = GL_INT }; };
 
 } // unnamed namespace
 
-COM::Config::Variable<float>	cvar_r_nodeSize("r_nodeSize", 0.2f);
+COM::Config::Variable<float>	cvar_r_nodeSize("r_nodeSize", 0.1f);
 COM::Config::Variable<float>    cvar_r_edgeRadius("r_edgeRadius", 0.1f);
 
 namespace R {

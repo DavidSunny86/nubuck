@@ -7,5 +7,13 @@
         <file>Images/edges.png</file>
         <file>Images/faces.png</file>
         <file>Images/vertices.png</file>
+        <file>Images/arrow-up.svg</file>
+        <file>Images/arrow-up-hover.svg</file>
+        <file>Images/arrow-down.svg</file>
+        <file>Images/arrow-down-hover.svg</file>
+        <file>Images/arrow-right.svg</file>
+        <file>Images/arrow-right-hover.svg</file>
+        <file>Images/unchecked.svg</file>
+        <file>Images/checked.svg</file>
     </qresource>
 </RCC>

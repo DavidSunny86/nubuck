@@ -78,6 +78,8 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
         i++;
     }
 
+    common.printf("INFO - Nubuck compiled with Qt version '%s'\n", QT_VERSION_STR);
+
     MainLoop mainLoop;
     mainLoop.Enter();
 
