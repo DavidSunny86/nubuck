@@ -37,6 +37,9 @@ Phase0::StepRet::Enum Phase0::Step() {
     mesh_t& G0 = g.geom0->GetRatPolyMesh();
     mesh_t& G1 = g.geom1->GetRatPolyMesh();
 
+    g.geom0->ApplyTransformation();
+    g.geom1->ApplyTransformation();
+
     ConvexHullXY_Graham(G0, H0, NULL, &maxH0, true);
     ConvexHullXY_Graham(G1, H1, &minH1, NULL, true);
 

@@ -92,7 +92,7 @@ public:
     leda::nb::RatPolyMesh& GetRatPolyMesh() override;
     void Update() override;
 
-    void ApplyTransformation();
+    void ApplyTransformation() override;
 
     float       GetEdgeRadius() const;
     R::Color    GetEdgeColor() const;

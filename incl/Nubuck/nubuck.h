@@ -47,6 +47,8 @@ struct IGeometry {
 
     virtual void SetName(const std::string& name) = 0;
 
+    virtual void ApplyTransformation() = 0;
+
     virtual void SetPosition(float x, float y, float z) = 0;
     virtual void Rotate(float ang, float x, float y, float z) = 0;
 
