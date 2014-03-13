@@ -11,5 +11,6 @@ struct Phase2 : OP::ALG::Phase {
 
     void Enter() override;
 
-    StepRet::Enum Step() override;
+    StepRet::Enum       Step() override;
+    GEN::Pointer<Phase> NextPhase() override;
 };

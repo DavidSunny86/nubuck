@@ -67,6 +67,7 @@ public:
     void set_radius(const edge e, const float radius);
     void set_color(const edge e, const R::Color& color);
     void set_masked(const edge e);
+    void set_unmasked(const edge e);
 
     void set_color(const face f, const R::Color& color);
 
@@ -224,6 +225,11 @@ inline void PolyMesh<VEC3>::set_color(const edge e, const R::Color& color) {
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_masked(const edge e) {
     _eatt_mask[e] = _eatt_mask[reversal(e)] = 1;
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::set_unmasked(const edge e) {
+    _eatt_mask[e] = _eatt_mask[reversal(e)] = 0;
 }
 
 template<typename VEC3>

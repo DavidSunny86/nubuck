@@ -17,4 +17,6 @@ public:
     Mantle(const Nubuck& nb, const mesh_t& subj);
 
     void AddTriangle(const leda::node v0, const leda::node v1, const leda::node v2);
+
+    void Destroy();
 };

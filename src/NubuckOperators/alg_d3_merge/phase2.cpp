@@ -1,3 +1,4 @@
+#include "phase3.h"
 #include "phase2.h"
 
 static bool IsUndirectedPurple(const leda::edge e) {
@@ -49,4 +50,8 @@ Phase2::StepRet::Enum Phase2::Step() {
     g.geom->Update();
 
     return StepRet::CONTINUE;
+}
+
+GEN::Pointer<OP::ALG::Phase> Phase2::NextPhase() {
+    return GEN::MakePtr(new Phase3);
 }

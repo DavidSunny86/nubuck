@@ -39,3 +39,5 @@ void Mantle::AddTriangle(const leda::node v0, const leda::node v1, const leda::n
     _geom->Update();
 }
 
+void Mantle::Destroy() { _geom->Destroy(); }
+
