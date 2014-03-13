@@ -8,7 +8,7 @@
 #include <Nubuck\operators\standard_algorithm_fwd.h>
 
 BEGIN_EVENT_DEF(ALG_Step) END_EVENT_DEF
-
+BEGIN_EVENT_DEF(ALG_Next) END_EVENT_DEF
 
 namespace OP {
 namespace ALG {
@@ -17,6 +17,7 @@ class NUBUCK_API StandardAlgorithmPanel : public OperatorPanel {
     Q_OBJECT
 private slots:
     void OnStep();
+    void OnNext();
 public:
     StandardAlgorithmPanel(QWidget* parent = NULL);
 };
@@ -30,6 +31,8 @@ struct NUBUCK_API Phase {
 
     virtual StepRet::Enum       Step();
 	virtual GEN::Pointer<Phase> NextPhase();
+
+    virtual bool                IsWall() const;
 };
 
 class NUBUCK_API StandardAlgorithm : public Operator {
@@ -40,6 +43,7 @@ private:
     void SetPhase(const GEN::Pointer<Phase>& phase);
 
     void Event_Step(const EV::Event& event);
+    void Event_Next(const EV::Event& event);
 protected:
     virtual const char* GetName() const = 0;
     virtual Phase*      Init(const Nubuck& nb) = 0;

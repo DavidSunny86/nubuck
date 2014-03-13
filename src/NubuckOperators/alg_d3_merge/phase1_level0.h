@@ -16,4 +16,6 @@ struct Phase1_Level0 : OP::ALG::Phase {
 
 	StepRet::Enum       Step() override;
 	GEN::Pointer<Phase> NextPhase() override { return nextPhase; }
+
+    bool IsWall() const override { return false; }
 };
