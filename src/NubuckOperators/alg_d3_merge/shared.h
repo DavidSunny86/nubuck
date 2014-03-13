@@ -65,7 +65,9 @@ enum Color {
 struct Globals {
     Nubuck nb;
 
-	leda::edge_map<Color> edgeColors;
+	leda::edge_map<Color>       edgeColors;
+    leda::node_map<Color>       nodeColors;
+    leda::node_map<leda::edge>  purpleEdges;
 
     leda::edge activeEdge;
 

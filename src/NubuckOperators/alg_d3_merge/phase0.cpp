@@ -54,6 +54,8 @@ Phase0::StepRet::Enum Phase0::Step() {
     g.geom->Update();
 
 	g.edgeColors.init(G, BLUE);
+    g.nodeColors.init(G, BLUE);
+    g.purpleEdges.init(G, NULL);
 
     g.nb.world->GetSelection()->Clear();
     g.geom0->Destroy();

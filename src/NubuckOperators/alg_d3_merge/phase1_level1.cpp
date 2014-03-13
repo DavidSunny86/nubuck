@@ -1,5 +1,6 @@
 #include "shared.h"
 #include "mantle.h"
+#include "phase2.h"
 #include "phase1_level0.h"
 #include "phase1_level1.h"
 
@@ -60,6 +61,10 @@ Phase1_Level1::Phase1_Level1() {
 	nextPhase = Phase::NextPhase(); // default idle phase
 }
 
+void Phase1_Level1::Enter() {
+    isWall = false;
+}
+
 Phase1_Level1::StepRet::Enum Phase1_Level1::Step() {
     mesh_t& G = GetG();
     Conf *wConf, *lConf;
@@ -71,14 +76,14 @@ Phase1_Level1::StepRet::Enum Phase1_Level1::Step() {
     G.set_color(wConf->e, purple);
     G.set_radius(wConf->e, G.radius_of(wConf->e) * 1.5f);
 
-    // g.nodeColors[G.target(wConf->e)] = PURPLE;
+    g.nodeColors[G.target(wConf->e)] = PURPLE;
     G.set_color(G.target(wConf->e), purple);
 
     // consider the case of one point that never wins itself, but
     // is connected to every new edge!
     // g.nodeColors[G.source(lConf->e)] = PURPLE; 
 
-    // g.purpleEdges[G.source(wConf->e)] = wConf->e;
+    g.purpleEdges[G.source(wConf->e)] = wConf->e;
 
     // construct new mantle face
 	if(!g.mantle.IsValid()) g.mantle = GEN::MakePtr(new Mantle(g.nb, G));
@@ -107,8 +112,8 @@ Phase1_Level1::StepRet::Enum Phase1_Level1::Step() {
     if( g.P0.term == G.source(g.P0.e) && 
         g.P1.term == G.source(g.P1.e))
     {
-		// nextPhase = GEN::MakePtr(new Phase2);
-		nextPhase = Phase::NextPhase(); // default idle phase
+		nextPhase = GEN::MakePtr(new Phase2);
+        isWall = true;
         // wrapping completed
     }
 	else nextPhase = g.phase1_level0P0;
