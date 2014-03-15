@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QComboBox>
+
 #include <UI\outliner\outliner.h>
 #include <Nubuck\events\events.h>
 #include "ent_geometry_events.h"
@@ -20,6 +22,8 @@ private:
     QPushButton*        _btnRenderVertices;
     QPushButton*        _btnRenderEdges;
     QPushButton*        _btnRenderFaces;
+    
+    QComboBox*          _cbEdgeShading;
 
     void InitOutline();
 
@@ -30,6 +34,7 @@ private slots:
     void OnEdgeColorChanged(float r, float g, float b);
     void OnTransparencyChanged(int value);
     void OnRenderModeChanged(bool checked);
+    void OnEdgeShadingChanged(int idx);
 public:
     ENT_GeometryOutln(ENT_Geometry& subject);
 

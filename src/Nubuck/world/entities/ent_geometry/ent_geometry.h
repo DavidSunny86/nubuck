@@ -65,6 +65,7 @@ private:
     void Event_EdgeColorChanged(const EV::Event& event);
     void Event_TransparencyChanged(const EV::Event& event);
     void Event_RenderModeChanged(const EV::Event& event);
+    void Event_EdgeShadingChanged(const EV::Event& event);
 #pragma endregion
 public:
     ENT_Geometry();

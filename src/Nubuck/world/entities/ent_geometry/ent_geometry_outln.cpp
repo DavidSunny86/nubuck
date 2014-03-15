@@ -38,6 +38,13 @@ void ENT_GeometryOutln::OnRenderModeChanged(bool) {
     _subject.Send(EV::def_ENT_Geometry_RenderModeChanged.Create(args));
 }
 
+void ENT_GeometryOutln::OnEdgeShadingChanged(int idx) {
+    EV::Params_ENT_Geometry_EdgeShadingChanged args;
+    if(0 == idx) args.shadingMode = IGeometry::ShadingMode::NICE;
+    else args.shadingMode = IGeometry::ShadingMode::FAST;
+    _subject.Send(EV::def_ENT_Geometry_EdgeShadingChanged.Create(args));
+}
+
 ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) {
     InitOutline();
 
@@ -59,6 +66,11 @@ void ENT_GeometryOutln::InitOutline() {
     _btnEdgeColor = new UI::ColorButton;
 	R::Color edgeColor = _subject.GetEdgeColor();
 	_btnEdgeColor->SetColor(edgeColor.r, edgeColor.g, edgeColor.b);
+
+    QLabel* lblEdgeShading = new QLabel("edge shading:");
+    _cbEdgeShading = new QComboBox;
+    _cbEdgeShading->addItem("nice");
+    _cbEdgeShading->addItem("fast");
 
     QLabel* lblHullAlpha = new QLabel("hull alpha:");
     _sldHullAlpha = new QSlider(Qt::Horizontal);
@@ -88,16 +100,20 @@ void ENT_GeometryOutln::InitOutline() {
     layout->addWidget(lblEdgeColor, 1, 0, 1, 1);
     layout->addWidget(_btnEdgeColor, 1, 1, 1, 1);
 
-    layout->addWidget(lblHullAlpha, 2, 0, 1, 1);
-    layout->addWidget(_sldHullAlpha, 2, 1, 1, 1);
+    layout->addWidget(lblEdgeShading, 2, 0, 1, 1);
+    layout->addWidget(_cbEdgeShading, 2, 1, 1, 1);
 
-    layout->addWidget(lblRenderMode, 3, 0, 1, 1);
-    layout->addLayout(hboxLayout, 3, 1, 1, 1);
+    layout->addWidget(lblHullAlpha, 3, 0, 1, 1);
+    layout->addWidget(_sldHullAlpha, 3, 1, 1, 1);
+
+    layout->addWidget(lblRenderMode, 4, 0, 1, 1);
+    layout->addLayout(hboxLayout, 4, 1, 1, 1);
 
 	setLayout(layout);
 
     QObject::connect(_sbEdgeRadius, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeRadiusChanged(double)));
     QObject::connect(_btnEdgeColor, SIGNAL(SigColorChanged(float, float, float)), this, SLOT(OnEdgeColorChanged(float, float, float)));
+    QObject::connect(_cbEdgeShading, SIGNAL(currentIndexChanged(int)), this, SLOT(OnEdgeShadingChanged(int)));
     QObject::connect(_sldHullAlpha, SIGNAL(valueChanged(int)), this, SLOT(OnTransparencyChanged(int)));
 
     QObject::connect(_btnRenderVertices, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));

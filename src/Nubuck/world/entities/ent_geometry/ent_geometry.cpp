@@ -120,6 +120,11 @@ void ENT_Geometry::Event_RenderModeChanged(const EV::Event& event) {
     SetRenderMode(args.renderMode);
 }
 
+void ENT_Geometry::Event_EdgeShadingChanged(const EV::Event& event) {
+    const EV::Params_ENT_Geometry_EdgeShadingChanged& args = EV::def_ENT_Geometry_EdgeShadingChanged.GetArgs(event);
+    SetShadingMode(args.shadingMode);
+}
+
 ENT_Geometry::ENT_Geometry() 
     : _outlinerItem(NULL)
     , _edgeRenderer(NULL)
@@ -147,6 +152,7 @@ ENT_Geometry::ENT_Geometry()
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
     AddEventHandler(EV::def_ENT_Geometry_TransparencyChanged, this, &ENT_Geometry::Event_TransparencyChanged);
     AddEventHandler(EV::def_ENT_Geometry_RenderModeChanged, this, &ENT_Geometry::Event_RenderModeChanged);
+    AddEventHandler(EV::def_ENT_Geometry_EdgeShadingChanged, this, &ENT_Geometry::Event_EdgeShadingChanged);
 }
 
 UI::OutlinerView* ENT_Geometry::CreateOutlinerView() {
@@ -346,8 +352,17 @@ void ENT_Geometry::SetRenderLayer(unsigned layer) {
 }
 
 void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) { 
-	SYS::ScopedLock lock(_mtx);
-	_shadingMode = mode; 
+    bool rebuild = false;
+    _mtx.Lock();
+    if(_shadingMode != mode) {
+        if(ShadingMode::FAST == mode) _edgeRenderer = &_lineEdges;
+        else _edgeRenderer = &_cylinderEdges; 
+        _shadingMode = mode;
+        rebuild = true;
+    }
+    _mtx.Unlock();
+
+    if(rebuild) Update();
 }
 
 void ENT_Geometry::FrameUpdate() {
@@ -378,14 +393,14 @@ void ENT_Geometry::BuildRenderList() {
         _renderList.meshJobs.push_back(rjob);
     }
 
-    if(RenderMode::NODES & _renderMode && ShadingMode::NICE == _shadingMode && !_nodes.IsEmpty()) {
+    if(RenderMode::NODES & _renderMode && !_nodes.IsEmpty()) {
 	    _nodes.BuildRenderMesh();
         R::MeshJob rjob = _nodes.GetRenderJob();
         rjob.layer = _renderLayer;
         _renderList.meshJobs.push_back(rjob);
     }
 
-    if(RenderMode::EDGES & _renderMode && ShadingMode::NICE == _shadingMode && !_edgeRenderer->IsEmpty()) {
+    if(RenderMode::EDGES & _renderMode && !_edgeRenderer->IsEmpty()) {
 		_edgeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _edgeRenderer->GetRenderJob();
         rjob.layer = _renderLayer;
