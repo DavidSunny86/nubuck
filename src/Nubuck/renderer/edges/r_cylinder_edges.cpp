@@ -134,8 +134,7 @@ void CylinderEdges::Rebuild(const std::vector<Edge>& edges) {
 
 void CylinderEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4&) {
 	SYS::ScopedLock lock(_mtx);
-
-    RebuildVertices(transform);
+    if(_tfmesh) meshMgr.GetMesh(_tfmesh).SetTransform(transform);
 }
 
 void CylinderEdges::BuildRenderMesh() {
