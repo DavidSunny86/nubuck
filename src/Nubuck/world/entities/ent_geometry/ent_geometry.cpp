@@ -165,8 +165,14 @@ void ENT_Geometry::SetSolid(bool solid) {
 
 void ENT_Geometry::SetTransparency(float transparency) {
     SYS::ScopedLock lock(_mtx);
-    _transparency = transparency;
-    Update();
+    if(_transparency != transparency) {
+        for(unsigned i = 0; i < _meshDesc.numVertices; ++i)
+            _meshDesc.vertices[i].color.a = transparency;
+        R::meshMgr.GetMesh(_mesh).Invalidate(_meshDesc.vertices);
+        _transparency = transparency;
+        // TODO: this ignores alpha of vertices!
+        _isTransparent = 1.0f > _transparency;
+    }
 }
 
 bool ENT_Geometry::IsMeshCompiled() const { return _meshCompiled; }
