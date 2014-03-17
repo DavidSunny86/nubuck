@@ -267,6 +267,12 @@
     <Filter Include="Private\operators\op_gen_merge">
       <UniqueIdentifier>{ef1f756d-5189-44ea-8086-fb6f23fba43e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\renderbuffer">
+      <UniqueIdentifier>{1c1ebd6d-8b48-4688-bfd7-aca3b911aadd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\framebuffer">
+      <UniqueIdentifier>{8d3fd6aa-dfd8-4d58-8650-0167c8d35435}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -655,6 +661,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\UI\outliner\outliner_fwd.h">
       <Filter>Private\UI\outliner</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\renderbuffer\renderbuffer.h">
+      <Filter>Private\renderer\renderbuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\framebuffer\framebuffer.h">
+      <Filter>Private\renderer\framebuffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1065,6 +1077,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\operators\op_gen_merge\op_gen_merge.cpp">
       <Filter>Private\operators\op_gen_merge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\renderbuffer\renderbuffer.cpp">
+      <Filter>Private\renderer\renderbuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\framebuffer\framebuffer.cpp">
+      <Filter>Private\renderer\framebuffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

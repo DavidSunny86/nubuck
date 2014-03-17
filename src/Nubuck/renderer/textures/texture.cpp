@@ -7,9 +7,11 @@ namespace R {
 
     inline int NumComponents(GLenum format) {
         switch(format) {
-        case GL_RGB: return 3;
-        case GL_RGBA: return 4;
+        case GL_RGB:                return 3;
+        case GL_RGBA:   			return 4;
+        case GL_DEPTH_COMPONENT:    return 4; // don't know, so return number of components of GL_DEPTH_COMPONENT32
         }
+        common.printf("ERROR - NumComponents(): unknown format %d\n", format);
         Crash();
         return 0;
     }
@@ -47,6 +49,11 @@ namespace R {
 	{
 		Init(pixelData);
 	}
+
+    Texture::~Texture() {
+        GL_CALL(glDeleteTextures(1, &_id));
+        metrics.resources.totalTextureBufferSize -= sizeof(char) * NumComponents(_internalFormat) * _width * _height;
+    }
 
 	void Texture::Bind(unsigned level) const {
 		GL_CALL(glActiveTexture(GL_TEXTURE0 + level));

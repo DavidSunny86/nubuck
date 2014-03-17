@@ -30,6 +30,7 @@ namespace UI {
         void initializeGL(void) override;
         void resizeGL(int width, int height) override;
         void paintGL(void) override;
+        void finishResizeGL() override;
 
         void enterEvent(QEvent* event) override;
         void mousePressEvent(QMouseEvent* event) override;

@@ -22,7 +22,7 @@ namespace UI {
         W::world.Send(EV::def_Resize.Create(args));
 
         _renderer.Resize(width, height);
-        // Update();
+        paintGL();
     }
 
     void RenderView::paintGL(void) {
@@ -43,6 +43,11 @@ namespace UI {
         _renderer.BeginFrame();
         _renderer.Render(_renderList);
         _renderer.EndFrame();
+    }
+
+    void RenderView::finishResizeGL() {
+        _renderer.FinishResize();
+        paintGL();
     }
 
     void RenderView::enterEvent(QEvent* event) {

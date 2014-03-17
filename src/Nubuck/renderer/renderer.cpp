@@ -19,6 +19,9 @@
 #include <renderer\material\material.h>
 #include <renderer\metrics\metrics.h>
 #include <renderer\giantbuffer\giant_buffer.h>
+#include <renderer\framebuffer\framebuffer.h>
+#include <renderer\renderbuffer\renderbuffer.h>
+#include <renderer\textures\texture.h>
 #include "renderer_local.h"
 #include "renderer.h"
 #include <world\world.h>
@@ -92,6 +95,56 @@ namespace R {
 static meshPtr_t nodeMesh;
 
 static State curState;
+
+// dimensions of offscreen buffers are the same as the dimension of the renderview
+static GEN::Pointer<Texture>        dp_cb[2];   // colorbuffers. TODO: one shared cb should work
+static GEN::Pointer<Texture>        dp_db[2];   // depthbuffers
+static GEN::Pointer<Framebuffer>    dp_fb[2];   // framebuffers
+
+static void DepthPeeling_FreeBuffers() {
+    dp_fb[0].Drop();
+    dp_fb[1].Drop();
+    dp_cb[0].Drop();
+    dp_cb[1].Drop();
+    dp_db[0].Drop();
+    dp_db[1].Drop();
+}
+
+static void DepthPeeling_CreateBuffers(int width = 400, int height = 400) {
+    DepthPeeling_FreeBuffers();
+
+    for(unsigned i = 0; i < 2; ++i) {
+        dp_cb[i] = GEN::MakePtr(new Texture(width, height, GL_RGBA));
+        dp_db[i] = GEN::MakePtr(new Texture(width, height, GL_DEPTH_COMPONENT));
+        dp_fb[i] = GEN::MakePtr(new Framebuffer);
+        dp_fb[i]->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *dp_cb[i]);
+        dp_fb[i]->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *dp_db[i]);
+    }
+    GL_CHECK_ERROR;
+}
+
+static void DepthPeeling_DrawDebugQuad() {
+    glUseProgram(0);
+    BindWindowSystemFramebuffer();
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, dp_cb[0]->GetID());
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 0.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, 0.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, 0.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, 0.0f);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+    dp_fb[0]->Bind();
+}
+
 
 enum UniformBindingIndices {
     BINDING_INDEX_HOT       = 0,
@@ -279,6 +332,10 @@ void SetState(const State& state) {
 
 Renderer::Renderer(void) : _time(0.0f) { }
 
+Renderer::~Renderer() {
+    DepthPeeling_FreeBuffers();
+}
+
 static void PrintGLInfo(void) {
     common.printf("INFO - GL strings {\n");
     common.printf("\tGL_VENDOR                   = '%s'\n", glGetString(GL_VENDOR));
@@ -300,6 +357,8 @@ static void PrintGLInfo(void) {
 static void CheckRequiredExtensions() {
     REQUIRE_EXT(NV_primitive_restart);
     REQUIRE_EXT(ARB_uniform_buffer_object);
+    REQUIRE_EXT(ARB_texture_non_power_of_two);
+    REQUIRE_EXT(EXT_framebuffer_object);
 }
 
 void Renderer::Init(void) {
@@ -347,13 +406,21 @@ void Renderer::Init(void) {
 
     Uniforms_InitBuffers();
 
+    DepthPeeling_CreateBuffers();
+
+    dp_fb[0]->Bind();
+
     _timer.Start();
 }
 
 void Renderer::Resize(int width, int height) {
+    DepthPeeling_CreateBuffers(width, height);
+
     glViewport(0, 0, width, height);
     _aspect = (float)width / height;
 }
+
+void Renderer::FinishResize() { }
 
 static bool Cmp_Dist(const Mesh::Triangle& lhp, const Mesh::Triangle& rhp) {
     return lhp.dist > rhp.dist;
@@ -585,6 +652,8 @@ void Renderer::Render(RenderList& renderList) {
         if(Layers::GEOMETRY_TRANSPARENT == i) geomSortMode = GeomSortMode::SORT_TRIANGLES;
         if(!_renderLayers[i].empty()) Render(renderList, projection, worldToEye, geomSortMode, _renderLayers[i]);
     }
+
+    DepthPeeling_DrawDebugQuad();
 }
 
 } // namespace R

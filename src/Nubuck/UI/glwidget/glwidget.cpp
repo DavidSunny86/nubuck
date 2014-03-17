@@ -29,13 +29,20 @@ namespace UI {
     void GLWidget::resizeEvent(QResizeEvent* event) {
         Initialize();
         resizeGL(event->size().width(), event->size().height());
+        _resizing = true;
+        _resizeTimer.Start();
     }
 
     void GLWidget::paintEvent(QPaintEvent*) {
         updateGL();
     }
 
-    GLWidget::GLWidget(QWidget* parent) : QWidget(parent), _winId(NULL), _isInitialized(false) {
+    GLWidget::GLWidget(QWidget* parent) 
+        : QWidget(parent)
+        , _winId(NULL)
+        , _isInitialized(false)
+        , _resizing(false)
+    {
         setAttribute(Qt::WA_PaintOnScreen, true); // avoids flimmering
     }
 
@@ -43,6 +50,12 @@ namespace UI {
         Initialize();
         paintGL();
         _rc->Flip();
+
+        const float resizeTimeout = 4.0f;
+        if(_resizing && resizeTimeout < _resizeTimer.Stop()) { // Timer::Stop doesn't actually stop the timer!
+            finishResizeGL();
+            _resizing = false;
+        }
     }
 
 } // namespace UI

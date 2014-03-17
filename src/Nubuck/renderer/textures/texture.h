@@ -24,6 +24,7 @@ namespace R {
 		Texture(int width, int height, GLenum internalFormat, GLenum format,
 			const COM::byte_t* pixelData = NULL);
 		Texture(int width, int height, GLenum format, const COM::byte_t* pixelData = NULL);
+        ~Texture();
 
 		void Bind(unsigned level) const;
 

@@ -166,6 +166,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\statedesc.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\statedesc_gen.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\statedesc_gen_local.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\framebuffer\framebuffer.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\glcall.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h" />
@@ -192,6 +193,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\metrics\metrics.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_nodes.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\program\program.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\renderbuffer\renderbuffer.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\renderer.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\renderer_local.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\resource\resource.h" />
@@ -423,6 +425,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\statedesc.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\lex.yystg.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\statedesc_gen\statedesc_gen.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\framebuffer\framebuffer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\giantbuffer\giant_buffer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c" />
     <ClCompile Include="..\..\src\Nubuck\renderer\material\material.cpp" />
@@ -442,6 +445,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\metrics\metrics.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_nodes.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\program\program.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\renderbuffer\renderbuffer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\renderer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\debugoutput.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\resource\resource.cpp" />

@@ -84,10 +84,12 @@ private:
         std::vector<MeshJob>& rjobs);
 public:
     Renderer(void);
+    ~Renderer();
 
     void Init(void); // requires gl context
 
     void Resize(int width, int height);
+    void FinishResize();
 
     void BeginFrame();
     void Render(RenderList& renderList);

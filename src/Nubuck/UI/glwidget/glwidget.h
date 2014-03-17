@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <Nubuck\generic\pointer.h>
 #include <Nubuck\generic\uncopyable.h>
+#include <system\timer\timer.h>
 
 namespace SYS {
 
@@ -16,14 +17,18 @@ namespace UI {
     private:
         GEN::Pointer<SYS::RenderingContext> _rc;
 
-        HWND _winId;
-        bool _isInitialized;
+        HWND        _winId;
+        bool 		_isInitialized;
+
+        bool        _resizing;
+        SYS::Timer  _resizeTimer;
 
         void Initialize(void);
     protected:
         virtual void initializeGL(void) { }
         virtual void resizeGL(int width, int height) { }
         virtual void paintGL(void) { }
+        virtual void finishResizeGL() { }
 
         virtual void mousePressEvent(QMouseEvent* event) override { }
         virtual void mouseReleaseEvent(QMouseEvent* event) override { }
