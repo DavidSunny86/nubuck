@@ -96,6 +96,11 @@ static meshPtr_t nodeMesh;
 
 static State curState;
 
+// default framebuffer
+static GEN::Pointer<Texture>        def_cb;
+static GEN::Pointer<Texture>        def_db;
+static GEN::Pointer<Framebuffer>    def_fb;
+
 // dimensions of offscreen buffers are the same as the dimension of the renderview
 static GEN::Pointer<Texture>        dp_cb[2];   // colorbuffers. TODO: one shared cb should work
 static GEN::Pointer<Texture>        dp_db[2];   // depthbuffers
@@ -106,7 +111,16 @@ static int                          dp_idx = 0;
 static GEN::Pointer<Texture>        cp_cb;
 static GEN::Pointer<Framebuffer>    cp_fb;
 
+static void BindDefaultFramebuffer() {
+    // BindWindowSystemFramebuffer();
+    def_fb->Bind();
+}
+
 static void DepthPeeling_FreeBuffers() {
+    def_fb.Drop();
+    def_cb.Drop();
+    def_db.Drop();
+
     dp_fb[0].Drop();
     dp_fb[1].Drop();
     dp_cb[0].Drop();
@@ -120,6 +134,12 @@ static void DepthPeeling_FreeBuffers() {
 
 static void DepthPeeling_CreateBuffers(int width = 400, int height = 400) {
     DepthPeeling_FreeBuffers();
+
+    def_cb = GEN::MakePtr(new Texture(width, height, GL_RGBA));
+    def_db = GEN::MakePtr(new Texture(width, height, GL_DEPTH_COMPONENT));
+    def_fb = GEN::MakePtr(new Framebuffer);
+    def_fb->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *def_cb);
+    def_fb->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *def_db);
 
     dp_cb[0] = dp_cb[1] = GEN::MakePtr(new Texture(width, height, GL_RGBA));
     for(unsigned i = 0; i < 2; ++i) {
@@ -150,20 +170,38 @@ static void DepthPeeling_DrawDebugQuad() {
     glUseProgram(0);
     BindWindowSystemFramebuffer();
 
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_ONE);
+    GLbitfield attribs
+        = GL_COLOR_BUFFER_BIT // blend
+        | GL_DEPTH_BUFFER_BIT
+        | GL_TEXTURE_BIT;
+    glPushAttrib(attribs);
 
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, cp_cb->GetID());
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
+
+    glBindTexture(GL_TEXTURE_2D, def_cb->GetID());
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 0.0f);
     glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, 0.0f);
     glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, 0.0f);
     glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, 0.0f);
     glEnd();
-    glDisable(GL_TEXTURE_2D);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+    glBindTexture(GL_TEXTURE_2D, cp_cb->GetID());
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 0.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, 0.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, 0.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, 0.0f);
+    glEnd();
+
+    glPopAttrib();
 }
 
 
@@ -554,7 +592,7 @@ static void DrawFrame(
         next = NULL;
 
         if(cur->fx == "DepthPeeling") dp_fb[dp_idx]->Bind();
-        else BindWindowSystemFramebuffer();
+        else BindDefaultFramebuffer();
 
         GEN::Pointer<Effect> fx = effectMgr.GetEffect(cur->fx);
         int numPasses = fx->NumPasses();
@@ -668,7 +706,7 @@ static void DrawFrame(
         cur = next;
     }
 
-    BindWindowSystemFramebuffer();
+    BindDefaultFramebuffer();
 }
 
 static bool CompareJobs(const R::MeshJob& lhp, const R::MeshJob& rhp) {
@@ -719,6 +757,10 @@ void Renderer::BeginFrame() {
         curState.depth.maskEnabled = GL_TRUE;
     }
     const float f = 1.0f / 255.0f;
+    BindWindowSystemFramebuffer();
+    glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
+    GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+    BindDefaultFramebuffer();
     glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 }
