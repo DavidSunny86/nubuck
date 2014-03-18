@@ -206,9 +206,10 @@ static void DepthPeeling_DrawDebugQuad() {
 
 
 enum UniformBindingIndices {
-    BINDING_INDEX_HOT       = 0,
-    BINDING_INDEX_LIGHTS    = 1,
-    BINDING_INDEX_SKELETON  = 2
+    BINDING_INDEX_HOT           = 0,
+    BINDING_INDEX_LIGHTS    	= 1,
+    BINDING_INDEX_SKELETON  	= 2,
+    BINDING_INDEX_RENDER_TARGET = 3
 };
 
 struct UniformsHot {
@@ -236,17 +237,25 @@ struct UniformsSkeleton {
     float       uNodeSize;
 };
 
+struct UniformsRenderTarget {
+    int uWidth;
+    int uHeight;
+};
+
 static UniformsHot                  uniformsHot;
 static UniformsLights               uniformsLights;
 static UniformsSkeleton             uniformsSkeleton;
+static UniformsRenderTarget         uniformsRenderTarget;
 static GEN::Pointer<StaticBuffer>   uniformsHotBuffer;
 static GEN::Pointer<StaticBuffer>   uniformsLightsBuffer;
 static GEN::Pointer<StaticBuffer>   uniformsSkeletonBuffer;
+static GEN::Pointer<StaticBuffer>   uniformsRenderTargetBuffer;
 
 static void Uniforms_InitBuffers(void) {
     uniformsHotBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsHot)));
     uniformsLightsBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsLights)));
     uniformsSkeletonBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsSkeleton)));
+    uniformsRenderTargetBuffer = GEN::Pointer<StaticBuffer>(new StaticBuffer(GL_UNIFORM_BUFFER, NULL, sizeof(UniformsRenderTarget)));
 }
 
 void Uniforms_BindBuffers(void) {
@@ -254,6 +263,7 @@ void Uniforms_BindBuffers(void) {
     GL_CALL(glBindBufferBase(GL_UNIFORM_BUFFER, BINDING_INDEX_HOT, uniformsHotBuffer->GetID()));
     GL_CALL(glBindBufferBase(GL_UNIFORM_BUFFER, BINDING_INDEX_LIGHTS, uniformsLightsBuffer->GetID()));
     GL_CALL(glBindBufferBase(GL_UNIFORM_BUFFER, BINDING_INDEX_SKELETON, uniformsSkeletonBuffer->GetID()));
+    GL_CALL(glBindBufferBase(GL_UNIFORM_BUFFER, BINDING_INDEX_RENDER_TARGET, uniformsRenderTargetBuffer->GetID()));
 }
 
 void Uniforms_BindBlocks(const Program& prog) {
@@ -267,6 +277,9 @@ void Uniforms_BindBlocks(const Program& prog) {
 
     idx = glGetUniformBlockIndex(prog.GetID(), "UniformsSkeleton");
     if(GL_INVALID_INDEX != idx) GL_CALL(glUniformBlockBinding(prog.GetID(), idx, BINDING_INDEX_SKELETON));
+
+    idx = glGetUniformBlockIndex(prog.GetID(), "UniformsRenderTarget");
+    if(GL_INVALID_INDEX != idx) GL_CALL(glUniformBlockBinding(prog.GetID(), idx, BINDING_INDEX_RENDER_TARGET));
 }
 
 static void Uniforms_Update(
@@ -299,6 +312,12 @@ static void Uniforms_UpdateModelView(const M::Matrix4& modelView) {
     M::TryInvert(modelView, uniformsHot.uInvTransform);
     uniformsHot.uNormalMat = M::Mat4::FromRigidTransform(M::Transpose(M::Inverse(M::RotationOf(modelView))), M::Vector3::Zero);
     uniformsHotBuffer->Update_Mapped(0, sizeof(UniformsHot), &uniformsHot);
+}
+
+static void Uniforms_UpdateRenderTargetSize(const int width, const int height) {
+    uniformsRenderTarget.uWidth = width;
+    uniformsRenderTarget.uHeight = height;
+    uniformsRenderTargetBuffer->Update_Mapped(0, sizeof(UniformsRenderTarget), &uniformsRenderTarget);
 }
 
 static float RandFloat(float min, float max) {
@@ -476,7 +495,7 @@ void Renderer::Resize(int width, int height) {
     glViewport(0, 0, width, height);
     _aspect = (float)width / height;
 
-    std::cout << "resize = { " << width << ", " << height << " }" << std::endl;
+    Uniforms_UpdateRenderTargetSize(width, height);
 }
 
 void Renderer::FinishResize() { }

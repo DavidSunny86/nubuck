@@ -8,6 +8,11 @@ layout(std140) uniform UniformsLights {
     float uShininess;
 };
 
+layout(std140) uniform UniformsRenderTarget {
+    int uWidth;
+    int uHeight;
+};
+
 uniform sampler2D depthTex;
 
 varying vec4 vPosition;
@@ -34,8 +39,8 @@ float linDepth(float z_b) {
 
 void main() {
     vec2 texCoords;
-    texCoords.x = gl_FragCoord.x / 1407.0;
-    texCoords.y = gl_FragCoord.y / 1008.0;
+    texCoords.x = gl_FragCoord.x / uWidth;
+    texCoords.y = gl_FragCoord.y / uHeight;
     float depth = texture2D(depthTex, texCoords).a;
     if(gl_FragCoord.z <= depth) discard;
 
