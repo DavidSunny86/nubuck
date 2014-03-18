@@ -1,0 +1,44 @@
+// depth peeling
+fx DepthPeeling {
+  sortkey = 999;
+
+  pass n0 {
+    vs = "#include <Shaders\lit_directional.vert>";
+    fs = "#include <Shaders\lit_directional_twosided.frag>";
+  }
+
+  pass n1 {
+    vs = "#include <Shaders\depth_peeling.vert>";
+    fs = "#include <Shaders\depth_peeling.frag>";
+  }
+
+  pass n2 {
+    vs = "#include <Shaders\depth_peeling.vert>";
+    fs = "#include <Shaders\depth_peeling.frag>";
+  }
+
+  pass n3 {
+    vs = "#include <Shaders\depth_peeling.vert>";
+    fs = "#include <Shaders\depth_peeling.frag>";
+  }
+
+  pass n4 {
+    vs = "#include <Shaders\depth_peeling.vert>";
+    fs = "#include <Shaders\depth_peeling.frag>";
+  }
+
+  pass n5 {
+    vs = "#include <Shaders\depth_peeling.vert>";
+    fs = "#include <Shaders\depth_peeling.frag>";
+  }
+
+  pass n6 {
+    vs = "#include <Shaders\depth_peeling.vert>";
+    fs = "#include <Shaders\depth_peeling.frag>";
+  }
+
+  pass n7 {
+    vs = "#include <Shaders\depth_peeling.vert>";
+    fs = "#include <Shaders\depth_peeling.frag>";
+  }
+}

@@ -1,0 +1,6 @@
+fx Composite {
+    pass Pass0 {
+        vs = "#include <Shaders\composite.vert>";
+        fs = "#include <Shaders\composite.frag>";
+    }
+}
