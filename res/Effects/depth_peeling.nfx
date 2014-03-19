@@ -17,6 +17,7 @@ fx DepthPeeling {
     fs = "#include <Shaders\depth_peeling.frag>";
   }
 
+/*
   pass n3 {
     vs = "#include <Shaders\depth_peeling.vert>";
     fs = "#include <Shaders\depth_peeling.frag>";
@@ -41,4 +42,5 @@ fx DepthPeeling {
     vs = "#include <Shaders\depth_peeling.vert>";
     fs = "#include <Shaders\depth_peeling.frag>";
   }
+*/
 }

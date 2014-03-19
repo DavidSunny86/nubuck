@@ -42,7 +42,7 @@ void main() {
     texCoords.x = gl_FragCoord.x / uWidth;
     texCoords.y = gl_FragCoord.y / uHeight;
     float depth = texture2D(depthTex, texCoords).a;
-    if(gl_FragCoord.z <= depth) discard;
+    if(gl_FragCoord.z - 0.00001 <= depth) discard;
 
     vec3 view = normalize(-vPosition.xyz);
     vec3 normal = normalize(vNormal);

@@ -1,0 +1,6 @@
+fx ShowAlpha {
+  pass Pass0 {
+    vs = "#include <Shaders\composite.vert>";
+    fs = "#include <Shaders\showalpha.frag>";
+  }
+}
