@@ -392,17 +392,12 @@ void ENT_Geometry::BuildRenderList() {
         if(_isTransparent) rjob.fx = "LitDirectionalTransparent";
         else rjob.fx = "LitDirectionalTwosided";
 
-        rjob.fx = "DepthPeeling";
-
         rjob.layer      = _renderLayer;
         rjob.material   = R::Material::White;
         rjob.tfmesh     = _tfmesh;
         rjob.primType   = 0;
         _renderList.meshJobs.push_back(rjob);
     }
-
-    // do not draw vertices, edges for now
-    return;
 
     if(RenderMode::NODES & _renderMode && !_nodes.IsEmpty()) {
 	    _nodes.BuildRenderMesh();

@@ -96,228 +96,6 @@ static meshPtr_t nodeMesh;
 
 static State curState;
 
-// fullscreen, textured, one pass
-static void DrawDebugQuad(
-    const std::string& fxName, 
-    const std::string& texName, 
-    const Texture& tex) 
-{
-    GEN::Pointer<Effect> fx = effectMgr.GetEffect(fxName.c_str());
-    fx->Compile();
-    Pass* pass = fx->GetPass(0);
-    Program& prog = pass->GetProgram();
-    prog.Use();
-    GLint loc = glGetUniformLocation(prog.GetID(), texName.c_str());
-    if(0 <= loc) prog.SetUniform(texName.c_str(), 0);
-    tex.Bind(0);
-
-    M::Vector3 pos[] = {
-        M::Vector3(-1.0f, -1.0f, 0.0f),
-        M::Vector3( 1.0f, -1.0f, 0.0f),
-        M::Vector3( 1.0f,  1.0f, 0.0f),
-        M::Vector3(-1.0f,  1.0f, 0.0f)
-    };
-    M::Vector2 texCoords[] = {
-        M::Vector2(0.0f, 0.0f),
-        M::Vector2(1.0f, 0.0f),
-        M::Vector2(1.0f, 1.0f),
-        M::Vector2(0.0f, 1.0f)
-    };
-
-    Mesh::Vertex verts[4];
-    for(unsigned i = 0; i < 4; ++i) {
-        verts[i].position = pos[i];
-        verts[i].texCoords = texCoords[i];
-    }
-
-    GLint vb, ib;
-
-    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &vb);
-    glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &ib);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    GL_CALL(glVertexAttribPointer(IN_POSITION,
-        3, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
-        &verts[0].position));
-    GL_CALL(glEnableVertexAttribArray(IN_POSITION));
-
-    GL_CALL(glVertexAttribPointer(IN_TEXCOORDS,
-        2, GL_FLOAT, GL_FALSE, sizeof(R::Mesh::Vertex),
-        &verts[0].texCoords));
-    GL_CALL(glEnableVertexAttribArray(IN_TEXCOORDS));
-
-    Mesh::Index indices[] = { 0, 1, 2, 3 };
-
-    glDrawElements(GL_QUADS, 4, ToGLEnum<Mesh::Index>::ENUM, indices);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vb);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib);
-}
-
-// default framebuffer
-static GEN::Pointer<Texture>        def_cb;
-static GEN::Pointer<Texture>        def_db;
-static GEN::Pointer<Framebuffer>    def_fb;
-
-// dimensions of offscreen buffers are the same as the dimension of the renderview
-static GEN::Pointer<Texture>        dp_cb[2];   // colorbuffers. TODO: one shared cb should work
-static GEN::Pointer<Texture>        dp_db[2];   // depthbuffers
-static GEN::Pointer<Framebuffer>    dp_fb[2];   // framebuffers
-static int                          dp_idx = 0;
-static int                          dp_cnt = 0;
-
-// composite framebuffer
-static GEN::Pointer<Texture>        cp_cb;
-static GEN::Pointer<Framebuffer>    cp_fb;
-
-static void BindDefaultFramebuffer() {
-    // BindWindowSystemFramebuffer();
-    def_fb->Bind();
-}
-
-static void DepthPeeling_FreeBuffers() {
-    def_fb.Drop();
-    def_cb.Drop();
-    def_db.Drop();
-
-    dp_fb[0].Drop();
-    dp_fb[1].Drop();
-    dp_cb[0].Drop();
-    dp_cb[1].Drop();
-    dp_db[0].Drop();
-    dp_db[1].Drop();
-
-    cp_fb.Drop();
-    cp_cb.Drop();
-}
-
-static void DepthPeeling_CreateBuffers(int width = 400, int height = 400) {
-    DepthPeeling_FreeBuffers();
-
-    def_cb = GEN::MakePtr(new Texture(width, height, GL_RGBA));
-    def_db = GEN::MakePtr(new Texture(width, height, GL_DEPTH_COMPONENT));
-    def_fb = GEN::MakePtr(new Framebuffer);
-    def_fb->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *def_cb);
-    def_fb->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *def_db);
-
-    dp_cb[0] = dp_cb[1] = GEN::MakePtr(new Texture(width, height, GL_RGBA));
-    for(unsigned i = 0; i < 2; ++i) {
-        dp_db[i] = GEN::MakePtr(new Texture(width, height, GL_DEPTH_COMPONENT));
-        dp_db[i]->Bind(0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-        glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_ALPHA);
-
-
-        dp_fb[i] = GEN::MakePtr(new Framebuffer);
-        dp_fb[i]->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *dp_cb[i]);
-        dp_fb[i]->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *dp_db[i]);
-    }
-
-    cp_cb = GEN::MakePtr(new Texture(width, height, GL_RGBA));
-    cp_fb = GEN::MakePtr(new Framebuffer);
-    cp_fb->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *cp_cb);
-
-    GL_CHECK_ERROR;
-}
-
-static void DepthPeeling_SwapBuffers() {
-    dp_idx = 1 - dp_idx;
-    dp_fb[dp_idx]->Bind();
-}
-
-/*
-static void DepthPeeling_DrawDebugQuad() {
-    // composite
-    cp_fb->Bind();
-
-    GLbitfield attribs
-        = GL_COLOR_BUFFER_BIT // blend
-        | GL_DEPTH_BUFFER_BIT
-        | GL_TEXTURE_BIT;
-    glPushAttrib(attribs);
-
-    glDisable(GL_DEPTH_TEST);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
-
-    DrawDebugQuad("Composite", "texture", *def_cb);
-
-    glPopAttrib();
-
-    // draw to sys fb
-    glUseProgram(0);
-    BindWindowSystemFramebuffer();
-
-    attribs
-        = GL_COLOR_BUFFER_BIT // blend
-        | GL_DEPTH_BUFFER_BIT
-        | GL_TEXTURE_BIT;
-    glPushAttrib(attribs);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_TEXTURE_2D);
-
-    glBindTexture(GL_TEXTURE_2D, cp_cb->GetID());
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, 0.0f);
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, 0.0f);
-    glEnd();
-
-    glPopAttrib();
-}
-*/
-
-static void DepthPeeling_DrawDebugQuad() {
-    glUseProgram(0);
-    BindWindowSystemFramebuffer();
-
-    GLbitfield attribs
-        = GL_COLOR_BUFFER_BIT // blend
-        | GL_DEPTH_BUFFER_BIT
-        | GL_TEXTURE_BIT;
-    glPushAttrib(attribs);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_TEXTURE_2D);
-
-    glBindTexture(GL_TEXTURE_2D, cp_cb->GetID());
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, 0.0f);
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, 0.0f);
-    glEnd();
-
-    /*
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
-
-    glBindTexture(GL_TEXTURE_2D, def_cb->GetID());
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, 0.0f);
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, 0.0f);
-    glEnd();
-    */
-
-    glDisable(GL_BLEND);
-    DrawDebugQuad("ShowAlpha", "texture", *cp_cb);
-    
-    glPopAttrib();
-}
-
 enum UniformBindingIndices {
     BINDING_INDEX_HOT           = 0,
     BINDING_INDEX_LIGHTS    	= 1,
@@ -523,9 +301,7 @@ void SetState(const State& state) {
 
 Renderer::Renderer(void) : _time(0.0f) { }
 
-Renderer::~Renderer() {
-    DepthPeeling_FreeBuffers();
-}
+Renderer::~Renderer() { }
 
 static void PrintGLInfo(void) {
     common.printf("INFO - GL strings {\n");
@@ -597,14 +373,10 @@ void Renderer::Init(void) {
 
     Uniforms_InitBuffers();
 
-    DepthPeeling_CreateBuffers();
-
     _timer.Start();
 }
 
 void Renderer::Resize(int width, int height) {
-    DepthPeeling_CreateBuffers(width, height);
-
     glViewport(0, 0, width, height);
     _aspect = (float)width / height;
 
@@ -723,9 +495,6 @@ static void DrawFrame(
     while(cur) {
         next = NULL;
 
-        if(cur->fx == "DepthPeeling") dp_fb[dp_idx]->Bind();
-        else BindDefaultFramebuffer();
-
         GEN::Pointer<Effect> fx = effectMgr.GetEffect(cur->fx);
         int numPasses = fx->NumPasses();
         for(int i = 0; i < numPasses; ++i) {
@@ -738,62 +507,10 @@ static void DrawFrame(
             Uniforms_BindBuffers();
             SetState(desc.state);
 
-            if(cur->fx == "DepthPeeling") {
-                if(0 == i) {
-                    dp_cnt++;
-
-                    cp_fb->Bind();
-                    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-                    glClear(GL_COLOR_BUFFER_BIT);
-
-                    dp_idx = 0;
-                    dp_fb[0]->Bind();
-
-                    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                }
-                if(0 < i) {
-                    DepthPeeling_SwapBuffers();
-
-                    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-                    GLint loc = glGetUniformLocation(prog.GetID(), "depthTex");
-                    if(0 <= loc) prog.SetUniform("depthTex", 0);
-                    dp_db[1 - dp_idx]->Bind(0);
-
-                }
-            }
-
             next = DrawMeshList(prog, desc.state, desc.type, desc.flags, modelView, geomSortMode, cur);
-
-            if(cur->fx == "DepthPeeling") {
-                // composite
-                cp_fb->Bind();
-
-                GLbitfield attribs
-                    = GL_COLOR_BUFFER_BIT // blend
-                    | GL_DEPTH_BUFFER_BIT
-                    | GL_TEXTURE_BIT;
-                glPushAttrib(attribs);
-
-                glDisable(GL_DEPTH_TEST);
-
-                glEnable(GL_BLEND);
-                glBlendEquation(GL_FUNC_ADD);
-                glBlendFuncSeparate(
-                    GL_ONE_MINUS_DST_ALPHA, GL_ONE,
-                    GL_ONE_MINUS_DST_ALPHA, GL_ONE);
-
-                if(3 > i) DrawDebugQuad("Composite", "texture", *dp_cb[0]);
-
-                glPopAttrib();
-            }
         }
         cur = next;
     }
-
-    BindDefaultFramebuffer();
 }
 
 static bool CompareJobs(const R::MeshJob& lhp, const R::MeshJob& rhp) {
@@ -844,10 +561,6 @@ void Renderer::BeginFrame() {
         curState.depth.maskEnabled = GL_TRUE;
     }
     const float f = 1.0f / 255.0f;
-    BindWindowSystemFramebuffer();
-    glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
-    GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
-    BindDefaultFramebuffer();
     glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 }
@@ -905,14 +618,6 @@ void Renderer::Render(RenderList& renderList) {
         if(Layers::GEOMETRY_TRANSPARENT == i) geomSortMode = GeomSortMode::SORT_TRIANGLES;
         if(!_renderLayers[i].empty()) Render(renderList, projection, worldToEye, geomSortMode, _renderLayers[i]);
     }
-
-    DepthPeeling_DrawDebugQuad();
-
-    if(1 < dp_cnt) {
-        common.printf("ERROR - dp_cnt = %d > 1\n", dp_cnt);
-        Crash();
-    }
-    dp_cnt = 0;
 }
 
 } // namespace R
