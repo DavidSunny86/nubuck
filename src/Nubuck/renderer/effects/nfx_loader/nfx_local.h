@@ -24,7 +24,8 @@ enum {
     NFX_TOK_VAL_FLOAT,
     NFX_TOK_VAL_ENUM,
 
-    NFX_TOK_STRING
+    NFX_TOK_STRING,
+    NFX_TOK_MLSTRING /* multiline string */
 };
 
 extern char*    yynfxtext;

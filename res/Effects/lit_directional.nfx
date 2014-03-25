@@ -1,7 +1,11 @@
 // uses renderList.dirLights only
 fx LitDirectional {
   pass Pass0 {
-    vs = "#include <Shaders\lit_directional.vert>";
+    vs =
+    """
+    #include <Shaders\lit_directional.vert>
+    """;
+
     fs = "#include <Shaders\lit_directional.frag>";
   }
 }

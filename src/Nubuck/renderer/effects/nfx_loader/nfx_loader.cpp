@@ -32,6 +32,7 @@ static const char* TokToString(int tok) {
     TOKTOSTRING_CASE(NFX_TOK_VAL_FLOAT);
     TOKTOSTRING_CASE(NFX_TOK_VAL_ENUM);
     TOKTOSTRING_CASE(NFX_TOK_STRING);
+    TOKTOSTRING_CASE(NFX_TOK_MLSTRING);
     default:
         assert(0 && "TokToString: unknown token");
     };
@@ -168,10 +169,17 @@ static bool ParseShaderSource(R::PassDesc& desc, R::Shader::Type type) {
         desc.filenames[type] = source;
         NextToken();
         if(!ExpectToken(NFX_TOK_SEMICOL)) return false;
+    } else if(NFX_TOK_MLSTRING == g_nextToken) {
+        unsigned tokLen = strlen(yynfxtext);
+        const std::string source(yynfxtext + 3, tokLen - 6);
+        desc.filenames[type] = source;
+        NextToken();
+        if(!ExpectToken(NFX_TOK_SEMICOL)) return false;
     } else {
-        common.printf("%s:%d: expected '%s', got '%s'\n",
+        common.printf("%s:%d: expected '%s' or '%s', got '%s'\n",
             g_filename, yynfxlineno,
             TokToString(NFX_TOK_STRING),
+            TokToString(NFX_TOK_MLSTRING),
             yynfxtext);
         return false;
     }

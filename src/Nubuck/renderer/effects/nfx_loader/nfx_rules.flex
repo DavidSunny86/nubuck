@@ -14,10 +14,12 @@
 #include "nfx_local.h"
 %}
 
-IDENT   [a-zA-Z][a-zA-Z0-9]*
-INT     "-"?[0-9]+
-FLOAT   [0-9]+"."[0-9]+
-STRING  "\"".*"\""
+MLQUOTES    \"\"\"
+IDENT       [a-zA-Z][a-zA-Z0-9]*
+INT         "-"?[0-9]+
+FLOAT       [0-9]+"."[0-9]+
+STRING      \"[^\n\"]*\"
+MLSTRING    {MLQUOTES}[^\"]*{MLQUOTES}
 
 %%
 
@@ -55,6 +57,7 @@ STRING  "\"".*"\""
 {FLOAT}     { nfx_val_float = atof(yynfxtext); return NFX_TOK_VAL_FLOAT; }
 
 {STRING}    { return NFX_TOK_STRING; }
+{MLSTRING}  { return NFX_TOK_MLSTRING; }
 
 .           { return NFX_TOK_UNKNOWN; }
 
