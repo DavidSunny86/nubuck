@@ -94,8 +94,8 @@ void LoadOBJ::Register(const Nubuck& nb, Invoker& invoker) {
     _nb = nb;
 
     printf("LoadOBJ: preloading mesh\n");
-    const char* filename = "C:\\Libraries\\LEDA\\LEDA-6.4\\vs_nubuck\\demo_flipclip0\\laurana_hp.obj";
-	preload.FromObj(filename);
+    std::string filename = common.BaseDir() + "Meshes\\laurana_hp.obj";
+    preload.FromObj(filename.c_str());
 
     QAction* action = _nb.ui->GetSceneMenu()->addAction("Load .obj file");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
