@@ -67,10 +67,10 @@ private:
 		}
     }
 
-    M::Vector3  _oldCursorPos;
     M::Vector3  _cursorPos;
     bool        _hidden;
 
+    M::Vector3              _oldCursorPos;
     std::vector<M::Vector3> _oldPos;
 
     bool        _dragging;

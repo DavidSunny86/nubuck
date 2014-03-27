@@ -182,8 +182,6 @@ void Translate::OnCameraChanged() {
         AlignWithCamera();
 }
 
-static float tmp;
-
 bool Translate::OnMouseDown(const MouseEvent& event) {
 	if(MouseEvent::BUTTON_RIGHT != event.button) return false;
 
@@ -192,27 +190,19 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
         if(!W::world.GetSelection()->GetList().empty()) {
             M::Matrix3 M = M::RotationOf(W::world.GetModelView());
             float det = M::Det(M);
-            if(M::AlmostEqual(0.0f, det)) printf("OMGOMGOMG\n");
+            if(M::AlmostEqual(0.0f, det)) common.printf("WARNING - modelview matrix is singular\n");
             M::Matrix3 invM = M::Inverse(M, det);
 
             M::Vector3 eyeZ = M::Transform(invM, M::Vector3(0.0f, 0.0f, 1.0f)); // z axis of eye space in world space
-            printf("eyeZ = %f %f %f\n", eyeZ.x, eyeZ.y, eyeZ.z);
 
             for(int i = 0; i < DIM; ++i) {
                 if(M::IS::Intersects(ray, _bboxes[i])) {
                     _dragAxis = i;
                     _dragPlane = M::Plane::FromPointSpan(_cursorPos, M::Cross(eyeZ, Axis(i)), Axis(i));
-                    printf("Cross: %f %f %f, Axis(i): %f %f %f\n",
-                        M::Cross(eyeZ, Axis(i)).x,
-                        M::Cross(eyeZ, Axis(i)).y,
-                        M::Cross(eyeZ, Axis(i)).z,
-                        Axis(i).x,
-                        Axis(i).y,
-                        Axis(i).z);
                     M::IS::Info inf;
                     bool is = M::IS::Intersects(ray, _dragPlane, &inf);
                     assert(is);
-                    tmp = _cursorPos.vec[_dragAxis];
+                    _oldCursorPos = _cursorPos;
                     const std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
                     _oldPos.resize(geomList.size());
                     for(unsigned i = 0; i < _oldPos.size(); ++i) _oldPos[i] = ((const W::ENT_Geometry*)geomList[i])->Transform(M::Vector3::Zero);
@@ -221,7 +211,6 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
                 }
             }
             if(_dragging) {
-                printf("N = %f %f %f\n", _dragPlane.n.x, _dragPlane.n.y, _dragPlane.n.z);
                 return true;
             } 
         } 
@@ -246,41 +235,14 @@ bool Translate::OnMouseUp(const MouseEvent&) {
     return false;
 }
 
-static inline M::Matrix4 SetZ(const M::Vector3& pos, float z) {
-    M::Matrix4 m = M::Mat4::Identity();
-    m.m22 = z / pos.z;
-    return m;
-}
-
 bool Translate::OnMouseMove(const MouseEvent& event) {
-    R::Color arrowHeadColors[] = {
-        R::Color::Red,
-        R::Color::Green,
-        R::Color::Blue
-    };
-    if(!_dragging) {
-		M::Ray ray = W::world.PickingRay(event.coords);
-        for(int i = 0; i < DIM; ++i) {
-            /* TODO: color arrow heads
-            if(M::IS::Intersects(ray, _bboxes[i])) {
-                leda::nb::set_color(_geom_arrowHeads[i]->GetRatPolyMesh(), R::BlendAddRGB(arrowHeadColors[i], R::Color::White));
-            } else leda::nb::set_color(_geom_arrowHeads[i]->GetRatPolyMesh(), arrowHeadColors[i]);
-            _geom_arrowHeads[i]->Update();
-            */
-        }
-    }
-
     if(_dragging) {
         M::Ray ray = W::world.PickingRay(event.coords);
         M::IS::Info inf;
         bool is = M::IS::Intersects(ray, _dragPlane, &inf);
         assert(is);
         M::Vector3 p = inf.where;
-        _cursorPos.vec[_dragAxis] = tmp + (p - _dragOrig).vec[_dragAxis];
-        printf("orig = %f %f %f, p = %f %f %f\n",
-            _dragOrig.x, _dragOrig.y, _dragOrig.z,
-            p.x, p.y, p.z);
-        printf("COORD = %f\n", _cursorPos.vec[_dragAxis]);
+        _cursorPos.vec[_dragAxis] = _oldCursorPos.vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
         SetPosition(_cursorPos);
 
         const std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
