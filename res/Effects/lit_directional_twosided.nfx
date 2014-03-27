@@ -1,7 +1,13 @@
 // uses renderList.dirLights only
 fx LitDirectionalTwosided {
   pass Pass0 {
-    vs = "#include <Shaders\lit_directional.vert>";
-    fs = "#include <Shaders\lit_directional_twosided.frag>";
+    vs = "#include <Shaders\mesh.vert>";
+    fs = 
+    """
+    const bool LIGHTING_ENABLED             = true;
+    const bool LIGHTING_TWOSIDED_ENABLED    = true;
+
+    #include <Shaders\mesh.frag>
+    """;
   }
 }

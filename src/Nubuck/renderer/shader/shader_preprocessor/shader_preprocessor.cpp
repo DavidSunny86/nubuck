@@ -54,6 +54,7 @@ static bool ParseInclude(void) {
     if(!ExpectToken(R::SPP::Tokens::TOK_STRING)) return false;
     std::string filename(yyspptext + 1, strlen(yyspptext) - 2);
     std::string path = common.BaseDir() + filename;
+    // TODO: does file exist?
     R::SPP::YYSPP_PushFile(path.c_str());
     return true;
 }

@@ -1,7 +1,14 @@
 // only vertex colors
 fx Unlit {
   pass Pass0 {
-    vs = "#include <Shaders\unlit.vert>";
-    fs = "#include <Shaders\unlit.frag>";
+    vs = "#include <Shaders\mesh.vert>";
+
+    fs = 
+    """
+    const bool LIGHTING_ENABLED             = false;
+    const bool LIGHTING_TWOSIDED_ENABLED    = false;
+
+    #include <Shaders\mesh.frag>
+    """;
   }
 }

@@ -1,11 +1,14 @@
 // uses renderList.dirLights only
 fx LitDirectional {
   pass Pass0 {
-    vs =
-    """
-    #include <Shaders\lit_directional.vert>
-    """;
+    vs = "#include <Shaders\mesh.vert>";
 
-    fs = "#include <Shaders\lit_directional.frag>";
+    fs = 
+    """
+    const bool LIGHTING_ENABLED             = true;
+    const bool LIGHTING_TWOSIDED_ENABLED    = false;
+
+    #include <Shaders\mesh.frag>
+    """;
   }
 }

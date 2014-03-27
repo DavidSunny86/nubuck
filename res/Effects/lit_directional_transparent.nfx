@@ -14,8 +14,16 @@ fx LitDirectionalTransparent {
         dstFactor = GL_ONE_MINUS_SRC_ALPHA;
       }
     }
-    vs = "#include <Shaders\lit_directional.vert>"; 
-    fs = "#include <Shaders\lit_directional_twosided.frag>"; 
+
+    vs = "#include <Shaders\mesh.vert>"; 
+
+    fs = 
+    """
+    const bool LIGHTING_ENABLED             = true;
+    const bool LIGHTING_TWOSIDED_ENABLED    = true;
+
+    #include <Shaders\mesh.frag>
+    """;
   }
 
   pass Frontfaces {
@@ -30,7 +38,15 @@ fx LitDirectionalTransparent {
         dstFactor = GL_ONE_MINUS_SRC_ALPHA;
       }
     }
-    vs = "#include <Shaders\lit_directional.vert>"; 
-    fs = "#include <Shaders\lit_directional.frag>"; 
+
+    vs = "#include <Shaders\mesh.vert>"; 
+
+    fs = 
+    """
+    const bool LIGHTING_ENABLED             = true;
+    const bool LIGHTING_TWOSIDED_ENABLED    = false;
+
+    #include <Shaders\mesh.frag>
+    """;
   }
 }
