@@ -55,7 +55,6 @@ void Loop::Invoke() {
 	leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
 	leda::CONVEX_HULL(L, mesh);
 	mesh.compute_faces();
-	_geom->Update();
 }
 
 } // namespace OP

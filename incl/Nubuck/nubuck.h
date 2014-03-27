@@ -24,7 +24,6 @@ struct IGeometry {
     virtual void Destroy() = 0;
 
     virtual leda::nb::RatPolyMesh& GetRatPolyMesh() = 0;
-    virtual void Update() = 0;
 
     struct RenderMode {
         enum Flags {
@@ -70,7 +69,7 @@ struct ISelection {
     virtual void Add(IGeometry* geom) = 0;
     virtual void Clear() = 0;
 
-    virtual M::Vector3 GetGlobalCenter() const = 0;
+    virtual M::Vector3 GetGlobalCenter() = 0;
     virtual std::vector<IGeometry*> GetList() const = 0;
 };
 

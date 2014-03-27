@@ -13,7 +13,6 @@ IGeometry* Phase0::CreateHighlightedEdgeGeometry(const point_t& p0, const point_
     leda::edge e = mesh.first_adj_edge(v0);
     mesh.set_color(e, R::Color::Red);
     mesh.set_radius(e, 0.05f);
-    geom->Update();
     return geom;
 }
 
@@ -54,7 +53,6 @@ Phase0::StepRet::Enum Phase0::Step() {
     mesh_t& G = g.geom->GetRatPolyMesh();
     G.join(G0);
     G.join(G1);
-    g.geom->Update();
 
 	g.edgeColors.init(G, BLUE);
     g.nodeColors.init(G, BLUE);

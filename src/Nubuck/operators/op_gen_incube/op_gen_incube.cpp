@@ -46,8 +46,6 @@ void InCube::UpdateBBox(int radius) {
 
     leda::D3_HULL(L, mesh);
     mesh.compute_faces();
-
-    _bbox->Update();
 }
 
 void InCube::UpdateCloud(int size, int radius) {
@@ -61,8 +59,6 @@ void InCube::UpdateCloud(int size, int radius) {
     forall_items(it, L) {
         mesh.set_position(mesh.new_node(), L[it]);
     }
-
-    _cloud->Update();
     _nb.world->GetSelection()->Set(_cloud);
 }
 

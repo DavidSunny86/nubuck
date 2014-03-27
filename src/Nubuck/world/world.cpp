@@ -133,8 +133,9 @@ void World::Selection::Clear() {
     SignalChange();
 }
 
-M::Vector3 World::Selection::GetGlobalCenter() const { 
+M::Vector3 World::Selection::GetGlobalCenter() { 
     SYS::ScopedLock lock(_mtx);
+    ComputeCenter();
     return center; 
 }
 
@@ -284,7 +285,11 @@ void World::Event_DestroyEntity(const EV::Event& event) {
 }
 
 void World::Event_SelectionChanged(const EV::Event&) {
-    BBoxes_BuildFromSelection();
+    // bboxes get updated in Update()
+}
+
+void World::Event_RebuildAll(const EV::Event&) {
+    RebuildAll();
 }
 
 void World::Event_Resize(const EV::Event& event) {
@@ -372,6 +377,7 @@ World::World(void) : _camArcball(800, 400) /* init values arbitrary */ {
     AddEventHandler(EV::def_LinkEntity,           this, &World::Event_LinkEntity);
     AddEventHandler(EV::def_DestroyEntity,        this, &World::Event_DestroyEntity);
     AddEventHandler(EV::def_SelectionChanged,     this, &World::Event_SelectionChanged);
+    AddEventHandler(EV::def_RebuildAll,           this, &World::Event_RebuildAll);
     AddEventHandler(EV::def_Resize,               this, &World::Event_Resize);
     AddEventHandler(EV::def_Mouse,                this, &World::Event_Mouse);
     AddEventHandler(EV::def_Key,                  this, &World::Event_Key);
@@ -425,6 +431,17 @@ bool World::Trace(const M::Ray& ray, ENT_Geometry** ret) {
     return false;
 }
 
+void World::RebuildAll() {
+    SYS::ScopedLock lockEntities(_entitiesMtx);
+    for(unsigned i = 0; i < _entities.size(); ++i) {
+        GEN::Pointer<Entity>& entity = _entities[i];
+        if(EntityType::ENT_GEOMETRY == entity->GetType()) {
+            ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
+            geom.Rebuild();
+        }
+    }
+}
+
 void World::Update(void) {
     _secsPassed = _timer.Stop();
     _timePassed += _secsPassed;
@@ -433,6 +450,8 @@ void World::Update(void) {
     SYS::ScopedLock lockEntities(_entitiesMtx);
 
     HandleEvents();
+
+    BBoxes_BuildFromSelection();
 
     for(unsigned i = 0; i < _entities.size(); ++i) {
         GEN::Pointer<Entity> entity = _entities[i];
@@ -471,6 +490,10 @@ void World::Render(R::RenderList& renderList) {
                 geom.GetRenderList().meshJobs.end());
         }
     }
+}
+
+ISelection* World::GetSelection() {
+    return &_selection;
 }
 
 IGeometry* World::CreateGeometry() {

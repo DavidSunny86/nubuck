@@ -25,6 +25,7 @@ void Driver::Event_Push(const EV::Event& event) {
     }
 	_activeOps.push_back(args.op);
 	args.op->Invoke();
+    W::world.Send(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 }
 
 void Driver::Event_SelectionChanged(const EV::Event& event) {
@@ -89,6 +90,8 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
     if(op) {
         op->Send(event);
         op->HandleEvents();
+
+        W::world.Send(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 
 		g_operators.Send(EV::def_OP_ActionFinished.Create(EV::Params_OP_ActionFinished()));
 	}

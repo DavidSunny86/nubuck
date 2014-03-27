@@ -31,16 +31,18 @@ private:
 		    activeOps(activeOps), activeOpsMtx(activeOpsMtx),
 			meshJobs(meshJobs), meshJobsMtx(meshJobsMtx) { }
 
+        void GatherJobs() {
+            SYS::ScopedLock lockOps(activeOpsMtx);
+            SYS::ScopedLock lockJobs(meshJobsMtx);
+            meshJobs.clear();
+            for(unsigned i = 0; i < activeOps.size(); ++i)
+                activeOps[i]->GetMeshJobs(meshJobs);
+        }
+
         DWORD Thread_Func() {
             int cnt = 0;
             while(true) {
-				{
-					SYS::ScopedLock lockOps(activeOpsMtx);
-					SYS::ScopedLock lockJobs(meshJobsMtx);
-					meshJobs.clear();
-					for(unsigned i = 0; i < activeOps.size(); ++i)
-						activeOps[i]->GetMeshJobs(meshJobs);
-				}
+                GatherJobs();
                 Sleep(100);
 			}
 		}

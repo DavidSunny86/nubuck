@@ -6,7 +6,6 @@ void Mantle::Init(const leda::node v0, const leda::node v1, const leda::node v2)
     _geom->SetRenderMode(IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES);
     leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
     leda::edge e = mesh.make_triangle(_subj[v0], _subj[v1], _subj[v2]);
-    _geom->Update();
     _cand[0] = mesh.face_cycle_pred(e);
     _cand[1] = mesh.face_cycle_succ(e);
     _last = v2;
@@ -35,8 +34,6 @@ void Mantle::AddTriangle(const leda::node v0, const leda::node v1, const leda::n
     _cand[0] = u;
     _cand[1] = e;
     _last = v2;
-
-    _geom->Update();
 }
 
 void Mantle::Destroy() { _geom->Destroy(); }

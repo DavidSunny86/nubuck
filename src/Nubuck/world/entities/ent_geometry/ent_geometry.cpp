@@ -208,14 +208,18 @@ void ENT_Geometry::RebuildRenderEdges() {
     _edgeRenderer->Rebuild(edges);
 }
 
-void ENT_Geometry::Update() {
+void ENT_Geometry::Rebuild() {
 	SYS::ScopedLock lock(_mtx);
 
-    CacheFPos();
-    RebuildRenderNodes();
-    RebuildRenderEdges();
-    RebuildRenderMesh();
-    ComputeBoundingBox();
+    if(_ratPolyMesh.needs_rebuild()) {
+        _ratPolyMesh.cache_all();
+
+        CacheFPos();
+        RebuildRenderNodes();
+        RebuildRenderEdges();
+        RebuildRenderMesh();
+        ComputeBoundingBox();
+    }
 }
 
 static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
@@ -368,7 +372,7 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
     }
     _mtx.Unlock();
 
-    if(rebuild) Update();
+    if(rebuild) Rebuild();
 }
 
 void ENT_Geometry::FrameUpdate() {

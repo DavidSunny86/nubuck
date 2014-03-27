@@ -31,7 +31,6 @@ void Join::Invoke() {
         geom->Destroy();
     }
 
-    geom0->Update();
 	_nb.world->GetSelection()->Set(geom0);
 
     printf(">>>>>>>>>> OP::Join finished\n");

@@ -30,7 +30,6 @@ void UpdateActiveEdge() {
     leda::edge e = mesh.first_adj_edge(v0);
     mesh.set_color(e, R::Color::Yellow);
     mesh.set_radius(e, 0.1f);
-	g.geom_activeEdge->Update();
 }
 
 // returns true if w lies in the negative halfspace of the directed

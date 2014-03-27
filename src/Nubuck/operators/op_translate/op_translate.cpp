@@ -142,6 +142,9 @@ void Translate::Invoke() {
 }
 
 void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
+    // updates cursor position
+    OnGeometrySelected();
+
     if(_hidden) return;
 
     R::MeshJob meshJob;

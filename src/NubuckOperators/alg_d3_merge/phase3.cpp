@@ -43,7 +43,6 @@ Phase3::StepRet::Enum Phase3::Step() {
     leda::edge e;
     forall_edges(e, G) G.set_unmasked(e);
     G.compute_faces();
-    g.geom->Update();
 
     g.geom_activeEdge->Destroy();
     g.geom_activeEdge0->Destroy();

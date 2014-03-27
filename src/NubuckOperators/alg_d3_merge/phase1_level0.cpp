@@ -97,7 +97,5 @@ Phase1_Level0::StepRet::Enum Phase1_Level0::Step() {
 
     UpdateActiveEdge();
 
-    g.geom->Update();
-
     return StepRet::CONTINUE;
 }

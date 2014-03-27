@@ -47,8 +47,6 @@ Phase2::StepRet::Enum Phase2::Step() {
     Push(G.cyclic_adj_succ(e));
     Push(G.face_cycle_succ(e));
 
-    g.geom->Update();
-
     return StepRet::CONTINUE;
 }
 

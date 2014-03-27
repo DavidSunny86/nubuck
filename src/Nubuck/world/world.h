@@ -51,7 +51,7 @@ namespace W {
             void Add(IGeometry* geom) override;
             void Clear() override;
 
-            M::Vector3 GetGlobalCenter() const override;
+            M::Vector3 GetGlobalCenter() override;
             std::vector<IGeometry*> GetList() const override;
         } _selection;
 
@@ -95,6 +95,7 @@ namespace W {
         void Event_LinkEntity(const EV::Event& event);
         void Event_DestroyEntity(const EV::Event& event);
         void Event_SelectionChanged(const EV::Event& event);
+        void Event_RebuildAll(const EV::Event& event);
         void Event_Resize(const EV::Event& event);
         void Event_Mouse(const EV::Event& event);
         void Event_Key(const EV::Event& event);
@@ -109,11 +110,12 @@ namespace W {
         M::Ray  PickingRay(const M::Vector2& mouseCoords);
         bool    Trace(const M::Ray& ray, ENT_Geometry** geom);
 
+        void RebuildAll();
         void Update(void);
         void Render(R::RenderList& renderList);
 
         // exported to client
-        ISelection* GetSelection() override { return &_selection; }
+        ISelection* GetSelection() override;
         IGeometry* CreateGeometry() override; // thread-safe
 
         // thread interface

@@ -43,13 +43,11 @@ void Merge::Invoke() {
     geom0->SetRenderMode(renderAll);
     leda::CONVEX_HULL(L0, geom0->GetRatPolyMesh());
     geom0->GetRatPolyMesh().compute_faces();
-    geom0->Update();
 
     IGeometry* geom1 = _nb.world->CreateGeometry();
     geom1->SetRenderMode(renderAll);
     leda::CONVEX_HULL(L1, geom1->GetRatPolyMesh());
     geom1->GetRatPolyMesh().compute_faces();
-    geom1->Update();
     
     ISelection* sel = _nb.world->GetSelection();
     sel->Clear();

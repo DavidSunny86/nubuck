@@ -116,8 +116,11 @@ void Operators::SetInitOp(unsigned id) {
 void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
 	if(!_renderThread.IsValid()) {
         _renderThread = GEN::MakePtr(new RenderThread(_activeOps, _activeOpsMtx, _meshJobs, _meshJobsMtx));
-        _renderThread->Thread_StartAsync();
+        // _renderThread->Thread_StartAsync();
 	}
+
+    // gather jobs synchronously
+    _renderThread->GatherJobs();
     
 	SYS::ScopedLock lockJobs(_meshJobsMtx);
 	meshJobs.insert(meshJobs.end(), _meshJobs.begin(), _meshJobs.end());

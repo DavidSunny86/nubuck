@@ -57,7 +57,6 @@ void LoadOBJ::Event_Load(const EV::Event& event) {
 	_geom->SetRenderMode(IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES);
 	leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
 	mesh.FromObj(args.filename->toAscii());
-	_geom->Update();
 
 	_nb.world->GetSelection()->Set(_geom);
 
@@ -78,7 +77,6 @@ void LoadOBJ::Event_LoadScene(const EV::Event& event) {
     W::ENT_Geometry* geom = (W::ENT_Geometry*)_nb.world->CreateGeometry();
     geom->SetRenderMode(renderAll);
     geom->GetRatPolyMesh() = mesh0;
-    geom->Update();
 
     _nb.world->GetSelection()->Set(geom);
 
@@ -121,7 +119,6 @@ void LoadOBJ::Invoke() {
     e = mesh.split(e);
 	mesh.set_position(leda::source(e), point_t(-1, 1, 1));
 	mesh.split(e0, e1);
-	geom->Update();
 }
 
 } // namespace OP

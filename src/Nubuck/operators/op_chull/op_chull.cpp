@@ -32,7 +32,6 @@ void ConvexHull::Invoke() {
     leda::nb::RatPolyMesh& chullMesh = chull->GetRatPolyMesh();
     leda::CONVEX_HULL(L, chullMesh);
     chullMesh.compute_faces();
-    chull->Update();
 
     float x, y, z;
     cloud->GetPosition(x, y, z);

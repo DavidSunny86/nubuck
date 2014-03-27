@@ -118,7 +118,5 @@ Phase1_Level1::StepRet::Enum Phase1_Level1::Step() {
     }
 	else nextPhase = g.phase1_level0P0;
 
-    g.geom->Update();
-
     return StepRet::DONE;
 }

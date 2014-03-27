@@ -91,7 +91,7 @@ public:
     UI::OutlinerView* CreateOutlinerView() override;
 
     leda::nb::RatPolyMesh& GetRatPolyMesh() override;
-    void Update() override;
+    void Rebuild();
 
     void ApplyTransformation() override;
 
