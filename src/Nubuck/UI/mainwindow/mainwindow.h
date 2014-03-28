@@ -5,6 +5,7 @@
 #include <Nubuck\nubuck.h>
 #include <common\types.h>
 #include <UI\renderconfig\renderconfig.h>
+#include <world\world.h> // EditMode
 #include "ui_mainwindow.h"
 
 namespace UI {
@@ -15,6 +16,13 @@ namespace UI {
 		Ui::MainWindow  _ui;
         RenderConfig*   _renderConfig;
         QDockWidget*    _outlinerDock;
+
+        // toolbar
+        QAction*    _editModeActs[W::EditMode::NUM_MODES];
+        void        BuildToolBar();
+    private slots:
+        void        OnEditModeToObjects();
+        void        OnEditModeToVertices();
     protected:
         void closeEvent(QCloseEvent*) override;
     public slots:
@@ -25,6 +33,8 @@ namespace UI {
         void OnLoadOperatorPlugin();
     public:
 		MainWindow(void);
+
+        void Toolbar_UpdateEditMode(const W::EditMode::Enum mode);
 
         QMenu* GetSceneMenu() override { return _ui.menuScene; }
         QMenu* GetObjectMenu() override { return _ui.menuObject; }

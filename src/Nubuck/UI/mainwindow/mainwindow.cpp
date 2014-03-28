@@ -1,3 +1,4 @@
+#include <QToolBar>
 #include <QFileDialog>
 #include <QScrollArea>
 #include <QDockWidget>
@@ -7,6 +8,7 @@
 #include <world\world_events.h>
 #include <Nubuck\operators\operator.h>
 #include <operators\operators.h>
+#include <UI\block_signals.h>
 #include <UI\renderview\renderview.h>
 #include <UI\rendermetrics\rendermetrics.h>
 #include <UI\randompoints\randompoints.h>
@@ -31,6 +33,45 @@ namespace {
 } // unnamed namespace
 
 namespace UI {
+
+    void MainWindow::BuildToolBar() {
+        struct {
+            const char* icon;
+            const char* text;
+            const char* recv;
+        } descs[] = {
+            { ":/ui/Images/faces.png",      "Edit Objects",  SLOT(OnEditModeToObjects()) },
+            { ":/ui/Images/vertices.png",   "Edit Vertices", SLOT(OnEditModeToVertices()) }
+        };
+
+        QToolBar* toolBar = new QToolBar("toolbar");
+        toolBar->setIconSize(QSize(15, 15));
+        toolBar->addWidget(new QLabel("edit mode:"));
+        for(int i = 0; i < W::EditMode::NUM_MODES; ++i) {
+            _editModeActs[i] = toolBar->addAction(QIcon(descs[i].icon), descs[i].text, this, descs[i].recv);
+            _editModeActs[i]->setCheckable(true);
+        }
+        toolBar->addSeparator();
+        addToolBar(toolBar);
+
+        Toolbar_UpdateEditMode(W::EditMode::OBJECTS);
+    }
+
+    void MainWindow::Toolbar_UpdateEditMode(const W::EditMode::Enum mode) {
+        for(int i = 0; i < W::EditMode::NUM_MODES; ++i) {
+            bool isEnabled = mode == W::EditMode::Enum(i);
+            BlockSignals blockSigs(_editModeActs[i]);
+            _editModeActs[i]->setChecked(isEnabled);
+        }
+    }
+
+    void MainWindow::OnEditModeToObjects() { 
+        W::world.SetEditMode(W::EditMode::OBJECTS);
+    }
+
+    void MainWindow::OnEditModeToVertices() { 
+        W::world.SetEditMode(W::EditMode::VERTICES);
+    }
 
     void MainWindow::closeEvent(QCloseEvent*) {
         qApp->exit();
@@ -79,6 +120,8 @@ namespace UI {
 
     MainWindow::MainWindow(void) {
         _ui.setupUi(this);
+
+        BuildToolBar();
 
         RenderView* renderView = new RenderView();
         statusBar()->addWidget(renderView->FpsLabel());

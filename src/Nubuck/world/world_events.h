@@ -23,3 +23,7 @@ END_EVENT_DEF
 
 BEGIN_EVENT_DEF(CameraChanged)
 END_EVENT_DEF
+
+BEGIN_EVENT_DEF(EditModeChanged)
+    int editMode;
+END_EVENT_DEF

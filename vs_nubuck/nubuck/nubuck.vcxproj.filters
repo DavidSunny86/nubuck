@@ -668,6 +668,12 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\framebuffer\framebuffer.h">
       <Filter>Private\renderer\framebuffer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\UI\block_signals.h">
+      <Filter>Private\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\UI\userinterface.h">
+      <Filter>Private\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -1083,6 +1089,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\framebuffer\framebuffer.cpp">
       <Filter>Private\renderer\framebuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\userinterface.cpp">
+      <Filter>Private\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

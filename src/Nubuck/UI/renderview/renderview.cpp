@@ -50,6 +50,12 @@ namespace UI {
         paintGL();
     }
 
+    bool RenderView::focusNextPrevChild(bool) {
+        // do not switch to next widget in tab order.
+        // generate KeyEvent with key = Key_Tab instead.
+        return false;
+    }
+
     void RenderView::enterEvent(QEvent* event) {
         setFocus(Qt::OtherFocusReason);
     }
@@ -106,6 +112,11 @@ namespace UI {
     }
 
     void RenderView::keyPressEvent(QKeyEvent* qevent) {
+        if(Qt::Key_Tab == qevent->key() && !qevent->isAutoRepeat()) {
+            W::world.CycleEditMode();
+            return;
+        }
+
         EV::Params_Key args;
         args.type = EV::Params_Key::KEY_DOWN;
         args.keyCode = qevent->key();
@@ -121,6 +132,7 @@ namespace UI {
     }
 
     RenderView::RenderView(QWidget* parent) : glWidget_t(parent), _fpsLabel(NULL) {        
+        setFocusPolicy(Qt::StrongFocus);
         setMouseTracking(true);
 
         connect(&_timer, SIGNAL(timeout()), this, SLOT(Update()));

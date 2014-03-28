@@ -33,6 +33,15 @@ namespace W {
         void*       inf;
     };
 
+    struct EditMode {
+        enum Enum {
+            OBJECTS = 0,
+            VERTICES,
+
+            NUM_MODES
+        };
+    };
+
     class World : public IWorld, public SYS::Thread, public EV::EventHandler<> {
     private:
         DECL_HANDLE_EVENTS(World)
@@ -90,6 +99,11 @@ namespace W {
         void                        BBoxes_BuildFromSelection();
         void                        BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs);
 
+        // edit mode
+        EditMode::Enum                      _editMode;
+        SYS::SpinLock                       _editModeObsMtx;
+        std::vector<EV::EventHandler<>*>    _editModeObs;
+
 #pragma region EventHandlers
         void Event_Apocalypse(const EV::Event& event);
         void Event_LinkEntity(const EV::Event& event);
@@ -103,6 +117,11 @@ namespace W {
 #pragma endregion
     public:
 		World(void);
+
+        EditMode::Enum  GetEditMode() const { return _editMode; }
+        void            SetEditMode(const EditMode::Enum mode);
+        void            CycleEditMode();
+        void            AddEditModeObserver(EV::EventHandler<>* obs);
 
         M::Matrix4 GetCameraMatrix() const { return _camArcball.GetWorldMatrix(); }
         M::Matrix4 GetModelView() const { return _camArcball.GetWorldMatrix(); }

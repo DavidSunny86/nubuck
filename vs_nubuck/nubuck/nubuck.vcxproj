@@ -273,6 +273,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </Command>
     </CustomBuild>
+    <ClInclude Include="..\..\src\Nubuck\UI\block_signals.h" />
     <ClInclude Include="..\..\src\Nubuck\UI\outliner\outliner_fwd.h" />
     <ClInclude Include="..\..\src\Nubuck\UI\simple_panel\simple_panel.h" />
     <CustomBuild Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.h">
@@ -291,6 +292,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </Command>
     </CustomBuild>
+    <ClInclude Include="..\..\src\Nubuck\UI\userinterface.h" />
     <ClInclude Include="..\..\src\Nubuck\UI\window_events.h" />
     <ClInclude Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_events.h" />
     <CustomBuild Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_outln.h">
@@ -477,6 +479,7 @@
     <ClCompile Include="..\..\src\Nubuck\UI\rendermetrics\rendermetrics.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\renderview\renderview.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\simple_panel\simple_panel.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\UI\userinterface.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_outln.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entity.cpp" />

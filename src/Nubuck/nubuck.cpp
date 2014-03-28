@@ -12,6 +12,7 @@
 #include <algdriver\algdriver.h>
 #include <UI\mainwindow\mainwindow.h>
 #include <UI\logwidget\logwidget.h>
+#include <UI\userinterface.h>
 #include <mainloop\mainloop.h>
 #include "nubuck_private.h"
 
@@ -79,6 +80,9 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     }
 
     common.printf("INFO - Nubuck compiled with Qt version '%s'\n", QT_VERSION_STR);
+
+    g_ui.Init();
+    W::world.AddEditModeObserver(&g_ui);
 
     MainLoop mainLoop;
     mainLoop.Enter();

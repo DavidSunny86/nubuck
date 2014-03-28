@@ -32,6 +32,8 @@ namespace UI {
         void paintGL(void) override;
         void finishResizeGL() override;
 
+        bool focusNextPrevChild(bool next) override;
+
         void enterEvent(QEvent* event) override;
         void mousePressEvent(QMouseEvent* event) override;
         void mouseReleaseEvent(QMouseEvent* event) override;

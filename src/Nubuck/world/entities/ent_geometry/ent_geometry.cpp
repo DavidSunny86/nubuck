@@ -155,6 +155,22 @@ ENT_Geometry::ENT_Geometry()
     AddEventHandler(EV::def_ENT_Geometry_EdgeShadingChanged, this, &ENT_Geometry::Event_EdgeShadingChanged);
 }
 
+static bool elem(const std::vector<leda::node>& set, const leda::node x) {
+    for(unsigned i = 0; i < set.size(); ++i)
+        if(set[i] == x) return true;
+    return false;
+}
+
+void ENT_Geometry::Select(const leda::node v) {
+    SYS::ScopedLock lock(_mtx);
+    if(!elem(_vertexSelection, v)) _vertexSelection.push_back(v);
+}
+
+std::vector<leda::node> ENT_Geometry::GetVertexSelection() const {
+    SYS::ScopedLock lock(_mtx);
+    return _vertexSelection;
+}
+
 UI::OutlinerView* ENT_Geometry::CreateOutlinerView() {
     return new ENT_GeometryOutln(*this);
 }

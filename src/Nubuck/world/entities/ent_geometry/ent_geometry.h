@@ -60,6 +60,9 @@ private:
     void ComputeCenter();
     void ComputeBoundingBox();
 
+    // selection
+    std::vector<leda::node> _vertexSelection;
+
 #pragma region EventHandlers
     void Event_EdgeRadiusChanged(const EV::Event& event);
     void Event_EdgeColorChanged(const EV::Event& event);
@@ -71,6 +74,11 @@ public:
     ENT_Geometry();
 
     DECL_HANDLE_EVENTS(ENT_Geometry);
+
+    void Select() { Entity::Select(); }
+
+    void                    Select(const leda::node v);
+    std::vector<leda::node> GetVertexSelection() const;
 
     bool IsSolid() const { return _isSolid; }
 

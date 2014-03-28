@@ -83,6 +83,17 @@ QAbstractButton, QAbstractSpinBox {
     );
 }
 
+QToolBar {
+    border-style: none;
+}
+
+QToolButton {
+    padding-top:    1px;
+    padding-bottom: 1px;
+    padding-left:   1px;
+    padding-right:  1px;
+}
+
 QLineEdit {
     border-color:   #1E1E1E;
     border-style:   solid;
