@@ -56,6 +56,16 @@ static MouseEvent ConvertMouseEvent(const EV::Params_Mouse& from) {
     return to;
 }
 
+void Driver::Event_EditModeChanged(const EV::Event& event) {
+    const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
+    SYS::ScopedLock lock(_activeOpsMtx);
+    for(std::vector<Operator*>::reverse_iterator it(_activeOps.rbegin());
+        _activeOps.rend() != it; ++it)
+    {
+        (*it)->OnEditModeChanged(W::editMode_t::Enum(args.editMode));
+    }
+}
+
 void Driver::Event_Mouse(const EV::Event& event) {
     SYS::ScopedLock lock(_activeOpsMtx);
 	const EV::Params_Mouse& args = EV::def_Mouse.GetArgs(event);
@@ -106,6 +116,7 @@ Driver::Driver(
 	AddEventHandler(EV::def_OP_Push, this, &Driver::Event_Push);
 	AddEventHandler(EV::def_SelectionChanged, this, &Driver::Event_SelectionChanged);
 	AddEventHandler(EV::def_CameraChanged, this, &Driver::Event_CameraChanged);
+    AddEventHandler(EV::def_EditModeChanged, this, &Driver::Event_EditModeChanged);
 	AddEventHandler(EV::def_Mouse, this, &Driver::Event_Mouse);
 }
 

@@ -75,6 +75,7 @@ private:
 
     void Event_ActionFinished(const EV::Event& event);
     void Event_SetPanel(const EV::Event& event);
+    void Event_EditModeChanged(const EV::Event& event);
     void Event_Default(const EV::Event& event, const char* className);
 public slots:
     void OnInvokeOperator(unsigned id);

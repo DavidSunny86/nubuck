@@ -7,6 +7,7 @@
 
 #include <Nubuck\operators\mouse_event.h>
 #include <Nubuck\events\events.h>
+#include <Nubuck\world\editmode.h>
 
 struct Nubuck;
 
@@ -41,6 +42,7 @@ public:
     virtual void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) { }
     virtual void OnGeometrySelected() { }
     virtual void OnCameraChanged() { }
+    virtual void OnEditModeChanged(const W::editMode_t::Enum mode) { }
 	virtual bool OnMouse(const MouseEvent& mouseEvent) { return false; }
 };
 

@@ -287,6 +287,10 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
     return false;
 }
 
+void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {
+    std::cout << "edit mode changed!" << std::endl;
+}
+
 bool Translate::OnMouse(const MouseEvent& event) {
 	switch(event.type) {
 	case MouseEvent::MOUSE_DOWN:  return OnMouseDown(event);

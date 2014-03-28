@@ -81,6 +81,7 @@ public:
     void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) override;
     void OnGeometrySelected() override;
     void OnCameraChanged() override;
+    void OnEditModeChanged(const W::editMode_t::Enum mode) override;
     bool OnMouse(const MouseEvent& event) override;
 };
 

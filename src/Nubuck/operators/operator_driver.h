@@ -24,6 +24,7 @@ private:
 
     void Event_SelectionChanged(const EV::Event& event);
     void Event_CameraChanged(const EV::Event& event);
+    void Event_EditModeChanged(const EV::Event& event);
     void Event_Mouse(const EV::Event& event);
 protected:
     void Event_Default(const EV::Event& event, const char* className) override;

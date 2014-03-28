@@ -83,6 +83,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
 
     g_ui.Init();
     W::world.GetEditMode().AddObserver(&g_ui);
+    W::world.GetEditMode().AddObserver(&OP::g_operators);
     QObject::connect(qApp, SIGNAL(aboutToQuit()), &g_ui, SLOT(OnQuit()));
 
     MainLoop mainLoop;

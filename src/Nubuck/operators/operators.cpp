@@ -39,6 +39,10 @@ void Operators::Event_SetPanel(const EV::Event& event) {
     nubuck.ui->SetOperatorPanel(panel);
 }
 
+void Operators::Event_EditModeChanged(const EV::Event& event) {
+    InvokeEvent(event);
+}
+
 void Operators::Event_Default(const EV::Event& event, const char*) {
 }
 
@@ -65,6 +69,7 @@ void Operators::OnInvokeOperator(unsigned id) {
 Operators::Operators() : _actionsPending(0) {
     AddEventHandler(EV::def_OP_ActionFinished, this, &Operators::Event_ActionFinished);
     AddEventHandler(EV::def_OP_SetPanel, this, &Operators::Event_SetPanel);
+    AddEventHandler(EV::def_EditModeChanged, this, &Operators::Event_EditModeChanged);
 }
 
 Operators::~Operators() {
