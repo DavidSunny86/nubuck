@@ -9,13 +9,14 @@ namespace SYS {
 	private:
 		HANDLE _handle;
 	public:
-		virtual ~Thread(void);
+                Thread();
+		virtual ~Thread();
 
-		virtual DWORD Thread_Func(void) = 0;
+		virtual DWORD Thread_Func() = 0;
 
-		void Thread_StartAsync(void);
-		void Thread_Kill(void);
-		void Thread_Join(void) const;
+		void Thread_StartAsync();
+		void Thread_Kill();
+		void Thread_Join() const;
 	};
 
 } // namespace SYS
