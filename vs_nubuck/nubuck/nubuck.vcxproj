@@ -75,6 +75,7 @@
     <ClInclude Include="..\..\incl\Nubuck\system\locks\semaphore.h" />
     <ClInclude Include="..\..\incl\Nubuck\system\locks\shared_resources.h" />
     <ClInclude Include="..\..\incl\Nubuck\system\locks\spinlock.h" />
+    <ClInclude Include="..\..\incl\Nubuck\world\editmode.h" />
     <ClInclude Include="..\..\src\Nubuck\algdriver\algdriver.h" />
     <ClInclude Include="..\..\src\Nubuck\camera\arcball_camera.h" />
     <ClInclude Include="..\..\src\Nubuck\common\config\config.h" />

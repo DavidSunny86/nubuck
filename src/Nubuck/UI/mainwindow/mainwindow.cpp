@@ -48,30 +48,30 @@ namespace UI {
         QToolBar* toolBar = new QToolBar("toolbar");
         toolBar->setIconSize(QSize(15, 15));
         toolBar->addWidget(new QLabel("edit mode:"));
-        for(int i = 0; i < W::EditMode::NUM_MODES; ++i) {
+        for(int i = 0; i < W::editMode_t::NUM_MODES; ++i) {
             _editModeActs[i] = toolBar->addAction(QIcon(descs[i].icon), descs[i].text, this, descs[i].recv);
             _editModeActs[i]->setCheckable(true);
         }
         toolBar->addSeparator();
         addToolBar(toolBar);
 
-        ToolBar_UpdateEditMode(W::EditMode::DEFAULT);
+        ToolBar_UpdateEditMode(W::editMode_t::DEFAULT);
     }
 
-    void MainWindow::ToolBar_UpdateEditMode(const W::EditMode::Enum mode) {
-        for(int i = 0; i < W::EditMode::NUM_MODES; ++i) {
-            bool isEnabled = mode == W::EditMode::Enum(i);
+    void MainWindow::ToolBar_UpdateEditMode(const W::editMode_t::Enum mode) {
+        for(int i = 0; i < W::editMode_t::NUM_MODES; ++i) {
+            bool isEnabled = mode == W::editMode_t::Enum(i);
             BlockSignals blockSigs(_editModeActs[i]);
             _editModeActs[i]->setChecked(isEnabled);
         }
     }
 
     void MainWindow::OnEditModeToObjects() { 
-        W::world.GetEditMode().SetMode(W::EditMode::OBJECTS);
+        W::world.GetEditMode().SetMode(W::editMode_t::OBJECTS);
     }
 
     void MainWindow::OnEditModeToVertices() { 
-        W::world.GetEditMode().SetMode(W::EditMode::VERTICES);
+        W::world.GetEditMode().SetMode(W::editMode_t::VERTICES);
     }
 
     void MainWindow::closeEvent(QCloseEvent*) {

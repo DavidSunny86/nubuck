@@ -4,19 +4,14 @@
 
 #include <Nubuck\system\locks\spinlock.h>
 #include <Nubuck\events\events.h>
+#include <Nubuck\world\editmode.h>
 
 namespace W {
 
 class EditMode {
-public:
-    enum Enum {
-        OBJECTS     = 0,
-        VERTICES,
-
-        NUM_MODES,
-        DEFAULT     = OBJECTS
-    };
 private:
+    typedef editMode_t::Enum Enum;
+
     SYS::SpinLock                       _mtx;
     Enum                                _mode;
     std::vector<EV::EventHandler<>*>    _obs;

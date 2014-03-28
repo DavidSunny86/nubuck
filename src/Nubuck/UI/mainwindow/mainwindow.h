@@ -18,7 +18,7 @@ namespace UI {
         QDockWidget*    _outlinerDock;
 
         // toolbar
-        QAction*    _editModeActs[W::EditMode::NUM_MODES];
+        QAction*    _editModeActs[W::editMode_t::NUM_MODES];
         void        ToolBar_Build();
     private slots:
         void        OnEditModeToObjects();
@@ -34,7 +34,7 @@ namespace UI {
     public:
 		MainWindow(void);
 
-        void ToolBar_UpdateEditMode(const W::EditMode::Enum mode);
+        void ToolBar_UpdateEditMode(const W::editMode_t::Enum mode);
 
         QMenu* GetSceneMenu() override { return _ui.menuScene; }
         QMenu* GetObjectMenu() override { return _ui.menuObject; }

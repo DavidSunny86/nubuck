@@ -9,7 +9,7 @@ UserInterface g_ui;
 
 void UserInterface::Event_EditModeChanged(const EV::Event& event) {
     const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
-    _mainWindow->ToolBar_UpdateEditMode(W::EditMode::Enum(args.editMode));
+    _mainWindow->ToolBar_UpdateEditMode(W::editMode_t::Enum(args.editMode));
 }
 
 void UserInterface::OnQuit() {

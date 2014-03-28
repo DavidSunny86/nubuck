@@ -276,6 +276,9 @@
     <Filter Include="Private\world\editmode">
       <UniqueIdentifier>{40eedabf-585a-492d-9251-e30be4386eeb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Public\world">
+      <UniqueIdentifier>{3273423e-9561-455b-8a68-d938cfef1e4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -676,6 +679,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\world\editmode\editmode.h">
       <Filter>Private\world\editmode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\world\editmode.h">
+      <Filter>Public\world</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -14,7 +14,7 @@ void EditMode::_SetMode(Enum mode) {
     _mode = mode;
 }
 
-EditMode::EditMode() : _mode(DEFAULT) { }
+EditMode::EditMode() : _mode(editMode_t::DEFAULT) { }
 
 void EditMode::AddObserver(EV::EventHandler<>* const obs) {
     SYS::ScopedLock lock(_mtx);
@@ -31,7 +31,7 @@ void EditMode::SetMode(Enum mode) {
 
 void EditMode::CycleModes() {
     SYS::ScopedLock lock(_mtx);
-    Enum nextMode = Enum((_mode + 1) % NUM_MODES);
+    Enum nextMode = Enum((_mode + 1) % editMode_t::NUM_MODES);
     _SetMode(nextMode);
     _NotifyObservers();
 }
