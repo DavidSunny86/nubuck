@@ -15,6 +15,9 @@
 
 #include <LEDA\geo\d3_hull.h>
 
+// forward decls
+namespace M { namespace IS { struct Info; } } 
+
 namespace OP {
 
 class TranslatePanel : public OperatorPanel {
@@ -24,8 +27,8 @@ public:
 
 class Translate : public Operator {
 private:
-    typedef leda::rational scalar_t;
-    typedef leda::d3_rat_point point3_t;
+    typedef leda::rational      scalar_t;
+    typedef leda::d3_rat_point  point3_t;
 
     Nubuck _nb;
 
@@ -37,41 +40,20 @@ private:
     R::tfmeshPtr_t  _arrowHeadTFMeshes[3];
     M::Matrix4      _arrowHeadTF[3];
 
-    M::Box _bboxes[DIM];
+    M::Box _bboxes[DIM]; // bounding boxes of cursor
 
     void BuildBBoxes();
-    void BuildCursor();
+
+    bool _hidden;
+
     void ShowCursor();
     void HideCursor();
 
-    void SetCenterPosition(M::Box& box, const M::Vector3& center) {
-        const M::Vector3 oldCenter = 0.5f * (box.max - box.min) + box.min;
-        const M::Vector3 d = (center - oldCenter);
-        box.min += d;
-        box.max += d;
-    }
+    void SetPosition(const M::Vector3& pos);
 
-    void SetPosition(const M::Vector3& pos) {
-		M::Matrix4 T = M::Mat4::Translate(pos);
-		R::meshMgr.GetMesh(_axisTFMesh).SetTransform(T);
-		for(int i = 0; i < DIM; ++i) {
-			R::meshMgr.GetMesh(_arrowHeadTFMeshes[i]).SetTransform(T * _arrowHeadTF[i]);
-		}
-		for(unsigned i = 0; i < DIM; ++i) {
-			SetCenterPosition(_bboxes[i], pos);
-			const float l = 1.2f;
-			const float w = 0.2f;
-			_bboxes[X] = M::Box::FromCenterSize(pos + M::Vector3(0.5f, 0.0f, 0.0f), M::Vector3(l, w, w));
-			_bboxes[Y] = M::Box::FromCenterSize(pos + M::Vector3(0.0f, 0.5f, 0.0f), M::Vector3(w, l, w));
-			_bboxes[Z] = M::Box::FromCenterSize(pos + M::Vector3(0.0f, 0.0f, 0.5f), M::Vector3(w, w, l));
-		}
-    }
-
-    M::Vector3  _cursorPos;
-    bool        _hidden;
-
+    M::Vector3              _cursorPos;
     M::Vector3              _oldCursorPos;
-    std::vector<M::Vector3> _oldPos;
+    std::vector<M::Vector3> _oldGeomPos;
 
     bool        _dragging;
     int         _dragAxis;
@@ -79,6 +61,8 @@ private:
     M::Plane    _dragPlane;
 
     void AlignWithCamera();
+
+    bool TraceCursor(const M::Ray& ray, int& axis, M::IS::Info* inf = NULL);
 
     bool OnMouseDown(const MouseEvent& event);
     bool OnMouseUp(const MouseEvent& event);

@@ -91,15 +91,35 @@ void Translate::BuildBBoxes() {
     _bboxes[Z] = M::Box::FromCenterSize(M::Vector3(0.0f, 0.0f, 0.5f), M::Vector3(w, w, l));
 }
 
-void Translate::BuildCursor() {
-}
-
 void Translate::HideCursor() {
     _hidden = true;
 }
 
 void Translate::ShowCursor() {
     _hidden = false;
+}
+
+static void SetCenterPosition(M::Box& box, const M::Vector3& center) {
+    const M::Vector3 oldCenter = 0.5f * (box.max - box.min) + box.min;
+    const M::Vector3 d = (center - oldCenter);
+    box.min += d;
+    box.max += d;
+}
+
+void Translate::SetPosition(const M::Vector3& pos) {
+    M::Matrix4 T = M::Mat4::Translate(pos);
+    R::meshMgr.GetMesh(_axisTFMesh).SetTransform(T);
+    for(int i = 0; i < DIM; ++i) {
+        R::meshMgr.GetMesh(_arrowHeadTFMeshes[i]).SetTransform(T * _arrowHeadTF[i]);
+    }
+    for(unsigned i = 0; i < DIM; ++i) {
+        SetCenterPosition(_bboxes[i], pos);
+        const float l = 1.2f;
+        const float w = 0.2f;
+        _bboxes[X] = M::Box::FromCenterSize(pos + M::Vector3(0.5f, 0.0f, 0.0f), M::Vector3(l, w, w));
+        _bboxes[Y] = M::Box::FromCenterSize(pos + M::Vector3(0.0f, 0.5f, 0.0f), M::Vector3(w, l, w));
+        _bboxes[Z] = M::Box::FromCenterSize(pos + M::Vector3(0.0f, 0.0f, 0.5f), M::Vector3(w, w, l));
+    }
 }
 
 void Translate::AlignWithCamera() {
@@ -123,8 +143,6 @@ void Translate::Register(const Nubuck& nb, Invoker& invoker) {
     QAction* action = _nb.ui->GetSceneMenu()->addAction("Translate");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
     */
-
-    BuildCursor();
 
     if(!W::world.GetSelection()->GetList().empty()) HideCursor();
 }
@@ -182,47 +200,57 @@ void Translate::OnCameraChanged() {
         AlignWithCamera();
 }
 
+bool Translate::TraceCursor(const M::Ray& ray, int& axis, M::IS::Info* inf) {
+    for(int i = 0; i < DIM; ++i) {
+        if(M::IS::Intersects(ray, _bboxes[i], inf)) {
+            axis = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+// returns z axis of eye space in world space
+static M::Vector3 EyeZ(const M::Matrix4& modelView) {
+    M::Matrix3 M = M::RotationOf(modelView);
+    float det = M::Det(M);
+    if(M::AlmostEqual(0.0f, det)) common.printf("WARNING - modelview matrix is singular\n");
+    M::Matrix3 invM = M::Inverse(M, det);
+    return M::Transform(invM, M::Vector3(0.0f, 0.0f, 1.0f));
+}
+
 bool Translate::OnMouseDown(const MouseEvent& event) {
 	if(MouseEvent::BUTTON_RIGHT != event.button) return false;
 
+    if(_dragging || W::world.GetSelection()->GetList().empty()) return false;
+
     M::Ray ray = W::world.PickingRay(event.coords);
-    if(!_dragging) {
-        if(!W::world.GetSelection()->GetList().empty()) {
-            M::Matrix3 M = M::RotationOf(W::world.GetModelView());
-            float det = M::Det(M);
-            if(M::AlmostEqual(0.0f, det)) common.printf("WARNING - modelview matrix is singular\n");
-            M::Matrix3 invM = M::Inverse(M, det);
 
-            M::Vector3 eyeZ = M::Transform(invM, M::Vector3(0.0f, 0.0f, 1.0f)); // z axis of eye space in world space
+    int         axis;
+    M::IS::Info inf;
 
-            for(int i = 0; i < DIM; ++i) {
-                if(M::IS::Intersects(ray, _bboxes[i])) {
-                    _dragAxis = i;
-                    _dragPlane = M::Plane::FromPointSpan(_cursorPos, M::Cross(eyeZ, Axis(i)), Axis(i));
-                    M::IS::Info inf;
-                    bool is = M::IS::Intersects(ray, _dragPlane, &inf);
-                    assert(is);
-                    _oldCursorPos = _cursorPos;
-                    const std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
-                    _oldPos.resize(geomList.size());
-                    for(unsigned i = 0; i < _oldPos.size(); ++i) _oldPos[i] = ((const W::ENT_Geometry*)geomList[i])->Transform(M::Vector3::Zero);
-                    _dragOrig = inf.where;
-                    _dragging = true;
-                }
-            }
-            if(_dragging) {
-                return true;
-            } 
-        } 
-        if(!_dragging) {
-            W::ENT_Geometry* geom;
-            if(W::world.Trace(ray, &geom)) {
-				if(MouseEvent::MODIFIER_SHIFT & event.mods) W::world.GetSelection()->Add(geom);
-                else W::world.GetSelection()->Set(geom);
-                return true;
-            }
+    if(TraceCursor(ray, axis, &inf)) {
+        M::Vector3 eyeZ = EyeZ(W::world.GetModelView());
+        M::Vector3 vAxis = Axis(axis);
+        _dragAxis = axis;
+        _dragPlane = M::Plane::FromPointSpan(_cursorPos, M::Cross(eyeZ, vAxis), vAxis);
+        bool is = M::IS::Intersects(ray, _dragPlane, &inf);
+        assert(is);
+        _dragOrig = inf.where;
+
+        const std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
+        _oldGeomPos.resize(geomList.size());
+        for(unsigned i = 0; i < _oldGeomPos.size(); ++i) 
+            _oldGeomPos[i] = ((const W::ENT_Geometry*)geomList[i])->Transform(M::Vector3::Zero);
+        _oldCursorPos = _cursorPos;
+        _dragging = true;
+    } else {
+        W::ENT_Geometry* geom;
+        if(W::world.Trace(ray, &geom)) {
+            if(MouseEvent::MODIFIER_SHIFT & event.mods) W::world.GetSelection()->Add(geom);
+            else W::world.GetSelection()->Set(geom);
+            return true;
         }
-        return false;
     }
     return false;
 }
@@ -248,8 +276,8 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
         const std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
         for(unsigned i = 0; i < geomList.size(); ++i) {
             IGeometry* geom = geomList[i];
-            M::Vector3 pos = _oldPos[i];
-            pos.vec[_dragAxis] = _oldPos[i].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
+            M::Vector3 pos = _oldGeomPos[i];
+            pos.vec[_dragAxis] = _oldGeomPos[i].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
             geom->SetPosition(pos.x, pos.y, pos.z);
         }
 
