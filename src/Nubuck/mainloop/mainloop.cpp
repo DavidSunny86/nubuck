@@ -7,7 +7,7 @@
 void MainLoop::Update() { 
 	W::world.Update(); 
 	OP::g_operators.FrameUpdate();
-	UI::Outliner::Instance()->HandleEvents();
+    g_ui.GetOutliner().HandleEvents();
     g_ui.HandleEvents();
 }
 

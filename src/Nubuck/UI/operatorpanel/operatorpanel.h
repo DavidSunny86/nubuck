@@ -12,12 +12,6 @@ private:
 public:
     OperatorPanel(QWidget* parent = NULL);
 
-    static OperatorPanel* Instance() {
-        static OperatorPanel* instance = NULL;
-        if(!instance) instance = new OperatorPanel();
-        return instance;
-    };
-
     void SetOperatorName(const QString& name);
 
     void setWidget(QWidget* widget);

@@ -15,6 +15,7 @@
 #include <UI\logwidget\logwidget.h>
 #include <UI\outliner\outliner.h>
 #include <UI\operatorpanel\operatorpanel.h>
+#include <UI\userinterface.h>
 #include "mainwindow.h"
 
 namespace {
@@ -127,13 +128,13 @@ namespace UI {
         statusBar()->addWidget(renderView->FpsLabel());
         setCentralWidget(renderView);
 
-        _outlinerDock = ScrollableDockWidget("Outliner", Outliner::Instance());
+        _outlinerDock = ScrollableDockWidget("Outliner", &g_ui.GetOutliner());
         addDockWidget(Qt::RightDockWidgetArea, _outlinerDock);
 
         UI::LogWidget* logWidget = UI::LogWidget::Instance();
         addDockWidget(Qt::RightDockWidgetArea, ScrollableDockWidget("LogWidget", logWidget));
 
-        addDockWidget(Qt::LeftDockWidgetArea, OperatorPanel::Instance());
+        addDockWidget(Qt::LeftDockWidgetArea, &g_ui.GetOperatorPanel());
 
         _renderConfig = new RenderConfig(this);
         _renderConfig->setFloating(true);
@@ -141,11 +142,11 @@ namespace UI {
     }
 
     void MainWindow::SetOperatorName(const char* name) {
-        OperatorPanel::Instance()->SetOperatorName(name);
+        g_ui.GetOperatorPanel().SetOperatorName(name);
     }
 
     void MainWindow::SetOperatorPanel(QWidget* panel) {
-        OperatorPanel::Instance()->setWidget(panel);
+        g_ui.GetOperatorPanel().setWidget(panel);
     }
 
 } // namespace UI

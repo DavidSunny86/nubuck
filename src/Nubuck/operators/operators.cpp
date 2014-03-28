@@ -2,6 +2,7 @@
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <Nubuck\operators\operator_invoker.h>
 #include <UI\window_events.h>
+#include <UI\userinterface.h>
 #include <world\world_events.h>
 #include <world\world.h>
 #include "operator_events.h"
@@ -34,7 +35,7 @@ void Operators::Event_SetPanel(const EV::Event& event) {
         if(_ops[i].op == op) panel = _ops[i].panel;
     }
     assert(panel);
-	UI::OperatorPanel::Instance()->Clear();
+    g_ui.GetOperatorPanel().Clear();
     nubuck.ui->SetOperatorPanel(panel);
 }
 
@@ -48,7 +49,7 @@ void Operators::OnInvokeOperator(unsigned id) {
 	}
 
     printf("invoking operator with id = %d\n", id);
-    UI::OperatorPanel::Instance()->Clear();
+    g_ui.GetOperatorPanel().Clear();
     Operator* op = _ops[id].op;
     nubuck.ui->SetOperatorPanel(_ops[id].panel);
 

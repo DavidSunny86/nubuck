@@ -71,8 +71,6 @@ public:
 
     Outliner(QWidget* parent = NULL);
 
-    static Outliner* Instance(void);
-
     void HandleEvents();
 
     itemHandle_t    AddItem(const QString& name, W::Entity* entity);

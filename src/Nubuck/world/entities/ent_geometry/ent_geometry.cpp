@@ -1,4 +1,6 @@
 #include <Nubuck\system\locks\scoped_lock.h>
+#include <UI\outliner\outliner.h>
+#include <UI\userinterface.h>
 #include <world\world.h>
 #include "ent_geometry_outln.h"
 #include "ent_geometry.h"
@@ -144,7 +146,7 @@ ENT_Geometry::ENT_Geometry()
     _edgeRadius = 0.02f;
     _edgeColor = R::Color(0.3f, 0.3f, 0.3f);
 
-    _outlinerItem = UI::Outliner::Instance()->AddItem("", this);
+    _outlinerItem = g_ui.GetOutliner().AddItem("", this);
 
     SetName("Mesh");
 
@@ -275,7 +277,7 @@ void ENT_Geometry::SetEdgeRadius(float edgeRadius) {
 
     EV::Params_ENT_Geometry_EdgeRadiusChanged args = { _edgeRadius };
     EV::Event event = EV::def_ENT_Geometry_EdgeRadiusChanged.Create(args);
-    UI::Outliner::Instance()->SendToView(_outlinerItem, event);
+    g_ui.GetOutliner().SendToView(_outlinerItem, event);
 }
 
 void ENT_Geometry::SetEdgeColor(const R::Color& color) {
@@ -285,7 +287,7 @@ void ENT_Geometry::SetEdgeColor(const R::Color& color) {
 
     EV::Params_ENT_Geometry_EdgeColorChanged args = { _edgeColor };
     EV::Event event = EV::def_ENT_Geometry_EdgeColorChanged.Create(args);
-    UI::Outliner::Instance()->SendToView(_outlinerItem, event);
+    g_ui.GetOutliner().SendToView(_outlinerItem, event);
 }
 
 M::Vector3 ENT_Geometry::GetLocalCenter() const { 
@@ -333,7 +335,7 @@ void ENT_Geometry::CompileMesh() {
 
 void ENT_Geometry::SetName(const std::string& name) {
     Entity::SetName(name);
-    UI::Outliner::Instance()->SetItemName(_outlinerItem, QString::fromStdString(name));
+    g_ui.GetOutliner().SetItemName(_outlinerItem, QString::fromStdString(name));
 }
 
 void ENT_Geometry::OnDestroy() {
@@ -342,7 +344,7 @@ void ENT_Geometry::OnDestroy() {
 	_edgeRenderer->DestroyRenderMesh();
 	_renderMode &= ~(RenderMode::EDGES | RenderMode::NODES); // !!!
 
-    UI::Outliner::Instance()->DeleteItem(_outlinerItem);
+    g_ui.GetOutliner().DeleteItem(_outlinerItem);
 }
 
 leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() { return _ratPolyMesh; }
@@ -354,7 +356,7 @@ void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
 
 void ENT_Geometry::HideOutline() {
     SYS::ScopedLock lock(_mtx);
-    UI::Outliner::Instance()->HideItem(_outlinerItem);
+    g_ui.GetOutliner().HideItem(_outlinerItem);
 }
 
 void ENT_Geometry::Show() { 

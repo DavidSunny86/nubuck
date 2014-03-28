@@ -102,12 +102,6 @@ Outliner::Outliner(QWidget* parent) : QWidget(parent), _items(NULL) {
     AddEventHandler(EV::def_Outliner_Delete, this, &Outliner::Event_Delete);
 }
 
-Outliner* Outliner::Instance(void) {
-    static Outliner* instance = NULL;
-    if(!instance) instance = new Outliner();
-    return instance;
-}
-
 void Outliner::HandleEvents() {
     SYS::ScopedLock lock(_itemsMtx);
     _EV_HandleEvents(this, "Outliner");

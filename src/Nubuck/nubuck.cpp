@@ -83,6 +83,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
 
     g_ui.Init();
     W::world.GetEditMode().AddObserver(&g_ui);
+    QObject::connect(qApp, SIGNAL(aboutToQuit()), &g_ui, SLOT(OnQuit()));
 
     MainLoop mainLoop;
     mainLoop.Enter();
@@ -93,12 +94,10 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
 
     ALG::gs_algorithm.SetAlloc(algAlloc);
 
-    UI::MainWindow mainWindow;
-
     nubuck.common   = &common;
     nubuck.world    = &W::world;
     nubuck.log      = UI::LogWidget::Instance();
-    nubuck.ui       = &mainWindow;
+    nubuck.ui       = &g_ui.GetMainWindow();
 
     // REMOVEME
 	OP::g_operators.Register(new OP::TranslatePanel, new OP::Translate);
@@ -112,6 +111,6 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
 	OP::g_operators.OnInvokeOperator(0); // call OP::Translate
     OP::LoadOperators();
 
-    mainWindow.show();
+    g_ui.GetMainWindow().show();
     return app.exec();
 }

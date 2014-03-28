@@ -674,9 +674,6 @@
     <ClInclude Include="..\..\src\Nubuck\UI\block_signals.h">
       <Filter>Private\UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\UI\userinterface.h">
-      <Filter>Private\UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\world\editmode\editmode.h">
       <Filter>Private\world\editmode</Filter>
     </ClInclude>
@@ -1102,6 +1099,12 @@
     <ClCompile Include="..\..\src\Nubuck\world\editmode\editmode.cpp">
       <Filter>Private\world\editmode</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_userinterface.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_userinterface.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1190,6 +1193,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\operators\op_gen_merge\op_gen_merge.h">
       <Filter>Private\operators\op_gen_merge</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\userinterface.h">
+      <Filter>Private\UI</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
