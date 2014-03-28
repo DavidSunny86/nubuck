@@ -75,6 +75,8 @@ public:
 
     DECL_HANDLE_EVENTS(ENT_Geometry);
 
+    bool TraceVertices(const M::Ray& ray, float radius, std::vector<M::Vector3>& centers);
+
     void Select() { Entity::Select(); }
 
     void                    Select(const leda::node v);

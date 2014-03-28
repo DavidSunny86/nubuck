@@ -1,3 +1,5 @@
+#include <Nubuck\math\sphere.h>
+#include <Nubuck\math\intersections.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <UI\outliner\outliner.h>
 #include <UI\userinterface.h>
@@ -155,6 +157,18 @@ ENT_Geometry::ENT_Geometry()
     AddEventHandler(EV::def_ENT_Geometry_TransparencyChanged, this, &ENT_Geometry::Event_TransparencyChanged);
     AddEventHandler(EV::def_ENT_Geometry_RenderModeChanged, this, &ENT_Geometry::Event_RenderModeChanged);
     AddEventHandler(EV::def_ENT_Geometry_EdgeShadingChanged, this, &ENT_Geometry::Event_EdgeShadingChanged);
+}
+
+bool ENT_Geometry::TraceVertices(const M::Ray& ray, float radius, std::vector<M::Vector3>& centers) {
+    SYS::ScopedLock lock(_mtx);
+    leda::node v;
+    centers.clear();
+    forall_nodes(v, _ratPolyMesh) {
+        M::Vector3 pos = Transform(ToVector(_ratPolyMesh.position_of(v)));
+        if(M::IS::Intersects(ray, M::Sphere(pos, radius)))
+            centers.push_back(pos);
+    }
+    return !centers.empty();
 }
 
 static bool elem(const std::vector<leda::node>& set, const leda::node x) {

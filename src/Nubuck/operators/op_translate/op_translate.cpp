@@ -161,7 +161,7 @@ void Translate::Invoke() {
 
 void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
     // updates cursor position
-    OnGeometrySelected();
+    // OnGeometrySelected();
 
     if(_hidden) return;
 
@@ -245,11 +245,25 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
         _oldCursorPos = _cursorPos;
         _dragging = true;
     } else {
-        W::ENT_Geometry* geom;
-        if(W::world.Trace(ray, &geom)) {
-            if(MouseEvent::MODIFIER_SHIFT & event.mods) W::world.GetSelection()->Add(geom);
-            else W::world.GetSelection()->Set(geom);
-            return true;
+        W::editMode_t::Enum editMode = W::world.GetEditMode().GetMode();
+
+        if(W::editMode_t::OBJECTS == editMode) {
+            W::ENT_Geometry* geom;
+            if(W::world.Trace(ray, &geom)) {
+                if(MouseEvent::MODIFIER_SHIFT & event.mods) W::world.GetSelection()->Add(geom);
+                else W::world.GetSelection()->Set(geom);
+                return true;
+            }
+        }
+
+        if(W::editMode_t::VERTICES == editMode) {
+            W::ENT_Geometry* geom = (W::ENT_Geometry*)W::world.GetSelection()->GetList().front();
+            std::vector<M::Vector3> centers;
+            if(geom->TraceVertices(ray, 0.2f, centers)) {
+                _cursorPos = centers.front();
+                SetPosition(_cursorPos);
+                AlignWithCamera();
+            }
         }
     }
     return false;
