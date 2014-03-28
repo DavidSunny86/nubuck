@@ -17,6 +17,7 @@
 #include <renderer\renderer.h>
 #include <camera\arcball_camera.h>
 #include <Nubuck\events\events.h>
+#include <world\editmode\editmode.h>
 #include "entity.h"
 
 namespace W {
@@ -31,15 +32,6 @@ namespace W {
         unsigned    entId;
         std::string name;
         void*       inf;
-    };
-
-    struct EditMode {
-        enum Enum {
-            OBJECTS = 0,
-            VERTICES,
-
-            NUM_MODES
-        };
     };
 
     class World : public IWorld, public SYS::Thread, public EV::EventHandler<> {
@@ -99,10 +91,7 @@ namespace W {
         void                        BBoxes_BuildFromSelection();
         void                        BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs);
 
-        // edit mode
-        EditMode::Enum                      _editMode;
-        SYS::SpinLock                       _editModeObsMtx;
-        std::vector<EV::EventHandler<>*>    _editModeObs;
+        EditMode _editMode;
 
 #pragma region EventHandlers
         void Event_Apocalypse(const EV::Event& event);
@@ -118,10 +107,8 @@ namespace W {
     public:
 		World(void);
 
-        EditMode::Enum  GetEditMode() const { return _editMode; }
-        void            SetEditMode(const EditMode::Enum mode);
-        void            CycleEditMode();
-        void            AddEditModeObserver(EV::EventHandler<>* obs);
+        const EditMode& GetEditMode() const { return _editMode; }
+        EditMode&       GetEditMode() { return _editMode; };
 
         M::Matrix4 GetCameraMatrix() const { return _camArcball.GetWorldMatrix(); }
         M::Matrix4 GetModelView() const { return _camArcball.GetWorldMatrix(); }

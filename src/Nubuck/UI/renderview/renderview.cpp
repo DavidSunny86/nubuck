@@ -113,7 +113,7 @@ namespace UI {
 
     void RenderView::keyPressEvent(QKeyEvent* qevent) {
         if(Qt::Key_Tab == qevent->key() && !qevent->isAutoRepeat()) {
-            W::world.CycleEditMode();
+            W::world.GetEditMode().CycleModes();
             return;
         }
 

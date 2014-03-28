@@ -273,6 +273,9 @@
     <Filter Include="Private\renderer\framebuffer">
       <UniqueIdentifier>{8d3fd6aa-dfd8-4d58-8650-0167c8d35435}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\world\editmode">
+      <UniqueIdentifier>{40eedabf-585a-492d-9251-e30be4386eeb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -673,6 +676,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\UI\userinterface.h">
       <Filter>Private\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\editmode\editmode.h">
+      <Filter>Private\world\editmode</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1092,6 +1098,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\UI\userinterface.cpp">
       <Filter>Private\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\editmode\editmode.cpp">
+      <Filter>Private\world\editmode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

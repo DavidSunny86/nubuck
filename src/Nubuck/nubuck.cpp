@@ -82,7 +82,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     common.printf("INFO - Nubuck compiled with Qt version '%s'\n", QT_VERSION_STR);
 
     g_ui.Init();
-    W::world.AddEditModeObserver(&g_ui);
+    W::world.GetEditMode().AddObserver(&g_ui);
 
     MainLoop mainLoop;
     mainLoop.Enter();

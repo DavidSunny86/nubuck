@@ -372,9 +372,7 @@ void World::BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
     }
 }
 
-World::World(void) 
-    : _camArcball(800, 400) /* init values arbitrary */
-    , _editMode(EditMode::OBJECTS)
+World::World(void) : _camArcball(800, 400) /* init values arbitrary */
 {
     AddEventHandler(EV::def_Apocalypse,           this, &World::Event_Apocalypse);
     AddEventHandler(EV::def_LinkEntity,           this, &World::Event_LinkEntity);
@@ -393,29 +391,6 @@ World::World(void)
     tf.rot = M::Quaternion(0.876f, M::Vector3(-0.298f, 0.355f, 0.126f));
     tf.scale = 1.0f;
     _camArcball.SetTransform(tf);
-}
-
-void World::SetEditMode(const EditMode::Enum mode) {
-    SYS::ScopedLock lock(_editModeObsMtx);
-
-    _editMode = mode;
-
-    EV::Params_EditModeChanged args;
-    args.editMode = _editMode;
-    EV::Event event = EV::def_EditModeChanged.Create(args);
-    for(unsigned i = 0; i < _editModeObs.size(); ++i) {
-        _editModeObs[i]->Send(event);
-    }
-}
-
-void World::CycleEditMode() {
-    int nextMode = (_editMode + 1) % EditMode::NUM_MODES;
-    SetEditMode(EditMode::Enum(nextMode));
-}
-
-void World::AddEditModeObserver(EV::EventHandler<>* obs) {
-    SYS::ScopedLock lock(_editModeObsMtx);
-    _editModeObs.push_back(obs);
 }
 
 M::Ray World::PickingRay(const M::Vector2& mouseCoords) {

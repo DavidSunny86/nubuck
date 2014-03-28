@@ -19,7 +19,7 @@ namespace UI {
 
         // toolbar
         QAction*    _editModeActs[W::EditMode::NUM_MODES];
-        void        BuildToolBar();
+        void        ToolBar_Build();
     private slots:
         void        OnEditModeToObjects();
         void        OnEditModeToVertices();
@@ -34,7 +34,7 @@ namespace UI {
     public:
 		MainWindow(void);
 
-        void Toolbar_UpdateEditMode(const W::EditMode::Enum mode);
+        void ToolBar_UpdateEditMode(const W::EditMode::Enum mode);
 
         QMenu* GetSceneMenu() override { return _ui.menuScene; }
         QMenu* GetObjectMenu() override { return _ui.menuObject; }

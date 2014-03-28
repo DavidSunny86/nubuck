@@ -34,7 +34,7 @@ namespace {
 
 namespace UI {
 
-    void MainWindow::BuildToolBar() {
+    void MainWindow::ToolBar_Build() {
         struct {
             const char* icon;
             const char* text;
@@ -54,10 +54,10 @@ namespace UI {
         toolBar->addSeparator();
         addToolBar(toolBar);
 
-        Toolbar_UpdateEditMode(W::EditMode::OBJECTS);
+        ToolBar_UpdateEditMode(W::EditMode::DEFAULT);
     }
 
-    void MainWindow::Toolbar_UpdateEditMode(const W::EditMode::Enum mode) {
+    void MainWindow::ToolBar_UpdateEditMode(const W::EditMode::Enum mode) {
         for(int i = 0; i < W::EditMode::NUM_MODES; ++i) {
             bool isEnabled = mode == W::EditMode::Enum(i);
             BlockSignals blockSigs(_editModeActs[i]);
@@ -66,11 +66,11 @@ namespace UI {
     }
 
     void MainWindow::OnEditModeToObjects() { 
-        W::world.SetEditMode(W::EditMode::OBJECTS);
+        W::world.GetEditMode().SetMode(W::EditMode::OBJECTS);
     }
 
     void MainWindow::OnEditModeToVertices() { 
-        W::world.SetEditMode(W::EditMode::VERTICES);
+        W::world.GetEditMode().SetMode(W::EditMode::VERTICES);
     }
 
     void MainWindow::closeEvent(QCloseEvent*) {
@@ -121,7 +121,7 @@ namespace UI {
     MainWindow::MainWindow(void) {
         _ui.setupUi(this);
 
-        BuildToolBar();
+        ToolBar_Build();
 
         RenderView* renderView = new RenderView();
         statusBar()->addWidget(renderView->FpsLabel());

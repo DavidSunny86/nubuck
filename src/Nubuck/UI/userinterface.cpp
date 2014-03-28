@@ -8,7 +8,7 @@ UserInterface g_ui;
 void UserInterface::Event_EditModeChanged(const EV::Event& event) {
     const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
     UI::MainWindow* mainWindow = (UI::MainWindow*)nubuck.ui;
-    mainWindow->Toolbar_UpdateEditMode(W::EditMode::Enum(args.editMode));
+    mainWindow->ToolBar_UpdateEditMode(W::EditMode::Enum(args.editMode));
 }
 
 void UserInterface::Init() {
