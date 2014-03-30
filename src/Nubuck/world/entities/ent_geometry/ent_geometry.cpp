@@ -160,16 +160,16 @@ ENT_Geometry::ENT_Geometry()
     AddEventHandler(EV::def_ENT_Geometry_EdgeShadingChanged, this, &ENT_Geometry::Event_EdgeShadingChanged);
 }
 
-bool ENT_Geometry::TraceVertices(const M::Ray& ray, float radius, std::vector<M::Vector3>& centers) {
+bool ENT_Geometry::TraceVertices(const M::Ray& ray, float radius, std::vector<leda::node>& verts) {
     SYS::ScopedLock lock(_mtx);
     leda::node v;
-    centers.clear();
+    verts.clear();
     forall_nodes(v, _ratPolyMesh) {
         M::Vector3 pos = Transform(ToVector(_ratPolyMesh.position_of(v)));
         if(M::IS::Intersects(ray, M::Sphere(pos, radius)))
-            centers.push_back(pos);
+            verts.push_back(v);
     }
-    return !centers.empty();
+    return !verts.empty();
 }
 
 static bool elem(const std::vector<leda::node>& set, const leda::node x) {
@@ -186,6 +186,11 @@ void ENT_Geometry::Select(const leda::node v) {
 std::vector<leda::node> ENT_Geometry::GetVertexSelection() const {
     SYS::ScopedLock lock(_mtx);
     return _vertexSelection;
+}
+
+void ENT_Geometry::ClearVertexSelection() {
+    SYS::ScopedLock lock(_mtx);
+    _vertexSelection.clear();
 }
 
 UI::OutlinerView* ENT_Geometry::CreateOutlinerView() {
@@ -363,6 +368,8 @@ void ENT_Geometry::OnDestroy() {
 }
 
 leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() { return _ratPolyMesh; }
+
+const leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() const { return _ratPolyMesh; }
 
 void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
 	SYS::ScopedLock lock(_mtx);

@@ -51,9 +51,10 @@ private:
 
     void SetPosition(const M::Vector3& pos);
 
-    M::Vector3              _cursorPos;
-    M::Vector3              _oldCursorPos;
-    std::vector<M::Vector3> _oldGeomPos;
+    M::Vector3                      _cursorPos;
+    M::Vector3              		_oldCursorPos;
+    std::vector<M::Vector3> 		_oldGeomPos;
+    leda::node_array<M::Vector3>    _oldVertPos;
 
     bool        _dragging;
     int         _dragAxis;

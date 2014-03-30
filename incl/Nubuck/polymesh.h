@@ -224,6 +224,7 @@ inline const R::Color& PolyMesh<VEC3>::color_of(const face f) const {
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_position(const node v, const VEC3& p) {
+    _vatt_cached[v] = false;
     LEDA_ACCESS(VEC3, entry(v)) = p;
 }
 

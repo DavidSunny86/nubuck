@@ -219,6 +219,38 @@ static M::Vector3 EyeZ(const M::Matrix4& modelView) {
     return M::Transform(invM, M::Vector3(0.0f, 0.0f, 1.0f));
 }
 
+static M::Vector3 ToVector(const leda::d3_rat_point& p) { // TODO: duplicate of ent_geometry.cpp:ToVector
+    const leda::d3_point fp = p.to_float();
+    return M::Vector3(fp.xcoord(), fp.ycoord(), fp.zcoord());
+}
+
+static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
+    const leda::rational x = v.x;
+    const leda::rational y = v.y;
+    const leda::rational z = v.z;
+    return leda::d3_rat_point(x, y, z);
+}
+
+static M::Vector3 FindCursorPosition(ISelection* sel) {
+    const W::editMode_t::Enum editMode = W::world.GetEditMode().GetMode();
+
+    if(W::editMode_t::OBJECTS == editMode) return sel->GetGlobalCenter();
+    
+    if(W::editMode_t::VERTICES == editMode) {
+        W::ENT_Geometry* geom = (W::ENT_Geometry*)sel->GetList().front();
+        std::vector<leda::node> verts = geom->GetVertexSelection();
+        M::Vector3 pos = M::Vector3::Zero;
+        for(unsigned i = 0; i < verts.size(); ++i) {
+            pos += geom->Transform(ToVector(geom->GetRatPolyMesh().position_of(verts[i])));
+        }
+        float d = 1.0f / verts.size();
+        return d * pos;
+    }
+
+    assert(false && "unreachable");
+    return M::Vector3::Zero;
+}
+
 bool Translate::OnMouseDown(const MouseEvent& event) {
 	if(MouseEvent::BUTTON_RIGHT != event.button) return false;
 
@@ -228,6 +260,8 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
 
     int         axis;
     M::IS::Info inf;
+
+    const W::editMode_t::Enum editMode = W::world.GetEditMode().GetMode();
 
     if(!W::world.GetSelection()->GetList().empty() && TraceCursor(ray, axis, &inf)) {
         M::Vector3 eyeZ = EyeZ(W::world.GetModelView());
@@ -239,14 +273,27 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
         _dragOrig = inf.where;
 
         const std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
-        _oldGeomPos.resize(geomList.size());
-        for(unsigned i = 0; i < _oldGeomPos.size(); ++i) 
-            _oldGeomPos[i] = ((const W::ENT_Geometry*)geomList[i])->Transform(M::Vector3::Zero);
+
+        if(W::editMode_t::OBJECTS == editMode) {
+            _oldGeomPos.resize(geomList.size());
+            for(unsigned i = 0; i < _oldGeomPos.size(); ++i) 
+                _oldGeomPos[i] = ((const W::ENT_Geometry*)geomList[i])->Transform(M::Vector3::Zero);
+        }
+
+        if(W::editMode_t::VERTICES == editMode) {
+            const W::ENT_Geometry* geom = (const W::ENT_Geometry*)geomList[0];
+            const leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+            _oldVertPos.init(mesh);
+            leda::node v;
+            forall_nodes(v, mesh) {
+                const M::Vector3 pos = ToVector(mesh.position_of(v));
+                _oldVertPos[v] = pos;
+            }
+        }
+
         _oldCursorPos = _cursorPos;
         _dragging = true;
     } else {
-        W::editMode_t::Enum editMode = W::world.GetEditMode().GetMode();
-
         if(W::editMode_t::OBJECTS == editMode) {
             W::ENT_Geometry* geom;
             if(W::world.Trace(ray, &geom)) {
@@ -258,9 +305,11 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
 
         if(W::editMode_t::VERTICES == editMode) {
             W::ENT_Geometry* geom = (W::ENT_Geometry*)W::world.GetSelection()->GetList().front();
-            std::vector<M::Vector3> centers;
-            if(geom->TraceVertices(ray, 0.2f, centers)) {
-                _cursorPos = centers.front();
+            std::vector<leda::node> verts;
+            if(geom->TraceVertices(ray, 0.2f, verts)) {
+                if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) geom->ClearVertexSelection();
+                geom->Select(verts[0]);
+                _cursorPos = FindCursorPosition(W::world.GetSelection());
                 SetPosition(_cursorPos);
                 AlignWithCamera();
             }
@@ -287,12 +336,32 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
         _cursorPos.vec[_dragAxis] = _oldCursorPos.vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
         SetPosition(_cursorPos);
 
-        const std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
-        for(unsigned i = 0; i < geomList.size(); ++i) {
-            IGeometry* geom = geomList[i];
-            M::Vector3 pos = _oldGeomPos[i];
-            pos.vec[_dragAxis] = _oldGeomPos[i].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
-            geom->SetPosition(pos.x, pos.y, pos.z);
+        const W::editMode_t::Enum editMode = W::world.GetEditMode().GetMode();
+
+        std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
+
+        if(W::editMode_t::OBJECTS == editMode) {
+            for(unsigned i = 0; i < geomList.size(); ++i) {
+                IGeometry* geom = geomList[i];
+                M::Vector3 pos = _oldGeomPos[i];
+                pos.vec[_dragAxis] = _oldGeomPos[i].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
+                geom->SetPosition(pos.x, pos.y, pos.z);
+            }
+        }
+
+        if(W::editMode_t::VERTICES == editMode) {
+            W::ENT_Geometry* geom = (W::ENT_Geometry*)geomList[0];
+            leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+
+            std::vector<leda::node> verts = geom->GetVertexSelection();
+            assert(!verts.empty());
+
+            for(unsigned i = 0; i < verts.size(); ++i) {
+                const leda::node v = verts[i];
+                M::Vector3 pos = _oldVertPos[v];
+                pos.vec[_dragAxis] = _oldVertPos[v].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
+                mesh.set_position(v, ToRatPoint(pos));
+            }
         }
 
         AlignWithCamera();
@@ -302,7 +371,9 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
 }
 
 void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {
-    std::cout << "edit mode changed!" << std::endl;
+    _cursorPos = FindCursorPosition(W::world.GetSelection());
+    SetPosition(_cursorPos);
+    AlignWithCamera();
 }
 
 bool Translate::OnMouse(const MouseEvent& event) {

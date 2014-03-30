@@ -75,12 +75,13 @@ public:
 
     DECL_HANDLE_EVENTS(ENT_Geometry);
 
-    bool TraceVertices(const M::Ray& ray, float radius, std::vector<M::Vector3>& centers);
+    bool TraceVertices(const M::Ray& ray, float radius, std::vector<leda::node>& verts);
 
     void Select() { Entity::Select(); }
 
     void                    Select(const leda::node v);
     std::vector<leda::node> GetVertexSelection() const;
+    void                    ClearVertexSelection();
 
     bool IsSolid() const { return _isSolid; }
 
@@ -100,7 +101,8 @@ public:
 
     UI::OutlinerView* CreateOutlinerView() override;
 
-    leda::nb::RatPolyMesh& GetRatPolyMesh() override;
+    leda::nb::RatPolyMesh&          GetRatPolyMesh() override;
+    const leda::nb::RatPolyMesh&    GetRatPolyMesh() const;
     void Rebuild();
 
     void ApplyTransformation() override;

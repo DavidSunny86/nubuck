@@ -86,6 +86,9 @@ void Driver::Event_Mouse(const EV::Event& event) {
                 op->Invoke();
             }
             ret = 1;
+
+            // TODO: remove me
+            W::world.Send(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
         }
     }
     if(!ret) {
