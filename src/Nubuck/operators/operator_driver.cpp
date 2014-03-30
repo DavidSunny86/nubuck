@@ -26,6 +26,7 @@ void Driver::Event_Push(const EV::Event& event) {
 	_activeOps.push_back(args.op);
 	args.op->Invoke();
     W::world.Send(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
+	g_operators.Send(EV::def_OP_ActionFinished.Create(EV::Params_OP_ActionFinished()));
 }
 
 void Driver::Event_SelectionChanged(const EV::Event& event) {
@@ -118,11 +119,6 @@ Driver::Driver(
 	AddEventHandler(EV::def_CameraChanged, this, &Driver::Event_CameraChanged);
     AddEventHandler(EV::def_EditModeChanged, this, &Driver::Event_EditModeChanged);
 	AddEventHandler(EV::def_Mouse, this, &Driver::Event_Mouse);
-}
-
-Operator* Driver::GetActiveOperator() {
-	SYS::ScopedLock  lock(_activeOpsMtx);
-    return ActiveOperator();
 }
 
 DWORD Driver::Thread_Func() {

@@ -92,7 +92,7 @@ void World::Selection::ComputeCenter() {
 
 void World::Selection::SignalChange() {
     world.Send(EV::def_SelectionChanged.Create(EV::Params_SelectionChanged()));
-	OP::g_operators.InvokeEvent(EV::def_SelectionChanged.Create(EV::Params_SelectionChanged()));
+	OP::g_operators.Send(EV::def_SelectionChanged.Create(EV::Params_SelectionChanged()));
 }
 
 void World::Selection::Set(IGeometry* geom) {

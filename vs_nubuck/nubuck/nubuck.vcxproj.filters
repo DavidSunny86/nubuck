@@ -1111,6 +1111,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_userinterface.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\operator_modules.cpp">
+      <Filter>Private\operators</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">

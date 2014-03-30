@@ -34,8 +34,6 @@ public:
         std::vector<R::MeshJob>& meshJobs, SYS::SpinLock& meshJobsMtx
 		);
 
-    Operator* GetActiveOperator();
-
     DWORD Thread_Func(void) override;
 };
 
