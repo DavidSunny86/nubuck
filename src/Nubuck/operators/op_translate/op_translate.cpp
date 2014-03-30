@@ -222,14 +222,14 @@ static M::Vector3 EyeZ(const M::Matrix4& modelView) {
 bool Translate::OnMouseDown(const MouseEvent& event) {
 	if(MouseEvent::BUTTON_RIGHT != event.button) return false;
 
-    if(_dragging || W::world.GetSelection()->GetList().empty()) return false;
+    if(_dragging) return false;
 
     M::Ray ray = W::world.PickingRay(event.coords);
 
     int         axis;
     M::IS::Info inf;
 
-    if(TraceCursor(ray, axis, &inf)) {
+    if(!W::world.GetSelection()->GetList().empty() && TraceCursor(ray, axis, &inf)) {
         M::Vector3 eyeZ = EyeZ(W::world.GetModelView());
         M::Vector3 vAxis = Axis(axis);
         _dragAxis = axis;
