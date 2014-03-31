@@ -10,10 +10,13 @@
 
 namespace UI {
 
+    class RenderView;
+
 	class MainWindow : public QMainWindow, public IMainWindow {
         Q_OBJECT
 	private:
 		Ui::MainWindow  _ui;
+        RenderView*     _renderView;
         RenderConfig*   _renderConfig;
         QDockWidget*    _outlinerDock;
 
@@ -35,6 +38,8 @@ namespace UI {
 		MainWindow(void);
 
         void ToolBar_UpdateEditMode(const W::editMode_t::Enum mode);
+
+        RenderView* GetRenderView() { return _renderView; }
 
         QMenu* GetSceneMenu() override { return _ui.menuScene; }
         QMenu* GetObjectMenu() override { return _ui.menuObject; }

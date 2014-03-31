@@ -124,9 +124,9 @@ namespace UI {
 
         ToolBar_Build();
 
-        RenderView* renderView = new RenderView();
-        statusBar()->addWidget(renderView->FpsLabel());
-        setCentralWidget(renderView);
+        _renderView = new RenderView();
+        statusBar()->addWidget(_renderView->FpsLabel());
+        setCentralWidget(_renderView);
 
         _outlinerDock = ScrollableDockWidget("Outliner", &g_ui.GetOutliner());
         addDockWidget(Qt::RightDockWidgetArea, _outlinerDock);

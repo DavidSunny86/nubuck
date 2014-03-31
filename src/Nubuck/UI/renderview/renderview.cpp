@@ -22,32 +22,11 @@ namespace UI {
         W::world.Send(EV::def_Resize.Create(args));
 
         _renderer.Resize(width, height);
-        paintGL();
-    }
-
-    void RenderView::paintGL(void) {
-        if(1.0f <= (_time += _rtimer.Stop())) {
-            float fps = _numFrames / _time;
-            _numFrames = 0;
-            _time = 0.0f;
-
-            if(_fpsLabel) _fpsLabel->setText(QString("fps = %1").arg(fps));
-        }
-        _numFrames++;
-        _rtimer.Start();
-
-        _renderList.Clear();
-        W::world.Render(_renderList);
-        OP::g_operators.GetMeshJobs(_renderList.meshJobs);
-
-        _renderer.BeginFrame();
-        _renderer.Render(_renderList);
-        _renderer.EndFrame();
+        Render();
     }
 
     void RenderView::finishResizeGL() {
         _renderer.FinishResize();
-        paintGL();
     }
 
     bool RenderView::focusNextPrevChild(bool) {
@@ -134,16 +113,31 @@ namespace UI {
     RenderView::RenderView(QWidget* parent) : glWidget_t(parent), _fpsLabel(NULL) {        
         setFocusPolicy(Qt::StrongFocus);
         setMouseTracking(true);
-
-        connect(&_timer, SIGNAL(timeout()), this, SLOT(Update()));
-        _timer.start();
     }
 
     RenderView::~RenderView(void) {
 		R::effectMgr.FreeResources();
     }
 
-    void RenderView::Update(void) {
+    void RenderView::Render() {
+        if(1.0f <= (_time += _rtimer.Stop())) {
+            float fps = _numFrames / _time;
+            _numFrames = 0;
+            _time = 0.0f;
+
+            if(_fpsLabel) _fpsLabel->setText(QString("fps = %1").arg(fps));
+        }
+        _numFrames++;
+        _rtimer.Start();
+
+        _renderList.Clear();
+        W::world.Render(_renderList);
+        OP::g_operators.GetMeshJobs(_renderList.meshJobs);
+
+        _renderer.BeginFrame();
+        _renderer.Render(_renderList);
+        _renderer.EndFrame();
+
         updateGL();
     }
 

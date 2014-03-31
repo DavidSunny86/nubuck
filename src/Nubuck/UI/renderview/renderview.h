@@ -3,7 +3,6 @@
 #include <renderer\glew\glew.h>
 #include <QLabel>
 #include <QGLWidget>
-#include <QTimer.h>
 
 #include <system\timer\timer.h>
 #include <world\world.h>
@@ -18,8 +17,6 @@ namespace UI {
     private:
         QLabel* _fpsLabel;
 
-        QTimer _timer;
-
         int         _numFrames;
         float       _time;
         SYS::Timer  _rtimer;
@@ -29,7 +26,6 @@ namespace UI {
     protected:
         void initializeGL(void) override;
         void resizeGL(int width, int height) override;
-        void paintGL(void) override;
         void finishResizeGL() override;
 
         bool focusNextPrevChild(bool next) override;
@@ -41,8 +37,6 @@ namespace UI {
         void wheelEvent(QWheelEvent* event) override;
         void keyPressEvent(QKeyEvent* event) override;
         void keyReleaseEvent(QKeyEvent* event) override;
-    public slots:
-        void Update(void);
     public:
         typedef GLWidget glWidget_t;
 
@@ -53,6 +47,8 @@ namespace UI {
 
         RenderView(QWidget* parent = NULL);
         ~RenderView(void);
+
+        void Render();
 
         QLabel* FpsLabel(void);
     };
