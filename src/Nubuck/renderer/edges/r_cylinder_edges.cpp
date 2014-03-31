@@ -140,13 +140,16 @@ void CylinderEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4&)
 void CylinderEdges::BuildRenderMesh() {
 	SYS::ScopedLock lock(_mtx);
 
+    M::Matrix4 lastTransform = M::Mat4::Identity();
+    if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
+
     if(_needsRebuild) {
         if(_mesh) DestroyMesh();
 
 		if(!_edges.empty()) {
             _mesh = meshMgr.Create(_meshDesc);
             _tfmesh = meshMgr.Create(_mesh);
-            meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
+            meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
 		}
 
         _needsRebuild = false;
