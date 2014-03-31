@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtGui\QMainwindow.h>
+#include <QWidgetAction>
 
 #include <Nubuck\nubuck.h>
 #include <common\types.h>
@@ -19,6 +20,20 @@ namespace UI {
         RenderView*     _renderView;
         RenderConfig*   _renderConfig;
         QDockWidget*    _outlinerDock;
+
+        // operator menus
+        struct OperatorMenu {
+            W::editMode_t::Enum mode;
+            QMenu*              menu;
+            QToolButton*    	button;
+            QWidgetAction*  	action;
+
+            OperatorMenu(QWidget* parent, const W::editMode_t::Enum mode, const QString& name);
+        };
+        enum { MENU_SCENE = 0, MENU_OBJECT, MENU_ALGORITHMS, MENU_VERTEX, NUM_MENUS };
+        GEN::Pointer<OperatorMenu> _opMenus[NUM_MENUS]; 
+        void OperatorMenus_Build();
+
 
         // toolbar
         QAction*    _editModeActs[W::editMode_t::NUM_MODES];
@@ -41,9 +56,11 @@ namespace UI {
 
         RenderView* GetRenderView() { return _renderView; }
 
-        QMenu* GetSceneMenu() override { return _ui.menuScene; }
-        QMenu* GetObjectMenu() override { return _ui.menuObject; }
-        QMenu* GetAlgorithmMenu() override { return _ui.menuAlgorithms; }
+        QMenu* GetSceneMenu() override      { return _opMenus[MENU_SCENE]->menu; }
+        QMenu* GetObjectMenu() override     { return _opMenus[MENU_OBJECT]->menu; }
+        QMenu* GetAlgorithmMenu() override  { return _opMenus[MENU_ALGORITHMS]->menu; }
+        QMenu* GetVertexMenu() override     { return _opMenus[MENU_VERTEX]->menu; }
+
         void SetOperatorName(const char* name) override;
         void SetOperatorPanel(QWidget* widget) override;
 	};

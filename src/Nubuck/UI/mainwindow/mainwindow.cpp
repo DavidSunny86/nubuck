@@ -1,4 +1,5 @@
 #include <QToolBar>
+#include <QToolButton>
 #include <QFileDialog>
 #include <QScrollArea>
 #include <QDockWidget>
@@ -53,7 +54,10 @@ namespace UI {
             _editModeActs[i]->setCheckable(true);
         }
         toolBar->addSeparator();
-        addToolBar(toolBar);
+
+        for(unsigned i = 0; i < NUM_MENUS; ++i) toolBar->addAction(_opMenus[i]->action);
+
+        addToolBar(Qt::TopToolBarArea, toolBar);
 
         ToolBar_UpdateEditMode(W::editMode_t::DEFAULT);
     }
@@ -63,6 +67,10 @@ namespace UI {
             bool isEnabled = mode == W::editMode_t::Enum(i);
             BlockSignals blockSigs(_editModeActs[i]);
             _editModeActs[i]->setChecked(isEnabled);
+        }
+
+        for(unsigned i = 0; i < NUM_MENUS; ++i) {
+            _opMenus[i]->action->setVisible(_opMenus[i]->mode == mode);
         }
     }
 
@@ -119,9 +127,29 @@ namespace UI {
 		}
 	}
 
+    MainWindow::OperatorMenu::OperatorMenu(QWidget* parent, const W::editMode_t::Enum mode, const QString& name) {
+        this->mode = mode;
+        menu = new QMenu(name);
+        button = new QToolButton();
+        button->setObjectName("menuButton");
+        button->setText(name);
+        button->setMenu(menu);
+        button->setPopupMode(QToolButton::InstantPopup);
+        action = new QWidgetAction(parent);
+        action->setDefaultWidget(button);
+    }
+
+    void MainWindow::OperatorMenus_Build() {
+        _opMenus[MENU_SCENE]        = GEN::MakePtr(new OperatorMenu(this, W::editMode_t::OBJECTS,    "Scene"));
+        _opMenus[MENU_OBJECT]       = GEN::MakePtr(new OperatorMenu(this, W::editMode_t::OBJECTS,    "Object"));
+        _opMenus[MENU_ALGORITHMS]   = GEN::MakePtr(new OperatorMenu(this, W::editMode_t::OBJECTS,    "Algorithms"));
+        _opMenus[MENU_VERTEX]       = GEN::MakePtr(new OperatorMenu(this, W::editMode_t::VERTICES,   "Vertex"));
+    }
+
     MainWindow::MainWindow(void) {
         _ui.setupUi(this);
 
+        OperatorMenus_Build();
         ToolBar_Build();
 
         _renderView = new RenderView();

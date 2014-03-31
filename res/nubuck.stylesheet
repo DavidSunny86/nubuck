@@ -94,6 +94,19 @@ QToolButton {
     padding-right:  1px;
 }
 
+QToolButton#menuButton {
+    color:              #B1B1B1;
+    background-color:   #2E2E2E;
+
+    border-width: 1px;
+    border-style: none;
+
+    padding-top:    1px;
+    padding-bottom: 1px;
+    padding-left:   1px;
+    padding-right:  10px;
+}
+
 QLineEdit {
     border-color:   #1E1E1E;
     border-style:   solid;

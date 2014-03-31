@@ -26,12 +26,6 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuScene">
-    <property name="title">
-     <string>Scene</string>
-    </property>
-    <addaction name="actRandomPoints"/>
-   </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
      <string>View</string>
@@ -39,26 +33,13 @@
     <addaction name="actShowRenderMetrics"/>
     <addaction name="actShowRenderConfig"/>
    </widget>
-   <widget class="QMenu" name="menuObject">
-    <property name="title">
-     <string>Object</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
     <addaction name="actLoadOperatorPlugin"/>
    </widget>
-   <widget class="QMenu" name="menuAlgorithms">
-    <property name="title">
-     <string>Algorithms</string>
-    </property>
-   </widget>
-   <addaction name="menuScene"/>
    <addaction name="menuView"/>
-   <addaction name="menuObject"/>
-   <addaction name="menuAlgorithms"/>
    <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
