@@ -12,6 +12,7 @@ void ConvexHull::Register(const Nubuck& nb, Invoker& invoker) {
     _nb = nb;
 
     QAction* action = _nb.ui->GetObjectMenu()->addAction("Convex Hull");
+    action->setShortcut(QKeySequence("C"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 

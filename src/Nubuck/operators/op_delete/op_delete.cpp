@@ -9,6 +9,7 @@ void Delete::Register(const Nubuck& nb, Invoker& invoker) {
     _nb = nb;
 
     QAction* action = _nb.ui->GetObjectMenu()->addAction("Delete");
+    action->setShortcut(QKeySequence("D"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
