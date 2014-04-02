@@ -154,6 +154,7 @@
       </Command>
     </CustomBuild>
     <ClInclude Include="..\..\src\Nubuck\operators\op_join\op_join.h" />
+    <ClInclude Include="..\..\src\Nubuck\operators\op_merge_vertices\op_merge_vertices.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_translate\op_translate.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges.h" />
@@ -422,6 +423,7 @@
     <ClCompile Include="..\..\src\Nubuck\operators\op_join\op_join.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_loop\op_loop.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\operators\op_merge_vertices\op_merge_vertices.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_translate\op_translate.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\standard_algorithm.cpp" />
     <ClCompile Include="..\..\src\Nubuck\polymesh\polymesh.cpp" />

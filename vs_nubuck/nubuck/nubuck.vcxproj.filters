@@ -279,6 +279,9 @@
     <Filter Include="Public\world">
       <UniqueIdentifier>{3273423e-9561-455b-8a68-d938cfef1e4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_merge_vertices">
+      <UniqueIdentifier>{e7919955-ff40-465f-badf-a52632393ee4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -682,6 +685,9 @@
     </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\world\editmode.h">
       <Filter>Public\world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_merge_vertices\op_merge_vertices.h">
+      <Filter>Private\operators\op_merge_vertices</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1113,6 +1119,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\operators\operator_modules.cpp">
       <Filter>Private\operators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_merge_vertices\op_merge_vertices.cpp">
+      <Filter>Private\operators\op_merge_vertices</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
