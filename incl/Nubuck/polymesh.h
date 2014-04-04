@@ -79,8 +79,6 @@ public:
     void set_color(const face f, const R::Color& color);
 
     edge make_triangle(const VEC3& p0, const VEC3& p1, const VEC3& p2);
-
-    node merge_nodes(node v1, node v2);
 };
 
 typedef PolyMesh<d3_rat_point> RatPolyMesh;
@@ -308,11 +306,6 @@ edge PolyMesh<VEC3>::make_triangle(const VEC3& p0, const VEC3& p1, const VEC3& p
     _fatt_visible[face_of(b[0])] = false;
 
     return f[0];
-}
-
-template<typename TYPE>
-node PolyMesh<TYPE>::merge_nodes(node v1, node v2) {
-    return v1;
 }
 
 struct OBJ_Face {
