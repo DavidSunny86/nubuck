@@ -63,6 +63,11 @@ struct IGeometry {
 };
 
 struct ISelection {
+    enum SelectMode {
+        SELECT_NEW = 0,
+        SELECT_ADD
+    };
+
     virtual ~ISelection() { }
 
     virtual void Set(IGeometry* geom) = 0;
@@ -71,6 +76,8 @@ struct ISelection {
 
     virtual M::Vector3 GetGlobalCenter() = 0;
     virtual std::vector<IGeometry*> GetList() const = 0;
+
+    virtual void SelectVertex(SelectMode mode, IGeometry* geom, leda::node vert) = 0;
 };
 
 struct IWorld {

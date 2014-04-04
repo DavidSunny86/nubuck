@@ -80,11 +80,11 @@ void MergeVertices::Invoke() {
     leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
     assert(EdgeEx(mesh, verts[0], verts[1]));
     // mesh.merge_nodes(verts[0], verts[1]);
-    merge_vertices(mesh, verts[0], verts[1]);
+    leda::node vert = merge_vertices(mesh, verts[0], verts[1]);
     leda::list<leda::edge> r;
     std::cout << "|r| = " << r.size() << std::endl;
     mesh.compute_faces();
-    geom->ClearVertexSelection();
+    sel->SelectVertex(ISelection::SELECT_NEW, geom, vert);
 }
 
 } // namespace OP

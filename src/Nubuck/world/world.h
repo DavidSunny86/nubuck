@@ -54,6 +54,8 @@ namespace W {
 
             M::Vector3 GetGlobalCenter() override;
             std::vector<IGeometry*> GetList() const override;
+
+            void SelectVertex(SelectMode mode, IGeometry* geom, leda::node vert) override;
         } _selection;
 
         std::vector<GEN::Pointer<Entity> > _entities;

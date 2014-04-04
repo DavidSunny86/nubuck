@@ -144,6 +144,14 @@ std::vector<IGeometry*> World::Selection::GetList() const {
     return geomList; 
 }
 
+void World::Selection::SelectVertex(SelectMode mode, IGeometry* geom, leda::node vert) {
+    SYS::ScopedLock lock(_mtx);
+    W::ENT_Geometry* ent = (W::ENT_Geometry*)geom;
+    if(SELECT_NEW == mode) ent->ClearVertexSelection();
+    ent->Select(vert);
+    SignalChange();
+}
+
 // --- Selection Impl
 
 static M::Vector3 Transform(const M::Matrix4& mat, const M::Vector3& vec, float w) {

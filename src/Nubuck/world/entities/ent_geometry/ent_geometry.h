@@ -79,9 +79,11 @@ public:
 
     void Select() { Entity::Select(); }
 
+    // NOTE: these methods should only be called by ISelection
     void                    Select(const leda::node v);
-    std::vector<leda::node> GetVertexSelection() const;
     void                    ClearVertexSelection();
+
+    std::vector<leda::node> GetVertexSelection() const;
 
     bool IsSolid() const { return _isSolid; }
 

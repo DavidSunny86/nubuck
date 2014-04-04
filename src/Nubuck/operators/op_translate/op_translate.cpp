@@ -323,8 +323,9 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
             W::ENT_Geometry* geom = (W::ENT_Geometry*)W::world.GetSelection()->GetList().front();
             std::vector<leda::node> verts;
             if(geom->TraceVertices(ray, 0.2f, verts)) {
-                if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) geom->ClearVertexSelection();
-                geom->Select(verts[0]);
+                ISelection::SelectMode selectMode = ISelection::SELECT_ADD;
+                if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = ISelection::SELECT_NEW;
+                W::world.GetSelection()->SelectVertex(selectMode, geom, verts[0]);
                 SetCursorPosition(FindCursorPosition(W::world.GetSelection()));
             }
         }
