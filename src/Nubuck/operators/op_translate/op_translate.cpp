@@ -106,7 +106,7 @@ static void SetCenterPosition(M::Box& box, const M::Vector3& center) {
     box.max += d;
 }
 
-void Translate::SetPosition(const M::Vector3& pos) {
+void Translate::SetRenderPosition(const M::Vector3& pos) {
     M::Matrix4 T = M::Mat4::Translate(pos);
     R::meshMgr.GetMesh(_axisTFMesh).SetTransform(T);
     for(int i = 0; i < DIM; ++i) {
@@ -122,17 +122,29 @@ void Translate::SetPosition(const M::Vector3& pos) {
     }
 }
 
-void Translate::AlignWithCamera() {
-    M::Matrix4 eyeToWorld, worldToEye = W::world.GetModelView();
+/*
+====================
+AlignWithCamera
+    moves vector v at constant distance to camera.
+    note: worldToEye = modelview matrix
+====================
+*/
+static M::Vector3 AlignWithCamera(const M::Matrix4& worldToEye, const M::Vector3& v) {
+    M::Matrix4 eyeToWorld;
     bool r = true;
     r = M::TryInvert(worldToEye, eyeToWorld);
-    assert(r);
+    COM_assert(r);
     M::Vector3 eye = M::Transform(eyeToWorld, M::Vector3::Zero); // eye pos in world space
     const float c = 10.0f;
-    M::Vector3 d = _cursorPos - eye;
+    M::Vector3 d = v - eye;
     M::Matrix4 M = M::Mat4::Translate(-(d.Length() - c) * M::Normalize(d));
-    W::ENT_Geometry* ent = NULL;
-    SetPosition(M::Transform(M, _cursorPos));
+    return M::Transform(M, v);
+}
+
+void Translate::SetCursorPosition(const M::Vector3& pos) {
+    _cursorPos = pos;
+    M::Vector3 renderPos = AlignWithCamera(W::world.GetModelView(), _cursorPos);
+    SetRenderPosition(renderPos);
 }
 
 void Translate::Register(const Nubuck& nb, Invoker& invoker) {
@@ -160,9 +172,6 @@ void Translate::Invoke() {
 }
 
 void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
-    // updates cursor position
-    // OnGeometrySelected();
-
     if(_hidden) return;
 
     R::MeshJob meshJob;
@@ -185,19 +194,11 @@ void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
 }
 
 void Translate::OnGeometrySelected() {
-	if(W::world.GetSelection()->GetList().empty()) HideCursor();
-    else {
-        _cursorPos = W::world.GetSelection()->GetGlobalCenter();
-        SetPosition(_cursorPos);
-
-        AlignWithCamera();
-        ShowCursor();
-    }
+    UpdateCursor();
 }
 
 void Translate::OnCameraChanged() {
-    if(!W::world.GetSelection()->GetList().empty()) // ie. cursor is visible
-        AlignWithCamera();
+    SetCursorPosition(_cursorPos); // updates renderpos
 }
 
 bool Translate::TraceCursor(const M::Ray& ray, int& axis, M::IS::Info* inf) {
@@ -249,6 +250,21 @@ static M::Vector3 FindCursorPosition(ISelection* sel) {
 
     assert(false && "unreachable");
     return M::Vector3::Zero;
+}
+
+/*
+====================
+Translate::UpdateCursor
+    updates visibility and position
+====================
+*/
+void Translate::UpdateCursor() {
+    ISelection* sel = W::world.GetSelection();
+	if(sel->GetList().empty()) HideCursor();
+    else {
+        SetCursorPosition(FindCursorPosition(sel));
+        ShowCursor();
+    }
 }
 
 bool Translate::OnMouseDown(const MouseEvent& event) {
@@ -303,15 +319,13 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
             }
         }
 
-        if(W::editMode_t::VERTICES == editMode) {
+        if(W::editMode_t::VERTICES == editMode && !W::world.GetSelection()->GetList().empty()) {
             W::ENT_Geometry* geom = (W::ENT_Geometry*)W::world.GetSelection()->GetList().front();
             std::vector<leda::node> verts;
             if(geom->TraceVertices(ray, 0.2f, verts)) {
                 if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) geom->ClearVertexSelection();
                 geom->Select(verts[0]);
-                _cursorPos = FindCursorPosition(W::world.GetSelection());
-                SetPosition(_cursorPos);
-                AlignWithCamera();
+                SetCursorPosition(FindCursorPosition(W::world.GetSelection()));
             }
         }
     }
@@ -333,8 +347,9 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
         bool is = M::IS::Intersects(ray, _dragPlane, &inf);
         assert(is);
         M::Vector3 p = inf.where;
-        _cursorPos.vec[_dragAxis] = _oldCursorPos.vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
-        SetPosition(_cursorPos);
+        M::Vector3 pos = _cursorPos;
+        pos.vec[_dragAxis] = _oldCursorPos.vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
+        SetCursorPosition(pos);
 
         const W::editMode_t::Enum editMode = W::world.GetEditMode().GetMode();
 
@@ -363,17 +378,13 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
                 mesh.set_position(v, ToRatPoint(pos));
             }
         }
-
-        AlignWithCamera();
         return true;
     }
     return false;
 }
 
 void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {
-    _cursorPos = FindCursorPosition(W::world.GetSelection());
-    SetPosition(_cursorPos);
-    AlignWithCamera();
+    UpdateCursor();
 }
 
 bool Translate::OnMouse(const MouseEvent& event) {

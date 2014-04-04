@@ -49,9 +49,12 @@ private:
     void ShowCursor();
     void HideCursor();
 
-    void SetPosition(const M::Vector3& pos);
+    void UpdateCursor();
 
-    M::Vector3                      _cursorPos;
+    void SetRenderPosition(const M::Vector3& pos);
+    void SetCursorPosition(const M::Vector3& pos);
+
+    M::Vector3                      _cursorPos; // use cursorPos as readonly and SetCursorPosition() for writes
     M::Vector3              		_oldCursorPos;
     std::vector<M::Vector3> 		_oldGeomPos;
     leda::node_array<M::Vector3>    _oldVertPos;
@@ -60,8 +63,6 @@ private:
     int         _dragAxis;
     M::Vector3  _dragOrig;
     M::Plane    _dragPlane;
-
-    void AlignWithCamera();
 
     bool TraceCursor(const M::Ray& ray, int& axis, M::IS::Info* inf = NULL);
 
