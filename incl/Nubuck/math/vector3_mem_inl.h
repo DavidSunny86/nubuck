@@ -28,6 +28,13 @@ namespace M {
 		return *this;
 	}
 
+	M_INLINE Vector3& Vector3::operator-=(const Vector3& other) {
+		x -= other.x;
+		y -= other.y;
+		z -= other.z;
+		return *this;
+	}
+
 	M_INLINE Vector3& Vector3::operator*=(float scalar) {
 		x *= scalar;
 		y *= scalar;
