@@ -412,7 +412,7 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
     }
     _mtx.Unlock();
 
-    if(rebuild) Rebuild();
+    if(rebuild) RebuildRenderEdges();
 }
 
 void ENT_Geometry::FrameUpdate() {
