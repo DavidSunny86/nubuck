@@ -102,23 +102,6 @@ void LoadOBJ::Register(const Nubuck& nb, Invoker& invoker) {
 void LoadOBJ::Invoke() {
     printf("LoadOBJ::Invoke\n");
     _geom = NULL;
-
-    // REMOVEME
-    const int renderAll =
-		IGeometry::RenderMode::NODES |
-		IGeometry::RenderMode::EDGES |
-		IGeometry::RenderMode::FACES;
-	IGeometry* geom = _nb.world->CreateGeometry();
-	geom->SetRenderMode(renderAll);
-    geom->HideOutline();
-	leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
-	leda::edge e0 = mesh.make_triangle(point_t(-1, -1, 0), point_t(1, -1, 0), point_t(1, 1, 0));
-	leda::edge e1 = mesh.face_cycle_pred(e0);
-    leda::edge e = e0;
-	e = mesh.face_cycle_pred(e);
-    e = mesh.split(e);
-	mesh.set_position(leda::source(e), point_t(-1, 1, 1));
-	mesh.split(e0, e1);
 }
 
 } // namespace OP
