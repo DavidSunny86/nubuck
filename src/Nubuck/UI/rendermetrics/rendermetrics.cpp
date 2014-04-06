@@ -27,11 +27,19 @@ namespace UI {
         return QString("%1 %2").arg(size).arg(units[mult]);
     }
 
+    static QString ToQString(float f) {
+        static const int    float_width = 0;
+        static const char   float_fmt = 'f';
+        static const int    float_prec = 8;
+        return QString("%1").arg((double)f, float_width, float_fmt, float_prec);
+    }
+
     void RenderMetrics::Update(void) {
         _ui.lblTotalVertexBufferSizeValue->setText(FormatBytes(R::metrics.resources.totalVertexBufferSize));
         _ui.lblTotalTextureBufferSizeValue->setText(FormatBytes(R::metrics.resources.totalTextureBufferSize));
         _ui.lblNumDrawCallsValue->setText(QString("%1").arg(R::metrics.frame.numDrawCalls));
-        _ui.lblFrameTimeValue->setText(QString("%1").arg(R::metrics.frame.time));
+        _ui.lblFrameTimeValue->setText(ToQString(R::metrics.frame.time));
+        _ui.lblEdgeRendererSetTransformValue->setText(ToQString(R::metrics.frame.edgeRendererSetTransform));
     }
 
     RenderMetrics::RenderMetrics(QWidget* parent) : QWidget(parent) {

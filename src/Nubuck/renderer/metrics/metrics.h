@@ -11,9 +11,13 @@ namespace R {
         struct {
             unsigned    numDrawCalls;
             float       time;
+            float       edgeRendererSetTransformAccu;
+            float       edgeRendererSetTransform;
         } frame;
 
         Metrics(void);
+
+        void EndFrame();
     };
 
     extern Metrics metrics;

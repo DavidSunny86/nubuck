@@ -3,6 +3,7 @@
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <UI\outliner\outliner.h>
 #include <UI\userinterface.h>
+#include <renderer\metrics\metrics.h>
 #include <world\world.h>
 #include "ent_geometry_outln.h"
 #include "ent_geometry.h"
@@ -421,10 +422,15 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
 }
 
 void ENT_Geometry::FrameUpdate() {
+    static SYS::Timer timer;
+
 	SYS::ScopedLock lock(_mtx);
     M::Matrix4 tf = M::Mat4::FromRigidTransform(GetTransform().rotation, GetTransform().position);
     _nodes.Transform(world.GetCameraMatrix() * tf);
+
+    timer.Start();
     _edgeRenderer->SetTransform(tf, world.GetCameraMatrix());
+    R::metrics.frame.edgeRendererSetTransformAccu += timer.Stop();
 }
 
 void ENT_Geometry::BuildRenderList() {

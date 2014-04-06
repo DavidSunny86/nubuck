@@ -569,6 +569,7 @@ void Renderer::EndFrame() {
     meshMgr.R_Update();
 
     metrics.frame.time = frame_time.Stop();
+    metrics.EndFrame();
 }
 
 void Renderer::Render(
