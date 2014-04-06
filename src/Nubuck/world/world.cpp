@@ -349,7 +349,11 @@ void World::BoundingBox::Destroy() {
 }
 
 World::BoundingBox::BoundingBox(const ENT_Geometry* geom) : geom(geom) {
-    WireframeBox meshDesc(M::Scale(geom->GetBoundingBox(), 1.2f));
+    const M::Vector3 vf = 0.5f * M::Vector3(1.0f, 1.0f, 1.0f);
+    M::Box bbox = geom->GetBoundingBox();
+    bbox.min -= vf;
+    bbox.max += vf;
+    WireframeBox meshDesc(bbox);
     mesh = R::meshMgr.Create(meshDesc.GetDesc());
     tfmesh = R::meshMgr.Create(mesh);
     Transform();
