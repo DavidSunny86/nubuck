@@ -2,7 +2,14 @@
 fx EdgeLineBillboard {
   pass Pass0 {
     state.depth.func = GL_LEQUAL;
-    vs = "#include <Shaders\edge_line_billboard_off.vert>";
+    vs =
+    """
+    const bool PROJECTION_OFFSET_ENABLED    = true;
+    const float PROJECTION_OFFSET           = 0.0001;
+
+    #include <Shaders\edge_line_billboard.vert>
+    """;
+
     fs = "#include <Shaders\edge_line_billboard.frag>";
   }
 }

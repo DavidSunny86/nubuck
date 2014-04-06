@@ -31,12 +31,34 @@ void LineEdges::Rebuild(const std::vector<Edge>& edges) {
     _edgeBBoards.clear();
     _edgeBBoards.resize(_edges.size());
 
+    // encodes vertex position
+    static const M::Vector2 texCoords[] = {
+        M::Vector2(-0.5f,  1.0f),
+        M::Vector2(-0.5f,  0.0f),
+        M::Vector2( 0.5f,  0.0f),
+        M::Vector2( 0.5f,  1.0f)
+    };
+
     unsigned numEdges = _edges.size();
     for(unsigned i = 0; i < numEdges; ++i) {
         const Edge& edge = _edges[i];
+        const M::Vector3 axis = edge.p1 - edge.p0;
         for(unsigned j = 0; j < 4; ++j) {
-            // edgeBBoards[i].verts[j].color = ColorTo3ub(edge.color);
-            _edgeBBoards[i].verts[j].color = edge.color;
+            _edgeBBoards[i].verts[j].position   = edge.p0;
+
+            // since line edges are unlit we can use the normal
+            // vector to store the edge axis.
+            // note that height = len(axis)
+            _edgeBBoards[i].verts[j].normal     = axis;
+
+            _edgeBBoards[i].verts[j].texCoords  = texCoords[j];
+
+            // edgeBBoards[i].verts[j].color    = ColorTo3ub(edge.color);
+            _edgeBBoards[i].verts[j].color      = edge.color;
+
+            // since line edges are opaque we can use the
+            // alpha channel to store the edge radius
+            _edgeBBoards[i].verts[j].color.a    = edge.radius;
         }
     }
 
@@ -57,43 +79,14 @@ void LineEdges::Rebuild(const std::vector<Edge>& edges) {
 
 void LineEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4& modelView) {
 	SYS::ScopedLock lock(_mtx);
-
-    if(_edges.empty()) return;
-
-    static const M::Vector3 vertPos[] = {
-        M::Vector3(-0.5f,  1.0f, 0.0f),
-        M::Vector3(-0.5f,  0.0f, 0.0f),
-        M::Vector3( 0.5f,  0.0f, 0.0f),
-        M::Vector3( 0.5f,  1.0f, 0.0f)
-    };
-
-    unsigned numEdges = _edges.size();
-    for(unsigned i = 0; i < numEdges; ++i) {
-        const Edge& edge = _edges[i];
-
-        const M::Vector3 p0 = M::Transform(modelView, M::Transform(transform, edge.p0));
-        const M::Vector3 p1 = M::Transform(modelView, M::Transform(transform, edge.p1));
-
-        const M::Vector3 wAxisY = M::Normalize(p1 - p0);
-        const M::Vector3 wAxisX = M::Normalize(M::Cross(wAxisY, -p0));
-        const M::Vector3 wAxisZ = M::Normalize(M::Cross(wAxisX, wAxisY));
-        const M::Matrix3 rotate = M::Mat3::FromColumns(wAxisX, wAxisY, wAxisZ); // local to world space
-
-        const float height = M::Distance(p0, p1);
-        const M::Matrix3 scale = M::Mat3::Scale(edge.radius, height, 1.0f);
-
-        const M::Matrix3 M = rotate * scale;
-
-        for(unsigned j = 0; j < 4; ++j) {
-            _edgeBBoards[i].verts[j].position = p0 + M::Transform(M, vertPos[j]);
-        }
-    }
-
-    _isInvalid = true;
+    if(_tfmesh) meshMgr.GetMesh(_tfmesh).SetTransform(transform);
 }
 
 void LineEdges::BuildRenderMesh() {
 	SYS::ScopedLock lock(_mtx);
+
+    M::Matrix4 lastTransform = M::Mat4::Identity();
+    if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
 
     if(_needsRebuild) {
         if(_mesh) DestroyMesh();
@@ -101,7 +94,7 @@ void LineEdges::BuildRenderMesh() {
 		if(!_edges.empty()) {
             _mesh = meshMgr.Create(_meshDesc);
             _tfmesh = meshMgr.Create(_mesh);
-            meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
+            meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
 		}
 
         _needsRebuild = false;
