@@ -110,7 +110,11 @@ namespace UI {
         if(!qevent->isAutoRepeat()) W::world.Send(EV::def_Key.Create(args));
     }
 
-    RenderView::RenderView(QWidget* parent) : glWidget_t(parent), _fpsLabel(NULL) {        
+    RenderView::RenderView(QWidget* parent)
+        : glWidget_t(parent)
+        , _fpsLabel(NULL)
+        , _time(0.0f)
+    {
         setFocusPolicy(Qt::StrongFocus);
         setMouseTracking(true);
     }
@@ -120,7 +124,8 @@ namespace UI {
     }
 
     void RenderView::Render() {
-        if(1.0f <= (_time += _rtimer.Stop())) {
+        _time += M::Max(0.0f, _rtimer.Stop());
+        if(1.0f <= _time) {
             float fps = _numFrames / _time;
             _numFrames = 0;
             _time = 0.0f;
