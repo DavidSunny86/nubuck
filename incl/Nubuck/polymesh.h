@@ -42,12 +42,23 @@ private:
     void InitVertexAttributes();
     void InitEdgeAttributes();
     void InitFaceAttributes();
+
+    int _updateFlags;
 public:
+    struct UpdateFlags {
+        enum {
+            VERTICES    = (1 << 0),
+            EDGES       = (1 << 1),
+            FACES       = (1 << 2)
+        };
+    };
+
     PolyMesh();
 
     // called by ENT_Geometry only!
     void    cache_all();
     bool    needs_rebuild() const;
+    int     clear_update_flags();
 
     size_t FromObj(const char* filename);
 
@@ -128,7 +139,7 @@ inline void PolyMesh<VEC3>::InitFaceAttributes() {
 }
 
 template<typename VEC3>
-inline PolyMesh<VEC3>::PolyMesh() {
+inline PolyMesh<VEC3>::PolyMesh() : _updateFlags(0) {
     InitVertexAttributes();
     InitEdgeAttributes();
     InitFaceAttributes();
@@ -153,6 +164,13 @@ inline bool PolyMesh<VEC3>::needs_rebuild() const {
     forall_edges(e, *this) if(!_eatt_cached[e]) return true;
     forall_faces(f, *this) if(!_fatt_cached[f]) return true;
     return false;
+}
+
+template<typename VEC3>
+inline int PolyMesh<VEC3>::clear_update_flags() {
+    int flags = _updateFlags;
+    _updateFlags = 0;
+    return flags;
 }
 
 template<typename VEC3>
@@ -224,7 +242,7 @@ inline const R::Color& PolyMesh<VEC3>::color_of(const face f) const {
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_position(const node v, const VEC3& p) {
-    _vatt_cached[v] = false;
+    _updateFlags |= UpdateFlags::VERTICES;
     LEDA_ACCESS(VEC3, entry(v)) = p;
 }
 

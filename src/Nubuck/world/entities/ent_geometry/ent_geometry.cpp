@@ -249,14 +249,19 @@ void ENT_Geometry::RebuildRenderEdges() {
 void ENT_Geometry::Rebuild() {
 	SYS::ScopedLock lock(_mtx);
 
-    if(_ratPolyMesh.needs_rebuild()) {
-        _ratPolyMesh.cache_all();
+    bool update = 0 < _ratPolyMesh.clear_update_flags();
+    bool rebuild = _ratPolyMesh.needs_rebuild();
 
-        CacheFPos();
-        RebuildRenderNodes();
-        RebuildRenderEdges();
-        RebuildRenderMesh();
-        ComputeBoundingBox();
+    if(!update && !rebuild) return; // nothing to do
+
+    CacheFPos();
+    RebuildRenderNodes();
+    RebuildRenderEdges();
+    RebuildRenderMesh();
+    ComputeBoundingBox();
+
+    if(rebuild) {
+        _ratPolyMesh.cache_all();
     }
 }
 
