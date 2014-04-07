@@ -32,6 +32,7 @@ private:
     void RebuildRenderEdges();
 
     std::vector<M::Vector3>         _fpos;
+    std::vector<unsigned>           _vmap; // maps rendermesh to polymesh vertex IDs
     std::vector<R::Mesh::Vertex>    _vertices;
     std::vector<R::Mesh::Index>     _indices;
     R::Mesh::Desc                   _meshDesc;
@@ -41,6 +42,7 @@ private:
 
     void CacheFPos();
     void RebuildRenderMesh();
+    void UpdateRenderMesh();
 
     float       _edgeRadius;
     R::Color    _edgeColor;

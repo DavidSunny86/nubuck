@@ -39,6 +39,7 @@ static leda::edge UnmaskedSucc(const leda::nb::RatPolyMesh& G, leda::edge e) {
 }
 
 void ENT_Geometry::RebuildRenderMesh() {
+    _vmap.clear();
     _vertices.clear();
     _indices.clear();
 
@@ -69,7 +70,9 @@ void ENT_Geometry::RebuildRenderMesh() {
 
         leda::edge it = e;
         do {
-            vert.position = _fpos[leda::source(it)->id()];
+            unsigned vid = leda::source(it)->id();
+            vert.position = _fpos[vid];
+            _vmap.push_back(vid);
             _vertices.push_back(vert);
             _indices.push_back(idxCnt++);
             it = UnmaskedSucc(_ratPolyMesh, it);
@@ -84,6 +87,12 @@ void ENT_Geometry::RebuildRenderMesh() {
     _meshDesc.primType = GL_TRIANGLE_FAN;
          
     _meshCompiled = false;
+}
+
+void ENT_Geometry::UpdateRenderMesh() {
+    for(unsigned i = 0; i < _vertices.size(); ++i)
+        _vertices[i].position = _fpos[_vmap[i]];
+    if(_mesh) R::meshMgr.GetMesh(_mesh).Invalidate(&_vertices[0]);
 }
 
 void ENT_Geometry::ComputeBoundingBox() {
@@ -258,12 +267,15 @@ void ENT_Geometry::Rebuild() {
     CacheFPos();
     RebuildRenderNodes();
     RebuildRenderEdges();
-    RebuildRenderMesh();
-    ComputeBoundingBox();
 
     if(rebuild) {
         _ratPolyMesh.cache_all();
+        RebuildRenderMesh();
+    } else {
+        UpdateRenderMesh();
     }
+
+    ComputeBoundingBox();
 }
 
 static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
