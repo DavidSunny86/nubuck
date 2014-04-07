@@ -256,19 +256,31 @@ void ENT_Geometry::RebuildRenderEdges() {
     _edgeRenderer->Rebuild(edges);
 }
 
+static int GetUpdateState(const leda::nb::RatPolyMesh& mesh) {
+    leda::node v;
+    leda::edge e;
+    leda::face f;
+    int state = leda::nb::RatPolyMesh::State::CACHED;
+    forall_nodes(v, mesh) state = M::Max(state, mesh.state_of(v));
+    forall_edges(e, mesh) state = M::Max(state, mesh.state_of(e));
+    forall_faces(f, mesh) state = M::Max(state, mesh.state_of(f));
+    return state;
+}
+
 void ENT_Geometry::Rebuild() {
+    typedef leda::nb::RatPolyMesh::State state_t;
+
 	SYS::ScopedLock lock(_mtx);
 
-    bool update = 0 < _ratPolyMesh.clear_update_flags();
-    bool rebuild = _ratPolyMesh.needs_rebuild();
+    int state = GetUpdateState(_ratPolyMesh);
 
-    if(!update && !rebuild) return; // nothing to do
+    if(state_t::CACHED == state) return; // nothing to do
 
     CacheFPos();
     RebuildRenderNodes();
     RebuildRenderEdges();
 
-    if(rebuild) {
+    if(state_t::TOPOLOGY_CHANGED == state) {
         _ratPolyMesh.cache_all();
         RebuildRenderMesh();
     } else {
