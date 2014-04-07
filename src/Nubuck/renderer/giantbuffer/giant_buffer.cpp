@@ -59,6 +59,22 @@ static void Unlink(GB_BufSeg* it) {
     it->prev = it->next = NULL;
 }
 
+bool IsSorted(GB_BufSeg* list);
+
+static void Insert(GB_BufSeg** list, GB_BufSeg* it) {
+    assert(list && it && IsSorted(*list));
+    GB_BufSeg *prev = NULL, *next = *list;
+    while(next && it->off > next->off) {
+        prev = next;
+        next = next->next;
+    }
+    it->prev = prev;
+    it->next = next;
+    if(next) next->prev = it;
+    if(prev) prev->next = it;
+    if(*list == next) *list = it;
+}
+
 static void Prepend(GB_BufSeg** list, GB_BufSeg* it) {
     assert(list && it);
     GB_BufSeg* head = *list;
@@ -66,27 +82,6 @@ static void Prepend(GB_BufSeg** list, GB_BufSeg* it) {
     it->prev = NULL;
     if(head) head->prev = it;
     *list = it;
-}
-
-typedef bool (*cmpBufSeg_t)(const GB_BufSeg* lhp, const GB_BufSeg* rhp);
-
-static bool Cmp_Offset(const GB_BufSeg* lhp, const GB_BufSeg* rhp) {
-    return lhp->off < rhp->off;
-}
-
-static void Sort(GB_BufSeg** list, cmpBufSeg_t cmp) {
-    std::vector<GB_BufSeg*> bufSegs;
-    GB_BufSeg *next, *it = *list;
-    while(it) {
-        next = it->next;
-        it->prev = it->next = NULL;
-        bufSegs.push_back(it);
-        it = next;
-    }
-    std::sort(bufSegs.begin(), bufSegs.end(), cmp);
-    *list = NULL;
-    for(std::vector<GB_BufSeg*>::reverse_iterator revIt(bufSegs.rbegin()); bufSegs.rend() != revIt; ++revIt)
-        Prepend(list, *revIt);
 }
 
 static bool IsSorted(GB_BufSeg* list) {
@@ -101,7 +96,6 @@ static bool IsSorted(GB_BufSeg* list) {
 }
 
 static void CoalesceFreeMem(void) {
-    Sort(&freeList, Cmp_Offset);
     assert(IsSorted(freeList));
     GB_BufSeg *tmp, *next, *it = freeList;
     while(it) {
@@ -137,7 +131,7 @@ void GB_FreeMemItem(gbHandle_t handle) {
     memItem.dead = true;
     if(bufSeg) {
         Unlink(bufSeg);
-        Prepend(&freeList, bufSeg);
+        Insert(&freeList, bufSeg);
     }
     CoalesceFreeMem();
     PrintInfo();
