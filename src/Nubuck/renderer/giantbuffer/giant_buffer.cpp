@@ -195,6 +195,26 @@ static void ResizeBuffer() {
     }
 }
 
+static void Split(GB_BufSeg* lseg, unsigned size) {
+    assert(lseg->size >= size);
+    if(lseg->size == size) return; // nothing to do
+
+    GB_BufSeg* rseg = new GB_BufSeg;
+
+    rseg->off = lseg->off + size;
+    rseg->size = lseg->size - size;
+    rseg->cached = false;
+
+    lseg->size = size;
+    lseg->cached = false;
+
+    rseg->next = lseg->next;
+    if(rseg->next) rseg->next->prev = rseg;
+    rseg->prev = lseg;
+
+    lseg->next = rseg;
+}
+
 static GB_BufSeg* GB_AllocBufSeg(unsigned size) {
     GB_BufSeg* bufSeg = FindFreeBufSeg(size);
     if(!bufSeg) {
@@ -203,6 +223,7 @@ static GB_BufSeg* GB_AllocBufSeg(unsigned size) {
     }
     assert(bufSeg);
     assert(size <= bufSeg->size);
+    Split(bufSeg, size);
     Unlink(bufSeg);
     Prepend(&usedList, bufSeg);
     PrintInfo();
