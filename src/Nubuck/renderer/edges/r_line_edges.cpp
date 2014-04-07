@@ -77,6 +77,15 @@ void LineEdges::Rebuild(const std::vector<Edge>& edges) {
     _meshDesc.primType = GL_TRIANGLE_FAN;
 }
 
+void LineEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
+    for(unsigned i = 0; i < _edges.size(); ++i) {
+        Edge& edge = _edges[i];
+        edge.p0 = fpos[edge.v0->id()];
+        edge.p1 = fpos[edge.v1->id()];
+    }
+    Rebuild(_edges);
+}
+
 void LineEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4& modelView) {
 	SYS::ScopedLock lock(_mtx);
     if(_tfmesh) meshMgr.GetMesh(_tfmesh).SetTransform(transform);

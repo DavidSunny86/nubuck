@@ -1,3 +1,4 @@
+#include <Nubuck\polymesh.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>
 #include "r_cylinder_edges.h"
@@ -23,48 +24,43 @@ static M::Matrix4 RotationOf(const M::Matrix4& mat) {
         0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-void CylinderEdges::RebuildVertices(const M::Matrix4& transform) {
-    _edgeBBoxVertices.clear();
-    for(unsigned i = 0; i < _edges.size(); ++i) {
-        const FatEdge& edge = _edges[i];
-        const M::Vector3 p0 = M::Transform(transform, edge.p0);
-        const M::Vector3 p1 = M::Transform(transform, edge.p1);
-        const M::Vector3 center = 0.5f * (p1 + p0);
-        M::Matrix4 objectToWorld = M::Mat4::Translate(center) * R::RotationOf(transform) * edge.Rt;
+void CylinderEdges::RebuildVertices(unsigned edgeIdx, const M::Matrix4& transform) {
+    const FatEdge& edge = _edges[edgeIdx];
+    const M::Vector3 p0 = M::Transform(transform, edge.p0);
+    const M::Vector3 p1 = M::Transform(transform, edge.p1);
+    const M::Vector3 center = 0.5f * (p1 + p0);
+    M::Matrix4 objectToWorld = M::Mat4::Translate(center) * R::RotationOf(transform) * edge.Rt;
 
-        const float h = 0.5f * M::Length(p1 - p0);
-        const float r = edge.radius;
-        M::Vector3 bboxVertexPositions[] = {
-            M::Vector3( r,  r, -h),
-            M::Vector3(-r,  r, -h),
-            M::Vector3( r,  r,  h),
-            M::Vector3(-r,  r,  h),
-            M::Vector3( r, -r, -h),
-            M::Vector3(-r, -r, -h),
-            M::Vector3(-r, -r,  h),
-            M::Vector3( r, -r,  h)
-        };
-        const unsigned numVertices = 8;
-        Mesh::Vertex vertex;
-        // vertex.color = ColorTo4ub(edge.color);
-        vertex.color = edge.color;
-        vertex.A[0] = M::Vector3(objectToWorld.m00, objectToWorld.m10, objectToWorld.m20);
-        vertex.A[1] = M::Vector3(objectToWorld.m01, objectToWorld.m11, objectToWorld.m21);
-        vertex.A[2] = M::Vector3(objectToWorld.m02, objectToWorld.m12, objectToWorld.m22);
-        vertex.A[3] = M::Vector3(objectToWorld.m03, objectToWorld.m13, objectToWorld.m23);
-        /*
-        vertex.halfHeightSq = h * h;
-        vertex.radiusSq = edge.radius * edge.radius;
-        */
-        vertex.texCoords.x = h * h;
-        vertex.texCoords.y = edge.radius * edge.radius;
-        for(unsigned i = 0; i < numVertices; ++i) {
-            vertex.position = M::Transform(objectToWorld, bboxVertexPositions[i]);
-            _edgeBBoxVertices.push_back(vertex);
-        }
-    } // forall edges
-
-    _isInvalid = true;
+    const float h = 0.5f * M::Length(p1 - p0);
+    const float r = edge.radius;
+    M::Vector3 bboxVertexPositions[] = {
+        M::Vector3( r,  r, -h),
+        M::Vector3(-r,  r, -h),
+        M::Vector3( r,  r,  h),
+        M::Vector3(-r,  r,  h),
+        M::Vector3( r, -r, -h),
+        M::Vector3(-r, -r, -h),
+        M::Vector3(-r, -r,  h),
+        M::Vector3( r, -r,  h)
+    };
+    const unsigned numVertices = 8;
+    Mesh::Vertex vertex;
+    // vertex.color = ColorTo4ub(edge.color);
+    vertex.color = edge.color;
+    vertex.A[0] = M::Vector3(objectToWorld.m00, objectToWorld.m10, objectToWorld.m20);
+    vertex.A[1] = M::Vector3(objectToWorld.m01, objectToWorld.m11, objectToWorld.m21);
+    vertex.A[2] = M::Vector3(objectToWorld.m02, objectToWorld.m12, objectToWorld.m22);
+    vertex.A[3] = M::Vector3(objectToWorld.m03, objectToWorld.m13, objectToWorld.m23);
+    /*
+    vertex.halfHeightSq = h * h;
+    vertex.radiusSq = edge.radius * edge.radius;
+    */
+    vertex.texCoords.x = h * h;
+    vertex.texCoords.y = edge.radius * edge.radius;
+    for(unsigned i = 0; i < numVertices; ++i) {
+        vertex.position = M::Transform(objectToWorld, bboxVertexPositions[i]);
+        _edgeBBoxVertices[edgeIdx * numVertices + i] = vertex;
+    }
 }
 
 CylinderEdges::~CylinderEdges() {
@@ -123,13 +119,36 @@ void CylinderEdges::Rebuild(const std::vector<Edge>& edges) {
         baseIdx += numVertices;
     }
 
-    RebuildVertices(M::Mat4::Identity());
+    _edgeBBoxVertices.clear();
+    const unsigned numVerticesPerEdge = 8;
+    _edgeBBoxVertices.resize(numVerticesPerEdge * _edges.size());
+    for(unsigned i = 0; i < _edges.size(); ++i)
+        RebuildVertices(i, M::Mat4::Identity());
+    _isInvalid = true;
 
     _meshDesc.vertices = &_edgeBBoxVertices[0];
     _meshDesc.numVertices = _edgeBBoxVertices.size();
     _meshDesc.indices = &_edgeBBoxIndices[0];
     _meshDesc.numIndices = _edgeBBoxIndices.size();
     _meshDesc.primType = GL_TRIANGLE_STRIP;
+}
+
+void CylinderEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
+    typedef leda::nb::RatPolyMesh::State state_t;
+	SYS::ScopedLock lock(_mtx);
+    for(unsigned i = 0; i < _edges.size(); ++i) {
+        FatEdge& edge = _edges[i];
+        int state = M::Max(mesh.state_of(edge.v0), mesh.state_of(edge.v1));
+        COM_assert(state_t::TOPOLOGY_CHANGED > state);
+        if(state_t::GEOMETRY_CHANGED == state) {
+            edge.p0 = fpos[edge.v0->id()];
+            edge.p1 = fpos[edge.v1->id()];
+            M::Matrix4 R = AlignZ(edge.p1 - edge.p0);
+            edge.Rt = M::Transpose(R);
+            RebuildVertices(i, M::Mat4::Identity());
+        }
+    }
+    if(_mesh) meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoxVertices[0]);
 }
 
 void CylinderEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4&) {

@@ -26,7 +26,7 @@ private:
     bool                        _isInvalid;
 
     void DestroyMesh();
-    void RebuildVertices(const M::Matrix4& transform);
+    void RebuildVertices(unsigned edgeIdx, const M::Matrix4& transform);
 public:
     CylinderEdges() : _mesh(NULL), _tfmesh(NULL), _needsRebuild(false), _isInvalid(false) { }
     ~CylinderEdges();
@@ -37,6 +37,7 @@ public:
 	}
 
     void Rebuild(const std::vector<Edge>& edges) override;
+    void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) override;
 
     void SetTransform(const M::Matrix4& transform, const M::Matrix4& modelView) override;
 

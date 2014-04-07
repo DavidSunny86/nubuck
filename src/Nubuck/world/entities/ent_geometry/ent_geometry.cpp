@@ -247,6 +247,8 @@ void ENT_Geometry::RebuildRenderEdges() {
         if(!visited[e] && !_ratPolyMesh.is_masked(e)) {
             re.radius = _ratPolyMesh.radius_of(e);
             re.color = _ratPolyMesh.color_of(e);
+            re.v0 = leda::source(e);
+            re.v1 = leda::target(e);
             re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
             re.p1 = ToVector(_ratPolyMesh.position_of(leda::target(e)));
             edges.push_back(re);
@@ -278,12 +280,14 @@ void ENT_Geometry::Rebuild() {
 
     CacheFPos();
     RebuildRenderNodes();
-    RebuildRenderEdges();
 
     if(state_t::TOPOLOGY_CHANGED == state) {
         _ratPolyMesh.cache_all();
+        RebuildRenderEdges();
         RebuildRenderMesh();
     } else {
+        _edgeRenderer->Update(_ratPolyMesh, _fpos);
+
         UpdateRenderMesh();
     }
 

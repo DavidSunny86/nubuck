@@ -12,6 +12,7 @@ namespace R {
 class EdgeRenderer {
 public:
     struct Edge {
+        leda::node  v0, v1;
         M::Vector3  p0, p1;
         R::Color    color;
         float       radius;
@@ -34,6 +35,7 @@ public:
     virtual bool IsEmpty() const = 0;
 
     virtual void Rebuild(const std::vector<Edge>& edges) = 0;
+    virtual void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) = 0;
 
     virtual void SetTransform(const M::Matrix4& transform, const M::Matrix4& modelView) = 0;
 
