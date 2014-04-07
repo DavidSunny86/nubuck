@@ -89,8 +89,20 @@ static void Sort(GB_BufSeg** list, cmpBufSeg_t cmp) {
         Prepend(list, *revIt);
 }
 
+static bool IsSorted(GB_BufSeg* list) {
+    GB_BufSeg *it = list, *next;
+    while(it && (next = it->next)) {
+        if(it->off + it->size > next->off)
+            return false;
+        it = next;
+    }
+    // a->off + a->size <= b->off + b->size forall a before b
+    return true;
+}
+
 static void CoalesceFreeMem(void) {
     Sort(&freeList, Cmp_Offset);
+    assert(IsSorted(freeList));
     GB_BufSeg *tmp, *next, *it = freeList;
     while(it) {
         next = it->next;
