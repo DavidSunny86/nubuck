@@ -43,6 +43,7 @@ private:
     void CacheFPos();
     void RebuildRenderMesh();
     void UpdateRenderMesh();
+    void DestroyRenderMesh();
 
     float       _edgeRadius;
     R::Color    _edgeColor;

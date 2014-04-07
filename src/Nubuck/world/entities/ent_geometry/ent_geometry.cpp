@@ -95,6 +95,17 @@ void ENT_Geometry::UpdateRenderMesh() {
     if(_mesh) R::meshMgr.GetMesh(_mesh).Invalidate(&_vertices[0]);
 }
 
+void ENT_Geometry::DestroyRenderMesh() {
+    if(_mesh) {
+        R::meshMgr.Destroy(_mesh);
+        _mesh = NULL;
+    }
+    if(_tfmesh) {
+        R::meshMgr.Destroy(_tfmesh);
+        _tfmesh = NULL;
+    }
+}
+
 void ENT_Geometry::ComputeBoundingBox() {
     _bbox.min = _bbox.max = _fpos[_ratPolyMesh.first_node()->id()];
     leda::node v;
@@ -396,6 +407,7 @@ void ENT_Geometry::OnDestroy() {
 	SYS::ScopedLock lock(_mtx);
 	_nodes.DestroyRenderMesh();
 	_edgeRenderer->DestroyRenderMesh();
+    DestroyRenderMesh();
 	_renderMode &= ~(RenderMode::EDGES | RenderMode::NODES); // !!!
 
     g_ui.GetOutliner().DeleteItem(_outlinerItem);
