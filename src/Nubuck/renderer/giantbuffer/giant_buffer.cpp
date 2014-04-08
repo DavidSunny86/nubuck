@@ -50,6 +50,17 @@ static void PrintInfo(void) {
     common.printf("} // GiantBuffer\n");
 }
 
+static bool IsSorted(GB_BufSeg* list) {
+    GB_BufSeg *it = list, *next;
+    while(it && (next = it->next)) {
+        if(it->off + it->size > next->off)
+            return false;
+        it = next;
+    }
+    // a->off + a->size <= b->off + b->size forall a before b
+    return true;
+}
+
 static void Unlink(GB_BufSeg* it) {
     COM_assert(it);
     if(it->prev) it->prev->next = it->next;
@@ -58,8 +69,6 @@ static void Unlink(GB_BufSeg* it) {
     if(usedList == it) usedList = it->next;
     it->prev = it->next = NULL;
 }
-
-bool IsSorted(GB_BufSeg* list);
 
 static void Insert(GB_BufSeg** list, GB_BufSeg* it) {
     COM_assert(list && it && IsSorted(*list));
@@ -82,17 +91,6 @@ static void Prepend(GB_BufSeg** list, GB_BufSeg* it) {
     it->prev = NULL;
     if(head) head->prev = it;
     *list = it;
-}
-
-static bool IsSorted(GB_BufSeg* list) {
-    GB_BufSeg *it = list, *next;
-    while(it && (next = it->next)) {
-        if(it->off + it->size > next->off)
-            return false;
-        it = next;
-    }
-    // a->off + a->size <= b->off + b->size forall a before b
-    return true;
 }
 
 static void CoalesceFreeMem(void) {
