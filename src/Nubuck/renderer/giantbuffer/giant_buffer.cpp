@@ -51,7 +51,7 @@ static void PrintInfo(void) {
 }
 
 static void Unlink(GB_BufSeg* it) {
-    assert(it);
+    COM_assert(it);
     if(it->prev) it->prev->next = it->next;
     if(it->next) it->next->prev = it->prev;
     if(freeList == it) freeList = it->next;
@@ -62,7 +62,7 @@ static void Unlink(GB_BufSeg* it) {
 bool IsSorted(GB_BufSeg* list);
 
 static void Insert(GB_BufSeg** list, GB_BufSeg* it) {
-    assert(list && it && IsSorted(*list));
+    COM_assert(list && it && IsSorted(*list));
     GB_BufSeg *prev = NULL, *next = *list;
     while(next && it->off > next->off) {
         prev = next;
@@ -76,7 +76,7 @@ static void Insert(GB_BufSeg** list, GB_BufSeg* it) {
 }
 
 static void Prepend(GB_BufSeg** list, GB_BufSeg* it) {
-    assert(list && it);
+    COM_assert(list && it);
     GB_BufSeg* head = *list;
     it->next = head;
     it->prev = NULL;
@@ -96,7 +96,7 @@ static bool IsSorted(GB_BufSeg* list) {
 }
 
 static void CoalesceFreeMem(void) {
-    assert(IsSorted(freeList));
+    COM_assert(IsSorted(freeList));
     GB_BufSeg *tmp, *next, *it = freeList;
     while(it) {
         next = it->next;
@@ -124,7 +124,7 @@ gbHandle_t GB_AllocMemItem(Mesh::Vertex* const vertices, unsigned numVertices) {
 }
 
 void GB_FreeMemItem(gbHandle_t handle) {
-    assert(GB_INVALID_HANDLE != handle);
+    COM_assert(GB_INVALID_HANDLE != handle);
     GB_MemItem& memItem = memItems[handle];
     GB_BufSeg* bufSeg = memItem.bufSeg;
     memItem.bufSeg = NULL;
@@ -149,7 +149,7 @@ static GB_BufSeg* FindFreeBufSeg(unsigned size) {
 }
 
 static void AllocateGiantBuffer(unsigned size) {
-    assert(0 == giantBufferId);
+    COM_assert(0 == giantBufferId);
     GL_CALL(glGenBuffers(1, &giantBufferId));
     GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, giantBufferId));
     GL_CALL(glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_DYNAMIC_DRAW));
@@ -158,7 +158,7 @@ static void AllocateGiantBuffer(unsigned size) {
 }
 
 static void DeleteGiantBuffer(void) {
-    assert(0 != giantBufferId);
+    COM_assert(0 != giantBufferId);
     GL_CALL(glDeleteBuffers(1, &giantBufferId));
     metrics.resources.totalVertexBufferSize -= giantBufferPSize;
     giantBufferId = 0;
@@ -174,7 +174,7 @@ static void InvalidateSegs(void) {
 }
 
 static void Resize(unsigned size) {
-    assert(giantBufferLSize < size);
+    COM_assert(giantBufferLSize < size);
 
     GB_BufSeg* bufSeg = new GB_BufSeg;
     bufSeg->off = giantBufferLSize;
@@ -196,7 +196,7 @@ static void ResizeBuffer() {
 }
 
 static void Split(GB_BufSeg* lseg, unsigned size) {
-    assert(lseg->size >= size);
+    COM_assert(lseg->size >= size);
     if(lseg->size == size) return; // nothing to do
 
     GB_BufSeg* rseg = new GB_BufSeg;
@@ -221,8 +221,8 @@ static GB_BufSeg* GB_AllocBufSeg(unsigned size) {
         Resize(giantBufferLSize + size);
         bufSeg = FindFreeBufSeg(size);
     }
-    assert(bufSeg);
-    assert(size <= bufSeg->size);
+    COM_assert(bufSeg);
+    COM_assert(size <= bufSeg->size);
     Split(bufSeg, size);
     Unlink(bufSeg);
     Prepend(&usedList, bufSeg);
@@ -237,7 +237,7 @@ static void GB_ForceCacheAll(void) {
             GB_BufSeg* bufSeg = memItems[i].bufSeg;
             unsigned size = sizeof(Mesh::Vertex) * memItems[i].numVertices;
             void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, bufSeg->off, bufSeg->size, GL_MAP_WRITE_BIT);
-            assert(ptr);
+            COM_assert(ptr);
             memcpy(ptr, memItems[i].vertices, size);
             GL_CALL(glUnmapBuffer(GL_ARRAY_BUFFER));
             bufSeg->cached = true;
@@ -252,7 +252,7 @@ void GB_CacheAll(void) {
             if(bufSeg && !bufSeg->cached) {
                 unsigned size = sizeof(Mesh::Vertex) * memItems[i].numVertices;
                 void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, bufSeg->off, bufSeg->size, GL_MAP_WRITE_BIT);
-                assert(ptr);
+                COM_assert(ptr);
                 memcpy(ptr, memItems[i].vertices, size);
                 GL_CALL(glUnmapBuffer(GL_ARRAY_BUFFER));
                 bufSeg->cached = true;
@@ -262,16 +262,16 @@ void GB_CacheAll(void) {
 }
 
 void GB_Cache(gbHandle_t handle) {
-    assert(GB_INVALID_HANDLE != handle);
+    COM_assert(GB_INVALID_HANDLE != handle);
     GB_MemItem& memItem = memItems[handle];
     GB_BufSeg* bufSeg = memItem.bufSeg;
-    assert(bufSeg);
-    assert(sizeof(Mesh::Vertex) * memItem.numVertices <= bufSeg->size);
-    assert(bufSeg->off + bufSeg->size <= giantBufferPSize);
+    COM_assert(bufSeg);
+    COM_assert(sizeof(Mesh::Vertex) * memItem.numVertices <= bufSeg->size);
+    COM_assert(bufSeg->off + bufSeg->size <= giantBufferPSize);
     if(!bufSeg->cached) {
         unsigned size = sizeof(Mesh::Vertex) * memItem.numVertices;
         void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, bufSeg->off, bufSeg->size, GL_MAP_WRITE_BIT);
-        assert(ptr);
+        COM_assert(ptr);
         memcpy(ptr, memItem.vertices, size);
         GL_CALL(glUnmapBuffer(GL_ARRAY_BUFFER));
         bufSeg->cached = true;
@@ -279,7 +279,7 @@ void GB_Cache(gbHandle_t handle) {
 }
 
 void GB_Touch(gbHandle_t handle) {
-    assert(GB_INVALID_HANDLE != handle);
+    COM_assert(GB_INVALID_HANDLE != handle);
     GB_MemItem& memItem = memItems[handle];
     memItem.touched = 1;
 }
@@ -290,7 +290,7 @@ void GB_CacheBuffer() {
             memItems[i].bufSeg = GB_AllocBufSeg(sizeof(Mesh::Vertex) * memItems[i].numVertices);
     }
     ResizeBuffer();
-    assert(giantBufferLSize <= giantBufferPSize);
+    COM_assert(giantBufferLSize <= giantBufferPSize);
     for(unsigned i = 0; i < memItems.size(); ++i) {
         if(!memItems[i].dead && memItems[i].touched) {
             GB_Cache(i);
@@ -300,15 +300,15 @@ void GB_CacheBuffer() {
 }
 
 unsigned GB_GetOffset(gbHandle_t handle) {
-    assert(GB_INVALID_HANDLE != handle);
+    COM_assert(GB_INVALID_HANDLE != handle);
     GB_MemItem& memItem = memItems[handle];
     GB_BufSeg* bufSeg = memItem.bufSeg;
-    assert(bufSeg);
+    COM_assert(bufSeg);
     return bufSeg->off;
 }
 
 void GB_Invalidate(gbHandle_t handle) {
-    assert(GB_INVALID_HANDLE != handle);
+    COM_assert(GB_INVALID_HANDLE != handle);
     GB_MemItem& memItem = memItems[handle];
     GB_BufSeg* bufSeg = memItem.bufSeg;
     if(bufSeg) bufSeg->cached = false;
@@ -321,7 +321,7 @@ void GB_Bind(void) {
 }
 
 bool GB_IsCached(gbHandle_t handle) {
-    assert(GB_INVALID_HANDLE != handle);
+    COM_assert(GB_INVALID_HANDLE != handle);
     GB_MemItem& memItem = memItems[handle];
     return memItem.bufSeg && memItem.bufSeg->cached;
 }
