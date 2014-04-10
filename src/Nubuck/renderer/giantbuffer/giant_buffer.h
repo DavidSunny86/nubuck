@@ -15,6 +15,7 @@ void        GB_Touch(gbHandle_t handle);
 void        GB_CacheBuffer();
 unsigned    GB_GetOffset(gbHandle_t handle);
 void        GB_Invalidate(gbHandle_t handle);
+void        GB_Invalidate(gbHandle_t handle, unsigned off, unsigned size);
 void        GB_Bind(void);
 bool        GB_IsCached(gbHandle_t handle);
 

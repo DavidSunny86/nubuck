@@ -12,11 +12,17 @@
 
 namespace R {
 
+struct GB_PatchCmd {
+    GB_PatchCmd*    next;
+    unsigned        off;
+    unsigned        size;
+};
+
 struct GB_BufSeg {
-    GB_BufSeg *prev, *next;
-    unsigned    off;
-    unsigned    size;
-    bool        cached;
+    GB_BufSeg       *prev, *next;
+    unsigned        off;
+    unsigned        size;
+    GB_PatchCmd*    cmds;
 };
 
 struct GB_MemItem {
@@ -27,7 +33,8 @@ struct GB_MemItem {
     bool            dead;
 };
 
-static GEN::PageAlloc<GB_BufSeg> bufSegAlloc;
+static GEN::PageAlloc<GB_PatchCmd>  patchCmdAlloc;
+static GEN::PageAlloc<GB_BufSeg>    bufSegAlloc;
 
 static std::vector<GB_MemItem> memItems;
 
@@ -36,6 +43,88 @@ static unsigned     giantBufferPSize 	= 0; // physical size
 static unsigned     giantBufferLSize    = 0; // logical size
 static GB_BufSeg*   usedList            = NULL;
 static GB_BufSeg*   freeList        	= NULL;
+
+static bool IsSorted(GB_PatchCmd* list) {
+    GB_PatchCmd *it = list, *next;
+    while(it && (next = it->next)) {
+        if(it->off + it->size > next->off)
+            return false;
+        it = next;
+    }
+    // a->off + a->size <= b->off + b->size forall a before b
+    return true;
+}
+
+static void InsertPatchCmd(GB_PatchCmd** list, unsigned off, unsigned size) {
+    COM_assert(list && IsSorted(*list));
+    GB_PatchCmd *prev = NULL, *next = *list;
+    while(next && off > next->off) {
+        prev = next;
+        next = next->next;
+    }
+    COM_assert(!prev || prev->off <= off);
+    COM_assert(!next || off <= next->off);
+
+    GB_PatchCmd* it = patchCmdAlloc.Malloc();
+    it->next = next;
+    it->off = off;
+    it->size = size;
+    if(prev) {
+        if(prev->off + prev->size >= it->off) {
+            prev->size = M::Max(prev->size, it->off - prev->off + it->size);
+            it = prev;
+        } else prev->next = it;
+    } else *list = it;
+
+    COM_assert(NULL != it && next == it->next);
+    while(next && it->off + it->size >= next->off) {
+        COM_assert(it->off <= next->off);
+        it->size = M::Max(it->size, next->off - it->off + next->size);
+        it->next = next->next;
+        patchCmdAlloc.Free(next);
+        next = it->next;
+    }
+
+    COM_assert(IsSorted(*list));
+}
+
+static void ClearPatchCmds(GB_PatchCmd** list) {
+    COM_assert(list);
+    GB_PatchCmd *next, *it = *list;
+    while(it) {
+        next = it->next;
+        patchCmdAlloc.Free(it);
+        it = next;
+    }
+    *list = NULL;
+}
+
+static void Invalidate(GB_BufSeg* bufSeg) {
+    assert(bufSeg);
+    ClearPatchCmds(&bufSeg->cmds);
+
+    GB_PatchCmd* cmd = patchCmdAlloc.Malloc();
+    cmd->next = NULL;
+    cmd->off = 0;
+    cmd->size = bufSeg->size;
+    bufSeg->cmds = cmd;
+}
+
+static void ApplyPatchCmds(GB_MemItem* memItem) {
+    GB_BufSeg* bufSeg = memItem->bufSeg;
+    COM_assert(bufSeg);
+    GB_PatchCmd* cmd = bufSeg->cmds;
+    while(cmd) {
+        unsigned size = sizeof(Mesh::Vertex) * memItem->numVertices;
+        COM_assert(size >= cmd->size);
+        void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, bufSeg->off + cmd->off, cmd->size, GL_MAP_WRITE_BIT);
+        COM_assert(ptr);
+        memcpy(ptr, reinterpret_cast<char*>(memItem->vertices) + cmd->off, cmd->size);
+        GL_CALL(glUnmapBuffer(GL_ARRAY_BUFFER));
+        cmd = cmd->next;
+    }
+    ClearPatchCmds(&bufSeg->cmds);
+}
 
 static void PrintInfo(void) {
     GB_BufSeg* it = NULL;
@@ -169,7 +258,7 @@ static void DeleteGiantBuffer(void) {
 static void InvalidateSegs(void) {
     GB_BufSeg* it = usedList;
     while(it) {
-        it->cached = false;
+        Invalidate(it);
         it = it->next;
     }
 }
@@ -180,7 +269,8 @@ static void Resize(unsigned size) {
     GB_BufSeg* bufSeg = bufSegAlloc.Malloc();
     bufSeg->off = giantBufferLSize;
     bufSeg->size = size - giantBufferLSize;
-    bufSeg->cached = false;
+    bufSeg->cmds = NULL;
+    Invalidate(bufSeg);
 
     Prepend(&freeList, bufSeg);
 
@@ -204,10 +294,11 @@ static void Split(GB_BufSeg* lseg, unsigned size) {
 
     rseg->off = lseg->off + size;
     rseg->size = lseg->size - size;
-    rseg->cached = false;
+    rseg->cmds = NULL;
+    Invalidate(rseg);
 
     lseg->size = size;
-    lseg->cached = false;
+    Invalidate(lseg);
 
     rseg->next = lseg->next;
     if(rseg->next) rseg->next->prev = rseg;
@@ -225,10 +316,11 @@ static GB_BufSeg* GB_AllocBufSeg(unsigned size) {
     COM_assert(bufSeg);
     COM_assert(size <= bufSeg->size);
     Split(bufSeg, size);
+    COM_assert(bufSeg->size == size);
     Unlink(bufSeg);
     Prepend(&usedList, bufSeg);
     PrintInfo();
-    bufSeg->cached = false;
+    Invalidate(bufSeg);
     return bufSeg;
 }
 
@@ -241,7 +333,7 @@ static void GB_ForceCacheAll(void) {
             COM_assert(ptr);
             memcpy(ptr, memItems[i].vertices, size);
             GL_CALL(glUnmapBuffer(GL_ARRAY_BUFFER));
-            bufSeg->cached = true;
+            ClearPatchCmds(&bufSeg->cmds);
         }
     }
 }
@@ -250,13 +342,13 @@ void GB_CacheAll(void) {
     for(unsigned i = 0; i < memItems.size(); ++i) {
         if(memItems[i].bufSeg) {
             GB_BufSeg* bufSeg = memItems[i].bufSeg;
-            if(bufSeg && !bufSeg->cached) {
+            if(bufSeg && bufSeg->cmds) {
                 unsigned size = sizeof(Mesh::Vertex) * memItems[i].numVertices;
                 void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, bufSeg->off, bufSeg->size, GL_MAP_WRITE_BIT);
                 COM_assert(ptr);
                 memcpy(ptr, memItems[i].vertices, size);
                 GL_CALL(glUnmapBuffer(GL_ARRAY_BUFFER));
-                bufSeg->cached = true;
+                ClearPatchCmds(&bufSeg->cmds);
             }
         }
     }
@@ -269,14 +361,7 @@ void GB_Cache(gbHandle_t handle) {
     COM_assert(bufSeg);
     COM_assert(sizeof(Mesh::Vertex) * memItem.numVertices <= bufSeg->size);
     COM_assert(bufSeg->off + bufSeg->size <= giantBufferPSize);
-    if(!bufSeg->cached) {
-        unsigned size = sizeof(Mesh::Vertex) * memItem.numVertices;
-        void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, bufSeg->off, bufSeg->size, GL_MAP_WRITE_BIT);
-        COM_assert(ptr);
-        memcpy(ptr, memItem.vertices, size);
-        GL_CALL(glUnmapBuffer(GL_ARRAY_BUFFER));
-        bufSeg->cached = true;
-    }
+    ApplyPatchCmds(&memItem);
 }
 
 void GB_Touch(gbHandle_t handle) {
@@ -312,7 +397,15 @@ void GB_Invalidate(gbHandle_t handle) {
     COM_assert(GB_INVALID_HANDLE != handle);
     GB_MemItem& memItem = memItems[handle];
     GB_BufSeg* bufSeg = memItem.bufSeg;
-    if(bufSeg) bufSeg->cached = false;
+    if(bufSeg) Invalidate(bufSeg);
+}
+
+void GB_Invalidate(gbHandle_t handle, unsigned off, unsigned size) {
+    COM_assert(GB_INVALID_HANDLE != handle);
+    GB_MemItem& memItem = memItems[handle];
+    COM_assert(off + size <= sizeof(Mesh::Vertex) * memItem.numVertices);
+    GB_BufSeg* bufSeg = memItem.bufSeg;
+    if(bufSeg) InsertPatchCmd(&bufSeg->cmds, off, size);
 }
 
 void GB_Bind(void) {
@@ -324,7 +417,7 @@ void GB_Bind(void) {
 bool GB_IsCached(gbHandle_t handle) {
     COM_assert(GB_INVALID_HANDLE != handle);
     GB_MemItem& memItem = memItems[handle];
-    return memItem.bufSeg && memItem.bufSeg->cached;
+    return memItem.bufSeg && !memItem.bufSeg->cmds;
 }
 
 } // namespace R
