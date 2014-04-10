@@ -2,6 +2,7 @@
 #include <vector>
 
 #include <Nubuck\generic\pointer.h>
+#include <Nubuck\generic\page_alloc.h>
 #include <Nubuck\common\common.h>
 #include <renderer\glcall.h>
 #include <renderer\metrics\metrics.h>
@@ -25,6 +26,8 @@ struct GB_MemItem {
     unsigned        touched;
     bool            dead;
 };
+
+static GEN::PageAlloc<GB_BufSeg> bufSegAlloc;
 
 static std::vector<GB_MemItem> memItems;
 
@@ -102,7 +105,7 @@ static void CoalesceFreeMem(void) {
             it->size += next->size;
             tmp = next->next;
             Unlink(next);
-            delete next;
+            bufSegAlloc.Free(next);
             next = tmp;
         }
         it = next;
@@ -174,7 +177,7 @@ static void InvalidateSegs(void) {
 static void Resize(unsigned size) {
     COM_assert(giantBufferLSize < size);
 
-    GB_BufSeg* bufSeg = new GB_BufSeg;
+    GB_BufSeg* bufSeg = bufSegAlloc.Malloc();
     bufSeg->off = giantBufferLSize;
     bufSeg->size = size - giantBufferLSize;
     bufSeg->cached = false;
@@ -197,7 +200,7 @@ static void Split(GB_BufSeg* lseg, unsigned size) {
     COM_assert(lseg->size >= size);
     if(lseg->size == size) return; // nothing to do
 
-    GB_BufSeg* rseg = new GB_BufSeg;
+    GB_BufSeg* rseg = bufSegAlloc.Malloc();
 
     rseg->off = lseg->off + size;
     rseg->size = lseg->size - size;
