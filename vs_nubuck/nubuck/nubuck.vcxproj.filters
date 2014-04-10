@@ -689,6 +689,9 @@
     <ClInclude Include="..\..\src\Nubuck\operators\op_merge_vertices\op_merge_vertices.h">
       <Filter>Private\operators\op_merge_vertices</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\generic\page_alloc.h">
+      <Filter>Public\generic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">

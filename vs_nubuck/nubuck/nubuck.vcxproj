@@ -16,6 +16,7 @@
     <ClInclude Include="..\..\incl\Nubuck\events\core_events.h" />
     <ClInclude Include="..\..\incl\Nubuck\events\events.h" />
     <ClInclude Include="..\..\incl\Nubuck\generic\pointer.h" />
+    <ClInclude Include="..\..\incl\Nubuck\generic\page_alloc.h" />
     <ClInclude Include="..\..\incl\Nubuck\generic\singleton.h" />
     <ClInclude Include="..\..\incl\Nubuck\generic\uncopyable.h" />
     <ClInclude Include="..\..\incl\Nubuck\math\box.h" />
