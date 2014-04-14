@@ -69,14 +69,14 @@ public:
     edge split(const edge e0, const edge e1);
 
     const VEC3&     position_of(const node v) const;
-    const R::Color& color_of(const node v) const;
+    R::Color        color_of(const node v) const;
 
     const float     radius_of(const edge e) const;
-    const R::Color& color_of(const edge e) const;
+    R::Color        color_of(const edge e) const;
     int             is_masked(const edge e) const;
 
     bool            is_visible(const face f) const;
-    const R::Color& color_of(const face f) const;
+    R::Color        color_of(const face f) const;
 
     void set_position(const node v, const VEC3& p);
     void set_color(const node v, const R::Color& color);
@@ -208,7 +208,7 @@ inline const VEC3& PolyMesh<VEC3>::position_of(const node v) const {
 }
 
 template<typename VEC3>
-inline const R::Color& PolyMesh<VEC3>::color_of(const node v) const {
+inline R::Color PolyMesh<VEC3>::color_of(const node v) const {
     return R::Color(_vatt_colorR[v], _vatt_colorG[v], _vatt_colorB[v]);
 }
 
@@ -218,7 +218,7 @@ inline const float PolyMesh<VEC3>::radius_of(const edge e) const {
 }
 
 template<typename VEC3>
-inline const R::Color& PolyMesh<VEC3>::color_of(const edge e) const {
+inline R::Color PolyMesh<VEC3>::color_of(const edge e) const {
     return R::Color(_eatt_colorR[e], _eatt_colorG[e], _eatt_colorB[e]);
 }
 
@@ -233,7 +233,7 @@ inline bool PolyMesh<VEC3>::is_visible(const face f) const {
 }
 
 template<typename VEC3>
-inline const R::Color& PolyMesh<VEC3>::color_of(const face f) const {
+inline R::Color PolyMesh<VEC3>::color_of(const face f) const {
     return R::Color(_fatt_colorR[f], _fatt_colorG[f], _fatt_colorB[f]);
 }
 
