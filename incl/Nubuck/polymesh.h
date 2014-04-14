@@ -173,6 +173,7 @@ template<typename VEC3>
 inline PolyMesh<VEC3>& PolyMesh<VEC3>::operator=(const PolyMesh& other) {
     if(&other != this) {
         base_t::operator=(other);
+        compute_faces();
         InitVertexAttributes();
         InitEdgeAttributes();
         InitFaceAttributes();
@@ -239,6 +240,10 @@ inline const R::Color& PolyMesh<VEC3>::color_of(const face f) const {
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_position(const node v, const VEC3& p) {
     _vatt_state[v] = State::GEOMETRY_CHANGED;
+
+    leda::face f;
+    forall_adj_faces(f, v) _fatt_state[f] = State::GEOMETRY_CHANGED;
+
     LEDA_ACCESS(VEC3, entry(v)) = p;
 }
 

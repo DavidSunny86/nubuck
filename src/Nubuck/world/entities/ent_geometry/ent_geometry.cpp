@@ -40,6 +40,7 @@ static leda::edge UnmaskedSucc(const leda::nb::RatPolyMesh& G, leda::edge e) {
 
 void ENT_Geometry::RebuildRenderMesh() {
     _vmap.clear();
+    _faces.clear();
     _vertices.clear();
     _indices.clear();
 
@@ -49,12 +50,17 @@ void ENT_Geometry::RebuildRenderMesh() {
 
     unsigned idxCnt = 0;
 
+    _faces.resize(_ratPolyMesh.max_face_index() + 1);
+
     leda::face f;
     forall_faces(f, _ratPolyMesh) {
         if(!_ratPolyMesh.is_visible(f)) continue;
 
         leda::edge e = _ratPolyMesh.first_face_edge(f);
         if(_ratPolyMesh.is_masked(e)) continue;
+
+        Face& face = _faces[f->id()];
+        face.sz = 0;
 
         leda::edge n = _ratPolyMesh.face_cycle_succ(e);
         const M::Vector3& p0 = _fpos[leda::source(e)->id()];
@@ -73,6 +79,7 @@ void ENT_Geometry::RebuildRenderMesh() {
             leda::node pv = leda::source(it);
             vert.position = _fpos[pv->id()];
             _vmap.push_back(pv);
+            if(0 == face.sz++) face.idx = _vertices.size();
             _vertices.push_back(vert);
             _indices.push_back(idxCnt++);
             it = UnmaskedSucc(_ratPolyMesh, it);
@@ -95,9 +102,27 @@ void ENT_Geometry::UpdateRenderMesh() {
         leda::node pv = _vmap[i];
         if(state_t::GEOMETRY_CHANGED == _ratPolyMesh.state_of(pv)) {
             _vertices[i].position = _fpos[pv->id()];
-            unsigned vertSz = sizeof(R::Mesh::Vertex);
-            unsigned off = vertSz * (&_vertices[i] - &_vertices[0]);
+            const unsigned vertSz = sizeof(R::Mesh::Vertex);
+            const unsigned off = vertSz * (&_vertices[i] - &_vertices[0]);
             if(_mesh) R::meshMgr.GetMesh(_mesh).Invalidate(&_vertices[0], off, vertSz);
+        }
+    }
+
+    leda::face f;
+    forall_faces(f, _ratPolyMesh) {
+        if(state_t::GEOMETRY_CHANGED == _ratPolyMesh.state_of(f)) {
+            const Face& rf = _faces[f->id()];
+            const M::Vector3& p0 = _vertices[rf.idx + 0].position;
+            const M::Vector3& p1 = _vertices[rf.idx + 1].position;
+            const M::Vector3& p2 = _vertices[rf.idx + 2].position;
+            const M::Vector3 normal = M::Normalize(M::Cross(p1 - p0, p2 - p0));
+
+            for(unsigned i = 0; i < rf.sz; ++i) _vertices[rf.idx + i].normal = normal;
+
+            const unsigned vertSz = sizeof(R::Mesh::Vertex);
+            const unsigned off = vertSz * (&_vertices[rf.idx] - &_vertices[0]);
+            const unsigned sz = vertSz * rf.sz;
+            if(_mesh) R::meshMgr.GetMesh(_mesh).Invalidate(&_vertices[0], off, sz);
         }
     }
 }
