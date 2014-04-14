@@ -1,4 +1,5 @@
 #include <Nubuck\math\matrix3.h>
+#include <Nubuck\polymesh.h>
 #include <renderer\mesh\meshmgr.h>
 #include "r_nodes.h"
 
@@ -30,17 +31,20 @@ void Nodes::Rebuild(const std::vector<Node>& nodes) {
     _billboards.clear();
     _billboards.resize(numBillboards);
 
-    static const M::Vector2 bbTexCoords[4] = {
-        M::Vector2(-1.0f, -1.0f),
-        M::Vector2( 1.0f, -1.0f),
-        M::Vector2( 1.0f,  1.0f),
-        M::Vector2(-1.0f,  1.0f)
+    // bbNormals.xy encode texcoords
+	float nodeSize = cvar_r_nodeSize;
+    static const M::Vector3 bbNormals[4] = {
+        M::Vector3(-1.0f, -1.0f, nodeSize),
+        M::Vector3( 1.0f, -1.0f, nodeSize),
+        M::Vector3( 1.0f,  1.0f, nodeSize),
+        M::Vector3(-1.0f,  1.0f, nodeSize)
     };
 
     for(unsigned i = 0; i < numBillboards; ++i) {
         for(unsigned k = 0; k < 4; ++k) {
+            _billboards[i].verts[k].position = _nodes[i].position;
             _billboards[i].verts[k].color = _nodes[i].color;
-            _billboards[i].verts[k].texCoords = bbTexCoords[k];
+            _billboards[i].verts[k].normal = bbNormals[k];
         }
     }
 
@@ -56,31 +60,25 @@ void Nodes::Rebuild(const std::vector<Node>& nodes) {
 }
 
 void Nodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
-    for(unsigned i = 0; i < _nodes.size(); ++i)
-        _nodes[i].position = fpos[_nodes[i].pvert->id()];
-    _isInvalid = true;
-}
+    typedef leda::nb::RatPolyMesh::State state_t;
+    for(unsigned i = 0; i < _nodes.size(); ++i) {
+        leda::node pv = _nodes[i].pvert;
+        if(state_t::GEOMETRY_CHANGED == mesh.state_of(pv)) {
+            _nodes[i].position = fpos[_nodes[i].pvert->id()];
+            for(unsigned k = 0; k < 4; ++k)
+                _billboards[i].verts[k].position = _nodes[i].position;
 
-void Nodes::Transform(const M::Matrix4& modelView) {
-	SYS::ScopedLock lock(_mtx);
-
-	if(_nodes.empty()) return;
-
-	float nodeSize = cvar_r_nodeSize;
-    const M::Vector3 bbPositions[4] = {
-        M::Vector3(-nodeSize, -nodeSize, 0.0f),
-        M::Vector3( nodeSize, -nodeSize, 0.0f),
-        M::Vector3( nodeSize,  nodeSize, 0.0f),
-        M::Vector3(-nodeSize,  nodeSize, 0.0f)
-    };
-
-    for(unsigned i = 0; i < _billboards.size(); ++i) {
-        for(unsigned k = 0; k < 4; ++k) {
-            _billboards[i].verts[k].position = M::Transform(modelView, _nodes[i].position) + bbPositions[k];
+            const unsigned vertSz = sizeof(Mesh::Vertex);
+            const unsigned off = vertSz * (&_billboards[i].verts[0] - &_billboards[0].verts[0]);
+            const unsigned size = 4 * vertSz;
+            if(_mesh) meshMgr.GetMesh(_mesh).Invalidate(&_billboards[0].verts[0], off, size);
         }
     }
+}
 
-    _isInvalid = true;
+void Nodes::Transform(const M::Matrix4& objToWorld) {
+	SYS::ScopedLock lock(_mtx);
+    if(_tfmesh) R::meshMgr.GetMesh(_tfmesh).SetTransform(objToWorld);
 }
 
 void Nodes::BuildRenderMesh() {
@@ -93,6 +91,9 @@ void Nodes::BuildRenderMesh() {
 		meshMgr.GetMesh(_mesh).Invalidate(&_billboards[0].verts[0]);
         _isInvalid = false;
 	}
+
+    M::Matrix4 lastTransform = M::Mat4::Identity();
+    if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
 
     if(_needsRebuild && !_nodes.empty()) {
         if(_mesh) DestroyMesh();
@@ -107,7 +108,7 @@ void Nodes::BuildRenderMesh() {
 
 			_mesh = meshMgr.Create(meshDesc);
 			_tfmesh = meshMgr.Create(_mesh);
-			meshMgr.GetMesh(_tfmesh).SetTransform(M::Mat4::Identity());
+			meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
 		}
 
         _needsRebuild = false;

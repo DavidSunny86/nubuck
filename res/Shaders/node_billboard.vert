@@ -5,16 +5,18 @@ layout(std140) uniform UniformsHot {
 };
 
 attribute(0) vec4 aPosition;
+attribute(1) vec3 aNormal;
 attribute(2) vec4 aColor;
-attribute(3) vec2 aTexCoord0;
 
 varying vec3 vPosition;
 varying vec4 vColor;
 varying vec2 vTexCoord0;
 
 void main() {
-	vPosition = aPosition.xyz;
     vColor = aColor;
-	vTexCoord0 = aTexCoord0;
-	gl_Position = uProjection * (mat4(1.0) * aPosition);
+	vTexCoord0 = aNormal.xy;
+    vec4 off = vec4(aNormal.z * aNormal.xy, 0.0, 1.0);
+    vec4 pos = uTransform * aPosition + off;
+    vPosition = pos.xyz;
+	gl_Position = uProjection * pos;
 }

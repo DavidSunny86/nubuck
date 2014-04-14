@@ -44,7 +44,7 @@ public:
 	void Rebuild(const std::vector<Node>& nodes);
     void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos);
 
-    void Transform(const M::Matrix4& modelView);
+    void Transform(const M::Matrix4& objToWorld);
 
     void BuildRenderMesh();
     void DestroyRenderMesh();

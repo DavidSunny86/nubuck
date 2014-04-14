@@ -475,7 +475,7 @@ void ENT_Geometry::FrameUpdate() {
 
 	SYS::ScopedLock lock(_mtx);
     M::Matrix4 tf = M::Mat4::FromRigidTransform(GetTransform().rotation, GetTransform().position);
-    _nodes.Transform(world.GetCameraMatrix() * tf);
+    _nodes.Transform(tf);
 
     timer.Start();
     _edgeRenderer->SetTransform(tf, world.GetCameraMatrix());
