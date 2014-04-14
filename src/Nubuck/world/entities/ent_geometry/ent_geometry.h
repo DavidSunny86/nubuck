@@ -32,7 +32,7 @@ private:
     void RebuildRenderEdges();
 
     std::vector<M::Vector3>         _fpos;
-    std::vector<unsigned>           _vmap; // maps rendermesh to polymesh vertex IDs
+    std::vector<leda::node>         _vmap; // maps rendermesh vertex IDs to polymesh vertices
     std::vector<R::Mesh::Vertex>    _vertices;
     std::vector<R::Mesh::Index>     _indices;
     R::Mesh::Desc                   _meshDesc;

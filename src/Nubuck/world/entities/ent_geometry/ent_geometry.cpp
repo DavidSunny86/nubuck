@@ -70,9 +70,9 @@ void ENT_Geometry::RebuildRenderMesh() {
 
         leda::edge it = e;
         do {
-            unsigned vid = leda::source(it)->id();
-            vert.position = _fpos[vid];
-            _vmap.push_back(vid);
+            leda::node pv = leda::source(it);
+            vert.position = _fpos[pv->id()];
+            _vmap.push_back(pv);
             _vertices.push_back(vert);
             _indices.push_back(idxCnt++);
             it = UnmaskedSucc(_ratPolyMesh, it);
@@ -90,9 +90,16 @@ void ENT_Geometry::RebuildRenderMesh() {
 }
 
 void ENT_Geometry::UpdateRenderMesh() {
-    for(unsigned i = 0; i < _vertices.size(); ++i)
-        _vertices[i].position = _fpos[_vmap[i]];
-    if(_mesh) R::meshMgr.GetMesh(_mesh).Invalidate(&_vertices[0]);
+    typedef leda::nb::RatPolyMesh::State state_t;
+    for(unsigned i = 0; i < _vertices.size(); ++i) {
+        leda::node pv = _vmap[i];
+        if(state_t::GEOMETRY_CHANGED == _ratPolyMesh.state_of(pv)) {
+            _vertices[i].position = _fpos[pv->id()];
+            unsigned vertSz = sizeof(R::Mesh::Vertex);
+            unsigned off = vertSz * (&_vertices[i] - &_vertices[0]);
+            if(_mesh) R::meshMgr.GetMesh(_mesh).Invalidate(&_vertices[0], off, vertSz);
+        }
+    }
 }
 
 void ENT_Geometry::DestroyRenderMesh() {
