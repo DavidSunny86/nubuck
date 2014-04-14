@@ -20,10 +20,23 @@ Nodes::~Nodes() {
     // DestroyMesh();
 }
 
-void Nodes::Rebuild(const std::vector<Node>& nodes) {
+void Nodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
 	SYS::ScopedLock lock(_mtx);
 
-    _nodes = nodes;
+    _nodes.clear();
+    _inMap.clear();
+    _inMap.resize(mesh.max_node_index() + 1);
+
+    Node        rv;
+    leda::node  pv;
+    forall_nodes(pv, mesh) {
+        rv.pvert    = pv;
+        rv.position = fpos[pv->id()];
+        rv.color    = mesh.color_of(pv);
+
+        _inMap[pv->id()] = _nodes.size();
+        _nodes.push_back(rv);
+    }
 
     unsigned numBillboards = _nodes.size();
     unsigned numBillboardIndices = 5 * numBillboards - 1;
@@ -73,6 +86,22 @@ void Nodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vecto
             const unsigned size = 4 * vertSz;
             if(_mesh) meshMgr.GetMesh(_mesh).Invalidate(&_billboards[0].verts[0], off, size);
         }
+    }
+}
+
+void Nodes::SetColor(leda::node pv, const Color& color) {
+    const unsigned ridx = _inMap[pv->id()];
+
+    _nodes[ridx].color = color;
+    for(unsigned k = 0; k < 4; ++k)
+        _billboards[ridx].verts[k].color = _nodes[ridx].color;
+
+    if(_mesh) {
+        const unsigned vertSz = sizeof(Mesh::Vertex);
+        const unsigned off = vertSz * (&_billboards[ridx].verts[0] - &_billboards[0].verts[0]);
+        const unsigned size = 4 * vertSz;
+
+        meshMgr.GetMesh(_mesh).Invalidate(&_billboards[0].verts[0], off, size);
     }
 }
 

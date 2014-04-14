@@ -4,6 +4,7 @@
 #include <Nubuck\polymesh.h>
 #include <Nubuck\math\box.h>
 #include <Nubuck\system\locks\spinlock.h>
+#include <Nubuck\world\editmode.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>
@@ -28,7 +29,6 @@ private:
     R::LineEdges                    _lineEdges;
     R::EdgeRenderer*                _edgeRenderer;
 
-    void RebuildRenderNodes();
     void RebuildRenderEdges();
 
     struct Face {
@@ -143,6 +143,8 @@ public:
     void SetShadingMode(ShadingMode::Enum mode) override;
 
     int GetRenderMode() const { return _renderMode; }
+
+    void SetEditMode(editMode_t::Enum mode);
 
     void FrameUpdate();
     void BuildRenderList();

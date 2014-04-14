@@ -300,6 +300,16 @@ void World::Event_RebuildAll(const EV::Event&) {
     RebuildAll();
 }
 
+void World::Event_EditModeChanged(const EV::Event& event) {
+    const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
+
+    std::vector<IGeometry*> geomSel = _selection.GetList();
+    if(!geomSel.empty()) {
+        ENT_Geometry* ent = (ENT_Geometry*)geomSel.front();
+        ent->SetEditMode(editMode_t::Enum(args.editMode));
+    }
+}
+
 void World::Event_Resize(const EV::Event& event) {
     const EV::Params_Resize& args = EV::def_Resize.GetArgs(event);
     _camArcball.SetScreenSize(args.width, args.height);
@@ -391,6 +401,7 @@ World::World(void) : _camArcball(800, 400) /* init values arbitrary */
     AddEventHandler(EV::def_DestroyEntity,        this, &World::Event_DestroyEntity);
     AddEventHandler(EV::def_SelectionChanged,     this, &World::Event_SelectionChanged);
     AddEventHandler(EV::def_RebuildAll,           this, &World::Event_RebuildAll);
+    AddEventHandler(EV::def_EditModeChanged,      this, &World::Event_EditModeChanged);
     AddEventHandler(EV::def_Resize,               this, &World::Event_Resize);
     AddEventHandler(EV::def_Mouse,                this, &World::Event_Mouse);
     AddEventHandler(EV::def_Key,                  this, &World::Event_Key);

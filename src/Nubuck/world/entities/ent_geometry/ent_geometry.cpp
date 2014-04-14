@@ -19,6 +19,9 @@ M::Vector3 ToVector(const leda::d3_rat_point& p) {
 
 namespace W {
 
+static R::Color selectedVertexColor     = R::Color::Yellow;
+static R::Color unselectedVertexColor   = R::Color::Black;
+
 void ENT_Geometry::CacheFPos() {
     leda::node v;
     _fpos.resize(_ratPolyMesh.max_node_index() + 1);
@@ -233,7 +236,12 @@ static bool elem(const std::vector<leda::node>& set, const leda::node x) {
 
 void ENT_Geometry::Select(const leda::node v) {
     SYS::ScopedLock lock(_mtx);
-    if(!elem(_vertexSelection, v)) _vertexSelection.push_back(v);
+    if(!elem(_vertexSelection, v)) {
+        _vertexSelection.push_back(v);
+
+        if(editMode_t::VERTICES == world.GetEditMode().GetMode())
+            _nodes.SetColor(v, selectedVertexColor);
+    }
 }
 
 std::vector<leda::node> ENT_Geometry::GetVertexSelection() const {
@@ -243,6 +251,12 @@ std::vector<leda::node> ENT_Geometry::GetVertexSelection() const {
 
 void ENT_Geometry::ClearVertexSelection() {
     SYS::ScopedLock lock(_mtx);
+
+    if(editMode_t::VERTICES == world.GetEditMode().GetMode()) {
+        for(unsigned i = 0; i < _vertexSelection.size(); ++i)
+            _nodes.SetColor(_vertexSelection[i], unselectedVertexColor);
+    }
+
     _vertexSelection.clear();
 }
 
@@ -267,20 +281,6 @@ void ENT_Geometry::SetTransparency(float transparency) {
 }
 
 bool ENT_Geometry::IsMeshCompiled() const { return _meshCompiled; }
-
-void ENT_Geometry::RebuildRenderNodes() {
-    leda::node v;
-
-	std::vector<R::Nodes::Node> nodes;
-    forall_nodes(v, _ratPolyMesh) {
-        R::Nodes::Node rnode;
-        rnode.pvert = v;
-        rnode.position = _fpos[v->id()];
-        rnode.color = _ratPolyMesh.color_of(v);
-		nodes.push_back(rnode);
-    }
-    _nodes.Rebuild(nodes);
-}
 
 void ENT_Geometry::RebuildRenderEdges() {
     leda::edge_array<bool> visited(_ratPolyMesh, false);
@@ -326,9 +326,12 @@ void ENT_Geometry::Rebuild() {
 
     if(state_t::TOPOLOGY_CHANGED == state) {
         _ratPolyMesh.cache_all();
-        RebuildRenderNodes();
+        _nodes.Rebuild(_ratPolyMesh, _fpos);
         RebuildRenderEdges();
         RebuildRenderMesh();
+
+        // TODO. used to colorize vertices
+        SetEditMode(world.GetEditMode().GetMode());
     } else {
         _nodes.Update(_ratPolyMesh, _fpos);
         _edgeRenderer->Update(_ratPolyMesh, _fpos);
@@ -493,6 +496,27 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
     _mtx.Unlock();
 
     if(rebuild) RebuildRenderEdges();
+}
+
+void ENT_Geometry::SetEditMode(editMode_t::Enum mode) {
+	SYS::ScopedLock lock(_mtx);
+
+    if(editMode_t::VERTICES == mode) {
+        leda::node pv;
+        forall_nodes(pv, _ratPolyMesh) {
+            _nodes.SetColor(pv, unselectedVertexColor);
+        }
+
+        for(unsigned i = 0; i < _vertexSelection.size(); ++i)
+            _nodes.SetColor(_vertexSelection[i], selectedVertexColor);
+    }
+
+    if(editMode_t::OBJECTS == mode) {
+        leda::node pv;
+        forall_nodes(pv, _ratPolyMesh) {
+            _nodes.SetColor(pv, _ratPolyMesh.color_of(pv));
+        }
+    }
 }
 
 void ENT_Geometry::FrameUpdate() {

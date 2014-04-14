@@ -23,6 +23,7 @@ private:
 
 	mutable SYS::SpinLock _mtx;
 
+    std::vector<unsigned>           _inMap; // maps polymesh vertex IDs to corresponding indices in _nodes
     std::vector<Node>               _nodes;
     std::vector<Billboard>          _billboards;
     std::vector<Mesh::Index>        _billboardIndices;
@@ -41,8 +42,10 @@ public:
 		return _nodes.empty(); 
 	}
 
-	void Rebuild(const std::vector<Node>& nodes);
+	void Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos);
     void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos);
+
+    void SetColor(leda::node pv, const Color& color);
 
     void Transform(const M::Matrix4& objToWorld);
 
