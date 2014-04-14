@@ -55,6 +55,12 @@ void Nodes::Rebuild(const std::vector<Node>& nodes) {
     _needsRebuild = true;
 }
 
+void Nodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
+    for(unsigned i = 0; i < _nodes.size(); ++i)
+        _nodes[i].position = fpos[_nodes[i].pvert->id()];
+    _isInvalid = true;
+}
+
 void Nodes::Transform(const M::Matrix4& modelView) {
 	SYS::ScopedLock lock(_mtx);
 

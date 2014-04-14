@@ -14,6 +14,7 @@ namespace R {
 class Nodes : private GEN::Uncopyable {
 public:
     struct Node {
+        leda::node  pvert; // corresponding vertex of polymesh
         M::Vector3  position;
         R::Color    color;
     };
@@ -41,6 +42,7 @@ public:
 	}
 
 	void Rebuild(const std::vector<Node>& nodes);
+    void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos);
 
     void Transform(const M::Matrix4& modelView);
 

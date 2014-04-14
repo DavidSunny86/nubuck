@@ -249,6 +249,7 @@ void ENT_Geometry::RebuildRenderNodes() {
 	std::vector<R::Nodes::Node> nodes;
     forall_nodes(v, _ratPolyMesh) {
         R::Nodes::Node rnode;
+        rnode.pvert = v;
         rnode.position = _fpos[v->id()];
         rnode.color = _ratPolyMesh.color_of(v);
 		nodes.push_back(rnode);
@@ -297,13 +298,14 @@ void ENT_Geometry::Rebuild() {
     if(state_t::CACHED == state) return; // nothing to do
 
     CacheFPos();
-    RebuildRenderNodes();
 
     if(state_t::TOPOLOGY_CHANGED == state) {
         _ratPolyMesh.cache_all();
+        RebuildRenderNodes();
         RebuildRenderEdges();
         RebuildRenderMesh();
     } else {
+        _nodes.Update(_ratPolyMesh, _fpos);
         _edgeRenderer->Update(_ratPolyMesh, _fpos);
 
         UpdateRenderMesh();
