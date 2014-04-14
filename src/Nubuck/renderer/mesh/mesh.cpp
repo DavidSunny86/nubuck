@@ -175,6 +175,13 @@ void Mesh::Invalidate(Mesh::Vertex* const vertices) {
     _invalidate = true;
 }
 
+void Mesh::Invalidate(Mesh::Vertex* const vertices, unsigned off, unsigned size) {
+    SYS::ScopedLock lock(_mtx);
+    memcpy(reinterpret_cast<char*>(&_vertices[0]) + off, reinterpret_cast<char*>(vertices) + off, size);
+    if(GB_INVALID_HANDLE == _gbHandle) _invalidate = true;
+    else GB_Invalidate(_gbHandle, off, size);
+}
+
 void Mesh::Invalidate(Mesh::Index* const indices, unsigned numIndices) {
     SYS::ScopedLock lock(_mtx);
     _indices.resize(numIndices);

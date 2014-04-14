@@ -117,10 +117,13 @@ static void ApplyPatchCmds(GB_MemItem* memItem) {
     while(cmd) {
         unsigned size = sizeof(Mesh::Vertex) * memItem->numVertices;
         COM_assert(size >= cmd->size);
+        GL_CALL(glBufferSubData(GL_ARRAY_BUFFER, bufSeg->off + cmd->off, cmd->size, reinterpret_cast<char*>(memItem->vertices) + cmd->off));
+        /*
         void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, bufSeg->off + cmd->off, cmd->size, GL_MAP_WRITE_BIT);
         COM_assert(ptr);
         memcpy(ptr, reinterpret_cast<char*>(memItem->vertices) + cmd->off, cmd->size);
         GL_CALL(glUnmapBuffer(GL_ARRAY_BUFFER));
+        */
         cmd = cmd->next;
     }
     ClearPatchCmds(&bufSeg->cmds);

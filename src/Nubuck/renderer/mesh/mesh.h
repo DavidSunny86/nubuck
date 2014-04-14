@@ -84,6 +84,7 @@ public:
     const std::vector<Mesh::Vertex>& GetVertices() const { return _vertices; }
 
     void Invalidate(Mesh::Vertex* const vertices); // assumes number of vertices and indices is constant
+    void Invalidate(Mesh::Vertex* const vertices, unsigned offset, unsigned size);
     void Invalidate(Mesh::Index* const indices, unsigned numIndices);
 
     // methods prefixed with R_ should only be called by the renderer

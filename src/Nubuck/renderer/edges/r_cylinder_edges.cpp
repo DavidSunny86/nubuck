@@ -146,9 +146,15 @@ void CylinderEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<
             M::Matrix4 R = AlignZ(edge.p1 - edge.p0);
             edge.Rt = M::Transpose(R);
             RebuildVertices(i, M::Mat4::Identity());
+            if(_mesh) {
+                const unsigned numVertices = 8;
+                unsigned off = i * sizeof(Mesh::Vertex) * numVertices;
+                unsigned size = sizeof(Mesh::Vertex) * numVertices;
+                meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoxVertices[0], off, size);
+            }
         }
     }
-    if(_mesh) meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoxVertices[0]);
+    // if(_mesh) meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoxVertices[0]);
 }
 
 void CylinderEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4&) {
