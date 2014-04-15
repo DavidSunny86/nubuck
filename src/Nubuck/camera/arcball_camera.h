@@ -3,7 +3,6 @@
 #include <Nubuck\math\vector3.h>
 #include <Nubuck\math\matrix4.h>
 #include <Nubuck\math\quaternion.h>
-#include <Nubuck\math\transform.h>
 
 class ArcballCamera {
 private:
@@ -17,16 +16,19 @@ private:
     M::Vector3 _v0;
     float _y0;
 
-    M::TransformTRS	_transform;
-    M::Quaternion	_dragRot;
-    M::Vector3		_panTrans;
-    M::Vector3      _zoomTrans;
+    M::Vector3      _pos;
+    M::Quaternion   _orient;
+    float           _zoom;
+
+    M::Vector3      _lastPos;
+    M::Quaternion   _lastOrient;
+    float           _lastZoom;
+
+    M::Vector3 LocalZ();
 public:
     ArcballCamera(int width, int height);
 
     void SetScreenSize(int width, int height);
-
-    void SetTransform(const M::TransformTRS& tf) { _transform = tf; }
 
     void Reset();
     void ResetRotation();

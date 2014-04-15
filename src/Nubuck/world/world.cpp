@@ -407,13 +407,6 @@ World::World(void) : _camArcball(800, 400) /* init values arbitrary */
     AddEventHandler(EV::def_Key,                  this, &World::Event_Key);
 
     Grid_Build();
-
-    // set default camera position
-    M::TransformTRS tf;
-    tf.trans = M::Vector3(0.0f, 0.0f, -28.0f);
-    tf.rot = M::Quaternion(0.876f, M::Vector3(-0.298f, 0.355f, 0.126f));
-    tf.scale = 1.0f;
-    _camArcball.SetTransform(tf);
 }
 
 M::Ray World::PickingRay(const M::Vector2& mouseCoords) {
