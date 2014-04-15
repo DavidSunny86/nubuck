@@ -419,10 +419,10 @@ World::World(void) : _camArcball(800, 400) /* init values arbitrary */
 M::Ray World::PickingRay(const M::Vector2& mouseCoords) {
     M::Matrix4 projectionMat = M::Mat4::Perspective(45.0f, aspect, 0.1f, 1000.0f);
     M::Matrix4 invWorldMat;
-    M::TryInvert(_camArcball.GetWorldMatrix(), invWorldMat);
+    M::TryInvert(_camArcball.GetWorldToEyeMatrix(), invWorldMat);
     M::Ray ray;
     ray.origin = M::Transform(invWorldMat, M::Vector3::Zero);
-    ray.direction = UnprojectPoint(projectionMat, _camArcball.GetWorldMatrix(), screenWidth, screenHeight, mouseCoords);
+    ray.direction = UnprojectPoint(projectionMat, _camArcball.GetWorldToEyeMatrix(), screenWidth, screenHeight, mouseCoords);
     ray.direction.Normalize();
     return ray;
 }
@@ -497,7 +497,7 @@ void World::Update(void) {
 void World::Render(R::RenderList& renderList) {
     SetupLights(renderList);
 
-    renderList.worldMat = _camArcball.GetWorldMatrix();
+    renderList.worldMat = _camArcball.GetWorldToEyeMatrix();
     renderList.meshJobs.clear();
 
     renderList.meshJobs.push_back(Grid_GetRenderJob());

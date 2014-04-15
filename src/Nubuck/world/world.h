@@ -113,8 +113,8 @@ namespace W {
         const EditMode& GetEditMode() const { return _editMode; }
         EditMode&       GetEditMode() { return _editMode; };
 
-        M::Matrix4 GetCameraMatrix() const { return _camArcball.GetWorldMatrix(); }
-        M::Matrix4 GetModelView() const { return _camArcball.GetWorldMatrix(); }
+        M::Matrix4 GetCameraMatrix() const { return _camArcball.GetWorldToEyeMatrix(); }
+        M::Matrix4 GetModelView() const { return _camArcball.GetWorldToEyeMatrix(); }
 
         M::Ray  PickingRay(const M::Vector2& mouseCoords);
         bool    Trace(const M::Ray& ray, ENT_Geometry** geom);

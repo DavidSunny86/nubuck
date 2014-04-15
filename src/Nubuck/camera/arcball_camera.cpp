@@ -184,16 +184,7 @@ void ArcballCamera::StopZooming(void) {
     _zoomTrans = M::Vector3::Zero;
 }
 
-const M::TransformTRS& ArcballCamera::GetTransform(void) const {
-    return _transform;
-}
-
-M::Quaternion ArcballCamera::GetRotation(void) const {
-    if(_dragging) return _dragRot * _transform.rot;
-    return _transform.rot;
-}
-
-M::Matrix4 ArcballCamera::GetWorldMatrix(void) const {
+M::Matrix4 ArcballCamera::GetWorldToEyeMatrix(void) const {
     if(_dragging) return M::Mat4::FromTransform(_dragRot * _transform.rot, _transform.trans, _transform.scale);
     if(_panning) return M::Mat4::FromTransform(_transform.rot, _panTrans + _transform.trans, _transform.scale);
     if(_zooming) return M::Mat4::FromTransform(_transform.rot, _zoomTrans + _transform.trans, _transform.scale);

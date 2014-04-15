@@ -24,31 +24,27 @@ private:
 public:
     ArcballCamera(int width, int height);
 
-    void Reset(void);
-    void ResetRotation(void);
-
     void SetScreenSize(int width, int height);
+
     void SetTransform(const M::TransformTRS& tf) { _transform = tf; }
 
-    void ZoomIn(void);
-    void ZoomOut(void);
+    void Reset();
+    void ResetRotation();
 
     void StartDragging(int mouseX, int mouseY);
     bool Drag(int mouseX, int mouseY);
-    void StopDragging(void);
+    void StopDragging();
 
     void StartPanning(int mouseX, int mouseY);
     bool Pan(int mouseX, int mouseY);
-    void StopPanning(void);
+    void StopPanning();
 
     void StartZooming(int mouseX, int mouseY);
     bool Zoom(int mouseX, int mouseY);
-    void StopZooming(void);
+    void StopZooming();
 
-    bool IsDragging(void) const { return _dragging; }
+    void ZoomIn();
+    void ZoomOut();
 
-    const M::TransformTRS& GetTransform(void) const;
-    M::Quaternion GetRotation(void) const;
-
-    M::Matrix4 GetWorldMatrix(void) const;
+    M::Matrix4 GetWorldToEyeMatrix() const;
 };
