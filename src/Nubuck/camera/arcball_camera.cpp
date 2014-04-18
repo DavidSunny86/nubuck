@@ -68,6 +68,13 @@ M::Vector3 VectorInXYPlaneFromMousePos(
     return M::Vector3(x * l, y * l, 0.0f);
 }
 
+M::Matrix3 LookAt(const M::Vector3& eye, const M::Vector3& ref, const M::Vector3& up) {
+    const M::Vector3 Z = M::Normalize(eye - ref);
+    const M::Vector3 X = M::Normalize(M::Cross(up, Z));
+    const M::Vector3 Y = M::Normalize(M::Cross(Z, X));
+    return M::Mat3::FromColumns(X, Y, Z);
+}
+
 } // unnamed namespace
 
 /*
@@ -89,6 +96,7 @@ ArcballCamera::ArcballCamera(int width, int height)
     , _zoom(0.0f)
 {
     SetScreenSize(width, height);
+    Reset();
 }
 
 void ArcballCamera::Reset() {
@@ -97,8 +105,8 @@ void ArcballCamera::Reset() {
     _zooming = false;
 
     _target = M::Vector3::Zero;
-    _orient = M::Quat::Identity();
-    _zoom   = 0.0f;
+    _orient = M::Quat::FromMatrix(LookAt(M::Vector3::Zero, M::Vector3(-1.0f, -1.0f, -1.0f), M::Vector3(0.0f, 1.0f, 0.0f)));
+    _zoom   = 15.0f;
 }
 
 void ArcballCamera::ResetRotation() {
