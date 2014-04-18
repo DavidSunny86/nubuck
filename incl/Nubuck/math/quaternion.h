@@ -4,6 +4,8 @@
 
 namespace M {
 
+    struct Matrix3;
+
 	struct Quaternion {
 		float	w;
 		Vector3 v;
@@ -21,6 +23,7 @@ namespace M {
 
 		Quaternion Identity(void);
 		Quaternion RotateAxis(const Vector3& axis, float angle);
+        Quaternion FromMatrix(const Matrix3& m);
 
 	} // namespace Quat
 
