@@ -286,8 +286,8 @@ namespace M {
 			const float cosa = cosf(rad);
 
 			return Matrix4(1.0f, 0.0f, 0.0f, 0.0f,
-						   0.0f, cosa, sina, 0.0f,
-						   0.0f, -sina, cosa, 0.0f,
+						   0.0f, cosa, -sina, 0.0f,
+						   0.0f, sina, cosa, 0.0f,
 						   0.0f, 0.0f, 0.0f, 1.0f);
 		}
 
@@ -296,9 +296,9 @@ namespace M {
 			const float sina = sinf(rad);
 			const float cosa = cosf(rad);
 
-			return Matrix4(cosa, 0.0f, -sina, 0.0f,
+			return Matrix4(cosa, 0.0f, sina, 0.0f,
 						   0.0f, 1.0f, 0.0f, 0.0f,
-						   sina, 0.0f, cosa, 0.0f,
+						   -sina, 0.0f, cosa, 0.0f,
 						   0.0f, 0.0f, 0.0f, 1.0f);
 		}
 
@@ -307,8 +307,8 @@ namespace M {
 			const float sina = sinf(rad);
 			const float cosa = cosf(rad);
 
-			return Matrix4(cosa, sina, 0.0f, 0.0f,
-						   -sina, cosa, 0.0f, 0.0f,
+			return Matrix4(cosa, -sina, 0.0f, 0.0f,
+						   sina, cosa, 0.0f, 0.0f,
 						   0.0f, 0.0f, 1.0f, 0.0f,
 						   0.0f, 0.0f, 0.0f, 1.0f);
 		}

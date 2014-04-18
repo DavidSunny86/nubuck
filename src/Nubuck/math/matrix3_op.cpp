@@ -104,11 +104,11 @@ namespace M {
 			const float yz = 2.0f * q.v.y	* q.v.z;
 			const float wx = 2.0f * q.w		* q.v.x;
 
-			return Matrix3(
+			return Transpose(Matrix3(
 				1.0f - y2 - z2, xy + wz, xz - wy,
 				xy - wz, 1.0f - x2 - z2, yz + wx,
 				xz + wy, yz - wx, 1.0f - x2 - y2
-				);
+				));
 		}
 
 		Matrix3 Identity(void) {
@@ -134,9 +134,9 @@ namespace M {
 			const float sina = sinf(rad);
 			const float cosa = cosf(rad);
 
-			return Matrix3(cosa, 0.0f, -sina,
+			return Matrix3(cosa, 0.0f, sina,
 						   0.0f, 1.0f, 0.0f,
-						   sina, 0.0f, cosa);
+						   -sina, 0.0f, cosa);
 		}
 
 		Matrix3 RotateAxis(const Vector3& axis, float angle) {

@@ -61,8 +61,8 @@ namespace LM {
             const float cosa = cosf(rad);
 
             return Matrix3<SCALAR>(1.0f, 0.0f, 0.0f,
-                0.0f, cosa, sina,
-                0.0f, -sina, cosa);
+                0.0f, cosa, -sina,
+                0.0f, sina, cosa);
         }
 
         template<typename SCALAR>
@@ -71,9 +71,9 @@ namespace LM {
             const float sina = sinf(rad);
             const float cosa = cosf(rad);
 
-            return Matrix3<SCALAR>(cosa, 0.0f, -sina,
+            return Matrix3<SCALAR>(cosa, 0.0f, sina,
                 0.0f, 1.0f, 0.0f,
-                sina, 0.0f, cosa);
+                -sina, 0.0f, cosa);
         }
 
         template<typename SCALAR>
@@ -82,8 +82,8 @@ namespace LM {
             const float sina = sinf(rad);
             const float cosa = cosf(rad);
 
-            return Matrix3<SCALAR>(cosa, sina, 0.0f,
-                    -sina, cosa, 0.0f,
+            return Matrix3<SCALAR>(cosa, -sina, 0.0f,
+                    sina, cosa, 0.0f,
                     0.0f, 0.0f, 1.0f);
         }
 

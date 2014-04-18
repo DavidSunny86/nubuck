@@ -72,19 +72,19 @@ M::Vector3 VectorInXYPlaneFromMousePos(
 
 /*
 ====================
-ArcballCamera::LocalZ
-    returns local z axis of the camera in world space
+ArcballCamera::Position
+    returns the position of the camera in world space
 ====================
 */
-M::Vector3 ArcballCamera::LocalZ() {
-    return M::Normalize(Transform(_orient, M::Vector3(0.0f, 0.0f, 1.0f)));
+M::Vector3 ArcballCamera::Position() const {
+    return _target + Transform(_orient, _zoom * M::Vector3(0.0f, 0.0f, 1.0f));
 }
 
 ArcballCamera::ArcballCamera(int width, int height)
     : _dragging(false)
     , _panning(false)
     , _zooming(false)
-    , _pos(M::Vector3::Zero)
+    , _target(M::Vector3::Zero)
     , _orient(M::Quat::Identity())
     , _zoom(0.0f)
 {
@@ -96,8 +96,9 @@ void ArcballCamera::Reset() {
     _dragging = false;
     _zooming = false;
 
-    _pos    = M::Vector3::Zero;
+    _target = M::Vector3::Zero;
     _orient = M::Quat::Identity();
+    _zoom   = 0.0f;
 }
 
 void ArcballCamera::ResetRotation() {
@@ -108,12 +109,10 @@ void ArcballCamera::ResetRotation() {
 }
 
 void ArcballCamera::ZoomIn() {
-    _pos -= LocalZ() * zoomStep;
     _zoom -= zoomStep;
 }
 
 void ArcballCamera::ZoomOut() {
-    _pos += LocalZ() * zoomStep;
     _zoom += zoomStep;
 }
 
@@ -134,12 +133,10 @@ bool ArcballCamera::Drag(int mouseX, int mouseY) {
     if(_dragging) {
         const M::Vector3 v1 = VectorOnSphereFromMousePos(_halfWidth, _halfHeight, _radius, mouseX, mouseY);
         if(M::LinearlyDependent(_v0, v1)) return _dragging;
-        const M::Vector3 axis = M::Normalize(Transform(_orient, M::Cross(_v0, v1)));
+        const M::Vector3 axis = M::Normalize(M::Cross(_v0, v1));
         float angle = acosf(M::Clamp(-1.0f, M::Dot(_v0, v1), 1.0f));
-        const M::Quaternion rot = M::Quat::RotateAxis(-axis, M::Rad2Deg(-angle));
-        M::Vector3 target = _pos - _zoom * LocalZ();
+        const M::Quaternion rot = M::Quat::RotateAxis(axis, M::Rad2Deg(-angle));
         _orient =  rot * _orient;
-        _pos = Transform(rot, _pos - target) + target;
         _v0 = v1;
     }
     return _dragging;
@@ -152,7 +149,7 @@ void ArcballCamera::StopDragging() {
 void ArcballCamera::StartPanning(int mouseX, int mouseY) {
     if(!_panning) {
         _v0 = VectorInXYPlaneFromMousePos(_halfWidth, _halfHeight, mouseX, mouseY, _zoom);
-        _lastPos = _pos;
+        _lastTarget = _target;
         _panning = true;
     }
 }
@@ -160,7 +157,7 @@ void ArcballCamera::StartPanning(int mouseX, int mouseY) {
 bool ArcballCamera::Pan(int mouseX, int mouseY) {
     if(_panning) {
         const M::Vector3 v1 = VectorInXYPlaneFromMousePos(_halfWidth, _halfHeight, mouseX, mouseY, _zoom);
-        _pos = _lastPos + Transform(_orient, v1 - _v0);
+        _target = _lastTarget + Transform(_orient, v1 - _v0);
     }
     return _panning;
 }
@@ -172,7 +169,6 @@ void ArcballCamera::StopPanning() {
 void ArcballCamera::StartZooming(int mouseX, int mouseY) {
     if(!_zooming) {
         _y0 = mouseY;
-        _lastPos = _pos;
         _lastZoom = _zoom;
         _zooming = true;
     }
@@ -182,7 +178,6 @@ bool ArcballCamera::Zoom(int mouseX, int mouseY) {
     const float scale = 0.8f;
     if(_zooming) {
         float zoom = scale  * (_y0 - mouseY);
-        _pos = _lastPos - LocalZ() * zoom;
         _zoom = _lastZoom - zoom;
     }
     return _zooming;
@@ -193,8 +188,9 @@ void ArcballCamera::StopZooming() {
 }
 
 M::Matrix4 ArcballCamera::GetWorldToEyeMatrix() const {
-    M::Quaternion q = M::Quaternion(_orient.w, -_orient.v);
-    M::Matrix4 T = M::Mat4::Translate(Transform(q, -_pos));
+    const M::Quaternion q = M::Quaternion(_orient.w, -_orient.v);
+    const M::Vector3    p = Position();
+    M::Matrix4 T = M::Mat4::Translate(-p);
     M::Matrix4 R = M::Mat4::FromRigidTransform(q, M::Vector3::Zero);
-    return T * R;
+    return R * T;
 }

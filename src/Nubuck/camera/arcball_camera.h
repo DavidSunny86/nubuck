@@ -16,15 +16,15 @@ private:
     M::Vector3 _v0;
     float _y0;
 
-    M::Vector3      _pos;
+    M::Vector3      _target;
     M::Quaternion   _orient;
-    float           _zoom;
+    float           _zoom; // distance to target
 
-    M::Vector3      _lastPos;
+    M::Vector3      _lastTarget;
     M::Quaternion   _lastOrient;
     float           _lastZoom;
 
-    M::Vector3 LocalZ();
+    M::Vector3 Position() const;
 public:
     ArcballCamera(int width, int height);
 
