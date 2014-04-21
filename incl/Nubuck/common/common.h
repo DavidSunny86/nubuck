@@ -36,6 +36,36 @@ typedef struct ctoken_s {
 int COM_Tokenize(ctoken_t** tokens, const char* string, char term);
 void COM_FreeTokens(ctoken_t* tokens);
 
+namespace COM {
+
+class ItTokenizer {
+private:
+    const char* start;
+    const char* end;
+public:
+    struct Token {
+        const char* start;
+        const char* end;
+
+        Token() { }
+        Token(const char* start, const char* end);
+    };
+
+    const char* const string;
+    const char* const delim;
+
+    ItTokenizer(const char* string, const char* delim);
+
+    Token       NextToken();
+    bool        IsValid(const Token& tok) const;
+
+    unsigned    Length(const Token& tok) const;
+    unsigned    StartIndex(const Token& tok) const;
+    unsigned    EndIndex(const Token& tok) const;
+};
+
+} // namespace COM
+
 class Common : public ICommon {
 private:
     FILE* _logfile;

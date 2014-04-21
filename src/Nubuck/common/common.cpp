@@ -65,6 +65,45 @@ void COM_FreeTokens(ctoken_t* tokens) {
 	}
 }
 
+namespace COM {
+
+inline bool IsDelim(const char* delim, char c) {
+    const char* cur = delim;
+    while('\0' !=  *cur) {
+        if(*cur == c) return true;
+        cur++;
+    }
+    return false;
+}
+
+ItTokenizer::Token::Token(const char* start, const char* end)
+    : start(start)
+    , end(end)
+{ }
+
+ItTokenizer::ItTokenizer(const char* string, const char* delim)
+    : string(string)
+    , delim(delim)
+    , start(string)
+    , end(string)
+{ }
+
+ItTokenizer::Token ItTokenizer::NextToken() {
+    const char* cur = end;
+    while('\0' != *cur && IsDelim(delim, *cur)) cur++;
+    start = cur;
+    while('\0' != *cur && !IsDelim(delim, *cur)) cur++;
+    end = cur;
+    return Token(start, end);
+}
+
+bool ItTokenizer::IsValid(const Token& tok) const { return tok.end - tok.start; }
+unsigned ItTokenizer::Length(const Token& tok) const { return tok.end - tok.start; }
+unsigned ItTokenizer::StartIndex(const Token& tok) const { return tok.start - string; }
+unsigned ItTokenizer::EndIndex(const Token& tok) const { return tok.end - string; }
+
+} // namespace COM
+
 static std::string DirOf(const std::string& path) {
     const char* delim = "/\\";
     return path.substr(0, path.find_last_of(delim));
