@@ -58,6 +58,7 @@ private:
     M::Vector3              		_oldCursorPos;
     std::vector<M::Vector3> 		_oldGeomPos;
     leda::node_array<M::Vector3>    _oldVertPos;
+    W::editMode_t::Enum             _editMode;
 
     bool        _dragging;
     int         _dragAxis;

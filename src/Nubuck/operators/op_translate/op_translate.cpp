@@ -277,7 +277,7 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
     int         axis;
     M::IS::Info inf;
 
-    const W::editMode_t::Enum editMode = W::world.GetEditMode().GetMode();
+    _editMode = W::world.GetEditMode().GetMode();
 
     if(!W::world.GetSelection()->GetList().empty() && TraceCursor(ray, axis, &inf)) {
         M::Vector3 eyeZ = EyeZ(W::world.GetModelView());
@@ -290,13 +290,13 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
 
         const std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
 
-        if(W::editMode_t::OBJECTS == editMode) {
+        if(W::editMode_t::OBJECTS == _editMode) {
             _oldGeomPos.resize(geomList.size());
             for(unsigned i = 0; i < _oldGeomPos.size(); ++i) 
                 _oldGeomPos[i] = ((const W::ENT_Geometry*)geomList[i])->Transform(M::Vector3::Zero);
         }
 
-        if(W::editMode_t::VERTICES == editMode) {
+        if(W::editMode_t::VERTICES == _editMode) {
             const W::ENT_Geometry* geom = (const W::ENT_Geometry*)geomList[0];
             const leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
             _oldVertPos.init(mesh);
@@ -310,7 +310,7 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
         _oldCursorPos = _cursorPos;
         _dragging = true;
     } else {
-        if(W::editMode_t::OBJECTS == editMode) {
+        if(W::editMode_t::OBJECTS == _editMode) {
             W::ENT_Geometry* geom;
             if(W::world.Trace(ray, &geom)) {
                 if(MouseEvent::MODIFIER_SHIFT & event.mods) W::world.GetSelection()->Add(geom);
@@ -319,7 +319,7 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
             }
         }
 
-        if(W::editMode_t::VERTICES == editMode && !W::world.GetSelection()->GetList().empty()) {
+        if(W::editMode_t::VERTICES == _editMode && !W::world.GetSelection()->GetList().empty()) {
             W::ENT_Geometry* geom = (W::ENT_Geometry*)W::world.GetSelection()->GetList().front();
             std::vector<leda::node> verts;
             if(geom->TraceVertices(ray, 0.2f, verts)) {
@@ -352,11 +352,9 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
         pos.vec[_dragAxis] = _oldCursorPos.vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
         SetCursorPosition(pos);
 
-        const W::editMode_t::Enum editMode = W::world.GetEditMode().GetMode();
-
         std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
 
-        if(W::editMode_t::OBJECTS == editMode) {
+        if(W::editMode_t::OBJECTS == _editMode) {
             for(unsigned i = 0; i < geomList.size(); ++i) {
                 IGeometry* geom = geomList[i];
                 M::Vector3 pos = _oldGeomPos[i];
@@ -365,7 +363,7 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
             }
         }
 
-        if(W::editMode_t::VERTICES == editMode) {
+        if(W::editMode_t::VERTICES == _editMode) {
             W::ENT_Geometry* geom = (W::ENT_Geometry*)geomList[0];
             leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
 
@@ -385,6 +383,7 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
 }
 
 void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {
+    _dragging = false;
     UpdateCursor();
 }
 
