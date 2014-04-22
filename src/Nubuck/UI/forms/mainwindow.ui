@@ -32,6 +32,7 @@
     </property>
     <addaction name="actShowRenderMetrics"/>
     <addaction name="actShowRenderConfig"/>
+    <addaction name="actShowConsole"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -61,6 +62,11 @@
   <action name="actLoadOperatorPlugin">
    <property name="text">
     <string>Load Operator Plugin</string>
+   </property>
+  </action>
+  <action name="actShowConsole">
+   <property name="text">
+    <string>Console</string>
    </property>
   </action>
  </widget>
@@ -130,11 +136,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actShowConsole</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OnShowConsole()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>OnRandomPoints()</slot>
   <slot>OnShowRenderMetrics()</slot>
   <slot>OnShowRenderConfig()</slot>
   <slot>OnLoadOperatorPlugin()</slot>
+  <slot>OnShowConsole()</slot>
  </slots>
 </ui>

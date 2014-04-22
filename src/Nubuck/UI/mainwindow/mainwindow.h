@@ -11,12 +11,14 @@
 
 namespace UI {
 
+    class Console;
     class RenderView;
 
 	class MainWindow : public QMainWindow, public IMainWindow {
         Q_OBJECT
 	private:
 		Ui::MainWindow  _ui;
+        Console*        _console;
         RenderView*     _renderView;
         RenderConfig*   _renderConfig;
         QDockWidget*    _outlinerDock;
@@ -44,6 +46,7 @@ namespace UI {
     protected:
         void closeEvent(QCloseEvent*) override;
     public slots:
+        void OnShowConsole();
 	    void OnRandomPoints(void);
         void OnShowRenderMetrics(void);
         void OnShowRenderConfig(void);

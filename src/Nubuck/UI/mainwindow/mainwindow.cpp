@@ -10,6 +10,7 @@
 #include <Nubuck\operators\operator.h>
 #include <operators\operators.h>
 #include <UI\block_signals.h>
+#include <UI\console\console.h>
 #include <UI\renderview\renderview.h>
 #include <UI\rendermetrics\rendermetrics.h>
 #include <UI\randompoints\randompoints.h>
@@ -86,6 +87,10 @@ namespace UI {
         qApp->exit();
     }
 
+    void MainWindow::OnShowConsole() {
+        _console->show();
+    }
+
     void MainWindow::OnRandomPoints(void) {
         RandomPoints randomPoints;
         if(QDialog::Accepted == randomPoints.exec()) {
@@ -148,6 +153,8 @@ namespace UI {
 
     MainWindow::MainWindow(void) {
         _ui.setupUi(this);
+
+        _console = new Console();
 
         OperatorMenus_Build();
         ToolBar_Build();

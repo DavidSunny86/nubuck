@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Console</class>
+ <widget class="QWidget" name="Console">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>672</width>
+    <height>447</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Console</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QPlainTextEdit" name="edtOutput">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>command:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="edtInput"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnExec">
+       <property name="text">
+        <string>Exec</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>edtInput</tabstop>
+  <tabstop>btnExec</tabstop>
+  <tabstop>edtOutput</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnExec</sender>
+   <signal>clicked()</signal>
+   <receiver>Console</receiver>
+   <slot>OnExec()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>624</x>
+     <y>425</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>335</x>
+     <y>223</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtInput</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Console</receiver>
+   <slot>OnExec()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>322</x>
+     <y>424</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>335</x>
+     <y>223</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>OnExec()</slot>
+ </slots>
+</ui>

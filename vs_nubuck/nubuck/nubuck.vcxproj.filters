@@ -282,6 +282,9 @@
     <Filter Include="Private\operators\op_merge_vertices">
       <UniqueIdentifier>{e7919955-ff40-465f-badf-a52632393ee4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\UI\console">
+      <UniqueIdentifier>{de44d42f-ebf7-4d33-a3e7-b5d031c22b21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -691,6 +694,15 @@
     </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\generic\page_alloc.h">
       <Filter>Public\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\common\commands.h">
+      <Filter>Private\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\UI\plaintextdevice.h">
+      <Filter>Private\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_console.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1126,6 +1138,21 @@
     <ClCompile Include="..\..\src\Nubuck\operators\op_merge_vertices\op_merge_vertices.cpp">
       <Filter>Private\operators\op_merge_vertices</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\common\commands.cpp">
+      <Filter>Private\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\plaintextdevice.cpp">
+      <Filter>Private\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\UI\console\console.cpp">
+      <Filter>Private\UI\console</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_console.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_console.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1217,6 +1244,12 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\userinterface.h">
       <Filter>Private\UI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\console.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\console\console.h">
+      <Filter>Private\UI\console</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
