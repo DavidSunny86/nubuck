@@ -321,12 +321,25 @@ void World::Event_Resize(const EV::Event& event) {
 void World::Event_Key(const EV::Event& event) {
     const EV::Params_Key& args = EV::def_Key.GetArgs(event);
 
-    if('R' == args.keyCode) _camArcball.ResetRotation();
-    if('E' == args.keyCode) _camArcball.Reset();
+    bool cameraChanged = false;
+
+    if('R' == args.keyCode) {
+        _camArcball.ResetRotation();
+        cameraChanged = true;
+    }
+    if('E' == args.keyCode) {
+        _camArcball.Reset();
+        cameraChanged = true;
+    }
 
     if(EV::Params_Key::KEY_DOWN == args.type && !args.autoRepeat) {
         GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
         if(phase.IsValid()) phase->OnKeyPressed((char)args.keyCode);
+    }
+
+    // TODO: do this once per world.Update()
+    if(cameraChanged) {
+        OP::g_operators.OnCameraChanged();
     }
 }
 
