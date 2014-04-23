@@ -629,6 +629,11 @@ void Renderer::Render(RenderList& renderList) {
         if(Layers::GEOMETRY_0 == i) worldToEye = renderList.worldMat;
         if(Layers::GEOMETRY_1 == i) worldToEye = M::Mat4::Identity();
         */
+
+        // HACK: always use perspective projection for translate gizmo,
+        // to maintain constant size on screen
+        if(Layers::GEOMETRY_1 == i) projection = perspective;
+
         GeomSortMode::Enum geomSortMode = GeomSortMode::UNSORTED;
         if(Layers::GEOMETRY_TRANSPARENT == i) geomSortMode = GeomSortMode::SORT_TRIANGLES;
         if(!_renderLayers[i].empty()) Render(renderList, projection, worldToEye, geomSortMode, _renderLayers[i]);
