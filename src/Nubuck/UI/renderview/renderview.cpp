@@ -99,6 +99,7 @@ namespace UI {
         EV::Params_Key args;
         args.type = EV::Params_Key::KEY_DOWN;
         args.keyCode = qevent->key();
+        args.nativeScanCode = qevent->nativeScanCode();
         args.autoRepeat = qevent->isAutoRepeat();
         W::world.Send(EV::def_Key.Create(args));
     }

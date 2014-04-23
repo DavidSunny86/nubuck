@@ -25,5 +25,6 @@ BEGIN_EVENT_DEF(Key)
     enum Type { KEY_DOWN = 0, KEY_UP };
     int type;
     int keyCode;
+    int nativeScanCode;
     bool autoRepeat;
 END_EVENT_DEF

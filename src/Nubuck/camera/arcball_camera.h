@@ -24,6 +24,15 @@ private:
     M::Quaternion   _lastOrient;
     float           _lastZoom;
 
+    // animation state of orientation
+    struct OrientAnim {
+        M::Quaternion   v0, v1;
+        float           dur, t;
+        bool            active;
+
+        OrientAnim() : active(false) { }
+    } _orientAnim;
+
     M::Vector3 Position() const;
 public:
     ArcballCamera(int width, int height);
@@ -47,6 +56,10 @@ public:
 
     void ZoomIn();
     void ZoomOut();
+
+    void RotateTo(const M::Quaternion& orient, float dur);
+
+    bool FrameUpdate(float secsPassed); // returns true when camera changed
 
     M::Matrix4 GetWorldToEyeMatrix() const;
 };

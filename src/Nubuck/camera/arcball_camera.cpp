@@ -195,6 +195,36 @@ void ArcballCamera::StopZooming() {
     _zooming = false;
 }
 
+void ArcballCamera::RotateTo(const M::Quaternion& orient, float dur) {
+    OrientAnim& anim = _orientAnim;
+
+    // don't reset duration when target doesn't change
+    if(!anim.active || !M::AlmostEqual(1.0f, M::Dot(orient, anim.v1))) {
+        anim.dur    = dur;
+        anim.t   	= 0.0f;
+        anim.v0  	= _orient;
+        anim.v1  	= orient;
+        anim.active = true;
+    }
+}
+
+bool ArcballCamera::FrameUpdate(float secsPassed) {
+    if(_orientAnim.active) {
+        OrientAnim& anim = _orientAnim;
+
+        float l = anim.t / anim.dur;
+        _orient = M::Slerp(anim.v0, anim.v1, l);
+
+        anim.t += secsPassed;
+        if(anim.dur <= anim.t) {
+            _orient = anim.v1;
+            anim.active = false;
+        }
+        return true;
+    }
+    return false;
+}
+
 M::Matrix4 ArcballCamera::GetWorldToEyeMatrix() const {
     const M::Quaternion q = M::Quaternion(_orient.w, -_orient.v);
     const M::Vector3    p = Position();

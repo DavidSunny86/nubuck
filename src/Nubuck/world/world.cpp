@@ -321,6 +321,16 @@ void World::Event_Resize(const EV::Event& event) {
 void World::Event_Key(const EV::Event& event) {
     const EV::Params_Key& args = EV::def_Key.GetArgs(event);
 
+    // numpad scancodes of generic usb keyboard
+    static const int numpad[] = {
+        82,
+        79, 80, 81,
+        75, 76, 77,
+        71, 72, 73
+    };
+
+    const float transitionDur = 0.5f;
+
     bool cameraChanged = false;
 
     if('R' == args.keyCode) {
@@ -330,6 +340,15 @@ void World::Event_Key(const EV::Event& event) {
     if('E' == args.keyCode) {
         _camArcball.Reset();
         cameraChanged = true;
+    }
+    if(numpad[1] == args.nativeScanCode) { // front view
+        _camArcball.RotateTo(M::Quat::Identity(), transitionDur);
+    }
+    if(numpad[6] == args.nativeScanCode) { // right view
+        _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(0.0f, 1.0f, 0.0f), 90.0f), transitionDur);
+    }
+    if(numpad[8] == args.nativeScanCode) { // top view
+        _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(1.0f, 0.0f, 0.0f), -90.0f), transitionDur);
     }
 
     if(EV::Params_Key::KEY_DOWN == args.type && !args.autoRepeat) {
@@ -498,6 +517,9 @@ void World::Update(void) {
             geom.BuildRenderList();
         }
     }
+
+    if(_camArcball.FrameUpdate(_secsPassed))
+        OP::g_operators.OnCameraChanged();
 }
 
 void World::Render(R::RenderList& renderList) {
