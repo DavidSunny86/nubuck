@@ -329,7 +329,7 @@ void World::Event_Key(const EV::Event& event) {
         71, 72, 73
     };
 
-    const float transitionDur = 0.5f;
+    const float transitionDur = 0.25f;
 
     bool cameraChanged = false;
 
@@ -344,17 +344,11 @@ void World::Event_Key(const EV::Event& event) {
     if(numpad[1] == args.nativeScanCode) { // front view
         _camArcball.RotateTo(M::Quat::Identity(), transitionDur);
     }
-    if(numpad[6] == args.nativeScanCode) { // right view
+    if(numpad[3] == args.nativeScanCode) { // right view
         _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(0.0f, 1.0f, 0.0f), 90.0f), transitionDur);
     }
-    if(numpad[8] == args.nativeScanCode) { // top view
+    if(numpad[7] == args.nativeScanCode) { // top view
         _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(1.0f, 0.0f, 0.0f), -90.0f), transitionDur);
-    }
-    if(numpad[7] == args.nativeScanCode) {
-        _camArcball.SetProjection(ArcballCamera::Projection::PERSPECTIVE, transitionDur);
-    }
-    if(numpad[9] == args.nativeScanCode) {
-        _camArcball.SetProjection(ArcballCamera::Projection::ORTHOGRAPHIC, transitionDur);
     }
     if(numpad[5] == args.nativeScanCode) _camArcball.ToggleProjection(transitionDur);
 
