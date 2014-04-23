@@ -5,6 +5,14 @@
 #include <Nubuck\math\quaternion.h>
 
 class ArcballCamera {
+public:
+    struct Projection {
+        enum Enum {
+            PERSPECTIVE = 0, 
+            ORTHOGRAPHIC,
+            NUM_PROJECTIONS
+        };
+    };
 private:
     float _halfWidth;
     float _halfHeight;
@@ -16,10 +24,11 @@ private:
     M::Vector3 _v0;
     float _y0;
 
-    M::Vector3      _target;
-    M::Quaternion   _orient;
-    float           _zoom; // distance to target
-    float           _projWeight;
+    M::Vector3          _target;
+    M::Quaternion       _orient;
+    float               _zoom; // distance to target
+    float               _projWeight;
+    Projection::Enum    _proj;
 
     M::Vector3      _lastTarget;
     M::Quaternion   _lastOrient;
@@ -44,8 +53,6 @@ private:
     } _projWeightAnim;
 
     M::Vector3 Position() const;
-
-    void SetProjection(float proj, float dur);
 public:
     ArcballCamera(int width, int height);
 
@@ -73,8 +80,8 @@ public:
     void ZoomOut();
 
     void RotateTo(const M::Quaternion& orient, float dur);
-    void SetPerspective(float dur);
-    void SetOrthographic(float dur);
+    void SetProjection(Projection::Enum proj, float dur);
+    void ToggleProjection(float dur);
 
     bool FrameUpdate(float secsPassed); // returns true when camera changed
 

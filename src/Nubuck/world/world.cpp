@@ -351,11 +351,12 @@ void World::Event_Key(const EV::Event& event) {
         _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(1.0f, 0.0f, 0.0f), -90.0f), transitionDur);
     }
     if(numpad[7] == args.nativeScanCode) {
-        _camArcball.SetPerspective(transitionDur);
+        _camArcball.SetProjection(ArcballCamera::Projection::PERSPECTIVE, transitionDur);
     }
     if(numpad[9] == args.nativeScanCode) {
-        _camArcball.SetOrthographic(transitionDur);
+        _camArcball.SetProjection(ArcballCamera::Projection::ORTHOGRAPHIC, transitionDur);
     }
+    if(numpad[5] == args.nativeScanCode) _camArcball.ToggleProjection(transitionDur);
 
     if(EV::Params_Key::KEY_DOWN == args.type && !args.autoRepeat) {
         GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
