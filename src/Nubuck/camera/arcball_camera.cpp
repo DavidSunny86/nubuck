@@ -88,13 +88,13 @@ M::Vector3 ArcballCamera::Position() const {
 }
 
 void ArcballCamera::SetProjection(float proj, float dur) {
-    ProjAnim& anim = _projAnim;
+    ProjWeightAnim& anim = _projWeightAnim;
 
     // don't reset duration when target doesn't change
     if(!anim.active || proj != anim.v1) {
         anim.dur    = dur;
         anim.t      = 0.0f;
-        anim.v0     = _proj;
+        anim.v0     = _projWeight;
         anim.v1     = proj;
         anim.active = true;
     }
@@ -107,7 +107,7 @@ ArcballCamera::ArcballCamera(int width, int height)
     , _target(M::Vector3::Zero)
     , _orient(M::Quat::Identity())
     , _zoom(0.0f)
-    , _proj(0.0f)
+    , _projWeight(0.0f)
 {
     SetScreenSize(width, height);
     Reset();
@@ -115,7 +115,7 @@ ArcballCamera::ArcballCamera(int width, int height)
 
 float ArcballCamera::GetZoom() const { return _zoom; }
 
-float ArcballCamera::GetProjection() const { return _proj; }
+float ArcballCamera::GetProjectionWeight() const { return _projWeight; }
 
 void ArcballCamera::Reset() {
     _panning = false;
@@ -249,8 +249,8 @@ bool ArcballCamera::FrameUpdate(float secsPassed) {
         cameraChanged = true;
     }
 
-    if(_projAnim.active) {
-        ProjAnim& anim = _projAnim;
+    if(_projWeightAnim.active) {
+        ProjWeightAnim& anim = _projWeightAnim;
 
         float u, t = anim.t / anim.dur;
 
@@ -264,11 +264,11 @@ bool ArcballCamera::FrameUpdate(float secsPassed) {
 
         if(!ease) u = t;
 
-        _proj = (1.0f - u) * anim.v0 + u * anim.v1;
+        _projWeight = (1.0f - u) * anim.v0 + u * anim.v1;
 
         anim.t += secsPassed;
         if(anim.dur <= anim.t) {
-            _proj = anim.v1;
+            _projWeight = anim.v1;
             anim.active = false;
         }
     }

@@ -40,7 +40,7 @@ struct DirectionalLight {
 };
 
 struct RenderList {
-    float                       projection;
+    float                       projWeight;
     float                       zoom;
     M::Matrix4                  worldMat;
     DirectionalLight        	dirLights[3];

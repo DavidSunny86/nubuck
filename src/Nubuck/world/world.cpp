@@ -531,7 +531,7 @@ void World::Update(void) {
 void World::Render(R::RenderList& renderList) {
     SetupLights(renderList);
 
-    renderList.projection = _camArcball.GetProjection();
+    renderList.projWeight = _camArcball.GetProjectionWeight();
     renderList.zoom = _camArcball.GetZoom();
     renderList.worldMat = _camArcball.GetWorldToEyeMatrix();
     renderList.meshJobs.clear();
