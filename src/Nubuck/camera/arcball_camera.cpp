@@ -87,6 +87,19 @@ M::Vector3 ArcballCamera::Position() const {
     return _target + Transform(_orient, _zoom * M::Vector3(0.0f, 0.0f, 1.0f));
 }
 
+void ArcballCamera::SetProjection(float proj, float dur) {
+    ProjAnim& anim = _projAnim;
+
+    // don't reset duration when target doesn't change
+    if(!anim.active || proj != anim.v1) {
+        anim.dur    = dur;
+        anim.t      = 0.0f;
+        anim.v0     = _proj;
+        anim.v1     = proj;
+        anim.active = true;
+    }
+}
+
 ArcballCamera::ArcballCamera(int width, int height)
     : _dragging(false)
     , _panning(false)
@@ -94,10 +107,15 @@ ArcballCamera::ArcballCamera(int width, int height)
     , _target(M::Vector3::Zero)
     , _orient(M::Quat::Identity())
     , _zoom(0.0f)
+    , _proj(0.0f)
 {
     SetScreenSize(width, height);
     Reset();
 }
+
+float ArcballCamera::GetZoom() const { return _zoom; }
+
+float ArcballCamera::GetProjection() const { return _proj; }
 
 void ArcballCamera::Reset() {
     _panning = false;
@@ -208,7 +226,14 @@ void ArcballCamera::RotateTo(const M::Quaternion& orient, float dur) {
     }
 }
 
+void ArcballCamera::SetPerspective(float dur) { SetProjection(0.0f, dur); }
+
+void ArcballCamera::SetOrthographic(float dur) { SetProjection(1.0f, dur); }
+
 bool ArcballCamera::FrameUpdate(float secsPassed) {
+    bool cameraChanged = false;
+    bool ease = true;
+
     if(_orientAnim.active) {
         OrientAnim& anim = _orientAnim;
 
@@ -220,9 +245,35 @@ bool ArcballCamera::FrameUpdate(float secsPassed) {
             _orient = anim.v1;
             anim.active = false;
         }
-        return true;
+
+        cameraChanged = true;
     }
-    return false;
+
+    if(_projAnim.active) {
+        ProjAnim& anim = _projAnim;
+
+        float u, t = anim.t / anim.dur;
+
+        // uses x^4 easing function
+        if(anim.v0 < anim.v1) { // transitioning from persp to orth
+            const float m = t - 1.0f;
+            u = - m * m * m * m + 1.0f;
+        } else {
+            u = t * t * t * t;
+        }
+
+        if(!ease) u = t;
+
+        _proj = (1.0f - u) * anim.v0 + u * anim.v1;
+
+        anim.t += secsPassed;
+        if(anim.dur <= anim.t) {
+            _proj = anim.v1;
+            anim.active = false;
+        }
+    }
+
+    return cameraChanged;
 }
 
 M::Matrix4 ArcballCamera::GetWorldToEyeMatrix() const {

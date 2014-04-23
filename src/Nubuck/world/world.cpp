@@ -350,6 +350,12 @@ void World::Event_Key(const EV::Event& event) {
     if(numpad[8] == args.nativeScanCode) { // top view
         _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(1.0f, 0.0f, 0.0f), -90.0f), transitionDur);
     }
+    if(numpad[7] == args.nativeScanCode) {
+        _camArcball.SetPerspective(transitionDur);
+    }
+    if(numpad[9] == args.nativeScanCode) {
+        _camArcball.SetOrthographic(transitionDur);
+    }
 
     if(EV::Params_Key::KEY_DOWN == args.type && !args.autoRepeat) {
         GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
@@ -525,6 +531,8 @@ void World::Update(void) {
 void World::Render(R::RenderList& renderList) {
     SetupLights(renderList);
 
+    renderList.projection = _camArcball.GetProjection();
+    renderList.zoom = _camArcball.GetZoom();
     renderList.worldMat = _camArcball.GetWorldToEyeMatrix();
     renderList.meshJobs.clear();
 

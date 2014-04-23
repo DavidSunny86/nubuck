@@ -40,6 +40,8 @@ struct DirectionalLight {
 };
 
 struct RenderList {
+    float                       projection;
+    float                       zoom;
     M::Matrix4                  worldMat;
     DirectionalLight        	dirLights[3];
     std::vector<MeshJob>        meshJobs;

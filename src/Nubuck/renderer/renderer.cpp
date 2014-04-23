@@ -599,6 +599,17 @@ void Renderer::Render(
     }
 }
 
+namespace {
+
+M::Matrix4 Lerp(const M::Matrix4& lhp, const M::Matrix4& rhp, float t) {
+    M::Matrix4 m;
+    for(unsigned i = 0; i < 16; ++i)
+        m.mat[i] = (1.0f - t) * lhp.mat[i] + t * rhp.mat[i];
+    return m;
+}
+
+} // unnamed namespace
+
 void Renderer::Render(RenderList& renderList) {
     for(unsigned i = 0; i < Layers::NUM_LAYERS; ++i) _renderLayers[i].clear();
 
@@ -608,7 +619,10 @@ void Renderer::Render(RenderList& renderList) {
     }
 
     for(unsigned i = 0; i < Layers::NUM_LAYERS; ++i) {
-        M::Matrix4 projection = M::Mat4::Perspective(45.0f, _aspect, 0.1f, 100.0f);
+        const float zoom = 0.45f * renderList.zoom; // arbitrary scaling factor, looks okay i guess
+        M::Matrix4 perspective  = M::Mat4::Perspective(45.0f, _aspect, 0.1f, 100.0f);
+        M::Matrix4 ortho        = M::Mat4::Ortho(-zoom * _aspect, zoom * _aspect, -zoom, zoom, 0.1f, 100.0f);
+        M::Matrix4 projection   = Lerp(perspective, ortho, renderList.projection);
         M::Matrix4 worldToEye = renderList.worldMat;
         /*
         M::Matrix4 worldToEye = M::Mat4::Identity();

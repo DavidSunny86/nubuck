@@ -19,6 +19,7 @@ private:
     M::Vector3      _target;
     M::Quaternion   _orient;
     float           _zoom; // distance to target
+    float           _proj;
 
     M::Vector3      _lastTarget;
     M::Quaternion   _lastOrient;
@@ -33,9 +34,23 @@ private:
         OrientAnim() : active(false) { }
     } _orientAnim;
 
+    // animation state of projection
+    struct ProjAnim {
+        float   v0, v1;
+        float   dur, t;
+        bool    active;
+
+        ProjAnim() : active(false) { }
+    } _projAnim;
+
     M::Vector3 Position() const;
+
+    void SetProjection(float proj, float dur);
 public:
     ArcballCamera(int width, int height);
+
+    float GetZoom() const;
+    float GetProjection() const;
 
     void SetScreenSize(int width, int height);
 
@@ -58,6 +73,8 @@ public:
     void ZoomOut();
 
     void RotateTo(const M::Quaternion& orient, float dur);
+    void SetPerspective(float dur);
+    void SetOrthographic(float dur);
 
     bool FrameUpdate(float secsPassed); // returns true when camera changed
 
