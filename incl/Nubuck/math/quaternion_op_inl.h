@@ -7,17 +7,42 @@
 
 namespace M {
 
+    M_INLINE Quaternion operator+(const Quaternion& lhp, const Quaternion& rhp) {
+        return Quaternion(lhp.w + rhp.w, lhp.v + rhp.v);
+    }
+
+    M_INLINE Quaternion operator*(float s, const Quaternion& q) {
+        return Quaternion(s * q.w, s * q.v);
+    }
+
+    M_INLINE Quaternion operator*(const Quaternion& q, float s) {
+        return Quaternion(s * q.w, s * q.v);
+    }
+
 	M_INLINE Quaternion operator*(const Quaternion& lhp, const Quaternion& rhp) {
 		return Quaternion(
 			lhp.w * rhp.w - Dot(lhp.v, rhp.v),
 			lhp.w * rhp.v + rhp.w * lhp.v + Cross(rhp.v, lhp.v));
 	}
 
+    M_INLINE float Dot(const Quaternion& lhp, const Quaternion& rhp) {
+        return lhp.w * rhp.w + Dot(lhp.v, rhp.v);
+    }
+
 	M_INLINE Quaternion Normalize(const Quaternion& q) {
 		const float norm = sqrtf(q.w * q.w + Dot(q.v, q.v));
 		const float oneOverNorm = 1.0f / norm;
 		return Quaternion(oneOverNorm * q.w, oneOverNorm * q.v);
 	}
+
+    M_INLINE Quaternion Slerp(Quaternion q0, const Quaternion& q1, float t) {
+        const float d = Dot(q0, q1);
+        if(AlmostEqual(1.0f, d)) return q0;
+        if(0.0f > d) q0 = -q0;
+        const float theta = acosf(d);
+        const float s = 1.0f / sinf(theta);
+        return s * (sinf(theta * (1.0f - t)) * q0 + sinf(theta * t) * q1);
+    }
 
 	namespace Quat {
 

@@ -13,11 +13,19 @@ namespace M {
 		Quaternion(void) { }
 		Quaternion(const Quaternion& other);
 		Quaternion(float w, const Vector3& v);
+
+        Quaternion& operator=(const Quaternion& other);
+        Quaternion  operator-() const;
 	};
 
+    Quaternion operator+(const Quaternion& lhp, const Quaternion& rhp);
+    Quaternion operator*(float s, const Quaternion& q);
+    Quaternion operator*(const Quaternion& q, float s);
 	Quaternion operator*(const Quaternion& lhp, const Quaternion& rhp);
 
-	Quaternion Normalize(const Quaternion& q);
+    float       Dot(const Quaternion& lhp, const Quaternion& rhp);
+	Quaternion  Normalize(const Quaternion& q);
+    Quaternion  Slerp(Quaternion q0, const Quaternion& q1, float t);
 
 	namespace Quat {
 
