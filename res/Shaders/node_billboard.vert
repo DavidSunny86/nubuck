@@ -15,7 +15,7 @@ varying vec2 vTexCoord0;
 void main() {
     vColor = aColor;
 	vTexCoord0 = aNormal.xy;
-    vec4 off = vec4(aNormal.z * aNormal.xy, 0.0, 1.0);
+    vec4 off = vec4(aNormal.z * aNormal.xy, 0.0, 0.0);
     vec4 pos = uTransform * aPosition + off;
     vPosition = pos.xyz;
 	gl_Position = uProjection * pos;
