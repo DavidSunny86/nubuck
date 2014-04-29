@@ -285,6 +285,9 @@
     <Filter Include="Private\UI\console">
       <UniqueIdentifier>{de44d42f-ebf7-4d33-a3e7-b5d031c22b21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_delaunay3d">
+      <UniqueIdentifier>{0097e044-abb1-4850-af69-fd7bee98a3ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -703,6 +706,9 @@
     </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\operators\operator_events.h">
       <Filter>Public\operators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_delaunay3d\op_delaunay3d.h">
+      <Filter>Private\operators\op_delaunay3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1152,6 +1158,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_console.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_delaunay3d\op_delaunay3d.cpp">
+      <Filter>Private\operators\op_delaunay3d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
