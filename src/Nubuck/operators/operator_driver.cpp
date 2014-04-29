@@ -57,6 +57,15 @@ static MouseEvent ConvertMouseEvent(const EV::Params_Mouse& from) {
     return to;
 }
 
+static KeyEvent ConvertKeyEvent(const EV::Params_Key& from) {
+    KeyEvent to;
+    to.type             = from.type;
+    to.keyCode          = from.keyCode;
+    to.nativeScanCode   = from.nativeScanCode;
+    to.autoRepeat       = from.autoRepeat;
+    return to;
+}
+
 void Driver::Event_EditModeChanged(const EV::Event& event) {
     const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
     SYS::ScopedLock lock(_activeOpsMtx);
@@ -98,6 +107,16 @@ void Driver::Event_Mouse(const EV::Event& event) {
 	event.Accept();
 }
 
+void Driver::Event_Key(const EV::Event& event) {
+    SYS::ScopedLock lock(_activeOpsMtx);
+    const EV::Params_Key& args = EV::def_Key.GetArgs(event);
+    for(int i = _activeOps.size() - 1; 0 <= i; --i) {
+        Operator* op = _activeOps[i];
+        op->OnKey(ConvertKeyEvent(args));
+    }
+    W::world.Send(event);
+}
+
 void Driver::Event_Default(const EV::Event& event, const char* className) {
     SYS::ScopedLock lock(_activeOpsMtx);
     Operator* op = ActiveOperator();
@@ -122,6 +141,7 @@ Driver::Driver(
 	AddEventHandler(EV::def_CameraChanged, this, &Driver::Event_CameraChanged);
     AddEventHandler(EV::def_EditModeChanged, this, &Driver::Event_EditModeChanged);
 	AddEventHandler(EV::def_Mouse, this, &Driver::Event_Mouse);
+    AddEventHandler(EV::def_Key, this, &Driver::Event_Key);
 }
 
 DWORD Driver::Thread_Func() {

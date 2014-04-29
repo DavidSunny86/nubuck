@@ -5,7 +5,7 @@
 
 #include <Nubuck\math\vector2.h>
 
-#include <Nubuck\operators\mouse_event.h>
+#include <Nubuck\operators\operator_events.h>
 #include <Nubuck\events\events.h>
 #include <Nubuck\world\editmode.h>
 
@@ -44,6 +44,7 @@ public:
     virtual void OnCameraChanged() { }
     virtual void OnEditModeChanged(const W::editMode_t::Enum mode) { }
 	virtual bool OnMouse(const MouseEvent& mouseEvent) { return false; }
+    virtual bool OnKey(const KeyEvent& keyEvent) { return false; }
 };
 
 NUBUCK_API void SendToOperator(const EV::Event& event);

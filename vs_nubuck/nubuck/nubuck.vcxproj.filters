@@ -665,9 +665,6 @@
     <ClInclude Include="..\..\incl\Nubuck\nubuck_api.h">
       <Filter>Public</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\incl\Nubuck\operators\mouse_event.h">
-      <Filter>Public\operators</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\operators\standard_algorithm_fwd.h">
       <Filter>Public\operators</Filter>
     </ClInclude>
@@ -703,6 +700,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_console.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\operators\operator_events.h">
+      <Filter>Public\operators</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

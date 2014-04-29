@@ -30,7 +30,18 @@ private:
     typedef leda::rational      scalar_t;
     typedef leda::d3_rat_point  point3_t;
 
+    struct TransformMode {
+        enum Enum {
+            TRANSLATE = 0,
+            SCALE,
+            ROTATE,
+            NUM_MODES
+        };
+    };
+
     Nubuck _nb;
+
+    TransformMode::Enum _mode;
 
     R::meshPtr_t    _axisMesh;
     R::tfmeshPtr_t  _axisTFMesh;
@@ -39,6 +50,14 @@ private:
     R::meshPtr_t    _arrowHeadMeshes[3];
     R::tfmeshPtr_t  _arrowHeadTFMeshes[3];
     M::Matrix4      _arrowHeadTF[3];
+
+    R::meshPtr_t    _boxHeadMeshes[3];
+    R::tfmeshPtr_t  _boxHeadTFMeshes[3];
+    M::Matrix4      _boxHeadTF[3];
+
+    void BuildAxis();
+    void BuildArrowHeads();
+    void BuildBoxHeads();
 
     M::Box _bboxes[DIM]; // bounding boxes of cursor
 
@@ -58,6 +77,7 @@ private:
     M::Vector3              		_oldCursorPos;
     std::vector<M::Vector3> 		_oldGeomPos;
     leda::node_array<M::Vector3>    _oldVertPos;
+    M::Vector3                      _center;
     W::editMode_t::Enum             _editMode;
 
     bool        _dragging;
@@ -86,6 +106,7 @@ public:
     void OnCameraChanged() override;
     void OnEditModeChanged(const W::editMode_t::Enum mode) override;
     bool OnMouse(const MouseEvent& event) override;
+    bool OnKey(const KeyEvent& event) override;
 };
 
 } // namespace OP

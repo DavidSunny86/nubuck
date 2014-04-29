@@ -111,6 +111,12 @@ namespace R {
         if(_indices) delete[] _indices;
     }
 
+    void Sphere::SetColor(const Color& color) {
+        for(int i = 0; i < _numVerts; ++i) {
+            _vertices[i].color = color;
+        }
+    }
+
     void Sphere::Scale(float scale) {
         for(int i = 0; i < _numVerts; ++i) {
 			_vertices[i].position *= scale;

@@ -4,6 +4,7 @@
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\cone\cone.h>
+#include <renderer\mesh\sphere\sphere.h>
 #include "op_translate.h"
 
 namespace OP {
@@ -56,16 +57,13 @@ struct AxisMesh {
     }
 };
 
-Translate::Translate() : _dragging(false) {
-	AddEventHandler(EV::def_SelectionChanged, this, &Translate::Event_SelectionChanged);
-
-    _cursorPos = M::Vector3::Zero;
-    _hidden = true;
-
+void Translate::BuildAxis() {
     AxisMesh axisDesc(1.0f, 4, 0.4f, R::Color::Red, R::Color::Blue, R::Color::Green);
     _axisMesh = R::meshMgr.Create(axisDesc.GetDesc());
     _axisTFMesh = R::meshMgr.Create(_axisMesh);
+}
 
+void Translate::BuildArrowHeads() {
     R::Cone arrowHead(0.1f, 0.5f, 20, R::Color::Red);
     R::meshPtr_t meshPtr = _arrowHeadMeshes[0] = R::meshMgr.Create(R::Cone(0.1f, 0.5f, 20, R::Color::Red).GetDesc());
     _arrowHeadTFMeshes[0] = R::meshMgr.Create(meshPtr);
@@ -81,6 +79,47 @@ Translate::Translate() : _dragging(false) {
     _arrowHeadTFMeshes[2] = R::meshMgr.Create(meshPtr);
     _arrowHeadTF[2] = M::Mat4::Translate(0.0f, 0.0f, 1.0f);
     R::meshMgr.GetMesh(_arrowHeadTFMeshes[2]).SetTransform(_arrowHeadTF[2]);
+}
+
+void Translate::BuildBoxHeads() {
+    const unsigned subdiv = 4;
+
+    R::meshPtr_t meshPtr;
+
+    R::Sphere sphere(subdiv, true);
+    sphere.Scale(0.1f);
+
+    sphere.SetColor(R::Color::Red);
+    meshPtr = _boxHeadMeshes[0] = R::meshMgr.Create(sphere.GetDesc());
+    _boxHeadTFMeshes[0] = R::meshMgr.Create(meshPtr);
+    _boxHeadTF[0] = M::Mat4::Translate(1.0f, 0.0f, 0.0f);
+    R::meshMgr.GetMesh(_boxHeadTFMeshes[0]).SetTransform(_boxHeadTF[0]);
+
+    sphere.SetColor(R::Color::Blue);
+    meshPtr = _boxHeadMeshes[1] = R::meshMgr.Create(sphere.GetDesc());
+    _boxHeadTFMeshes[1] = R::meshMgr.Create(meshPtr);
+    _boxHeadTF[1] = M::Mat4::Translate(0.0f, 1.0f, 0.0f);
+    R::meshMgr.GetMesh(_boxHeadTFMeshes[1]).SetTransform(_boxHeadTF[1]);
+
+    sphere.SetColor(R::Color::Green);
+    meshPtr = _boxHeadMeshes[2] = R::meshMgr.Create(sphere.GetDesc());
+    _boxHeadTFMeshes[2] = R::meshMgr.Create(meshPtr);
+    _boxHeadTF[2] = M::Mat4::Translate(0.0f, 0.0f, 1.0f);
+    R::meshMgr.GetMesh(_boxHeadTFMeshes[2]).SetTransform(_boxHeadTF[2]);
+}
+
+Translate::Translate()
+    : _mode(TransformMode::TRANSLATE)
+    , _dragging(false)
+{
+	AddEventHandler(EV::def_SelectionChanged, this, &Translate::Event_SelectionChanged);
+
+    _cursorPos = M::Vector3::Zero;
+    _hidden = true;
+
+    BuildAxis();
+    BuildArrowHeads();
+    BuildBoxHeads();
 }
 
 void Translate::BuildBBoxes() {
@@ -111,6 +150,7 @@ void Translate::SetRenderPosition(const M::Vector3& pos) {
     R::meshMgr.GetMesh(_axisTFMesh).SetTransform(T);
     for(int i = 0; i < DIM; ++i) {
         R::meshMgr.GetMesh(_arrowHeadTFMeshes[i]).SetTransform(T * _arrowHeadTF[i]);
+        R::meshMgr.GetMesh(_boxHeadTFMeshes[i]).SetTransform(T * _boxHeadTF[i]);
     }
     for(unsigned i = 0; i < DIM; ++i) {
         SetCenterPosition(_bboxes[i], pos);
@@ -188,7 +228,14 @@ void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
     meshJob.material = R::Material::White;
     meshJob.primType = 0;
     for(int i = 0; i < 3; ++i) {
-        meshJob.tfmesh = _arrowHeadTFMeshes[i];
+        switch(_mode) {
+        case TransformMode::TRANSLATE:
+            meshJob.tfmesh = _arrowHeadTFMeshes[i];
+            break;
+        case TransformMode::SCALE:
+            meshJob.tfmesh = _boxHeadTFMeshes[i];
+            break;
+        }
         meshJobs.push_back(meshJob);
     }
 }
@@ -290,21 +337,33 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
 
         const std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
 
+        _center = M::Vector3::Zero;
+
+        // save entity positions
         if(W::editMode_t::OBJECTS == _editMode) {
             _oldGeomPos.resize(geomList.size());
-            for(unsigned i = 0; i < _oldGeomPos.size(); ++i) 
+            for(unsigned i = 0; i < _oldGeomPos.size(); ++i) {
                 _oldGeomPos[i] = ((const W::ENT_Geometry*)geomList[i])->Transform(M::Vector3::Zero);
+                _center += _oldGeomPos[i];
+            }
+            _center /= _oldGeomPos.size();
+        }
+
+        // save vertex positions
+        const W::ENT_Geometry* geom = (const W::ENT_Geometry*)geomList[0];
+        const leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+        _oldVertPos.init(mesh);
+        leda::node v;
+        forall_nodes(v, mesh) {
+            const M::Vector3 pos = ToVector(mesh.position_of(v));
+            _oldVertPos[v] = pos;
         }
 
         if(W::editMode_t::VERTICES == _editMode) {
-            const W::ENT_Geometry* geom = (const W::ENT_Geometry*)geomList[0];
-            const leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
-            _oldVertPos.init(mesh);
-            leda::node v;
-            forall_nodes(v, mesh) {
-                const M::Vector3 pos = ToVector(mesh.position_of(v));
-                _oldVertPos[v] = pos;
-            }
+            std::vector<leda::node> verts = geom->GetVertexSelection();
+            for(unsigned i = 0; i < verts.size(); ++i)
+                _center += _oldVertPos[verts[i]];
+            _center /= verts.size();
         }
 
         _oldCursorPos = _cursorPos;
@@ -341,8 +400,20 @@ bool Translate::OnMouseUp(const MouseEvent&) {
     return false;
 }
 
+namespace {
+
+leda::d3_rat_point Scale(float s, leda::d3_rat_point p) {
+    leda::rational r(8, 7);
+    return leda::d3_rat_point(
+        r * p.xcoord(),
+        r * p.ycoord(),
+        r * p.zcoord());
+}
+
+} // unnamed namespace
+
 bool Translate::OnMouseMove(const MouseEvent& event) {
-    if(_dragging) {
+    if(_dragging && TransformMode::TRANSLATE == _mode) {
         M::Ray ray = W::world.PickingRay(event.coords);
         M::IS::Info inf;
         bool is = M::IS::Intersects(ray, _dragPlane, &inf);
@@ -379,6 +450,51 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
         }
         return true;
     }
+    if(_dragging && TransformMode::SCALE == _mode) {
+        M::Vector2 mousePos = event.coords;
+        float base = M::Length(_dragOrig - _oldCursorPos);
+
+        M::Ray ray = W::world.PickingRay(event.coords);
+        M::IS::Info inf;
+        bool is = M::IS::Intersects(ray, _dragPlane, &inf);
+        assert(is);
+        M::Vector3 p = inf.where;
+
+        float scale = M::Length(p - _oldCursorPos) / base;
+
+        std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
+
+        if(W::editMode_t::OBJECTS == _editMode) {
+            for(unsigned i = 0; i < geomList.size(); ++i) {
+                IGeometry* geom = geomList[i];
+                leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+                leda::node v;
+                forall_nodes(v, mesh) {
+                    M::Vector3 pos = _oldVertPos[v];
+                    pos.vec[_dragAxis] *= scale;
+                    mesh.set_position(v, ToRatPoint(pos));
+                }
+            }
+        }
+
+        if(W::editMode_t::VERTICES == _editMode) {
+            W::ENT_Geometry* geom = (W::ENT_Geometry*)geomList[0];
+            leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+
+            std::vector<leda::node> verts = geom->GetVertexSelection();
+            assert(!verts.empty());
+
+            for(unsigned i = 0; i < verts.size(); ++i) {
+                leda::node v = verts[i];
+                M::Vector3 pos = _oldVertPos[v] - _center;
+                pos.vec[_dragAxis] *= scale;
+                pos += _center;
+                mesh.set_position(v, ToRatPoint(pos));
+            }
+        }
+
+        return true;
+    }
     return false;
 }
 
@@ -394,6 +510,22 @@ bool Translate::OnMouse(const MouseEvent& event) {
 	case MouseEvent::MOUSE_MOVE:  return OnMouseMove(event);
 	}
     return false;
+}
+
+bool Translate::OnKey(const KeyEvent& event) {
+    // scancodes for number row of generic usb keyboard
+    static const unsigned numrow[3] = { 11, 2, 3 };
+
+    if(numrow[1] == event.nativeScanCode) {
+        _mode = TransformMode::TRANSLATE;
+        _dragging = false;
+    }
+    if(numrow[2] == event.nativeScanCode) {
+        _mode = TransformMode::SCALE;
+        _dragging = false;
+    }
+
+    return true;
 }
 
 } // namespace OP

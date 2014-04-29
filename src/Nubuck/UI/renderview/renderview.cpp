@@ -101,7 +101,9 @@ namespace UI {
         args.keyCode = qevent->key();
         args.nativeScanCode = qevent->nativeScanCode();
         args.autoRepeat = qevent->isAutoRepeat();
-        W::world.Send(EV::def_Key.Create(args));
+
+        // HACK: use MouseEvent to forward key event to driver
+        OP::g_operators.MouseEvent(EV::def_Key.Create(args));
     }
 
     void RenderView::keyReleaseEvent(QKeyEvent* qevent) {
