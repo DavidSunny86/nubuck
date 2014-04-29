@@ -433,6 +433,7 @@
     <ClCompile Include="..\..\src\Nubuck\operators\operator_driver.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\operator_modules.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_chull\op_chull.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\operators\op_delaunay3d\d3_delaunay.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_delaunay3d\op_delaunay3d.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_delete\op_delete.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.cpp" />

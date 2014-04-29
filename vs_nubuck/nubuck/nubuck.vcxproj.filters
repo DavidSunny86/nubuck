@@ -1162,6 +1162,9 @@
     <ClCompile Include="..\..\src\Nubuck\operators\op_delaunay3d\op_delaunay3d.cpp">
       <Filter>Private\operators\op_delaunay3d</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_delaunay3d\d3_delaunay.cpp">
+      <Filter>Private\operators\op_delaunay3d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">

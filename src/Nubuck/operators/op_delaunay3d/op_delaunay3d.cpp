@@ -6,6 +6,14 @@
 #include <Nubuck\polymesh.h>
 #include "op_delaunay3d.h"
 
+namespace leda {
+namespace fork {
+
+void D3_DELAUNAY(const list<d3_rat_point>& L0, GRAPH<d3_rat_point,int>& G);
+
+} // namespace fork
+} // namespace leda
+
 namespace OP {
 
 void Delaunay3D::Register(const Nubuck& nb, Invoker& invoker) {
@@ -36,7 +44,7 @@ void Delaunay3D::Invoke() {
     
     std::cout << "Delaunay3D: calling D3_DELAUNAY ... " << std::flush;
     // NOTE: include d3_delaunay.cpp when building LEDA
-    leda::D3_DELAUNAY(L, delaunayMesh);
+    leda::fork::D3_DELAUNAY(L, delaunayMesh);
     std::cout << "DONE" << std::endl;
 
     float x, y, z;
