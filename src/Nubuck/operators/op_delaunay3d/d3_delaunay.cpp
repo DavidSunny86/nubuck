@@ -37,6 +37,8 @@ it's not part of the normal leda compilation.
 #include <LEDA/geo/d3_hull.h>
 #include <LEDA/system/assert.h>
 
+#include "d3_delaunay.h"
+
 
 /*
 #if defined(LEDA_NAMESPACE)
@@ -531,6 +533,21 @@ be neighbours, if they have 3 vertices together, or if they have 2 vertices toge
 
   void compute_graph(GRAPH<d3_rat_point,int>& Gout);
 /*{\Mop   computes from |C| the GRAPH |Gout|.}*/
+
+  void compute_simplices(list<fork::simplex_t>& simplices) {
+      simplices.clear();
+      sc_simplex S;
+      forall(S, Sil) {
+          if(!S->HULL_TR) {
+              fork::simplex_t s;
+              s.verts[0] = S->a->stor;
+              s.verts[1] = S->b->stor;
+              s.verts[2] = S->c->stor;
+              s.verts[3] = S->d->stor;
+              simplices.push(s);
+          }
+      }
+  }
 
 /*
   void compute_graph(GRAPH<d3_rat_point,int>& Gout,set<sc_vertex>& DS,list<edge>& erg);
@@ -3654,6 +3671,13 @@ void D3_DELAUNAY(const list<d3_rat_point>& L0, GRAPH<d3_rat_point,int>& G)
   d3_simpl_complex C;
   D3_DELAU(L0,C);
   C.compute_graph(G);
+}
+
+void D3_DELAUNAY(const list<d3_rat_point>& L0, list<simplex_t>& simplices)
+{
+  d3_simpl_complex C;
+  D3_DELAU(L0,C);
+  C.compute_simplices(simplices);
 }
 
 void D3_VORONOI(const list<d3_rat_point>& L, GRAPH<d3_rat_sphere,int>& G)

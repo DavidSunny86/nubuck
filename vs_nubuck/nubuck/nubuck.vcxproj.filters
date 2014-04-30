@@ -710,6 +710,9 @@
     <ClInclude Include="..\..\src\Nubuck\operators\op_delaunay3d\op_delaunay3d.h">
       <Filter>Private\operators\op_delaunay3d</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_delaunay3d\d3_delaunay.h">
+      <Filter>Private\operators\op_delaunay3d</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
