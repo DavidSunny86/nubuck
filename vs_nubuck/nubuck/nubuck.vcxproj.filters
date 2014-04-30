@@ -707,11 +707,11 @@
     <ClInclude Include="..\..\incl\Nubuck\operators\operator_events.h">
       <Filter>Public\operators</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\operators\op_delaunay3d\op_delaunay3d.h">
-      <Filter>Private\operators\op_delaunay3d</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\operators\op_delaunay3d\d3_delaunay.h">
       <Filter>Private\operators\op_delaunay3d</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_op_delaunay3d.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1168,6 +1168,12 @@
     <ClCompile Include="..\..\src\Nubuck\operators\op_delaunay3d\d3_delaunay.cpp">
       <Filter>Private\operators\op_delaunay3d</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_op_delaunay3d.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_op_delaunay3d.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1265,6 +1271,12 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\UI\console\console.h">
       <Filter>Private\UI\console</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\UI\forms\op_delaunay3d.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_delaunay3d\op_delaunay3d.h">
+      <Filter>Private\operators\op_delaunay3d</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
