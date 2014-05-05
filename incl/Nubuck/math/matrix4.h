@@ -42,8 +42,8 @@ namespace M {
 
 	namespace Mat4 {
 
-		Matrix4 ExpandedTR(const M::Matrix3& rot, const M::Vector3& tran);
-		Matrix4 ExpandedTR(const M::Quaternion& rot, const M::Vector3& tran);
+		Matrix4 ExpandedTR(const M::Vector3& tran, const M::Matrix3& rot);
+		Matrix4 ExpandedTR(const M::Vector3& tran, const M::Quaternion& rot);
 
 		Matrix4 Identity(void);
 		Matrix4 Translate(float x, float y, float z);

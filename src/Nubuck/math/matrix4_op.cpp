@@ -233,19 +233,15 @@ namespace M {
 
 	namespace Mat4 {
 
-		Matrix4 ExpandedTR(const M::Matrix3& rot, const M::Vector3& tran) {
+		Matrix4 ExpandedTR(const M::Vector3& tran, const M::Matrix3& rot) {
 			return Matrix4(rot.m00, rot.m01, rot.m02, tran.x,
 							rot.m10, rot.m11, rot.m12, tran.y,
 							rot.m20, rot.m21, rot.m22, tran.z,
 							0.0f, 0.0f, 0.0f, 1.0f);
 		}
 
-		Matrix4 ExpandedTR(const Quaternion& rot, const Vector3& tran) {
-			return ExpandedTR(Mat3::RotateQuaternion(rot), tran);
-		}
-
-		Matrix4 ExpandedSTR(const Quaternion& rot, const Vector3& tran, float scale) {
-			return Scale(scale) * ExpandedTR(rot, tran);
+		Matrix4 ExpandedTR(const Vector3& tran, const Quaternion& rot) {
+			return ExpandedTR(tran, Mat3::RotateQuaternion(rot));
 		}
 
 		Matrix4 Identity(void) {

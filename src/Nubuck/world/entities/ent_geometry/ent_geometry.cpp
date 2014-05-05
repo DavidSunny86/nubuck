@@ -514,7 +514,7 @@ void ENT_Geometry::FrameUpdate() {
     static SYS::Timer timer;
 
 	SYS::ScopedLock lock(_mtx);
-    M::Matrix4 tf = M::Mat4::ExpandedTR(Entity::GetOrientation(), Entity::GetPosition());
+    M::Matrix4 tf = M::Mat4::ExpandedTR(Entity::GetPosition(), Entity::GetOrientation());
     _nodes.Transform(tf);
 
     timer.Start();
