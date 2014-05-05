@@ -34,9 +34,7 @@ void ConvexHull::Invoke() {
     leda::CONVEX_HULL(L, chullMesh);
     chullMesh.compute_faces();
 
-    float x, y, z;
-    cloud->GetPosition(x, y, z);
-    chull->SetPosition(x, y, z);
+    chull->SetPosition(cloud->GetPosition());
 
     cloud->Destroy();
 	_nb.world->GetSelection()->Set(chull);

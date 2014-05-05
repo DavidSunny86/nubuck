@@ -561,7 +561,7 @@ IGeometry* World::CreateGeometry() {
     geom->SetID(entId);
     geom->SetFxName("LitDirectional");
 
-    geom->SetPosition(0.0f, 0.0f, 0.0f);
+    geom->SetPosition(M::Vector3::Zero);
     geom->SetOrientation(M::Quat::Identity());
     geom->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 

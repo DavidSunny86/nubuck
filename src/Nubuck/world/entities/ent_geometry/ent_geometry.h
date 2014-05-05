@@ -128,10 +128,9 @@ public:
 
     const M::Box& GetBoundingBox() const;
 
-    void GetPosition(float& x, float& y, float& z) const override;
+    M::Vector3 GetPosition() const override;
 
-    void SetPosition(float x, float y, float z) override;
-    void Rotate(float ang, float x, float y, float z) override;
+    void SetPosition(const M::Vector3& position) override;
 
     void HideOutline() override;
 

@@ -42,14 +42,13 @@ struct IGeometry {
 
     virtual const std::string& GetName() const = 0;
 
-    virtual void GetPosition(float& x, float& y, float& z) const = 0;
+    virtual M::Vector3 GetPosition() const = 0;
 
     virtual void SetName(const std::string& name) = 0;
 
     virtual void ApplyTransformation() = 0;
 
-    virtual void SetPosition(float x, float y, float z) = 0;
-    virtual void Rotate(float ang, float x, float y, float z) = 0;
+    virtual void SetPosition(const M::Vector3& position) = 0;
 
     virtual void HideOutline() = 0;
 

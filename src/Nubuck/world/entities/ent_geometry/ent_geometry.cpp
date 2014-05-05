@@ -408,16 +408,12 @@ const M::Box& ENT_Geometry::GetBoundingBox() const {
 	return _bbox; 
 }
 
-void ENT_Geometry::GetPosition(float& x, float& y, float& z) const {
-	SYS::ScopedLock lock(_mtx);
-    x = Entity::GetPosition().x;
-    y = Entity::GetPosition().y;
-    z = Entity::GetPosition().z;
+M::Vector3 ENT_Geometry::GetPosition() const {
+    return Entity::GetPosition();
 }
 
-void ENT_Geometry::SetPosition(float x, float y, float z) { 
-	SYS::ScopedLock lock(_mtx);
-    Entity::SetPosition(M::Vector3(x, y, z));
+void ENT_Geometry::SetPosition(const M::Vector3& position) {
+    Entity::SetPosition(position);
 }
 
 void ENT_Geometry::CompileMesh() {
@@ -453,12 +449,6 @@ void ENT_Geometry::OnDestroy() {
 leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() { return _ratPolyMesh; }
 
 const leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() const { return _ratPolyMesh; }
-
-void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
-	SYS::ScopedLock lock(_mtx);
-    assert(false && "not implemented");
-    // GetTransform().rotation = M::RotationOf(M::Mat4::RotateAxis(M::Normalize(M::Vector3(x, y, z)), ang)) * GetTransform().rotation;
-}
 
 void ENT_Geometry::HideOutline() {
     SYS::ScopedLock lock(_mtx);

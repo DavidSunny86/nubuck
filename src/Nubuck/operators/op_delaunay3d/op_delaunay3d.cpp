@@ -38,10 +38,10 @@ void Delaunay3D::Event_SetScale(const EV::Event& event) {
         leda::rational scale = 1 + 5 * leda::rational(args.value, args.max);
         leda::rat_vector center = scale * simplex.center;
 
-        simplex.geom->SetPosition(
+        simplex.geom->SetPosition(M::Vector3(
             center.xcoord().to_float(),
             center.ycoord().to_float(),
-            center.zcoord().to_float());
+            center.zcoord().to_float()));
     }
 }
 
@@ -80,9 +80,6 @@ void Delaunay3D::Invoke() {
     leda::fork::D3_DELAUNAY(L, S);
     std::cout << "DONE" << std::endl;
 
-    float x, y, z;
-    cloud->GetPosition(x, y, z);
-
     std::cout << "Delaunay3D: creating simplex geometries ... " << std::flush;
     leda::list_item it;
     forall_items(it, S) {
@@ -110,10 +107,10 @@ void Delaunay3D::Invoke() {
         leda::CONVEX_HULL(L, mesh);
         mesh.compute_faces();
 
-        geom->SetPosition(
+        geom->SetPosition(M::Vector3(
             center.xcoord().to_float(),
             center.ycoord().to_float(),
-            center.zcoord().to_float());
+            center.zcoord().to_float()));
 
         Simplex simplex;
         simplex.geom    = geom;

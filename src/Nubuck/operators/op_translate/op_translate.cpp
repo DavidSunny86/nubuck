@@ -344,9 +344,7 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
         if(W::editMode_t::OBJECTS == _editMode) {
             _oldGeomPos.resize(geomList.size());
             for(unsigned i = 0; i < _oldGeomPos.size(); ++i) {
-                M::Vector3 oldPos;
-                ((const W::ENT_Geometry*)geomList[i])->GetPosition(oldPos.x, oldPos.y, oldPos.z);
-                _oldGeomPos[i] = oldPos;
+                _oldGeomPos[i] = ((const W::ENT_Geometry*)geomList[i])->GetPosition();
                 _center += _oldGeomPos[i];
             }
             _center /= _oldGeomPos.size();
@@ -433,7 +431,7 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
                 IGeometry* geom = geomList[i];
                 M::Vector3 pos = _oldGeomPos[i];
                 pos.vec[_dragAxis] = _oldGeomPos[i].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
-                geom->SetPosition(pos.x, pos.y, pos.z);
+                geom->SetPosition(pos);
             }
         }
 
