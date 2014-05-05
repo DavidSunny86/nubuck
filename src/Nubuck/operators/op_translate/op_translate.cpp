@@ -288,8 +288,9 @@ static M::Vector3 FindCursorPosition(ISelection* sel) {
         W::ENT_Geometry* geom = (W::ENT_Geometry*)sel->GetList().front();
         std::vector<leda::node> verts = geom->GetVertexSelection();
         M::Vector3 pos = M::Vector3::Zero;
+        M::Matrix4 objToWorld = geom->GetObjectToWorldMatrix();
         for(unsigned i = 0; i < verts.size(); ++i) {
-            pos += geom->Transform(ToVector(geom->GetRatPolyMesh().position_of(verts[i])));
+            pos += M::Transform(objToWorld, ToVector(geom->GetRatPolyMesh().position_of(verts[i])));
         }
         float d = 1.0f / verts.size();
         return d * pos;
@@ -343,7 +344,9 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
         if(W::editMode_t::OBJECTS == _editMode) {
             _oldGeomPos.resize(geomList.size());
             for(unsigned i = 0; i < _oldGeomPos.size(); ++i) {
-                _oldGeomPos[i] = ((const W::ENT_Geometry*)geomList[i])->Transform(M::Vector3::Zero);
+                M::Vector3 oldPos;
+                ((const W::ENT_Geometry*)geomList[i])->GetPosition(oldPos.x, oldPos.y, oldPos.z);
+                _oldGeomPos[i] = oldPos;
                 _center += _oldGeomPos[i];
             }
             _center /= _oldGeomPos.size();

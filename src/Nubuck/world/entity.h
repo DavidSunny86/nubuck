@@ -1,16 +1,10 @@
 #pragma once
 
 #include <Nubuck\math\vector3.h>
-#include <Nubuck\math\matrix3.h>
+#include <Nubuck\math\quaternion.h>
 #include <UI\outliner\outliner_fwd.h>
 
 namespace W {
-
-struct EntTransform {
-    M::Vector3  position;
-    M::Matrix3  rotation;
-    M::Vector3  scale;
-};
 
 struct EntityType {
     enum Enum {
@@ -35,7 +29,10 @@ private:
     unsigned            _entId;
     std::string         _name;
     std::string     	_fxName;
-    EntTransform       	_transform;
+
+    M::Vector3          _position;
+    M::Quaternion       _orientation;
+    M::Vector3          _scale;
 public:
     Entity();
     virtual ~Entity() { }
@@ -46,23 +43,25 @@ public:
 
     bool IsDead() const;
 
-    EntityType::Enum    GetType() const { return _type; }
-    unsigned            GetID() const { return _entId; }
-    const std::string&  GetName() const { return _name; }
-    const std::string&  GetFxName() const { return _fxName; }
-    const EntTransform& GetTransform() const { return _transform; }
+    EntityType::Enum    GetType() const;
+    unsigned            GetID() const;
+    const std::string&  GetName() const;
+    const std::string&  GetFxName() const;
 
-    EntTransform&       GetTransform() { return _transform; }
-    M::Vector3          Transform(const M::Vector3& v) const;
-    M::Matrix4          GetTransformationMatrix() const;
+    void                SetType(EntityType::Enum type);
+    void                SetID(unsigned id);
+    virtual void        SetName(const std::string& name);
+    void                SetFxName(const std::string& fxName);
 
-    void                Translate(const M::Vector3& v);
+    M::Vector3          GetPosition() const;
+    M::Quaternion       GetOrientation() const;
+    M::Vector3          GetScale() const;
 
-    void                SetType(EntityType::Enum type) { _type = type; }
-    void                SetID(unsigned id) { _entId = id; }
-    virtual void        SetName(const std::string& name) { _name = name; }
-    void                SetFxName(const std::string& fxName) { _fxName = fxName; }
-    void                SetTransform(const EntTransform& t) { _transform = t; }
+    M::Matrix4          GetObjectToWorldMatrix() const;
+
+    void                SetPosition(const M::Vector3& position);
+    void                SetOrientation(const M::Quaternion& orientation);
+    void                SetScale(const M::Vector3& scale);
 
     void                Destroy();
 	virtual void        OnDestroy() { }

@@ -218,10 +218,11 @@ ENT_Geometry::ENT_Geometry()
 
 bool ENT_Geometry::TraceVertices(const M::Ray& ray, float radius, std::vector<leda::node>& verts) {
     SYS::ScopedLock lock(_mtx);
-    leda::node v;
     verts.clear();
+    M::Matrix4 objToWorld = GetObjectToWorldMatrix();
+    leda::node v;
     forall_nodes(v, _ratPolyMesh) {
-        M::Vector3 pos = Transform(ToVector(_ratPolyMesh.position_of(v)));
+        M::Vector3 pos = M::Transform(objToWorld, ToVector(_ratPolyMesh.position_of(v)));
         if(M::IS::Intersects(ray, M::Sphere(pos, radius)))
             verts.push_back(v);
     }
@@ -349,17 +350,16 @@ static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
 void ENT_Geometry::ApplyTransformation() {
 	SYS::ScopedLock lock(_mtx);
 
+    M::Matrix4 objToWorld = GetObjectToWorldMatrix();
     leda::node n;
     forall_nodes(n, _ratPolyMesh) {
-        M::Vector3 pos = Transform(ToVector(_ratPolyMesh.position_of(n)));
+        M::Vector3 pos = M::Transform(objToWorld, ToVector(_ratPolyMesh.position_of(n)));
         _ratPolyMesh.set_position(n, ToRatPoint(pos));
     }
 
-    EntTransform transform;
-    transform.position = M::Vector3::Zero;
-    transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
-    transform.rotation = M::Mat3::Identity();
-    SetTransform(transform);
+    Entity::SetPosition(M::Vector3::Zero);
+    Entity::SetOrientation(M::Quat::Identity());
+    Entity::SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 }
 
 float ENT_Geometry::GetEdgeRadius() const {
@@ -400,7 +400,7 @@ M::Vector3 ENT_Geometry::GetLocalCenter() const {
 M::Vector3 ENT_Geometry::GetGlobalCenter() { 
 	SYS::ScopedLock lock(_mtx);
     M::Vector3 localCenter = GetLocalCenter();
-    return Transform(localCenter); 
+    return M::Transform(GetObjectToWorldMatrix(), localCenter);
 }
 
 const M::Box& ENT_Geometry::GetBoundingBox() const { 
@@ -410,14 +410,14 @@ const M::Box& ENT_Geometry::GetBoundingBox() const {
 
 void ENT_Geometry::GetPosition(float& x, float& y, float& z) const {
 	SYS::ScopedLock lock(_mtx);
-    x = GetTransform().position.x;
-    y = GetTransform().position.y;
-    z = GetTransform().position.z;
+    x = Entity::GetPosition().x;
+    y = Entity::GetPosition().y;
+    z = Entity::GetPosition().z;
 }
 
 void ENT_Geometry::SetPosition(float x, float y, float z) { 
 	SYS::ScopedLock lock(_mtx);
-	GetTransform().position = M::Vector3(x, y, z);
+    Entity::SetPosition(M::Vector3(x, y, z));
 }
 
 void ENT_Geometry::CompileMesh() {
@@ -430,7 +430,7 @@ void ENT_Geometry::CompileMesh() {
 
     if(NULL != _tfmesh) R::meshMgr.Destroy(_tfmesh);
     _tfmesh = R::meshMgr.Create(_mesh);
-    R::meshMgr.GetMesh(_tfmesh).SetTransform(GetTransformationMatrix());
+    R::meshMgr.GetMesh(_tfmesh).SetTransform(GetObjectToWorldMatrix());
 
     _meshCompiled = true;
 }
@@ -456,7 +456,8 @@ const leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() const { return _ratP
 
 void ENT_Geometry::Rotate(float ang, float x, float y, float z) {
 	SYS::ScopedLock lock(_mtx);
-    GetTransform().rotation = M::RotationOf(M::Mat4::RotateAxis(M::Normalize(M::Vector3(x, y, z)), ang)) * GetTransform().rotation;
+    assert(false && "not implemented");
+    // GetTransform().rotation = M::RotationOf(M::Mat4::RotateAxis(M::Normalize(M::Vector3(x, y, z)), ang)) * GetTransform().rotation;
 }
 
 void ENT_Geometry::HideOutline() {
@@ -523,7 +524,7 @@ void ENT_Geometry::FrameUpdate() {
     static SYS::Timer timer;
 
 	SYS::ScopedLock lock(_mtx);
-    M::Matrix4 tf = M::Mat4::FromRigidTransform(GetTransform().rotation, GetTransform().position);
+    M::Matrix4 tf = M::Mat4::FromRigidTransform(Entity::GetOrientation(), Entity::GetPosition());
     _nodes.Transform(tf);
 
     timer.Start();
@@ -538,7 +539,7 @@ void ENT_Geometry::BuildRenderList() {
     if(_isHidden) return;
 
     if(RenderMode::FACES & _renderMode && NULL != _mesh) {
-        R::meshMgr.GetMesh(_tfmesh).SetTransform(GetTransformationMatrix());
+        R::meshMgr.GetMesh(_tfmesh).SetTransform(GetObjectToWorldMatrix());
 
         R::MeshJob rjob;
 

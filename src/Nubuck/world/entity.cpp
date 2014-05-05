@@ -6,7 +6,12 @@
 
 namespace W {
 
-Entity::Entity() : _tags(0) { }
+Entity::Entity()
+    : _tags(0)
+    , _position(M::Vector3::Zero)
+    , _orientation(M::Quat::Identity())
+    , _scale(1.0f, 1.0f, 1.0f)
+{ }
 
 void Entity::Select() {
     SYS::ScopedLock lock(_mtx);
@@ -26,22 +31,75 @@ bool Entity::IsDead() const {
 	return _tags & Tags::IS_DEAD;
 }
 
-M::Vector3 Entity::Transform(const M::Vector3& v) const {
-    M::Vector3 r;
-    r = M::Vector3(_transform.scale.x * v.x, _transform.scale.y * v.y, _transform.scale.z * v.z);
-    r = M::Transform(_transform.rotation, r);
-    r += _transform.position;
-    return r;
+EntityType::Enum Entity::GetType() const {
+    return _type;
 }
 
-M::Matrix4 Entity::GetTransformationMatrix() const {
-    M::Matrix4 R = M::Mat4::FromRigidTransform(_transform.rotation, M::Vector3::Zero);
-    M::Matrix4 T = M::Mat4::Translate(_transform.position);
-    return T * R;
+unsigned Entity::GetID() const {
+    return _entId;
 }
 
-void Entity::Translate(const M::Vector3& v) {
-	_transform.position += v;
+const std::string& Entity::GetName() const {
+    SYS::ScopedLock lock(_mtx);
+    return _name;
+}
+
+const std::string& Entity::GetFxName() const {
+    SYS::ScopedLock lock(_mtx);
+    return _fxName;
+}
+
+void Entity::SetType(EntityType::Enum type) {
+    _type = type;
+}
+
+void Entity::SetID(unsigned id) {
+    _entId = id;
+}
+
+void Entity::SetName(const std::string& name) {
+    SYS::ScopedLock lock(_mtx);
+    _name = name;
+}
+
+void Entity::SetFxName(const std::string& fxName) {
+    SYS::ScopedLock lock(_mtx);
+    _fxName = fxName;
+}
+
+M::Vector3 Entity::GetPosition() const {
+    SYS::ScopedLock lock(_mtx);
+    return _position;
+}
+
+M::Quaternion Entity::GetOrientation() const {
+    SYS::ScopedLock lock(_mtx);
+    return _orientation;
+}
+
+M::Vector3 Entity::GetScale() const {
+    SYS::ScopedLock lock(_mtx);
+    return _scale;
+}
+
+M::Matrix4 Entity::GetObjectToWorldMatrix() const {
+    SYS::ScopedLock lock(_mtx);
+    return M::Mat4::Translate(_position) * M::Mat4::FromRigidTransform(_orientation, M::Vector3::Zero);
+}
+
+void Entity::SetPosition(const M::Vector3& position) {
+    SYS::ScopedLock lock(_mtx);
+    _position = position;
+}
+
+void Entity::SetOrientation(const M::Quaternion& orientation) {
+    SYS::ScopedLock lock(_mtx);
+    _orientation = orientation;
+}
+
+void Entity::SetScale(const M::Vector3& scale) {
+    SYS::ScopedLock lock(_mtx);
+    _scale = scale;
 }
 
 void Entity::Destroy() {

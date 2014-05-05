@@ -403,7 +403,7 @@ World::BoundingBox::BoundingBox(const ENT_Geometry* geom) : geom(geom) {
 }
 
 void World::BoundingBox::Transform() {
-    R::meshMgr.GetMesh(tfmesh).SetTransform(geom->GetTransformationMatrix());
+    R::meshMgr.GetMesh(tfmesh).SetTransform(geom->GetObjectToWorldMatrix());
 }
 
 void World::BBoxes_BuildFromSelection() {
@@ -471,7 +471,7 @@ bool World::Trace(const M::Ray& ray, ENT_Geometry** ret) {
         if(EntityType::ENT_GEOMETRY == entity->GetType()) {
             ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
             M::Box bbox = geom.GetBoundingBox();
-            SetCenterPosition(bbox, M::Transform(geom.GetTransformationMatrix(), GetCenterPosition(bbox)));
+            SetCenterPosition(bbox, M::Transform(geom.GetObjectToWorldMatrix(), GetCenterPosition(bbox)));
             if(geom.IsSolid() && M::IS::Intersects(ray, bbox)) {
                 *ret = &geom;
                 return true;
@@ -561,11 +561,9 @@ IGeometry* World::CreateGeometry() {
     geom->SetID(entId);
     geom->SetFxName("LitDirectional");
 
-    EntTransform transform;
-    transform.position = M::Vector3::Zero;
-    transform.scale = M::Vector3(1.0f, 1.0f, 1.0f);
-    transform.rotation = M::Mat3::Identity();
-    geom->SetTransform(transform);
+    geom->SetPosition(0.0f, 0.0f, 0.0f);
+    geom->SetOrientation(M::Quat::Identity());
+    geom->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 
     EV::Params_LinkEntity args;
     args.entity = geom;
