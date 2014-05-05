@@ -181,7 +181,7 @@ static void Uniforms_Update(
     uniformsHot.uProjection = projectionMat;
     uniformsHot.uTransform = worldMat;
     M::TryInvert(worldMat, uniformsHot.uInvTransform);
-    uniformsHot.uNormalMat = M::Mat4::FromRigidTransform(M::Transpose(M::Inverse(M::RotationOf(worldMat))), M::Vector3::Zero);
+    uniformsHot.uNormalMat = M::Mat4::RotateMatrix(M::Transpose(M::Inverse(M::RotationOf(worldMat))));
     uniformsHotBuffer->Update_Mapped(0, sizeof(UniformsHot), &uniformsHot);
 
     uniformsLights.uLightVec0 = -dirLights[0].direction;
@@ -201,7 +201,7 @@ static void Uniforms_Update(
 static void Uniforms_UpdateModelView(const M::Matrix4& modelView) {
     uniformsHot.uTransform = modelView;
     M::TryInvert(modelView, uniformsHot.uInvTransform);
-    uniformsHot.uNormalMat = M::Mat4::FromRigidTransform(M::Transpose(M::Inverse(M::RotationOf(modelView))), M::Vector3::Zero);
+    uniformsHot.uNormalMat = M::Mat4::RotateMatrix(M::Transpose(M::Inverse(M::RotationOf(modelView))));
     uniformsHotBuffer->Update_Mapped(0, sizeof(UniformsHot), &uniformsHot);
 }
 

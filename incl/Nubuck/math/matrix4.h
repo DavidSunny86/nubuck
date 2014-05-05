@@ -42,9 +42,8 @@ namespace M {
 
 	namespace Mat4 {
 
-		Matrix4 FromRigidTransform(const M::Matrix3& rot, const M::Vector3& tran);
-		Matrix4 FromRigidTransform(const M::Quaternion& rot, const M::Vector3& tran);
-		Matrix4 FromTransform(const M::Quaternion& rot, const M::Vector3& tran, float scale);
+		Matrix4 ExpandedTR(const M::Matrix3& rot, const M::Vector3& tran);
+		Matrix4 ExpandedTR(const M::Quaternion& rot, const M::Vector3& tran);
 
 		Matrix4 Identity(void);
 		Matrix4 Translate(float x, float y, float z);
@@ -54,7 +53,10 @@ namespace M {
 		Matrix4 RotateX(float angle);
 		Matrix4 RotateY(float angle);
 		Matrix4 RotateZ(float angle);
+        
 		Matrix4 RotateAxis(const Vector3& axis, float angle);
+        Matrix4 RotateMatrix(const Matrix3& rot);
+        Matrix4 RotateQuaternion(const Quaternion& q);
 
         Matrix4 Perspective(float fovy, float aspect, float zNear, float zFar);
         Matrix4 Perspective(float fovy, float aspect, float zNear, float zFar, float zOff);

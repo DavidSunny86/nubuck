@@ -43,13 +43,14 @@ namespace M {
 
 	namespace Mat3 {
 		Matrix3 FromColumns(const M::Vector3& A1, const M::Vector3& A2, const M::Vector3& A3);
-		Matrix3 FromQuaternion(const Quaternion& q);
 
 		Matrix3 Identity(void);
         Matrix3 Scale(float f);
         Matrix3 Scale(float fx, float fy, float fz);
 		Matrix3 RotateY(float angle);
-		Matrix3 RotateAxis(const Vector3& axis, float angle);
+
+		Matrix3 RotatAxis(const Vector3& axis, float angle);
+        Matrix3 RotateQuaternion(const Quaternion& q);
 
 	} // namespace Mat3
 

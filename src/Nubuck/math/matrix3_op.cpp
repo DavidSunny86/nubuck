@@ -92,25 +92,6 @@ namespace M {
 						   A1.z, A2.z, A3.z);
 		}
 
-		Matrix3 FromQuaternion(const Quaternion& q) {
-			const float x2 = 2.0f * q.v.x * q.v.x;
-			const float y2 = 2.0f * q.v.y * q.v.y;
-			const float z2 = 2.0f * q.v.z * q.v.z;
-
-			const float xy = 2.0f * q.v.x	* q.v.y;
-			const float wz = 2.0f * q.w		* q.v.z;
-			const float xz = 2.0f * q.v.x	* q.v.z;
-			const float wy = 2.0f * q.w		* q.v.y;
-			const float yz = 2.0f * q.v.y	* q.v.z;
-			const float wx = 2.0f * q.w		* q.v.x;
-
-			return Transpose(Matrix3(
-				1.0f - y2 - z2, xy + wz, xz - wy,
-				xy - wz, 1.0f - x2 - z2, yz + wx,
-				xz + wy, yz - wx, 1.0f - x2 - y2
-				));
-		}
-
 		Matrix3 Identity(void) {
 			return Matrix3(1.0f, 0.0f, 0.0f,
 						   0.0f, 1.0f, 0.0f,
@@ -156,6 +137,25 @@ namespace M {
 			return Matrix3(axis.x * axis.x * oneMinusCos + cosa, xyT - zT, xzT + yT,
 						   xyT + zT, axis.y * axis.y * oneMinusCos + cosa, yzT - xT,
 						   xzT - yT, yzT + xT, axis.z * axis.z * oneMinusCos + cosa);
+		}
+
+		Matrix3 RotateQuaternion(const Quaternion& q) {
+			const float x2 = 2.0f * q.v.x * q.v.x;
+			const float y2 = 2.0f * q.v.y * q.v.y;
+			const float z2 = 2.0f * q.v.z * q.v.z;
+
+			const float xy = 2.0f * q.v.x	* q.v.y;
+			const float wz = 2.0f * q.w		* q.v.z;
+			const float xz = 2.0f * q.v.x	* q.v.z;
+			const float wy = 2.0f * q.w		* q.v.y;
+			const float yz = 2.0f * q.v.y	* q.v.z;
+			const float wx = 2.0f * q.w		* q.v.x;
+
+			return Transpose(Matrix3(
+				1.0f - y2 - z2, xy + wz, xz - wy,
+				xy - wz, 1.0f - x2 - z2, yz + wx,
+				xz + wy, yz - wx, 1.0f - x2 - y2
+				));
 		}
 
 	} // namespace Mat3

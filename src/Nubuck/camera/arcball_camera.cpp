@@ -6,7 +6,7 @@ const float zoomStep = 2.0f;
 
 M::Vector3 Transform(const M::Quaternion& q, const M::Vector3& v) {
     // TODO: use q*vq instead
-    M::Matrix4 m = M::Mat4::FromRigidTransform(q, M::Vector3::Zero);
+    M::Matrix4 m = M::Mat4::RotateQuaternion(q);
     return M::Transform(m, v);
 }
 
@@ -287,6 +287,6 @@ M::Matrix4 ArcballCamera::GetWorldToEyeMatrix() const {
     const M::Quaternion q = M::Quaternion(_orient.w, -_orient.v);
     const M::Vector3    p = Position();
     M::Matrix4 T = M::Mat4::Translate(-p);
-    M::Matrix4 R = M::Mat4::FromRigidTransform(q, M::Vector3::Zero);
+    M::Matrix4 R = M::Mat4::RotateQuaternion(q);
     return R * T;
 }

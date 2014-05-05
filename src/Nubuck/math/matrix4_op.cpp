@@ -233,19 +233,19 @@ namespace M {
 
 	namespace Mat4 {
 
-		Matrix4 FromRigidTransform(const M::Matrix3& rot, const M::Vector3& tran) {
+		Matrix4 ExpandedTR(const M::Matrix3& rot, const M::Vector3& tran) {
 			return Matrix4(rot.m00, rot.m01, rot.m02, tran.x,
 							rot.m10, rot.m11, rot.m12, tran.y,
 							rot.m20, rot.m21, rot.m22, tran.z,
 							0.0f, 0.0f, 0.0f, 1.0f);
 		}
 
-		Matrix4 FromRigidTransform(const Quaternion& rot, const Vector3& tran) {
-			return FromRigidTransform(Mat3::FromQuaternion(rot), tran);
+		Matrix4 ExpandedTR(const Quaternion& rot, const Vector3& tran) {
+			return ExpandedTR(Mat3::RotateQuaternion(rot), tran);
 		}
 
-		Matrix4 FromTransform(const Quaternion& rot, const Vector3& tran, float scale) {
-			return Scale(scale) * FromRigidTransform(rot, tran);
+		Matrix4 ExpandedSTR(const Quaternion& rot, const Vector3& tran, float scale) {
+			return Scale(scale) * ExpandedTR(rot, tran);
 		}
 
 		Matrix4 Identity(void) {
@@ -332,6 +332,18 @@ namespace M {
 						   xzT - yT, yzT + xT, axis.z * axis.z * oneMinusCos + cosa, 0.0f,
 						   0.0f, 0.0f, 0.0f, 1.0f);
 		}
+
+        Matrix4 RotateMatrix(const Matrix3& rot) {
+			return Matrix4(
+                rot.m00, rot.m01, rot.m02, 0.0f, 
+                rot.m10, rot.m11, rot.m12, 0.0f,
+				rot.m20, rot.m21, rot.m22, 0.0f,
+				0.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+        Matrix4 RotateQuaternion(const Quaternion& q) {
+            return RotateMatrix(Mat3::RotateQuaternion(q));
+        }
 
         Matrix4 Perspective(float fovy, float aspect, float zNear, float zFar) {
             const float f = 1.0f / tan(0.5f * Deg2Rad(fovy));
