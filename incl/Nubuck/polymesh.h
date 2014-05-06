@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Nubuck\renderer\color\color.h>
+#include <Nubuck\math\math.h>
 
 #include <LEDA\graph\graph.h>
 #include <LEDA\graph\face_map.h>
@@ -239,10 +240,10 @@ inline R::Color PolyMesh<VEC3>::color_of(const face f) const {
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_position(const node v, const VEC3& p) {
-    _vatt_state[v] = State::GEOMETRY_CHANGED;
+    _vatt_state[v] = M::Max(_vatt_state[v], static_cast<char>(State::GEOMETRY_CHANGED));
 
     leda::face f;
-    forall_adj_faces(f, v) _fatt_state[f] = State::GEOMETRY_CHANGED;
+    forall_adj_faces(f, v) _fatt_state[f] = M::Max(_fatt_state[f], static_cast<char>(State::GEOMETRY_CHANGED));
 
     LEDA_ACCESS(VEC3, entry(v)) = p;
 }

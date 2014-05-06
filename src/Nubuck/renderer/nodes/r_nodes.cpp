@@ -96,7 +96,7 @@ void Nodes::SetColor(leda::node pv, const Color& color) {
     for(unsigned k = 0; k < 4; ++k)
         _billboards[ridx].verts[k].color = _nodes[ridx].color;
 
-    if(_mesh) {
+    if(!_needsRebuild && _mesh) {
         const unsigned vertSz = sizeof(Mesh::Vertex);
         const unsigned off = vertSz * (&_billboards[ridx].verts[0] - &_billboards[0].verts[0]);
         const unsigned size = 4 * vertSz;
