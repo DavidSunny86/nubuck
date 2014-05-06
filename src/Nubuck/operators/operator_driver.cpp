@@ -15,8 +15,8 @@ Operator* Driver::ActiveOperator() {
 }
 
 void Driver::Event_Push(const EV::Event& event) {
-    SYS::ScopedLock lock(_activeOpsMtx);
 	const EV::Params_OP_Push& args = EV::def_OP_Push.GetArgs(event);
+    _activeOpsMtx.Lock();
     Operator* op = ActiveOperator();
     if(op) {
         op->Finish();
@@ -24,8 +24,9 @@ void Driver::Event_Push(const EV::Event& event) {
             _activeOps.pop_back();
     }
 	_activeOps.push_back(args.op);
+    _activeOpsMtx.Unlock();
 	args.op->Invoke();
-    W::world.Send(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
+    W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 	g_operators.Send(EV::def_OP_ActionFinished.Create(EV::Params_OP_ActionFinished()));
 }
 
@@ -77,10 +78,10 @@ void Driver::Event_EditModeChanged(const EV::Event& event) {
 }
 
 void Driver::Event_Mouse(const EV::Event& event) {
-    SYS::ScopedLock lock(_activeOpsMtx);
 	const EV::Params_Mouse& args = EV::def_Mouse.GetArgs(event);
 	bool shiftKey = args.mods & EV::Params_Mouse::MODIFIER_SHIFT;
     unsigned ret = 0;
+    _activeOpsMtx.Lock();
     for(int i = _activeOps.size() - 1; !ret && 0 <= i; --i) {
         Operator* op = _activeOps[i];
 		if(op->OnMouse(ConvertMouseEvent(args))) {
@@ -97,12 +98,13 @@ void Driver::Event_Mouse(const EV::Event& event) {
             ret = 1;
         }
     }
+    _activeOpsMtx.Unlock();
     if(!ret) {
         // forward event
         W::world.Send(event);
     } else {
         // TODO: remove me
-        W::world.Send(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
+        W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
     }
 	event.Accept();
 }
@@ -118,13 +120,14 @@ void Driver::Event_Key(const EV::Event& event) {
 }
 
 void Driver::Event_Default(const EV::Event& event, const char* className) {
-    SYS::ScopedLock lock(_activeOpsMtx);
+    _activeOpsMtx.Lock();
     Operator* op = ActiveOperator();
+    _activeOpsMtx.Unlock();
     if(op) {
         op->Send(event);
         op->HandleEvents();
 
-        W::world.Send(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
+        W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 
 		g_operators.Send(EV::def_OP_ActionFinished.Create(EV::Params_OP_ActionFinished()));
 	}

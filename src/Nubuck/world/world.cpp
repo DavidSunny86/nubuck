@@ -296,8 +296,9 @@ void World::Event_SelectionChanged(const EV::Event&) {
     // bboxes get updated in Update()
 }
 
-void World::Event_RebuildAll(const EV::Event&) {
+void World::Event_RebuildAll(const EV::Event& event) {
     RebuildAll();
+    event.Accept();
 }
 
 void World::Event_EditModeChanged(const EV::Event& event) {
