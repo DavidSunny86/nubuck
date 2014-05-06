@@ -469,7 +469,7 @@ bool World::Trace(const M::Ray& ray, ENT_Geometry** ret) {
     SYS::ScopedLock lockEntities(_entitiesMtx);
     for(unsigned i = 0; i < _entities.size(); ++i) {
         GEN::Pointer<Entity> entity = _entities[i];
-        if(EntityType::ENT_GEOMETRY == entity->GetType()) {
+        if(!entity->IsDead() && EntityType::ENT_GEOMETRY == entity->GetType()) {
             ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
             M::Box bbox = geom.GetBoundingBox();
             SetCenterPosition(bbox, M::Transform(geom.GetObjectToWorldMatrix(), GetCenterPosition(bbox)));
@@ -502,16 +502,23 @@ void World::Update(void) {
 
     HandleEvents();
 
+    unsigned entIdx = 0;
+    while(entIdx < _entities.size()) {
+        GEN::Pointer<Entity> entity = _entities[entIdx];
+		if(entity->IsDead() && !entity->IsSelected()) {
+            _entities[entIdx]->OnDestroy();
+            std::swap(_entities[entIdx], _entities.back());
+            _entities.pop_back();
+        } else entIdx++;
+    }
+
+    // it's important to build the bboxes after dead entities have been destroyed,
+    // so that bboxes don't have dangling pointers
     BBoxes_BuildFromSelection();
 
     for(unsigned i = 0; i < _entities.size(); ++i) {
         GEN::Pointer<Entity> entity = _entities[i];
-		if(entity->IsDead() && !entity->IsSelected()) {
-			_entities[i]->OnDestroy();
-            std::swap(_entities[i], _entities.back());
-            _entities.erase(_entities.end() - 1);
-		}
-        else if(EntityType::ENT_GEOMETRY == entity->GetType()) {
+        if(EntityType::ENT_GEOMETRY == entity->GetType()) {
             ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
 			geom.HandleEvents();
             geom.CompileMesh();
@@ -539,7 +546,7 @@ void World::Render(R::RenderList& renderList) {
     SYS::ScopedLock lockEntities(_entitiesMtx);
 
     for(unsigned i = 0; i < _entities.size(); ++i) {
-        if(EntityType::ENT_GEOMETRY == _entities[i]->GetType()) {
+        if(!_entities[i]->IsDead() && EntityType::ENT_GEOMETRY == _entities[i]->GetType()) {
             ENT_Geometry& geom = static_cast<ENT_Geometry&>(*_entities[i]);
             renderList.meshJobs.insert(renderList.meshJobs.end(),
                 geom.GetRenderList().meshJobs.begin(),

@@ -444,6 +444,7 @@ void ENT_Geometry::OnDestroy() {
 	_renderMode &= ~(RenderMode::EDGES | RenderMode::NODES); // !!!
 
     g_ui.GetOutliner().DeleteItem(_outlinerItem);
+    _outlinerItem = NULL;
 }
 
 leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() { return _ratPolyMesh; }

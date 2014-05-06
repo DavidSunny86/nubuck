@@ -69,9 +69,11 @@ Outliner::itemHandle_t Outliner::AddItem(const QString& name, W::Entity* entity)
     return item;
 }
 
+// NOTE that this method must be called from main/ui thread
+// for the event handler is called directly
 void Outliner::DeleteItem(itemHandle_t item) {
     EV::Params_Outliner_Delete args = { item };
-    baseHandler_t::Send(EV::def_Outliner_Delete.Create(args));
+    Event_Delete(EV::def_Outliner_Delete.Create(args));
 }
 
 void Outliner::HideItem(itemHandle_t item) {
