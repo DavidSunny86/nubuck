@@ -13,13 +13,14 @@ namespace OP {
 
 Operators g_operators;
 
-void Operators::Event_ActionFinished(const EV::Event& event) {
-    _actionsPending--;
-}
-
-void Operators::Event_SetPanel(const EV::Event& event) {
-    const EV::Params_OP_SetPanel& args = EV::def_OP_SetPanel.GetArgs(event);
-    Operator* op = args.op;
+/*
+====================
+Operators::UpdateOperatorPanel
+    sets the panel of the currently active (ie. topmost) operator
+====================
+*/
+void Operators::UpdateOperatorPanel() {
+    Operator* op = _activeOps.back();
     OperatorPanel* panel = NULL;
     for(unsigned i = 0; !panel && i < _ops.size(); ++i) {
         if(_ops[i].op == op) panel = _ops[i].panel;
@@ -27,6 +28,28 @@ void Operators::Event_SetPanel(const EV::Event& event) {
     assert(panel);
     g_ui.GetOperatorPanel().Clear();
     nubuck.ui->SetOperatorPanel(panel);
+}
+
+void Operators::Event_Push(const EV::Event& event) {
+    const EV::Params_OP_Push& args = EV::def_OP_Push.GetArgs(event);
+    while(1 < _activeOps.size()) // keep bottommost op in stack (usually OP::Translate)
+        _activeOps.pop_back();
+    _activeOps.push_back(args.op);
+    _actionsPending--;
+    UpdateOperatorPanel();
+    event.Accept();
+}
+
+void Operators::Event_Pop(const EV::Event& event) {
+    assert(0 < event.args);
+    const EV::Params_OP_Pop& args = EV::def_OP_Pop.GetArgs(event);
+    for(unsigned i = 0; i < args.count; ++i) _activeOps.pop_back();
+    UpdateOperatorPanel();
+    event.Accept();
+}
+
+void Operators::Event_ActionFinished(const EV::Event& event) {
+    _actionsPending--;
 }
 
 void Operators::Event_ForwardToDriver(const EV::Event& event) {
@@ -40,14 +63,12 @@ void Operators::OnInvokeOperator(unsigned id) {
 	}
 
     printf("invoking operator with id = %d\n", id);
-    g_ui.GetOperatorPanel().Clear();
-    Operator* op = _ops[id].op;
-    nubuck.ui->SetOperatorPanel(_ops[id].panel);
 
 	if(!_driver.IsValid()) {
-        _driver = GEN::MakePtr(new Driver(_activeOps, _activeOpsMtx, _meshJobs, _meshJobsMtx));
+        _driver = GEN::MakePtr(new Driver(_activeOps, _activeOpsMtx));
         _driver->Thread_StartAsync();
 	}
+    Operator* op = _ops[id].op;
 	EV::Params_OP_Push args = { op };
     _ops[id].panel->Invoke();
     _actionsPending++;
@@ -55,8 +76,9 @@ void Operators::OnInvokeOperator(unsigned id) {
 }
 
 Operators::Operators() : _actionsPending(0) {
+    AddEventHandler(EV::def_OP_Push, this, &Operators::Event_Push);
+    AddEventHandler(EV::def_OP_Pop, this, &Operators::Event_Pop);
     AddEventHandler(EV::def_OP_ActionFinished, this, &Operators::Event_ActionFinished);
-    AddEventHandler(EV::def_OP_SetPanel, this, &Operators::Event_SetPanel);
 
     // forward other known events
     AddEventHandler(EV::def_EditModeChanged, this, &Operators::Event_ForwardToDriver);

@@ -71,8 +71,12 @@ private:
 
     GEN::Pointer<Driver>        _driver;
 
+    void UpdateOperatorPanel();
+
     void UnloadModules();
 
+    void Event_Push(const EV::Event& event);
+    void Event_Pop(const EV::Event& event);
     void Event_ActionFinished(const EV::Event& event);
     void Event_SetPanel(const EV::Event& event);
     void Event_ForwardToDriver(const EV::Event& event);

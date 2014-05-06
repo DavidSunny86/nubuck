@@ -16,22 +16,17 @@ Operator* Driver::ActiveOperator() {
 
 void Driver::Event_Push(const EV::Event& event) {
 	const EV::Params_OP_Push& args = EV::def_OP_Push.GetArgs(event);
-    _activeOpsMtx.Lock();
+
     Operator* op = ActiveOperator();
-    if(op) {
-        op->Finish();
-        if(1 < _activeOps.size()) // keep OP::Translate in stack
-            _activeOps.pop_back();
-    }
-	_activeOps.push_back(args.op);
-    _activeOpsMtx.Unlock();
+    if(op) op->Finish();
+
 	args.op->Invoke();
+
     W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
-	g_operators.Send(EV::def_OP_ActionFinished.Create(EV::Params_OP_ActionFinished()));
+	g_operators.SendAndWait(event);
 }
 
 void Driver::Event_SelectionChanged(const EV::Event& event) {
-    SYS::ScopedLock lock(_activeOpsMtx);
     for(std::vector<Operator*>::reverse_iterator it(_activeOps.rbegin());
         _activeOps.rend() != it; ++it)
     {
@@ -40,7 +35,6 @@ void Driver::Event_SelectionChanged(const EV::Event& event) {
 }
 
 void Driver::Event_CameraChanged(const EV::Event& event) {
-	SYS::ScopedLock lock(_activeOpsMtx);
     for(std::vector<Operator*>::reverse_iterator it(_activeOps.rbegin());
         _activeOps.rend() != it; ++it)
     {
@@ -69,7 +63,6 @@ static KeyEvent ConvertKeyEvent(const EV::Params_Key& from) {
 
 void Driver::Event_EditModeChanged(const EV::Event& event) {
     const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
-    SYS::ScopedLock lock(_activeOpsMtx);
     for(std::vector<Operator*>::reverse_iterator it(_activeOps.rbegin());
         _activeOps.rend() != it; ++it)
     {
@@ -81,36 +74,34 @@ void Driver::Event_Mouse(const EV::Event& event) {
 	const EV::Params_Mouse& args = EV::def_Mouse.GetArgs(event);
 	bool shiftKey = args.mods & EV::Params_Mouse::MODIFIER_SHIFT;
     unsigned ret = 0;
-    _activeOpsMtx.Lock();
+    unsigned N;
     for(int i = _activeOps.size() - 1; !ret && 0 <= i; --i) {
         Operator* op = _activeOps[i];
 		if(op->OnMouse(ConvertMouseEvent(args))) {
-            unsigned N = _activeOps.size() - 1 - i;
-            for(unsigned j = 0; j < N; ++j) {
-                _activeOps.back()->Finish();
-                _activeOps.pop_back();
-            }
-            if(0 < N) {
-                EV::Params_OP_SetPanel args = { op };
-                g_operators.Send(EV::def_OP_SetPanel.Create(args));
-                op->Invoke();
-            }
+            N = _activeOps.size() - 1 - i;
+            for(unsigned j = i; j < _activeOps.size(); ++j)
+                _activeOps[j]->Finish();
+            if(0 < N) op->Invoke();
             ret = 1;
         }
     }
-    _activeOpsMtx.Unlock();
+
     if(!ret) {
         // forward event
         W::world.Send(event);
     } else {
         // TODO: remove me
         W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
+
+        if(0 < N) {
+            EV::Params_OP_Pop popArgs = { N };
+            g_operators.SendAndWait(EV::def_OP_Pop.Create(popArgs));
+        }
     }
 	event.Accept();
 }
 
 void Driver::Event_Key(const EV::Event& event) {
-    SYS::ScopedLock lock(_activeOpsMtx);
     const EV::Params_Key& args = EV::def_Key.GetArgs(event);
     for(int i = _activeOps.size() - 1; 0 <= i; --i) {
         Operator* op = _activeOps[i];
@@ -120,9 +111,7 @@ void Driver::Event_Key(const EV::Event& event) {
 }
 
 void Driver::Event_Default(const EV::Event& event, const char* className) {
-    _activeOpsMtx.Lock();
     Operator* op = ActiveOperator();
-    _activeOpsMtx.Unlock();
     if(op) {
         op->Send(event);
         op->HandleEvents();
@@ -133,11 +122,9 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
 	}
 }
 
-Driver::Driver(
-	std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx,
-    std::vector<R::MeshJob>& meshJobs, SYS::SpinLock& meshJobsMtx) 
-	:   _activeOps(activeOps), _activeOpsMtx(activeOpsMtx),
-        _meshJobs(meshJobs), _meshJobsMtx(meshJobsMtx)
+Driver::Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx) 
+    : _activeOps(activeOps)
+    , _activeOpsMtx(activeOpsMtx)
 { 
 	AddEventHandler(EV::def_OP_Push, this, &Driver::Event_Push);
 	AddEventHandler(EV::def_SelectionChanged, this, &Driver::Event_SelectionChanged);
