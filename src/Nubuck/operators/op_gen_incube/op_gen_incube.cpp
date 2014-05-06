@@ -13,8 +13,8 @@ void InCubePanel::OnArgsChanged(int) {
 }
 
 InCubePanel::InCubePanel(QWidget* parent) : SimplePanel(parent) {
-    const int size = 5;
-    const int radius = 2;
+    const int size = InCube::DEFAULT_SIZE;
+    const int radius = InCube::DEFAULT_RADIUS;
 
     AddLabel("Random Points in Cube");
 
@@ -69,10 +69,17 @@ void InCube::Update(int size, int radius) {
 
 void InCube::Event_Update(const EV::Event& event) {
     const EV::Params_OP_InCube_Update& args = EV::def_OP_InCube_Update.GetArgs(event);
+    _lastSize = args.size;
+    _lastRadius = args.radius;
     Update(args.size, args.radius);
 }
 
-InCube::InCube() : _bbox(NULL), _cloud(NULL) { 
+InCube::InCube()
+    : _bbox(NULL)
+    , _cloud(NULL)
+    , _lastSize(DEFAULT_SIZE)
+    , _lastRadius(DEFAULT_RADIUS)
+{
     AddEventHandler(EV::def_OP_InCube_Update, this, &InCube::Event_Update);
 }
 
@@ -96,7 +103,7 @@ void InCube::Invoke() {
     _cloud->SetName("point cloud");
     _cloud->SetRenderMode(IGeometry::RenderMode::NODES);
 
-    Update(5, 2);
+    Update(_lastSize, _lastRadius);
 
     _nb.world->GetSelection()->Set(_cloud);
 }

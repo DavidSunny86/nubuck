@@ -40,12 +40,20 @@ private:
     IGeometry* _bbox;
     IGeometry* _cloud;
 
+    int _lastSize;
+    int _lastRadius;
+
     void UpdateBBox(int radius);
     void UpdateCloud(int size, int radius);
     void Update(int size, int radius);
 
     void Event_Update(const EV::Event& event);
 public:
+    enum {
+        DEFAULT_SIZE    = 5,
+        DEFAULT_RADIUS  = 2
+    };
+
     InCube();
 
     void Register(const Nubuck& nb, Invoker& invoker) override;
