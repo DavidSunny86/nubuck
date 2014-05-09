@@ -28,9 +28,11 @@ public:
 class Delaunay3D : public Operator {
 private:
     struct Simplex {
-        IGeometry*          geom;
+        leda::node          verts[4];
+        leda::rat_vector    localPos[4];
         leda::rat_vector    center;
     };
+    IGeometry*              geom;
     std::vector<Simplex> _simplices;
 
     Nubuck  _nb;

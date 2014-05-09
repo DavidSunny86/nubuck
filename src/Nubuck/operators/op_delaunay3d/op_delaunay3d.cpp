@@ -38,10 +38,11 @@ void Delaunay3D::Event_SetScale(const EV::Event& event) {
         leda::rational scale = 1 + 5 * leda::rational(args.value, args.max);
         leda::rat_vector center = scale * simplex.center;
 
-        simplex.geom->SetPosition(M::Vector3(
-            center.xcoord().to_float(),
-            center.ycoord().to_float(),
-            center.zcoord().to_float()));
+        leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+        for(int i = 0; i < 4; ++i) {
+            leda::rat_vector pos = simplex.localPos[i] + center;
+            mesh.set_position(simplex.verts[i], pos);
+        }
     }
 }
 
@@ -54,6 +55,24 @@ void Delaunay3D::Register(const Nubuck& nb, Invoker& invoker) {
 
     QAction* action = _nb.ui->GetObjectMenu()->addAction("Delaunay 3D");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
+}
+
+void AddFace(leda::nb::RatPolyMesh& mesh, leda::node v0, leda::node v1, leda::node v2, leda::node v3) {
+    mesh.new_edge(v0, v1);
+    mesh.new_edge(v0, v3);
+    mesh.new_edge(v0, v2);
+
+    mesh.new_edge(v1, v2);
+    mesh.new_edge(v1, v3);
+    mesh.new_edge(v1, v0);
+
+    mesh.new_edge(v2, v0);
+    mesh.new_edge(v2, v3);
+    mesh.new_edge(v2, v1);
+
+    mesh.new_edge(v3, v0);
+    mesh.new_edge(v3, v1);
+    mesh.new_edge(v3, v2);
 }
 
 void Delaunay3D::Invoke() {
@@ -80,47 +99,38 @@ void Delaunay3D::Invoke() {
     leda::fork::D3_DELAUNAY(L, S);
     std::cout << "DONE" << std::endl;
 
+    geom = _nb.world->CreateGeometry();
+    geom->SetRenderMode(IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES);
+    leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+
     std::cout << "Delaunay3D: creating simplex geometries ... " << std::flush;
     leda::list_item it;
     forall_items(it, S) {
-        IGeometry* geom = _nb.world->CreateGeometry();
-        geom->SetRenderMode(IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES);
-        leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
-
-        leda::rat_vector v0 = S[it].verts[0].to_vector();
-        leda::rat_vector v1 = S[it].verts[1].to_vector();
-        leda::rat_vector v2 = S[it].verts[2].to_vector();
-        leda::rat_vector v3 = S[it].verts[3].to_vector();
-
-        leda::rat_vector center = leda::rat_vector::zero(3);
-        center += v0;
-        center += v1;
-        center += v2;
-        center += v3;
-        center /= 4;
-
-        leda::list<leda::d3_rat_point> L;
-        L.push(v0 - center);
-        L.push(v1 - center);
-        L.push(v2 - center);
-        L.push(v3 - center);
-        leda::CONVEX_HULL(L, mesh);
-        mesh.compute_faces();
-
-        geom->SetPosition(M::Vector3(
-            center.xcoord().to_float(),
-            center.ycoord().to_float(),
-            center.zcoord().to_float()));
-
         Simplex simplex;
-        simplex.geom    = geom;
-        simplex.center  = center;
+
+        simplex.center = leda::rat_vector::zero(3);
+        leda::rat_vector pos[4];
+        for(int i = 0; i < 4; ++i) {
+            pos[i] = S[it].verts[i].to_vector();
+            simplex.center += pos[i];
+
+            simplex.verts[i] = mesh.new_node();
+            mesh.set_position(simplex.verts[i], pos[i]);
+        }
+        simplex.center /= 4;
+        for(int i = 0; i < 4; ++i) simplex.localPos[i] = pos[i] - simplex.center;
+        AddFace(mesh, simplex.verts[0], simplex.verts[1], simplex.verts[2], simplex.verts[3]);
+
         _simplices.push_back(simplex);
     }
-    std::cout << "DONE" << std::endl;
+
+    mesh.make_map();
+    mesh.compute_faces();
 
     cloud->Destroy();
     _nb.world->GetSelection()->Clear();
+
+    std::cout << "DONE" << std::endl;
 }
 
 } // namespace OP
