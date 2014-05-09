@@ -227,7 +227,6 @@ void GB_FreeMemItem(gbHandle_t handle) {
         Insert(&freeList, bufSeg);
     }
     CoalesceFreeMem();
-    PrintInfo();
 }
 
 static GB_BufSeg* FindFreeBufSeg(unsigned size) {
@@ -322,7 +321,6 @@ static GB_BufSeg* GB_AllocBufSeg(unsigned size) {
     COM_assert(bufSeg->size == size);
     Unlink(bufSeg);
     Prepend(&usedList, bufSeg);
-    PrintInfo();
     Invalidate(bufSeg);
     return bufSeg;
 }
