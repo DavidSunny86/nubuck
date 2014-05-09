@@ -7,6 +7,7 @@
 #include <system\timer\timer.h>
 #include <world\world.h>
 #include <renderer\renderer.h>
+#include <renderer\debugtext\debugtext.h>
 #include <camera\arcball_camera.h>
 #include <UI\glwidget\glwidget.h>
 
@@ -23,6 +24,7 @@ namespace UI {
 
         R::Renderer     _renderer;
         R::RenderList   _renderList;
+        R::DebugText    _debugText;
     protected:
         void initializeGL(void) override;
         void resizeGL(int width, int height) override;

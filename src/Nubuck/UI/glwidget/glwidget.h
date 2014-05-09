@@ -25,6 +25,8 @@ namespace UI {
 
         void Initialize(void);
     protected:
+        SYS::RenderingContext& GetRenderingContext();
+
         virtual void initializeGL(void) { }
         virtual void resizeGL(int width, int height) { }
         virtual void paintGL(void) { }

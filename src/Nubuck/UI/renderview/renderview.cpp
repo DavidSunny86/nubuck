@@ -2,10 +2,12 @@
 #include <QKeyEvent>
 
 #include <Nubuck\common\common.h>
+#include <system\opengl\opengl.h>
 #include <UI\window_events.h>
 #include <UI\outliner\outliner.h>
 #include <world\world.h>
 #include <operators\operators.h>
+#include <renderer\metrics\metrics.h>
 #include <renderer\effects\effectmgr.h>
 #include "renderview.h"
 
@@ -13,6 +15,7 @@ namespace UI {
 
     void RenderView::initializeGL(void) {
         _renderer.Init();
+        _debugText.Init(GetRenderingContext().GetDeviceContext());
     }
 
     void RenderView::resizeGL(int width, int height) {
@@ -22,6 +25,7 @@ namespace UI {
         W::world.Send(EV::def_Resize.Create(args));
 
         _renderer.Resize(width, height);
+        _debugText.Resize(width, height);
         Render();
     }
 
@@ -145,6 +149,11 @@ namespace UI {
         _renderer.BeginFrame();
         _renderer.Render(_renderList);
         _renderer.EndFrame();
+
+        _debugText.BeginFrame();
+        _debugText.Printf("frame time: %f\n", R::metrics.frame.time);
+        _debugText.Printf("number of draw calls: %d\n", R::metrics.frame.numDrawCalls);
+        _debugText.EndFrame();
 
         updateGL();
     }

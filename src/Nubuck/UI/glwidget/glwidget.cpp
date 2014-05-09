@@ -26,6 +26,10 @@ namespace UI {
         }
     }
 
+    SYS::RenderingContext& GLWidget::GetRenderingContext() {
+        return *_rc;
+    }
+
     void GLWidget::resizeEvent(QResizeEvent* event) {
         Initialize();
         resizeGL(event->size().width(), event->size().height());

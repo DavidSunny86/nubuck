@@ -43,6 +43,8 @@ namespace SYS {
         explicit RenderingContext(HWND windowHandle);
 		~RenderingContext(void);
 
+        DeviceContext& GetDeviceContext();
+
 		void Use(void);
 		void Flip(void);
 	};

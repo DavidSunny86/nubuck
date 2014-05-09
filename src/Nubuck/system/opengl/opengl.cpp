@@ -162,6 +162,10 @@ namespace SYS {
         }
     }
 
+    DeviceContext& RenderingContext::GetDeviceContext() {
+        return _deviceContext;
+    }
+
     void RenderingContext::Use(void) {
         wglMakeCurrent(_deviceContext.GetNativeHandle(), _contextHandle);
 

@@ -169,6 +169,7 @@
     <ClInclude Include="..\..\src\Nubuck\operators\op_join\op_join.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_merge_vertices\op_merge_vertices.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_translate\op_translate.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\debugtext\debugtext.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_line_edges.h" />
@@ -457,6 +458,7 @@
     <ClCompile Include="..\..\src\Nubuck\operators\standard_algorithm.cpp" />
     <ClCompile Include="..\..\src\Nubuck\polymesh\polymesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\color\color.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\debugtext\debugtext.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_line_edges.cpp" />
