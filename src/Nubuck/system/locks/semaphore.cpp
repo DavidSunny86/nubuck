@@ -4,8 +4,8 @@
 
 namespace SYS {
 
-    Semaphore::Semaphore(int initCount) : _hsem(NULL) {
-        if(!(_hsem = CreateSemaphore(NULL, initCount, MAX_COUNT, NULL))) {
+    Semaphore::Semaphore(long initCount, long maxCount) : _hsem(NULL) {
+        if(!(_hsem = CreateSemaphore(NULL, initCount, maxCount, NULL))) {
             common.printf("Semaphore: CreateSemaphore failed.\n");
             CHECK_WIN_ERROR;
             Crash();

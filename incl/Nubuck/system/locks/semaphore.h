@@ -9,9 +9,9 @@ namespace SYS {
     private:
         HANDLE _hsem;
     public:
-        enum { MAX_COUNT = 10 };
+        enum { MAX_COUNT = 10000 };
 
-        explicit Semaphore(int initCount);
+        explicit Semaphore(long initCount, long maxCount = MAX_COUNT);
         ~Semaphore(void);
 
         void Wait(void);
