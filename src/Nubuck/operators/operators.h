@@ -86,6 +86,8 @@ public:
     Operators();
     ~Operators();
 
+    unsigned GetDriverQueueSize() const;
+
     void FrameUpdate();
 
     unsigned Register(OperatorPanel* panel, Operator* op, HMODULE module = NULL);

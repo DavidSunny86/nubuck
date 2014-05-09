@@ -89,6 +89,10 @@ Operators::~Operators() {
     UnloadModules();
 }
 
+unsigned Operators::GetDriverQueueSize() const {
+    return _driver->GetEventQueueSize();
+}
+
 void Operators::FrameUpdate() {
     HandleEvents();
 }

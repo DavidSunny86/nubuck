@@ -140,6 +140,8 @@ public:
         _ev_handlers.push_back(item);
     }
 protected:
+    unsigned GetEventQueueSize() const { return _ev_events.size(); }
+
     template<typename TYPE>
     void _EV_HandleEvents(TYPE* instance, const char* className) {                               
         bool done = false;                                  

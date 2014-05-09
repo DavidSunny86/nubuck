@@ -29,6 +29,8 @@ protected:
 public:
     Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx);
 
+    unsigned GetEventQueueSize() const { return EV::EventHandler<EV::EventHandlerPolicies::Blocking>::GetEventQueueSize(); }
+
     DWORD Thread_Func(void) override;
 };
 

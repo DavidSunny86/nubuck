@@ -11,6 +11,8 @@
 #include <renderer\effects\effectmgr.h>
 #include "renderview.h"
 
+#include <operators\operators.h> // !!!
+
 namespace UI {
 
     void RenderView::initializeGL(void) {
@@ -153,6 +155,7 @@ namespace UI {
         _debugText.BeginFrame();
         _debugText.Printf("frame time: %f\n", R::metrics.frame.time);
         _debugText.Printf("number of draw calls: %d\n", R::metrics.frame.numDrawCalls);
+        _debugText.Printf("operator driver queue size: %d\n", OP::g_operators.GetDriverQueueSize());
         _debugText.EndFrame();
 
         updateGL();
