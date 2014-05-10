@@ -166,6 +166,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </Command>
     </CustomBuild>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_gen_windows\op_gen_windows.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_join\op_join.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_merge_vertices\op_merge_vertices.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_translate\op_translate.h" />
@@ -450,6 +451,7 @@
     <ClCompile Include="..\..\src\Nubuck\operators\op_delete\op_delete.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_gen_merge\op_gen_merge.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\operators\op_gen_windows\op_gen_windows.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_join\op_join.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_loop\op_loop.cpp" />
