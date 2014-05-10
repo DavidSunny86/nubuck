@@ -27,23 +27,39 @@ void Delaunay3DPanel::Invoke() {
     _ui.sldScale->setValue(0);
 }
 
+namespace {
+
+M::Vector3 ToVector(const leda::d3_rat_point& p) {
+    const leda::d3_point fp = p.to_float();
+    return M::Vector3(fp.xcoord(), fp.ycoord(), fp.zcoord());
+}
+
+leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
+    return leda::d3_rat_point(leda::d3_point(v.x, v.y, v.z));
+}
+
+} // unnamed namespace
+
 void Delaunay3D::Event_SetScale(const EV::Event& event) {
     const EV::Params_OP_Delaunay3D_SetScale& args = EV::def_OP_Delaunay3D_SetScale.GetArgs(event);
 
     if(_simplices.empty()) return;
 
-    for(unsigned i = 0; i < _simplices.size(); ++i) {
-        Simplex& simplex = _simplices[i];
+    std::cout << "Delaunay3D: scaling simplices ... ";
+    for(unsigned j = 0; j < _simplices.size(); ++j) {
+        Simplex& simplex = _simplices[j];
 
         leda::rational scale = 1 + 5 * leda::rational(args.value, args.max);
         leda::rat_vector center = scale * simplex.center;
 
         leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
         for(int i = 0; i < 4; ++i) {
-            leda::rat_vector pos = simplex.localPos[i] + center;
-            mesh.set_position(simplex.verts[i], pos);
+            // NOTE: carrying out this addition with rat_vectors yields NaNs when converted to float.
+            // i have absolutely NO IDEA why. maybe corrupted leda install?
+            mesh.set_position(simplex.verts[i], ToRatPoint(ToVector(simplex.localPos[i]) + ToVector(center)));
         }
     }
+    std::cout << "DONE" << std::endl;
 }
 
 Delaunay3D::Delaunay3D() {
