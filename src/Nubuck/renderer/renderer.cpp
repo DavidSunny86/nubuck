@@ -211,6 +211,93 @@ static void Uniforms_UpdateRenderTargetSize(const int width, const int height) {
     uniformsRenderTargetBuffer->Update_Mapped(0, sizeof(UniformsRenderTarget), &uniformsRenderTarget);
 }
 
+GEN::Pointer<Texture>       colorbuffer;
+GEN::Pointer<Texture> 	    depthbuffer;
+GEN::Pointer<Framebuffer>   framebuffer;
+
+// depth peeling buffers
+GEN::Pointer<Texture>       dp_cb;
+GEN::Pointer<Texture>       dp_db[2];
+GEN::Pointer<Framebuffer>   dp_fb[2];
+
+struct {
+    GEN::Pointer<Texture>       cb;
+    GEN::Pointer<Framebuffer>   fb;
+} fb_comp; // compositing framebuffer
+
+static void Framebuffers_DestroyBuffers() {
+    framebuffer.Drop();
+    colorbuffer.Drop();
+    depthbuffer.Drop();
+
+    dp_fb[0].Drop();
+    dp_fb[1].Drop();
+    dp_cb.Drop();
+    dp_db[0].Drop();
+    dp_db[1].Drop();
+
+    fb_comp.fb.Drop();
+    fb_comp.cb.Drop();
+}
+
+static void Framebuffers_CreateBuffers(int width, int height) {
+    Framebuffers_DestroyBuffers();
+
+    colorbuffer = GEN::MakePtr(new Texture(width, height, GL_RGBA));
+    depthbuffer = GEN::MakePtr(new Texture(width, height, GL_DEPTH_COMPONENT));
+    framebuffer = GEN::MakePtr(new Framebuffer);
+    framebuffer->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *colorbuffer);
+    framebuffer->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *depthbuffer);
+
+    fb_comp.cb = GEN::MakePtr(new Texture(width, height, GL_RGBA));
+    fb_comp.fb = GEN::MakePtr(new Framebuffer);
+    fb_comp.fb->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *fb_comp.cb);
+
+    dp_cb       = GEN::MakePtr(new Texture(width, height, GL_RGBA));
+    dp_db[0]    = GEN::MakePtr(new Texture(width, height, GL_DEPTH_COMPONENT));
+    dp_db[1]    = GEN::MakePtr(new Texture(width, height, GL_DEPTH_COMPONENT));
+
+    dp_fb[0] = GEN::MakePtr(new Framebuffer);
+    dp_fb[0]->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *dp_cb);
+    dp_fb[0]->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *dp_db[0]);
+
+    dp_fb[1] = GEN::MakePtr(new Framebuffer);
+    dp_fb[1]->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *dp_cb);
+    dp_fb[1]->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *dp_db[1]);
+
+    GL_CHECK_ERROR;
+}
+
+static void DrawFullscreenQuad(const R::Texture& tex) {
+    glUseProgram(0);
+
+    glPushAttrib(GL_ENABLE_BIT | GL_TEXTURE_BIT | GL_TRANSFORM_BIT);
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, tex.GetID());
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 0.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, 0.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, 0.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, 0.0f);
+    glEnd();
+
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glPopAttrib();
+}
+
 static float RandFloat(float min, float max) {
     return min + (rand() % 1000 / 1000.0f) * (max - min);
 }
@@ -301,7 +388,9 @@ void SetState(const State& state) {
 
 Renderer::Renderer(void) : _time(0.0f) { }
 
-Renderer::~Renderer() { }
+Renderer::~Renderer() {
+    Framebuffers_DestroyBuffers();
+}
 
 static void PrintGLInfo(void) {
     common.printf("INFO - GL strings {\n");
@@ -377,6 +466,8 @@ void Renderer::Init(void) {
 }
 
 void Renderer::Resize(int width, int height) {
+    Framebuffers_CreateBuffers(width, height);
+
     glViewport(0, 0, width, height);
     _aspect = (float)width / height;
 
@@ -556,6 +647,8 @@ void Renderer::BeginFrame() {
 
     metrics.frame.numDrawCalls = 0;
 
+    framebuffer->Bind();
+
     if(curState.depth.maskEnabled != GL_TRUE) {
         GL_CALL(glDepthMask(GL_TRUE));
         curState.depth.maskEnabled = GL_TRUE;
@@ -566,6 +659,9 @@ void Renderer::BeginFrame() {
 }
 
 void Renderer::EndFrame() {
+    BindWindowSystemFramebuffer();
+    DrawFullscreenQuad(*colorbuffer);
+
     meshMgr.R_Update();
 
     metrics.frame.time = frame_time.Stop();
@@ -618,25 +714,24 @@ void Renderer::Render(RenderList& renderList) {
         _renderLayers[rjob.layer].push_back(rjob);
     }
 
-    for(unsigned i = 0; i < Layers::NUM_LAYERS; ++i) {
-        const float zoom = 0.45f * renderList.zoom; // arbitrary scaling factor, looks okay i guess
-        M::Matrix4 perspective  = M::Mat4::Perspective(45.0f, _aspect, 0.1f, 100.0f);
-        M::Matrix4 ortho        = M::Mat4::Ortho(-zoom * _aspect, zoom * _aspect, -zoom, zoom, 0.1f, 100.0f);
-        M::Matrix4 projection   = Lerp(perspective, ortho, renderList.projWeight);
-        M::Matrix4 worldToEye = renderList.worldMat;
-        /*
-        M::Matrix4 worldToEye = M::Mat4::Identity();
-        if(Layers::GEOMETRY_0 == i) worldToEye = renderList.worldMat;
-        if(Layers::GEOMETRY_1 == i) worldToEye = M::Mat4::Identity();
-        */
+    const float zoom = 0.45f * renderList.zoom; // arbitrary scaling factor, looks okay i guess
+    M::Matrix4 perspective  = M::Mat4::Perspective(45.0f, _aspect, 0.1f, 100.0f);
+    M::Matrix4 ortho        = M::Mat4::Ortho(-zoom * _aspect, zoom * _aspect, -zoom, zoom, 0.1f, 100.0f);
+    M::Matrix4 projection   = Lerp(perspective, ortho, renderList.projWeight);
+    M::Matrix4 worldToEye   = renderList.worldMat;
 
-        // HACK: always use perspective projection for translate gizmo,
-        // to maintain constant size on screen
-        if(Layers::GEOMETRY_1 == i) projection = perspective;
+    if(!_renderLayers[Layers::GEOMETRY_0].empty()) {
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0]);
+    }
 
-        GeomSortMode::Enum geomSortMode = GeomSortMode::UNSORTED;
-        if(Layers::GEOMETRY_TRANSPARENT == i) geomSortMode = GeomSortMode::SORT_TRIANGLES;
-        if(!_renderLayers[i].empty()) Render(renderList, projection, worldToEye, geomSortMode, _renderLayers[i]);
+    // HACK: always use perspective projection for translate gizmo,
+    // to maintain constant size on screen
+    if(!_renderLayers[Layers::GEOMETRY_1].empty()) {
+        Render(renderList, perspective, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_1]);
+    }
+
+    if(!_renderLayers[Layers::GEOMETRY_TRANSPARENT].empty()) {
+        Render(renderList, projection, worldToEye, GeomSortMode::SORT_TRIANGLES, _renderLayers[Layers::GEOMETRY_TRANSPARENT]);
     }
 }
 
