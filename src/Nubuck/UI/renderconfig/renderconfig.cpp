@@ -26,11 +26,25 @@ void RenderConfig::OnEdgeRadiusChanged(double value) {
     }
 }
 
+void RenderConfig::OnTransparencyModeChanged(int index) {
+    // combobox order must conform enum
+    assert(0 <= index && index < R::TransparencyMode::NUM_MODES);
+    cvar_r_transparencyMode = index;
+    std::cout << "RenderConfig::OnTransparencyModeChanged: index = " << index << std::endl;
+}
+
+void RenderConfig::OnNumDepthPeelsChanged(int value) {
+    if(cvar_r_numDepthPeels != value) {
+        cvar_r_numDepthPeels = value;
+    }
+}
+
 RenderConfig::RenderConfig(QWidget* parent) : QDockWidget(parent) {
     _ui.setupUi(this);
 
     _ui.sbNodeSize->setValue(cvar_r_nodeSize);
     _ui.sbEdgeRadius->setValue(cvar_r_edgeRadius);
+    _ui.sbNumDepthPeels->setValue(cvar_r_numDepthPeels);
 }
 
 } // namespace UI

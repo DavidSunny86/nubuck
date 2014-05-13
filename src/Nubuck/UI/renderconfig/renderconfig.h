@@ -12,6 +12,8 @@ private:
 public slots:
     void OnNodeSizeChanged(double value);
     void OnEdgeRadiusChanged(double value);
+    void OnTransparencyModeChanged(int index);
+    void OnNumDepthPeelsChanged(int value);
 public:
     RenderConfig(QWidget* parent = NULL);
 };

@@ -13,8 +13,23 @@
 #include "skin\skinmgr.h"
 #include "light\light.h"
 
+namespace R {
+
+struct TransparencyMode {
+    enum Enum {
+        BACKFACES_FRONTFACES = 0,
+        SORT_TRIANGLES,
+        DEPTH_PEELING,
+        NUM_MODES
+    };
+};
+
+} // namespace R
+
 extern COM::Config::Variable<float>	cvar_r_nodeSize;
 extern COM::Config::Variable<float> cvar_r_edgeRadius;
+extern COM::Config::Variable<int>   cvar_r_transparencyMode;
+extern COM::Config::Variable<int>   cvar_r_numDepthPeels;
 
 namespace R {
 	

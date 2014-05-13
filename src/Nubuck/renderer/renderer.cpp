@@ -89,6 +89,8 @@ template<> struct ToGLEnum<int>         { enum { ENUM = GL_INT }; };
 
 COM::Config::Variable<float>	cvar_r_nodeSize("r_nodeSize", 0.1f);
 COM::Config::Variable<float>    cvar_r_edgeRadius("r_edgeRadius", 0.1f);
+COM::Config::Variable<int>      cvar_r_transparencyMode("r_transparencyMode", R::TransparencyMode::BACKFACES_FRONTFACES);
+COM::Config::Variable<int>      cvar_r_numDepthPeels("r_numDepthPeels", 5);
 
 namespace R {
 
@@ -740,7 +742,28 @@ void Renderer::Render(RenderList& renderList) {
     for(unsigned i = 0; i < Layers::NUM_LAYERS; ++i) _renderLayers[i].clear();
 
     for(unsigned i = 0; i < renderList.meshJobs.size(); ++i) {
-        const MeshJob& rjob = renderList.meshJobs[i];
+        MeshJob& rjob = renderList.meshJobs[i];
+
+        // set transparency technique
+        if(rjob.material.isTransparent) {
+            int transparencyMode = cvar_r_transparencyMode;
+            switch(transparencyMode) {
+            case TransparencyMode::BACKFACES_FRONTFACES:
+                rjob.fx     = "LitDirectionalTransparent";
+                rjob.layer  = Layers::GEOMETRY_0;
+                break;
+            case TransparencyMode::SORT_TRIANGLES:
+                rjob.fx     = "LitDirectionalTransparent";
+                rjob.layer  = Layers::GEOMETRY_TRANSPARENT;
+                break;
+            case TransparencyMode::DEPTH_PEELING:
+                rjob.layer  = Layers::GEOMETRY_DEPTH_PEELING;
+                break;
+            default:
+                assert(0 && "Renderer::Render(): unknown transparency mode");
+            }
+        }
+
         _renderLayers[rjob.layer].push_back(rjob);
     }
 
@@ -792,7 +815,9 @@ void Renderer::Render(RenderList& renderList) {
             mjob.material.texture0.samplerName  = "depthTex";
         }
 
-        for(unsigned i = 0; i < 8; ++i) {
+        assert(0 < cvar_r_numDepthPeels);
+        unsigned numDepthPeels = static_cast<unsigned>(cvar_r_numDepthPeels) - 1;
+        for(unsigned i = 0; i < numDepthPeels; ++i) {
             unsigned self   = i % 2;
             unsigned other  = 1 - self;
 

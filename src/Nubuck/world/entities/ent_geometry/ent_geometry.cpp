@@ -534,11 +534,12 @@ void ENT_Geometry::BuildRenderList() {
 
         R::MeshJob rjob;
 
-        if(_isTransparent) rjob.fx = "LitDirectionalTransparent";
-        else rjob.fx = "LitDirectionalTwosided";
+        R::Material mat = R::Material::White;
+        mat.isTransparent = _isTransparent;
 
+        rjob.fx = "LitDirectionalTwosided";
         rjob.layer      = _renderLayer;
-        rjob.material   = R::Material::White;
+        rjob.material   = mat;
         rjob.tfmesh     = _tfmesh;
         rjob.primType   = 0;
         _renderList.meshJobs.push_back(rjob);

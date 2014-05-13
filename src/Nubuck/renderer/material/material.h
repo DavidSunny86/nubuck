@@ -15,10 +15,14 @@ namespace R {
             bool IsValid() const { return NULL != texture && NULL != samplerName; }
         };
 
+        bool                    isTransparent;
         Color                   diffuseColor;
         TexBinding              texture0;
 
 		static Material White;
+
+        Material() : isTransparent(false) { }
+        Material(const Color& diffuseColor) : diffuseColor(diffuseColor) { }
     };
 
 } // namespace R

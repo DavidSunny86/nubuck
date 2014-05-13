@@ -4,6 +4,7 @@ fx LitDirectionalTransparent {
 
   pass Backfaces {
     state {
+      depth.maskEnabled = GL_FALSE;
       culling.hw {
         enabled   = GL_TRUE;
         cullFace  = GL_FRONT;
@@ -31,6 +32,7 @@ fx LitDirectionalTransparent {
 
   pass Frontfaces {
     state {
+      depth.maskEnabled = GL_FALSE;
       culling.hw {
         enabled   = GL_TRUE;
         cullFace  = GL_BACK;

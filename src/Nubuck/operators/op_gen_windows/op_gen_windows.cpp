@@ -22,7 +22,6 @@ void Windows::Invoke() {
     _nb.ui->SetOperatorName("Windows Scene");
 
     const int renderMode = IGeometry::RenderMode::FACES;
-    const int renderLayer = 3; // depth peeling layer
     const point3_t p[3] = {
         point3_t(-1, -1, 0),
         point3_t( 1, -1, 0),
@@ -41,7 +40,6 @@ void Windows::Invoke() {
         sprintf(nameBuffer, "Window %d", i);
         geom->SetName(nameBuffer);
         geom->SetRenderMode(renderMode);
-        geom->SetRenderLayer(renderLayer);
         geom->SetPosition(M::Vector3(0.0f, 0.0f, -dist + dist * i));
         leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
         mesh.make_triangle(p[0], p[1], p[2]);

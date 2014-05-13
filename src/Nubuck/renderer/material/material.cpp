@@ -2,8 +2,6 @@
 
 namespace R {
 
-	Material Material::White = {
-		Color::White /* diffuse */
-	};
+	Material Material::White(Color::White);
 
 } // namespace R
