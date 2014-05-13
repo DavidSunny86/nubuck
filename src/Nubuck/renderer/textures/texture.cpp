@@ -35,6 +35,12 @@ namespace R {
 
 		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
 		GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+
+        if(GL_DEPTH_COMPONENT == _format) {
+            // TODO: you probably don't want this for every depth texture...
+            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE));
+            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_ALPHA));
+        }
 	}
 
 	Texture::Texture(int width, int height, GLenum internalFormat, GLenum format,

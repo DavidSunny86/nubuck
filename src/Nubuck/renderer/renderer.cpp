@@ -218,7 +218,7 @@ GEN::Pointer<Framebuffer>   framebuffer;
 // depth peeling buffers
 GEN::Pointer<Texture>       dp_cb;
 GEN::Pointer<Texture>       dp_db[2];
-GEN::Pointer<Framebuffer>   dp_fb[2];
+GEN::Pointer<Framebuffer>   dp_fb[3];
 
 struct {
     GEN::Pointer<Texture>       cb;
@@ -232,6 +232,7 @@ static void Framebuffers_DestroyBuffers() {
 
     dp_fb[0].Drop();
     dp_fb[1].Drop();
+    dp_fb[2].Drop();
     dp_cb.Drop();
     dp_db[0].Drop();
     dp_db[1].Drop();
@@ -259,11 +260,15 @@ static void Framebuffers_CreateBuffers(int width, int height) {
 
     dp_fb[0] = GEN::MakePtr(new Framebuffer);
     dp_fb[0]->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *dp_cb);
-    dp_fb[0]->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *dp_db[0]);
+    dp_fb[0]->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *depthbuffer);
 
     dp_fb[1] = GEN::MakePtr(new Framebuffer);
     dp_fb[1]->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *dp_cb);
-    dp_fb[1]->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *dp_db[1]);
+    dp_fb[1]->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *dp_db[0]);
+
+    dp_fb[2] = GEN::MakePtr(new Framebuffer);
+    dp_fb[2]->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *dp_cb);
+    dp_fb[2]->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *dp_db[1]);
 
     GL_CHECK_ERROR;
 }
@@ -598,7 +603,30 @@ static void DrawFrame(
             Uniforms_BindBuffers();
             SetState(desc.state);
 
+            // HACK: set depth texture for depth peeling passes
+            if(cur->material.texture0.IsValid()) {
+                Material::TexBinding& tex0 = cur->material.texture0;
+
+                assert(!strcmp("depthTex", tex0.samplerName));
+
+                GLint loc = glGetUniformLocation(prog.GetID(), tex0.samplerName);
+                if(0 <= loc) prog.SetUniform(tex0.samplerName, 0);
+                tex0.texture->Bind(0);
+            }
+
+            // also set depth texture for solid geometry
+            if("LitDirectionalTwosidedPremulA" == cur->fx || "DepthPeel" == cur->fx) {
+                GLint loc = glGetUniformLocation(prog.GetID(), "solidDepth");
+                if(0 <= loc) prog.SetUniform("solidDepth", 1);
+                depthbuffer->Bind(1);
+            }
+
             next = DrawMeshList(prog, desc.state, desc.type, desc.flags, modelView, geomSortMode, cur);
+
+            // remember to unbind default depthbuffer
+            GL_CALL(glActiveTexture(GL_TEXTURE0 + 1));
+            GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
+            GL_CALL(glActiveTexture(GL_TEXTURE0 + 0));
         }
         cur = next;
     }
@@ -668,6 +696,14 @@ void Renderer::EndFrame() {
     metrics.EndFrame();
 }
 
+static void ClearDepthBuffer() {
+    if(curState.depth.maskEnabled != GL_TRUE) {
+        GL_CALL(glDepthMask(GL_TRUE));
+        curState.depth.maskEnabled = GL_TRUE;
+    }
+    GL_CALL(glClear(GL_DEPTH_BUFFER_BIT));
+}
+
 void Renderer::Render(
     const RenderList& renderList, 
     const M::Matrix4& projection,
@@ -675,12 +711,6 @@ void Renderer::Render(
     const GeomSortMode::Enum geomSortMode,
     std::vector<MeshJob>& rjobs) 
 {
-    if(curState.depth.maskEnabled != GL_TRUE) {
-        GL_CALL(glDepthMask(GL_TRUE));
-        curState.depth.maskEnabled = GL_TRUE;
-    }
-    GL_CALL(glClear(GL_DEPTH_BUFFER_BIT));
-
     Uniforms_Update(projection, worldToEye, renderList.dirLights);
 
     if(!rjobs.empty()) {
@@ -724,14 +754,99 @@ void Renderer::Render(RenderList& renderList) {
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0]);
     }
 
+    if(!_renderLayers[Layers::GEOMETRY_TRANSPARENT].empty()) {
+        Render(renderList, projection, worldToEye, GeomSortMode::SORT_TRIANGLES, _renderLayers[Layers::GEOMETRY_TRANSPARENT]);
+    }
+
+    if(!_renderLayers[Layers::GEOMETRY_DEPTH_PEELING].empty()) {
+        glPushAttrib(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+        fb_comp.fb->Bind();
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        dp_fb[2]->Bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // use effect with premult alpha
+        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_DEPTH_PEELING].size(); ++i) {
+            _renderLayers[Layers::GEOMETRY_DEPTH_PEELING][i].fx = "LitDirectionalTwosidedPremulA";
+        }
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_DEPTH_PEELING]);
+
+        // composite first peel
+        glPushAttrib(GL_COLOR_BUFFER_BIT);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+
+        fb_comp.fb->Bind();
+        DrawFullscreenQuad(*dp_cb);
+
+        glPopAttrib();
+
+        // set depth texture for first peeling pass
+        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_DEPTH_PEELING].size(); ++i) {
+            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_DEPTH_PEELING][i];
+            mjob.material.texture0.texture      = dp_db[1].Raw();
+            mjob.material.texture0.samplerName  = "depthTex";
+        }
+
+        for(unsigned i = 0; i < 8; ++i) {
+            unsigned self   = i % 2;
+            unsigned other  = 1 - self;
+
+            dp_fb[1 + self]->Bind();
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_DEPTH_PEELING].size(); ++i) {
+                MeshJob& mjob = _renderLayers[Layers::GEOMETRY_DEPTH_PEELING][i];
+                mjob.fx = "DepthPeel";
+            }
+            Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_DEPTH_PEELING]);
+
+            // composite depth peeling framebuffer
+            glPushAttrib(GL_COLOR_BUFFER_BIT);
+
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+
+            fb_comp.fb->Bind();
+            DrawFullscreenQuad(*dp_cb);
+
+            glPopAttrib();
+
+            // set depth texture for next peeling pass
+            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_DEPTH_PEELING].size(); ++i) {
+                MeshJob& mjob = _renderLayers[Layers::GEOMETRY_DEPTH_PEELING][i];
+                mjob.material.texture0.texture = dp_db[self].Raw();
+            }
+
+        } // passes
+
+        // composite default framebuffer
+        glPushAttrib(GL_COLOR_BUFFER_BIT);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+
+        fb_comp.fb->Bind();
+        DrawFullscreenQuad(*colorbuffer);
+
+        glPopAttrib();
+
+        // draw compositing buffer
+        framebuffer->Bind();
+        DrawFullscreenQuad(*fb_comp.cb);
+
+        glPopAttrib();
+    }
+
     // HACK: always use perspective projection for translate gizmo,
     // to maintain constant size on screen
     if(!_renderLayers[Layers::GEOMETRY_1].empty()) {
+        ClearDepthBuffer();
         Render(renderList, perspective, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_1]);
-    }
-
-    if(!_renderLayers[Layers::GEOMETRY_TRANSPARENT].empty()) {
-        Render(renderList, projection, worldToEye, GeomSortMode::SORT_TRIANGLES, _renderLayers[Layers::GEOMETRY_TRANSPARENT]);
     }
 }
 

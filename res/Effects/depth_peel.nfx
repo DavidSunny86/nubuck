@@ -1,0 +1,16 @@
+// uses renderList.dirLights only
+fx LitDirectionalTwosidedPremulA {
+  pass Pass0 {
+    vs = "#include <Shaders\mesh.vert>";
+    fs =
+    """
+    const bool LIGHTING_ENABLED             = true;
+    const bool LIGHTING_TWOSIDED_ENABLED    = true;
+    const bool PREMULT_ALPHA                = true;
+    const bool PERFORM_DEPTH_TEST           = true;
+    const bool PERFORM_DEPTH_PEEL           = false;
+
+    #include <Shaders\mesh.frag>
+    """;
+  }
+}

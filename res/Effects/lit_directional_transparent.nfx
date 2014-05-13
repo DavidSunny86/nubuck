@@ -21,6 +21,9 @@ fx LitDirectionalTransparent {
     """
     const bool LIGHTING_ENABLED             = true;
     const bool LIGHTING_TWOSIDED_ENABLED    = true;
+    const bool PREMULT_ALPHA                = false;
+    const bool PERFORM_DEPTH_TEST           = false;
+    const bool PERFORM_DEPTH_PEEL           = false;
 
     #include <Shaders\mesh.frag>
     """;
@@ -45,6 +48,9 @@ fx LitDirectionalTransparent {
     """
     const bool LIGHTING_ENABLED             = true;
     const bool LIGHTING_TWOSIDED_ENABLED    = false;
+    const bool PREMULT_ALPHA                = false;
+    const bool PERFORM_DEPTH_TEST           = false;
+    const bool PERFORM_DEPTH_PEEL           = false;
 
     #include <Shaders\mesh.frag>
     """;

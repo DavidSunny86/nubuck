@@ -58,6 +58,7 @@ public:
             GEOMETRY_0 = 0,
             GEOMETRY_1,
             GEOMETRY_TRANSPARENT,
+            GEOMETRY_DEPTH_PEELING,
 
             NUM_LAYERS
         };

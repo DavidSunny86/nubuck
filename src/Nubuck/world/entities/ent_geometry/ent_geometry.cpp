@@ -547,14 +547,14 @@ void ENT_Geometry::BuildRenderList() {
     if(RenderMode::NODES & _renderMode && !_nodes.IsEmpty()) {
 	    _nodes.BuildRenderMesh();
         R::MeshJob rjob = _nodes.GetRenderJob();
-        rjob.layer = _renderLayer;
+        rjob.layer = R::Renderer::Layers::GEOMETRY_0;
         _renderList.meshJobs.push_back(rjob);
     }
 
     if(RenderMode::EDGES & _renderMode && !_edgeRenderer->IsEmpty()) {
 		_edgeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _edgeRenderer->GetRenderJob();
-        rjob.layer = _renderLayer;
+        rjob.layer = R::Renderer::Layers::GEOMETRY_0;
         _renderList.meshJobs.push_back(rjob);
     }
 }

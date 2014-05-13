@@ -2,6 +2,9 @@
 OPTIONS:
 LIGHTING_ENABLED
 LIGHTING_TWOSIDED_ENABLED
+PREMULT_ALPHA
+PERFORM_DEPTH_PEEL
+PERFORM_DEPTH_TEST
 */
 
 layout(std140) uniform UniformsLights {
@@ -14,12 +17,34 @@ layout(std140) uniform UniformsLights {
     float uShininess;
 };
 
+layout(std140) uniform UniformsRenderTarget {
+    int uWidth;
+    int uHeight;
+};
+
+uniform sampler2D depthTex;
+uniform sampler2D solidDepth;
+
 varying vec4 vPosition;
 varying vec3 vNormal;
 varying vec4 vColor;
 
 void main() {
     vec4 color = vColor;
+
+    if(PERFORM_DEPTH_TEST || PERFORM_DEPTH_PEEL) {
+        vec2 texCoords;
+        texCoords.x = gl_FragCoord.x / uWidth;
+        texCoords.y = gl_FragCoord.y / uHeight;
+        if(PERFORM_DEPTH_TEST) {
+            float sdepth = texture2D(solidDepth, texCoords).a;
+            if(gl_FragCoord.z > sdepth) discard;
+        }
+        if(PERFORM_DEPTH_PEEL) {
+            float depth = texture2D(depthTex, texCoords).a;
+            if(gl_FragCoord.z <= depth) discard;
+        }
+    }
 
     if(LIGHTING_ENABLED) {
         vec3 view = normalize(-vPosition.xyz);
@@ -28,7 +53,7 @@ void main() {
         if(LIGHTING_TWOSIDED_ENABLED) {
             if(dot(normal, view) < 0.0) {
                 normal *= -1.0;
-                color *= 0.9f;
+                color.rgb *= 0.9f;
             }
         }
 
@@ -44,6 +69,8 @@ void main() {
 
         color.rgb *= (diff + spec).rgb;
     }
+
+    if(PREMULT_ALPHA) color.rgb *= color.a;
 
     gl_FragColor = color;
 }
