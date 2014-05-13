@@ -30,7 +30,7 @@ void ENT_GeometryOutln::OnTransparencyChanged(int value) {
 
 void ENT_GeometryOutln::OnRenderModeChanged(bool) {
     EV::Params_ENT_Geometry_RenderModeChanged args;
-    int renderMode;
+    int renderMode = 0;
     if(_btnRenderVertices->isChecked()) renderMode |= IGeometry::RenderMode::NODES;
     if(_btnRenderEdges->isChecked()) renderMode |= IGeometry::RenderMode::EDGES;
     if(_btnRenderFaces->isChecked()) renderMode |= IGeometry::RenderMode::FACES;
