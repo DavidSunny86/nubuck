@@ -103,7 +103,7 @@ template<typename VEC3>
 const R::Color PolyMesh<VEC3>::defaultEdgeColor = R::Color(0.3f, 0.3f, 0.3f);
 
 template<typename VEC3>
-const float PolyMesh<VEC3>::defaultEdgeRadius = 0.02f;
+const float PolyMesh<VEC3>::defaultEdgeRadius = 0.01f;
 
 template<typename VEC3>
 void set_color(PolyMesh<VEC3>& mesh, const R::Color& color) {
