@@ -30,6 +30,10 @@ void SetDefaultState(State& state) {
 
     state.raster.lineWidth          = 1.0f;
 
+    state.raster.lineStipple.enabled    = GL_FALSE;
+    state.raster.lineStipple.factor     = 1;
+    state.raster.lineStipple.pattern    = 0x1111;
+
     state.color.maskEnabled.red     = GL_TRUE;
     state.color.maskEnabled.green   = GL_TRUE;
     state.color.maskEnabled.blue    = GL_TRUE;

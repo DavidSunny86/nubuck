@@ -383,6 +383,19 @@ void SetState(const State& state) {
         curState.raster.lineWidth = state.raster.lineWidth;
     }
 
+    if(curState.raster.lineStipple.enabled != state.raster.lineStipple.enabled) {
+        SetEnabled(GL_LINE_STIPPLE, state.raster.lineStipple.enabled);
+        curState.raster.lineStipple.enabled = state.raster.lineStipple.enabled;
+    }
+
+    c0 = curState.raster.lineStipple.factor != state.raster.lineStipple.factor;
+    c1 = curState.raster.lineStipple.pattern != state.raster.lineStipple.pattern;
+    if(c0 || c1) {
+        GL_CALL(glLineStipple(state.raster.lineStipple.factor, state.raster.lineStipple.pattern));
+        curState.raster.lineStipple.factor = state.raster.lineStipple.factor;
+        curState.raster.lineStipple.pattern = state.raster.lineStipple.pattern;
+    }
+
     c0 = curState.color.maskEnabled.red != state.color.maskEnabled.red;
     c1 = curState.color.maskEnabled.green != state.color.maskEnabled.green;
     c2 = curState.color.maskEnabled.blue != state.color.maskEnabled.blue;

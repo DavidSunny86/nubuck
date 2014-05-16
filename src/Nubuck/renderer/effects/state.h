@@ -52,6 +52,12 @@ struct State {
 
     struct Rasterizing {
         float       lineWidth;
+
+        struct LineStipple {
+            GLboolean   enabled;
+            GLint       factor;
+            GLuint      pattern;
+        } lineStipple;
     } raster;
 
     struct ColorBuffer {
