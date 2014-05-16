@@ -40,8 +40,8 @@ void ENT_GeometryOutln::OnRenderModeChanged(bool) {
 
 void ENT_GeometryOutln::OnEdgeShadingChanged(int idx) {
     EV::Params_ENT_Geometry_EdgeShadingChanged args;
-    if(0 == idx) args.shadingMode = IGeometry::ShadingMode::NICE;
-    else args.shadingMode = IGeometry::ShadingMode::FAST;
+    assert(0 <= idx && idx < IGeometry::ShadingMode::NUM_MODES);
+    args.shadingMode = IGeometry::ShadingMode::Enum(idx);
     _subject.Send(EV::def_ENT_Geometry_EdgeShadingChanged.Create(args));
 }
 
@@ -71,6 +71,7 @@ void ENT_GeometryOutln::InitOutline() {
     _cbEdgeShading = new QComboBox;
     _cbEdgeShading->addItem("nice");
     _cbEdgeShading->addItem("fast");
+    _cbEdgeShading->addItem("lines");
 
     QLabel* lblHullAlpha = new QLabel("hull alpha:");
     _sldHullAlpha = new QSlider(Qt::Horizontal);

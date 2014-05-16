@@ -11,6 +11,7 @@
 #include <renderer\nodes\r_nodes.h>
 #include <renderer\edges\r_cylinder_edges.h>
 #include <renderer\edges\r_line_edges.h>
+#include <renderer\edges\r_gl_line_edges.h>
 #include <UI\outliner\outliner.h>
 #include <world\entity.h>
 
@@ -27,6 +28,7 @@ private:
     R::Nodes                        _nodes;
     R::CylinderEdges                _cylinderEdges;
     R::LineEdges                    _lineEdges;
+    R::GL_LineEdges                 _glLineEdges;
     R::EdgeRenderer*                _edgeRenderer;
 
     void RebuildRenderEdges();

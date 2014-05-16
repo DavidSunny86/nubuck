@@ -36,7 +36,10 @@ struct IGeometry {
     struct ShadingMode {
         enum Enum {
             NICE = 0,
-            FAST
+            FAST,
+            LINES,
+
+            NUM_MODES
         };
     };
 

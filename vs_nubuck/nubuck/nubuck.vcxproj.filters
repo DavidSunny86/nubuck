@@ -725,6 +725,9 @@
     <ClInclude Include="..\..\src\Nubuck\operators\op_gen_windows\op_gen_windows.h">
       <Filter>Private\operators\op_gen_windows</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_gl_line_edges.h">
+      <Filter>Private\renderer\edges</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -1191,6 +1194,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\operators\op_gen_windows\op_gen_windows.cpp">
       <Filter>Private\operators\op_gen_windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_gl_line_edges.cpp">
+      <Filter>Private\renderer\edges</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -480,8 +480,13 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
     bool rebuild = false;
     _mtx.Lock();
     if(_shadingMode != mode) {
-        if(ShadingMode::FAST == mode) _edgeRenderer = &_lineEdges;
-        else _edgeRenderer = &_cylinderEdges; 
+        switch(mode) {
+        case ShadingMode::FAST:     _edgeRenderer = &_lineEdges; break;
+        case ShadingMode::NICE:     _edgeRenderer = &_cylinderEdges; break;
+        case ShadingMode::LINES:    _edgeRenderer = &_glLineEdges; break;
+        default:
+            assert(0 && "ENT_Geometry::SetShadingMode(): unkown shading mode");
+        };
         _shadingMode = mode;
         rebuild = true;
     }

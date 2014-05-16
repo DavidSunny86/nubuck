@@ -173,6 +173,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\debugtext\debugtext.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_edges.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_gl_line_edges.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_line_edges.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\effect.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\effectmgr.h" />
@@ -463,6 +464,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\debugtext\debugtext.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_edges.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_gl_line_edges.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_line_edges.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\default_effects.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\effect.cpp" />
