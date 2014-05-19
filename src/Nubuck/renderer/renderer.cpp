@@ -763,14 +763,14 @@ void Renderer::Render(RenderList& renderList) {
             switch(transparencyMode) {
             case TransparencyMode::BACKFACES_FRONTFACES:
                 rjob.fx     = "LitDirectionalTransparent";
-                rjob.layer  = Layers::GEOMETRY_0;
+                rjob.layer  = Layers::GEOMETRY_0_SOLID_0;
                 break;
             case TransparencyMode::SORT_TRIANGLES:
                 rjob.fx     = "LitDirectionalTransparent";
-                rjob.layer  = Layers::GEOMETRY_TRANSPARENT;
+                rjob.layer  = Layers::GEOMETRY_0_TRANSPARENT_SORTED;
                 break;
             case TransparencyMode::DEPTH_PEELING:
-                rjob.layer  = Layers::GEOMETRY_DEPTH_PEELING;
+                rjob.layer  = Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING;
                 break;
             default:
                 assert(0 && "Renderer::Render(): unknown transparency mode");
@@ -786,15 +786,15 @@ void Renderer::Render(RenderList& renderList) {
     M::Matrix4 projection   = Lerp(perspective, ortho, renderList.projWeight);
     M::Matrix4 worldToEye   = renderList.worldMat;
 
-    if(!_renderLayers[Layers::GEOMETRY_0].empty()) {
-        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0]);
+    if(!_renderLayers[Layers::GEOMETRY_0_SOLID_0].empty()) {
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_0]);
     }
 
-    if(!_renderLayers[Layers::GEOMETRY_TRANSPARENT].empty()) {
-        Render(renderList, projection, worldToEye, GeomSortMode::SORT_TRIANGLES, _renderLayers[Layers::GEOMETRY_TRANSPARENT]);
+    if(!_renderLayers[Layers::GEOMETRY_0_TRANSPARENT_SORTED].empty()) {
+        Render(renderList, projection, worldToEye, GeomSortMode::SORT_TRIANGLES, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_SORTED]);
     }
 
-    if(!_renderLayers[Layers::GEOMETRY_DEPTH_PEELING].empty()) {
+    if(!_renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].empty()) {
         glPushAttrib(GL_COLOR_BUFFER_BIT);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -805,10 +805,10 @@ void Renderer::Render(RenderList& renderList) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // use effect with premult alpha
-        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_DEPTH_PEELING].size(); ++i) {
-            _renderLayers[Layers::GEOMETRY_DEPTH_PEELING][i].fx = "LitDirectionalTwosidedPremulA";
+        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
+            _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i].fx = "LitDirectionalTwosidedPremulA";
         }
-        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_DEPTH_PEELING]);
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING]);
 
         // composite first peel
         glPushAttrib(GL_COLOR_BUFFER_BIT);
@@ -822,8 +822,8 @@ void Renderer::Render(RenderList& renderList) {
         glPopAttrib();
 
         // set depth texture for first peeling pass
-        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_DEPTH_PEELING].size(); ++i) {
-            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_DEPTH_PEELING][i];
+        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
+            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i];
             mjob.material.texture0.texture      = dp_db[1].Raw();
             mjob.material.texture0.samplerName  = "depthTex";
         }
@@ -837,11 +837,11 @@ void Renderer::Render(RenderList& renderList) {
             dp_fb[1 + self]->Bind();
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_DEPTH_PEELING].size(); ++i) {
-                MeshJob& mjob = _renderLayers[Layers::GEOMETRY_DEPTH_PEELING][i];
+            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
+                MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i];
                 mjob.fx = "DepthPeel";
             }
-            Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_DEPTH_PEELING]);
+            Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING]);
 
             // composite depth peeling framebuffer
             glPushAttrib(GL_COLOR_BUFFER_BIT);
@@ -855,8 +855,8 @@ void Renderer::Render(RenderList& renderList) {
             glPopAttrib();
 
             // set depth texture for next peeling pass
-            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_DEPTH_PEELING].size(); ++i) {
-                MeshJob& mjob = _renderLayers[Layers::GEOMETRY_DEPTH_PEELING][i];
+            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
+                MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i];
                 mjob.material.texture0.texture = dp_db[self].Raw();
             }
 

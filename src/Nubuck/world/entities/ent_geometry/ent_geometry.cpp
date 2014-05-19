@@ -290,7 +290,7 @@ void ENT_Geometry::RebuildRenderEdges() {
     leda::edge e;
     forall_edges(e, _ratPolyMesh) {
         if(!visited[e] && !_ratPolyMesh.is_masked(e)) {
-            re.radius = _ratPolyMesh.radius_of(e);
+            re.radius = 2 * _ratPolyMesh.radius_of(e); // !!!
             re.color = _ratPolyMesh.color_of(e);
             re.v0 = leda::source(e);
             re.v1 = leda::target(e);
@@ -553,14 +553,14 @@ void ENT_Geometry::BuildRenderList() {
     if(RenderMode::NODES & _renderMode && !_nodes.IsEmpty()) {
 	    _nodes.BuildRenderMesh();
         R::MeshJob rjob = _nodes.GetRenderJob();
-        rjob.layer = R::Renderer::Layers::GEOMETRY_0;
+        rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
         _renderList.meshJobs.push_back(rjob);
     }
 
     if(RenderMode::EDGES & _renderMode && !_edgeRenderer->IsEmpty()) {
 		_edgeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _edgeRenderer->GetRenderJob();
-        rjob.layer = R::Renderer::Layers::GEOMETRY_0;
+        rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
         _renderList.meshJobs.push_back(rjob);
     }
 }

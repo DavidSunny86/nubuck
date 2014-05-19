@@ -217,14 +217,14 @@ void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
     R::MeshJob meshJob;
 
     meshJob.fx = "UnlitThickLines";
-    meshJob.layer = 1;
+    meshJob.layer = R::Renderer::Layers::GEOMETRY_1;
     meshJob.material = R::Material::White;
     meshJob.primType = 0;
     meshJob.tfmesh = _axisTFMesh;
     meshJobs.push_back(meshJob);
 
     meshJob.fx = "LitDirectional";
-    meshJob.layer = 1;
+    meshJob.layer = R::Renderer::Layers::GEOMETRY_1;
     meshJob.material = R::Material::White;
     meshJob.primType = 0;
     for(int i = 0; i < 3; ++i) {

@@ -374,7 +374,7 @@ void World::Grid_Build() {
 R::MeshJob World::Grid_GetRenderJob() {
     R::MeshJob meshJob;
     meshJob.fx = "Unlit";
-    meshJob.layer = 0;
+    meshJob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
     meshJob.material = R::Material::White;
     meshJob.tfmesh = _gridTFMesh;
     meshJob.primType = 0;
@@ -418,7 +418,7 @@ void World::BBoxes_BuildFromSelection() {
 void World::BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
     R::MeshJob rjob;
     rjob.fx         = "Unlit";
-    rjob.layer      = 0;
+    rjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
     rjob.material   = R::Material::White;
     rjob.primType   = 0;
     for(unsigned i = 0; i < _bboxes.size(); ++i) {

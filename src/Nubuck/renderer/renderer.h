@@ -70,10 +70,11 @@ class Renderer {
 public:
     struct Layers {
         enum Enum {
-            GEOMETRY_0 = 0,
+            GEOMETRY_0_SOLID_0 = 0,
+            GEOMETRY_0_TRANSPARENT_SORTED,
+            GEOMETRY_0_TRANSPARENT_DEPTH_PEELING,
+            GEOMETRY_0_SOLID_1,
             GEOMETRY_1,
-            GEOMETRY_TRANSPARENT,
-            GEOMETRY_DEPTH_PEELING,
 
             NUM_LAYERS
         };
