@@ -182,6 +182,7 @@ void ENT_Geometry::Event_RenderModeChanged(const EV::Event& event) {
 
 void ENT_Geometry::Event_EdgeShadingChanged(const EV::Event& event) {
     const EV::Params_ENT_Geometry_EdgeShadingChanged& args = EV::def_ENT_Geometry_EdgeShadingChanged.GetArgs(event);
+    _stylizedHiddenLines = args.showHiddenLines;
     SetShadingMode(args.shadingMode);
 }
 
@@ -196,6 +197,7 @@ ENT_Geometry::ENT_Geometry()
     , _renderMode(0)
     , _renderLayer(0)
     , _shadingMode(ShadingMode::NICE)
+    , _stylizedHiddenLines(false)
     , _transparency(1.0f)
     , _isTransparent(false)
 { 
@@ -560,7 +562,12 @@ void ENT_Geometry::BuildRenderList() {
     if(RenderMode::EDGES & _renderMode && !_edgeRenderer->IsEmpty()) {
 		_edgeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _edgeRenderer->GetRenderJob();
-        rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+        if(ShadingMode::LINES == _shadingMode && _stylizedHiddenLines) {
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
+            rjob.fx = "UnlitThickLinesStippled";
+        } else {
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+        }
         _renderList.meshJobs.push_back(rjob);
     }
 }

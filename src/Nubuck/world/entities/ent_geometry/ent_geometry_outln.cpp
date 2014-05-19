@@ -38,11 +38,12 @@ void ENT_GeometryOutln::OnRenderModeChanged(bool) {
     _subject.Send(EV::def_ENT_Geometry_RenderModeChanged.Create(args));
 }
 
-void ENT_GeometryOutln::OnEdgeShadingChanged(int idx) {
-    EV::Params_ENT_Geometry_EdgeShadingChanged args;
-    assert(0 <= idx && idx < IGeometry::ShadingMode::NUM_MODES);
-    args.shadingMode = IGeometry::ShadingMode::Enum(idx);
-    _subject.Send(EV::def_ENT_Geometry_EdgeShadingChanged.Create(args));
+void ENT_GeometryOutln::OnEdgeShadingChanged(int) {
+    SendEdgeShading();
+}
+
+void ENT_GeometryOutln::OnHiddenLinesChanged(int) {
+    SendEdgeShading();
 }
 
 ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) {
@@ -72,6 +73,8 @@ void ENT_GeometryOutln::InitOutline() {
     _cbEdgeShading->addItem("nice");
     _cbEdgeShading->addItem("fast");
     _cbEdgeShading->addItem("lines");
+
+    _cbHiddenLines = new QCheckBox("show hidden lines");
 
     QLabel* lblHullAlpha = new QLabel("hull alpha:");
     _sldHullAlpha = new QSlider(Qt::Horizontal);
@@ -104,22 +107,34 @@ void ENT_GeometryOutln::InitOutline() {
     layout->addWidget(lblEdgeShading, 2, 0, 1, 1);
     layout->addWidget(_cbEdgeShading, 2, 1, 1, 1);
 
-    layout->addWidget(lblHullAlpha, 3, 0, 1, 1);
-    layout->addWidget(_sldHullAlpha, 3, 1, 1, 1);
+    layout->addWidget(_cbHiddenLines, 3, 0, 1, 2);
 
-    layout->addWidget(lblRenderMode, 4, 0, 1, 1);
-    layout->addLayout(hboxLayout, 4, 1, 1, 1);
+    layout->addWidget(lblHullAlpha, 4, 0, 1, 1);
+    layout->addWidget(_sldHullAlpha, 4, 1, 1, 1);
+
+    layout->addWidget(lblRenderMode, 5, 0, 1, 1);
+    layout->addLayout(hboxLayout, 5, 1, 1, 1);
 
 	setLayout(layout);
 
     QObject::connect(_sbEdgeRadius, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeRadiusChanged(double)));
     QObject::connect(_btnEdgeColor, SIGNAL(SigColorChanged(float, float, float)), this, SLOT(OnEdgeColorChanged(float, float, float)));
     QObject::connect(_cbEdgeShading, SIGNAL(currentIndexChanged(int)), this, SLOT(OnEdgeShadingChanged(int)));
+    QObject::connect(_cbHiddenLines, SIGNAL(stateChanged(int)), this, SLOT(OnHiddenLinesChanged(int)));
     QObject::connect(_sldHullAlpha, SIGNAL(valueChanged(int)), this, SLOT(OnTransparencyChanged(int)));
 
     QObject::connect(_btnRenderVertices, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
     QObject::connect(_btnRenderEdges, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
     QObject::connect(_btnRenderFaces, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
+}
+
+void ENT_GeometryOutln::SendEdgeShading() {
+    EV::Params_ENT_Geometry_EdgeShadingChanged args;
+    int idx = _cbEdgeShading->currentIndex();
+    assert(0 <= idx && idx < IGeometry::ShadingMode::NUM_MODES);
+    args.shadingMode = IGeometry::ShadingMode::Enum(idx);
+    args.showHiddenLines = _cbHiddenLines->isChecked();
+    _subject.Send(EV::def_ENT_Geometry_EdgeShadingChanged.Create(args));
 }
 
 void ENT_GeometryOutln::Event_EdgeRadiusChanged(const EV::Event& event) {

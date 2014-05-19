@@ -60,6 +60,7 @@ private:
     int                 _renderMode;
     unsigned            _renderLayer;
     ShadingMode::Enum   _shadingMode;
+    bool                _stylizedHiddenLines;
     R::RenderList       _renderList;
 
     float               _transparency;

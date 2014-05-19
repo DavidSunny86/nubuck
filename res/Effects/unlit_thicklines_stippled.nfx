@@ -1,0 +1,50 @@
+// only vertex colors
+fx UnlitThickLinesStippled {
+  pass Solid {
+    state {
+      raster.lineWidth = 2.0;
+      depth.maskEnabled = GL_FALSE;
+    }
+
+    vs = "#include <Shaders\mesh.vert>";
+
+    fs = 
+    """
+    const bool LIGHTING_ENABLED             = false;
+    const bool LIGHTING_TWOSIDED_ENABLED    = false;
+    const bool PREMULT_ALPHA                = false;
+    const bool PERFORM_DEPTH_TEST           = false;
+    const bool PERFORM_DEPTH_PEEL           = false;
+
+    #include <Shaders\mesh.frag>
+    """;
+  }
+
+  pass Stippled {
+    state {
+      raster.lineWidth = 2.0;
+      depth {
+        maskEnabled = GL_FALSE;
+        func = GL_GREATER;
+      }
+      raster.lineStipple {
+        enabled = GL_TRUE;
+        factor  = 4;
+        pattern = 43690; // 0xAAAA
+      }
+    }
+
+    vs = "#include <Shaders\mesh.vert>";
+
+    fs = 
+    """
+    const bool LIGHTING_ENABLED             = false;
+    const bool LIGHTING_TWOSIDED_ENABLED    = false;
+    const bool PREMULT_ALPHA                = false;
+    const bool PERFORM_DEPTH_TEST           = false;
+    const bool PERFORM_DEPTH_PEEL           = false;
+
+    #include <Shaders\mesh.frag>
+    """;
+  }
+}

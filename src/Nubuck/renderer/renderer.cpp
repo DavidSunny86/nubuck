@@ -278,6 +278,10 @@ static void Framebuffers_CreateBuffers(int width, int height) {
 static void DrawFullscreenQuad(const R::Texture& tex) {
     glUseProgram(0);
 
+    State defaultState;
+    SetDefaultState(defaultState);
+    SetState(defaultState);
+
     glPushAttrib(GL_ENABLE_BIT | GL_TEXTURE_BIT | GL_TRANSFORM_BIT);
 
     glDisable(GL_DEPTH_TEST);
@@ -681,6 +685,29 @@ static M::Matrix4 ComputeProjectionMatrix(float aspect, const M::Matrix4& worldM
 static SYS::Timer   frame_time;
 static float        frame_secsPassed = 0.0f;
 
+static void Clear(GLbitfield mask) {
+    if(GL_COLOR_BUFFER_BIT & mask) {
+        const bool c0 = GL_TRUE != curState.color.maskEnabled.red;
+        const bool c1 = GL_TRUE != curState.color.maskEnabled.green;
+        const bool c2 = GL_TRUE != curState.color.maskEnabled.blue;
+        const bool c3 = GL_TRUE != curState.color.maskEnabled.alpha;
+        if(c0 || c1 || c2 || c3) {
+            GL_CALL(glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE));
+            curState.color.maskEnabled.red      = GL_TRUE;
+            curState.color.maskEnabled.green    = GL_TRUE;
+            curState.color.maskEnabled.blue     = GL_TRUE;
+            curState.color.maskEnabled.alpha    = GL_TRUE;
+        }
+    }
+    if(GL_DEPTH_BUFFER_BIT & mask) {
+        if(curState.depth.maskEnabled != GL_TRUE) {
+            GL_CALL(glDepthMask(GL_TRUE));
+            curState.depth.maskEnabled = GL_TRUE;
+        }
+    }
+    GL_CALL(glClear(mask));
+}
+
 void Renderer::BeginFrame() {
     float secsPassed = _timer.Stop();
     _time += secsPassed;
@@ -698,7 +725,7 @@ void Renderer::BeginFrame() {
     }
     const float f = 1.0f / 255.0f;
     glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
-    GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+    Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void Renderer::EndFrame() {
@@ -709,14 +736,6 @@ void Renderer::EndFrame() {
 
     metrics.frame.time = frame_time.Stop();
     metrics.EndFrame();
-}
-
-static void ClearDepthBuffer() {
-    if(curState.depth.maskEnabled != GL_TRUE) {
-        GL_CALL(glDepthMask(GL_TRUE));
-        curState.depth.maskEnabled = GL_TRUE;
-    }
-    GL_CALL(glClear(GL_DEPTH_BUFFER_BIT));
 }
 
 void Renderer::Render(
@@ -754,6 +773,8 @@ M::Matrix4 Lerp(const M::Matrix4& lhp, const M::Matrix4& rhp, float t) {
 void Renderer::Render(RenderList& renderList) {
     for(unsigned i = 0; i < Layers::NUM_LAYERS; ++i) _renderLayers[i].clear();
 
+    std::vector<MeshJob> transparentJobs;
+
     for(unsigned i = 0; i < renderList.meshJobs.size(); ++i) {
         MeshJob& rjob = renderList.meshJobs[i];
 
@@ -775,6 +796,8 @@ void Renderer::Render(RenderList& renderList) {
             default:
                 assert(0 && "Renderer::Render(): unknown transparency mode");
             }
+
+            transparentJobs.push_back(rjob);
         }
 
         _renderLayers[rjob.layer].push_back(rjob);
@@ -799,10 +822,10 @@ void Renderer::Render(RenderList& renderList) {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         fb_comp.fb->Bind();
-        glClear(GL_COLOR_BUFFER_BIT);
+        Clear(GL_COLOR_BUFFER_BIT);
 
         dp_fb[2]->Bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // use effect with premult alpha
         for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
@@ -835,7 +858,7 @@ void Renderer::Render(RenderList& renderList) {
             unsigned other  = 1 - self;
 
             dp_fb[1 + self]->Bind();
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
                 MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i];
@@ -880,10 +903,20 @@ void Renderer::Render(RenderList& renderList) {
         glPopAttrib();
     }
 
+    // HACK: assumes that every transparent mesh is supposed to be rendered in depth-only pass
+    for(unsigned i = 0; i < transparentJobs.size(); ++i) {
+        transparentJobs[i].fx = "DepthOnly";
+    }
+    Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, transparentJobs);
+
+    if(!_renderLayers[Layers::GEOMETRY_0_SOLID_1].empty()) {
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_1]);
+    }
+
     // HACK: always use perspective projection for translate gizmo,
     // to maintain constant size on screen
     if(!_renderLayers[Layers::GEOMETRY_1].empty()) {
-        ClearDepthBuffer();
+        Clear(GL_DEPTH_BUFFER_BIT);
         Render(renderList, perspective, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_1]);
     }
 }
