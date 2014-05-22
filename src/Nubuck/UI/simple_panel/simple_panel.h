@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QGridLayout>
+#include <QComboBox>
 #include <QSpinBox>
 #include <QPushButton>
 #include <QWidget>
@@ -16,6 +17,7 @@ public:
     SimplePanel(QWidget* parent = NULL);
 
     void            AddLabel(const QString& str);
+    QComboBox*      AddComboBox(const QString& str, const std::vector<QString>& items);
     QSpinBox*   	AddSpinBox(const QString& str, int min, int max);
     QPushButton*    AddPushButton(const QString& str);
 };

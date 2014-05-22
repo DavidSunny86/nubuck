@@ -19,7 +19,7 @@
 // REMOVEME
 #include <operators\operators.h>
 #include <operators\op_loop\op_loop.h>
-#include <operators\op_gen_incube\op_gen_incube.h>
+#include <operators\op_gen_randompoints\op_gen_randompoints.h>
 #include <operators\op_gen_merge\op_gen_merge.h>
 #include <operators\op_gen_windows\op_gen_windows.h>
 #include <operators\op_loadobj\op_loadobj.h>
@@ -107,7 +107,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     // REMOVEME
 	OP::g_operators.Register(new OP::TranslatePanel, new OP::Translate);
     OP::g_operators.Register(new OP::LoopPanel, new OP::Loop);
-    OP::g_operators.Register(new OP::GEN::InCubePanel, new OP::GEN::InCube);
+    OP::g_operators.Register(new OP::GEN::RandomPointsPanel, new OP::GEN::RandomPoints);
     OP::g_operators.Register(new OP::GEN::MergePanel, new OP::GEN::Merge);
     OP::g_operators.Register(new OP::GEN::WindowsPanel, new OP::GEN::Windows);
 	OP::g_operators.Register(new OP::LoadOBJPanel, new OP::LoadOBJ);

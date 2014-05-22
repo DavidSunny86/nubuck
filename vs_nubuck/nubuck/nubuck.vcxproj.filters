@@ -228,9 +228,6 @@
     <Filter Include="Private\operators\op_loop">
       <UniqueIdentifier>{72aaef09-493a-44f1-a76a-6c94612cfd55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Private\operators\op_gen_incube">
-      <UniqueIdentifier>{097bb690-6639-4c6c-9745-1af79b0b19fe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\operators\op_loadobj">
       <UniqueIdentifier>{cd0eb854-06d3-4204-b7c8-d933a7270e51}</UniqueIdentifier>
     </Filter>
@@ -293,6 +290,9 @@
     </Filter>
     <Filter Include="Private\operators\op_gen_windows">
       <UniqueIdentifier>{0cb1c1d7-044c-46bd-9522-82898a772ef5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\operators\op_gen_randompoints">
+      <UniqueIdentifier>{097bb690-6639-4c6c-9745-1af79b0b19fe}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1096,15 +1096,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_ent_geometry_outln.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.cpp">
-      <Filter>Private\operators\op_gen_incube</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_op_gen_incube.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_op_gen_incube.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.cpp">
       <Filter>Private\operators\op_loadobj</Filter>
     </ClCompile>
@@ -1198,6 +1189,15 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_gl_line_edges.cpp">
       <Filter>Private\renderer\edges</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_gen_randompoints\op_gen_randompoints.cpp">
+      <Filter>Private\operators\op_gen_randompoints</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_op_gen_randompoints.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_op_gen_randompoints.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1275,9 +1275,6 @@
     <CustomBuild Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_outln.h">
       <Filter>Private\world\entities\ent_geometry</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\src\Nubuck\operators\op_gen_incube\op_gen_incube.h">
-      <Filter>Private\operators\op_gen_incube</Filter>
-    </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.h">
       <Filter>Private\operators\op_loadobj</Filter>
     </CustomBuild>
@@ -1301,6 +1298,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\operators\op_delaunay3d\op_delaunay3d.h">
       <Filter>Private\operators\op_delaunay3d</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_gen_randompoints\op_gen_randompoints.h">
+      <Filter>Private\operators\op_gen_randompoints</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

@@ -12,7 +12,8 @@
 
 #include <LEDA\geo\d3_hull.h>
 
-BEGIN_EVENT_DEF(OP_InCube_Update)
+BEGIN_EVENT_DEF(OP_RandomPoints_Update)
+    int domain;
     int size;
     int radius;
 END_EVENT_DEF
@@ -20,41 +21,54 @@ END_EVENT_DEF
 namespace OP {
 namespace GEN {
 
-class InCubePanel : public UI::SimplePanel {
+class RandomPointsPanel : public UI::SimplePanel {
     Q_OBJECT
 private:
-    QSpinBox* _sbSize;
-    QSpinBox* _sbRadius;
+    QComboBox*  _cbDomain;
+    QSpinBox*   _sbSize;
+    QSpinBox*   _sbRadius;
 public slots:
     void OnArgsChanged(int);
 public:
-    InCubePanel(QWidget* parent = NULL);
+    RandomPointsPanel(QWidget* parent = NULL);
 };
 
-class InCube : public Operator {
+class RandomPoints : public Operator {
+public:
+    struct Domain {
+        enum Enum {
+            IN_BALL = 0,
+            IN_CUBE,
+            ON_SPHERE,
+            ON_PARABOLOID
+        };
+    };
 private:
     typedef leda::d3_rat_point point3_t;
 
+    leda::nb::RatPolyMesh   _spherePrefab;
+
     Nubuck _nb;
 
-    IGeometry* _bbox;
+    IGeometry* _hull;
     IGeometry* _cloud;
 
-    int _lastSize;
-    int _lastRadius;
+    Domain::Enum    _lastDomain;
+    int             _lastSize;
+    int             _lastRadius;
 
-    void UpdateBBox(int radius);
-    void UpdateCloud(int size, int radius);
-    void Update(int size, int radius);
+    void UpdateHull(Domain::Enum domain, int radius);
+    void UpdateCloud(Domain::Enum domain, int size, int radius);
 
     void Event_Update(const EV::Event& event);
 public:
     enum {
+        DEFAULT_DOMAIN  = Domain::IN_BALL,
         DEFAULT_SIZE    = 5,
         DEFAULT_RADIUS  = 2
     };
 
-    InCube();
+    RandomPoints();
 
     void Register(const Nubuck& nb, Invoker& invoker) override;
     void Invoke() override;
