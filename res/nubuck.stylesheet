@@ -64,7 +64,7 @@ QGroupBox::title {
     subcontrol-position: top left;
 }
 
-QAbstractButton, QAbstractSpinBox {
+QAbstractButton, QAbstractSpinBox, QComboBox {
     border-color:   #1E1E1E;
     border-style:   solid;
     border-width:   2px;
@@ -167,6 +167,16 @@ QAbstractSpinBox::down-button {
 
 QAbstractSpinBox::down-button:hover {
     image: url(:/ui/Images/arrow-down-hover.svg);
+}
+
+QComboBox::drop-down {
+    image: url(:/ui/Images/arrow-down.svg);
+}
+
+QComboBox QAbstractItemView {
+    background-color: #000000;
+    selection-background-color: #FFFFFF;
+    selection-color: #000000;
 }
 
 QTreeWidget::branch:closed:has-children {
