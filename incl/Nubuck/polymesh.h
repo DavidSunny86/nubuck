@@ -354,7 +354,6 @@ size_t PolyMesh<VEC3>::FromObj(const char* filename) {
     std::map<uedge_t, edge> edgemap; // maps pairs of vertices to edge handles
 
     unsigned numVertices = 0, numFaces = 0;
-    int r = 0;
     while(!feof(file)) {
         char buffer[512];
         float f[3];
@@ -363,14 +362,18 @@ size_t PolyMesh<VEC3>::FromObj(const char* filename) {
         memset(buffer, 0, sizeof(buffer));
         fgets(buffer, 512, file);
 
-        if(r = sscanf(buffer, "v %f %f %f", &f[0], &f[1], &f[2])) {
+        if(3 == sscanf(buffer, "v %f %f %f", &f[0], &f[1], &f[2])) {
             node v = new_node();
             verts.push_back(v);
             float scale = 1.0f;
             set_position(v, FromFloat3<VEC3>::Conv(scale * f[0], scale * f[1], scale * f[2]));
             numVertices++;
         }
-        if(r = sscanf(buffer, "f %d %d %d", &d[0], &d[1], &d[2])) {
+        if(3 == sscanf(buffer, "f %d %d %d", &d[0], &d[1], &d[2]) ||
+           3 == sscanf(buffer, "f %d/%*d %d/%*d %d/%*d", &d[0], &d[1], &d[2]) ||
+           3 == sscanf(buffer, "f %d/%*d/%*d %d/%*d/%*d %d/%*d/%*d", &d[0], &d[1], &d[2]) ||
+           3 == sscanf(buffer, "f %d//%*d %d//%*d %d//%*d", &d[0], &d[1], &d[2]))
+        {
             OBJ_Face f;
             f.vertices[0] = d[0] - 1;
             f.vertices[1] = d[1] - 1;
@@ -390,7 +393,13 @@ size_t PolyMesh<VEC3>::FromObj(const char* filename) {
             uedge_t uedge = std::make_pair(std::min(v0, v1), std::max(v0, v1));
             edge e = new_edge(verts[v0], verts[v1]);
             if(edgemap.end() == edgemap.find(uedge)) edgemap[uedge] = e;
-            else set_reversal(edgemap[uedge], e);
+            else {
+                if(leda::target(edgemap[uedge]) == leda::source(e) &&
+                   leda::source(edgemap[uedge]) == leda::target(e))
+                {
+                    set_reversal(edgemap[uedge], e);
+                }
+            }
         }
     }
     leda::list<edge> E;
