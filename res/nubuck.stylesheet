@@ -72,8 +72,8 @@ QAbstractButton, QAbstractSpinBox, QComboBox {
 
     padding-top:    1ex;
     padding-bottom: 1ex;
-    padding-left:   5ex;
-    padding-right:  5ex;
+    padding-left:   2ex;
+    padding-right:  2ex;
 
     background-color: QLinearGradient(
         x1: 0, y1: 0,
@@ -81,6 +81,10 @@ QAbstractButton, QAbstractSpinBox, QComboBox {
         stop: 0 #5E5E5E,
         stop: 1 #2E2E2E
     );
+}
+
+QAbstractSpinBox, QComboBox {
+    padding-right: 0;
 }
 
 QToolBar {
@@ -126,7 +130,7 @@ QLineEdit {
     );
 }
 
-QAbstractButton:hover, QAbstractSpinBox:hover, QLineEdit:hover {
+QAbstractButton:hover, QAbstractSpinBox:hover, QLineEdit:hover, QComboBox:hover {
     border-color: #00FF00;
     border-width: 2;
 }
@@ -170,13 +174,61 @@ QAbstractSpinBox::down-button:hover {
 }
 
 QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+
+    border-left-width: 2px;
+    border-left-color: #1E1E1E;
+    border-left-style: solid;       /* just a single line */
+    border-top-right-radius: 3px;   /* same radius as the QComboBox */
+    border-bottom-right-radius: 3px;
+}
+
+QComboBox::down-arrow {
     image: url(:/ui/Images/arrow-down.svg);
+    width: 10px;
 }
 
 QComboBox QAbstractItemView {
     background-color: #000000;
     selection-background-color: #FFFFFF;
     selection-color: #000000;
+}
+
+QSlider::groove:horizontal {
+    border-color:   #1E1E1E;
+    border-style:   solid;
+    border-width:   2px;
+    border-radius:  6;
+
+    background-color: QLinearGradient(
+        x1: 0, y1: 0,
+        x2: 0, y2: 1,
+        stop: 0 #5E5E5E,
+        stop: 1 #2E2E2E
+    );
+}
+
+QSlider::handle:horizontal {
+    background-color:   rgba(0, 0, 0, 0);
+    image:              url(:/ui/Images/slider-handle-horizontal.svg);
+    width:              18px;
+    margin-left:        -2px;
+}
+
+QSlider::sub-page:horizontal {
+    border-color:   #1E1E1E;
+    border-style:   solid;
+    border-width:   2px;
+    border-radius:  6;
+
+    background-color: QLinearGradient(
+        x1: 0, y1: 0,
+        x2: 0, y2: 1,
+        stop: 0 #008F00,
+        stop: 1 #2E2E2E
+    );
 }
 
 QTreeWidget::branch:closed:has-children {

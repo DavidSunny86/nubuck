@@ -15,5 +15,6 @@
         <file>Images/arrow-right-hover.svg</file>
         <file>Images/unchecked.svg</file>
         <file>Images/checked.svg</file>
+        <file>Images/slider-handle-horizontal.svg</file>
     </qresource>
 </RCC>
