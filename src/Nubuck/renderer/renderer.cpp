@@ -213,6 +213,8 @@ static void Uniforms_UpdateRenderTargetSize(const int width, const int height) {
     uniformsRenderTargetBuffer->Update_Mapped(0, sizeof(UniformsRenderTarget), &uniformsRenderTarget);
 }
 
+static unsigned vpMargin = 50; // viewport margin
+
 GEN::Pointer<Texture>       colorbuffer;
 GEN::Pointer<Texture> 	    depthbuffer;
 GEN::Pointer<Framebuffer>   framebuffer;
@@ -226,6 +228,11 @@ struct {
     GEN::Pointer<Texture>       cb;
     GEN::Pointer<Framebuffer>   fb;
 } fb_comp; // compositing framebuffer
+
+struct {
+    GEN::Pointer<Texture>       cb;
+    GEN::Pointer<Framebuffer>   fb;
+} fb_useDepth; // use-depth framebuffer
 
 static void Framebuffers_DestroyBuffers() {
     framebuffer.Drop();
@@ -241,6 +248,9 @@ static void Framebuffers_DestroyBuffers() {
 
     fb_comp.fb.Drop();
     fb_comp.cb.Drop();
+
+    fb_useDepth.fb.Drop();
+    fb_useDepth.cb.Drop();
 }
 
 static void Framebuffers_CreateBuffers(int width, int height) {
@@ -255,6 +265,10 @@ static void Framebuffers_CreateBuffers(int width, int height) {
     fb_comp.cb = GEN::MakePtr(new Texture(width, height, GL_RGBA));
     fb_comp.fb = GEN::MakePtr(new Framebuffer);
     fb_comp.fb->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *fb_comp.cb);
+
+    fb_useDepth.cb = colorbuffer;
+    fb_useDepth.fb = GEN::MakePtr(new Framebuffer);
+    fb_useDepth.fb->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *fb_useDepth.cb);
 
     dp_cb       = GEN::MakePtr(new Texture(width, height, GL_RGBA));
     dp_db[0]    = GEN::MakePtr(new Texture(width, height, GL_DEPTH_COMPONENT));
@@ -275,7 +289,14 @@ static void Framebuffers_CreateBuffers(int width, int height) {
     GL_CHECK_ERROR;
 }
 
-static void DrawFullscreenQuad(const R::Texture& tex) {
+struct QuadTexCoords {
+    M::Vector2 ll; // lower left hand corner
+    M::Vector2 ur; // upper right hand corner
+
+    QuadTexCoords() : ll(0.0f, 0.0f), ur(1.0f, 1.0f) { }
+};
+
+static void DrawFullscreenQuad(const R::Texture& tex, const QuadTexCoords& texCoords = QuadTexCoords()) {
     glUseProgram(0);
 
     State defaultState;
@@ -297,10 +318,10 @@ static void DrawFullscreenQuad(const R::Texture& tex) {
     glLoadIdentity();
 
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, 0.0f);
-    glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, 0.0f);
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, 0.0f);
+    glTexCoord2f(texCoords.ll.x, texCoords.ll.y); glVertex3f(-1.0f, -1.0f, 0.0f);
+    glTexCoord2f(texCoords.ur.x, texCoords.ll.y); glVertex3f( 1.0f, -1.0f, 0.0f);
+    glTexCoord2f(texCoords.ur.x, texCoords.ur.y); glVertex3f( 1.0f,  1.0f, 0.0f);
+    glTexCoord2f(texCoords.ll.x, texCoords.ur.y); glVertex3f(-1.0f,  1.0f, 0.0f);
     glEnd();
 
     glPopMatrix();
@@ -490,6 +511,12 @@ void Renderer::Init(void) {
 }
 
 void Renderer::Resize(int width, int height) {
+    _width = width;
+    _height = height;
+
+    width   += vpMargin;
+    height  += vpMargin;
+
     Framebuffers_CreateBuffers(width, height);
 
     glViewport(0, 0, width, height);
@@ -719,6 +746,8 @@ void Renderer::BeginFrame() {
 
     framebuffer->Bind();
 
+    glViewport(0, 0, _width + vpMargin, _height + vpMargin);
+
     if(curState.depth.maskEnabled != GL_TRUE) {
         GL_CALL(glDepthMask(GL_TRUE));
         curState.depth.maskEnabled = GL_TRUE;
@@ -730,7 +759,17 @@ void Renderer::BeginFrame() {
 
 void Renderer::EndFrame() {
     BindWindowSystemFramebuffer();
-    DrawFullscreenQuad(*colorbuffer);
+
+    glViewport(0, 0, _width, _height);
+
+    float ds = 0.5f * vpMargin / (_width + vpMargin);
+    float dt = 0.5f * vpMargin / (_height + vpMargin);
+
+    QuadTexCoords texCoords;
+    texCoords.ll = M::Vector2(ds, dt);
+    texCoords.ur = M::Vector2(1.0f - ds, 1.0f - dt);
+
+    DrawFullscreenQuad(*colorbuffer, texCoords);
 
     meshMgr.R_Update();
 
@@ -784,7 +823,7 @@ void Renderer::Render(RenderList& renderList) {
             switch(transparencyMode) {
             case TransparencyMode::BACKFACES_FRONTFACES:
                 rjob.fx     = "LitDirectionalTransparent";
-                rjob.layer  = Layers::GEOMETRY_0_SOLID_0;
+                rjob.layer  = Layers::GEOMETRY_0_SOLID_1;
                 break;
             case TransparencyMode::SORT_TRIANGLES:
                 rjob.fx     = "LitDirectionalTransparent";
@@ -811,6 +850,31 @@ void Renderer::Render(RenderList& renderList) {
 
     if(!_renderLayers[Layers::GEOMETRY_0_SOLID_0].empty()) {
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_0]);
+    }
+
+    // render use-depth pass
+    if(!_renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].empty()) {
+        fb_useDepth.fb->Bind();
+
+        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
+            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
+            mjob.material.texture0.texture = depthbuffer.Raw();
+            mjob.material.texture0.samplerName = "depthTex";
+        }
+
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0]);
+
+        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
+            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
+            mjob.material.texture0.texture = NULL;
+            mjob.material.texture0.samplerName = "";
+        }
+
+        framebuffer->Bind();
+    }
+
+    if(!_renderLayers[Layers::GEOMETRY_0_SOLID_1].empty()) {
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_1]);
     }
 
     if(!_renderLayers[Layers::GEOMETRY_0_TRANSPARENT_SORTED].empty()) {
@@ -909,8 +973,29 @@ void Renderer::Render(RenderList& renderList) {
     }
     Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, transparentJobs);
 
-    if(!_renderLayers[Layers::GEOMETRY_0_SOLID_1].empty()) {
-        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_1]);
+    // render use-depth pass
+    if(!_renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].empty()) {
+        fb_useDepth.fb->Bind();
+
+        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
+            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
+            mjob.material.texture0.texture = depthbuffer.Raw();
+            mjob.material.texture0.samplerName = "depthTex";
+        }
+
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0]);
+
+        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
+            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
+            mjob.material.texture0.texture = NULL;
+            mjob.material.texture0.samplerName = "";
+        }
+
+        framebuffer->Bind();
+    }
+
+    if(!_renderLayers[Layers::GEOMETRY_0_SOLID_2].empty()) {
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_2]);
     }
 
     // HACK: always use perspective projection for translate gizmo,

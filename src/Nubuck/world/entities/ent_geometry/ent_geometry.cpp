@@ -485,7 +485,10 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
         switch(mode) {
         case ShadingMode::FAST:     _edgeRenderer = &_lineEdges; break;
         case ShadingMode::NICE:     _edgeRenderer = &_cylinderEdges; break;
-        case ShadingMode::LINES:    _edgeRenderer = &_glLineEdges; break;
+        case ShadingMode::LINES:
+        case ShadingMode::NICE_BILLBOARDS:
+            _edgeRenderer = &_glLineEdges;
+            break;
         default:
             assert(0 && "ENT_Geometry::SetShadingMode(): unkown shading mode");
         };
@@ -562,11 +565,16 @@ void ENT_Geometry::BuildRenderList() {
     if(RenderMode::EDGES & _renderMode && !_edgeRenderer->IsEmpty()) {
 		_edgeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _edgeRenderer->GetRenderJob();
-        if(ShadingMode::LINES == _shadingMode && _stylizedHiddenLines) {
-            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
-            rjob.fx = "UnlitThickLinesStippled";
-        } else {
-            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+        rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+        if(ShadingMode::LINES == _shadingMode) {
+            if(_stylizedHiddenLines) {
+                rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
+                rjob.fx = "UnlitThickLinesStippled";
+            }
+        }
+        if(ShadingMode::NICE_BILLBOARDS == _shadingMode) {
+            rjob.fx = "EdgeLineBillboardGS";
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_DEPTH_0;
         }
         _renderList.meshJobs.push_back(rjob);
     }

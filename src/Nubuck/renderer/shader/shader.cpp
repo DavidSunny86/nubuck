@@ -43,7 +43,8 @@ Shader::Shader(Type type, const GLchar* source) {
     }
 
     const char* preamble =
-        "#version 120                                           \n"
+        // "#version 120                                           \n"
+        "#version 330                                           \n" // TODO: let effect chose glsl version
         "#extension GL_ARB_uniform_buffer_object : enable       \n"
         "\n";
 

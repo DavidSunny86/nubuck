@@ -38,6 +38,7 @@ struct IGeometry {
             NICE = 0,
             FAST,
             LINES,
+            NICE_BILLBOARDS,
 
             NUM_MODES
         };

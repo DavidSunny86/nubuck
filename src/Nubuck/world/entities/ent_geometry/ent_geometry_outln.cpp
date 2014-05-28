@@ -73,6 +73,7 @@ void ENT_GeometryOutln::InitOutline() {
     _cbEdgeShading->addItem("nice");
     _cbEdgeShading->addItem("fast");
     _cbEdgeShading->addItem("lines");
+    _cbEdgeShading->addItem("billboards (nice)");
 
     _cbHiddenLines = new QCheckBox("show hidden lines");
 

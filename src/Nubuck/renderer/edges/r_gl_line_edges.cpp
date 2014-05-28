@@ -40,6 +40,11 @@ void GL_LineEdges::Rebuild(const std::vector<Edge>& edges) {
         _meshVertices[v1].position  = edge.p1;
         _meshVertices[v0].color     = edge.color;
         _meshVertices[v1].color     = edge.color;
+
+        // since line edges are opaque we can use the
+        // alpha channel to store the edge radius
+        _meshVertices[v0].color.a   = edge.radius;
+        _meshVertices[v1].color.a   = edge.radius;
     }
 
     _meshIndices.resize(numVerts);

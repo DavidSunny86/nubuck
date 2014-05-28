@@ -1,6 +1,8 @@
 // only vertex colors
 fx Unlit {
   pass Pass0 {
+    state.depth.maskEnabled = GL_FALSE;
+
     vs = "#include <Shaders\mesh.vert>";
 
     fs = 

@@ -1,0 +1,13 @@
+fx EdgeLineBillboardGS {
+    pass Pass0 {
+        state.blend {
+            enabled   = GL_TRUE;
+            srcFactor = GL_SRC_ALPHA;
+            dstFactor = GL_ONE_MINUS_SRC_ALPHA;
+        }
+
+        vs = "#include <Shaders\edge_line_billboard_gs.vert>";
+        fs = "#include <Shaders\edge_line_billboard_gs.frag>";
+        gs = "#include <Shaders\edge_line_billboard_gs.geom>";
+    }
+}

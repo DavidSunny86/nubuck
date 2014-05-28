@@ -71,9 +71,12 @@ public:
     struct Layers {
         enum Enum {
             GEOMETRY_0_SOLID_0 = 0,
+            GEOMETRY_0_USE_DEPTH_0,
+            GEOMETRY_0_SOLID_1,
             GEOMETRY_0_TRANSPARENT_SORTED,
             GEOMETRY_0_TRANSPARENT_DEPTH_PEELING,
-            GEOMETRY_0_SOLID_1,
+            GEOMETRY_0_USE_DEPTH_1,
+            GEOMETRY_0_SOLID_2,
             GEOMETRY_1,
 
             NUM_LAYERS
@@ -91,7 +94,8 @@ private:
     SYS::Timer  _timer;
     float       _time;
 
-    float _aspect;
+    int     _width, _height;
+    float   _aspect;
 
     std::vector<MeshJob> _renderLayers[Layers::NUM_LAYERS];
 
