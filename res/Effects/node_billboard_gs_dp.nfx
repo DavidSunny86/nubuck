@@ -1,11 +1,11 @@
-fx NodeBillboardGS {
+fx NodeBillboardGSDP {
     pass Pass0 {
         vs = "#include <Shaders\node_billboard_gs.vert>";
         gs = "#include <Shaders\node_billboard_gs.geom>";
 
-        fs =
+        fs = 
         """
-        const bool PERFORM_DEPTH_PEEL = false;
+        const bool PERFORM_DEPTH_PEEL = true;
 
         #include <Shaders\node_billboard_gs.frag>
         """;

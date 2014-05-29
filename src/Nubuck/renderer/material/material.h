@@ -14,10 +14,11 @@ namespace R {
 
             bool IsValid() const { return NULL != texture && NULL != samplerName; }
         };
+        enum { NUM_TEX_BINDINGS = 3 };
 
-        bool                    isTransparent;
-        Color                   diffuseColor;
-        TexBinding              texture0;
+        bool        isTransparent;
+        Color       diffuseColor;
+        TexBinding  texBindings[NUM_TEX_BINDINGS];
 
 		static Material White;
 

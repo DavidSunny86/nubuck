@@ -1,3 +1,8 @@
+/*
+OPTIONS:
+PERFORM_DEPTH_PEEL
+*/
+
 layout(std140) uniform UniformsHot {
     mat4 uProjection;
     mat4 uTransform;
@@ -11,6 +16,8 @@ layout(std140) uniform UniformsRenderTarget {
 };
 
 uniform sampler2D depthTex;
+uniform sampler2D solidDepth;
+uniform sampler2D peelDepth;
 
 in AxisData {
     vec3    v0;
@@ -36,8 +43,16 @@ void main() {
     texCoords.x = spinePos_ss.x / uWidth;
     texCoords.y = spinePos_ss.y / uHeight;
 
-    float sdepth = texture2D(depthTex, texCoords).a;
+    float sdepth = texture2D(solidDepth, texCoords).a;
     if(spinePos_ss.z > sdepth) discard;
+
+    if(PERFORM_DEPTH_PEEL) {
+        float pdepth = texture2D(peelDepth, texCoords).a;
+        if(spinePos_ss.z > pdepth) discard;
+
+        float depth = texture2D(depthTex, texCoords).a;
+        if(spinePos_ss.z <= depth) discard;
+    }
 
     vec3 v0_ss = WorldToScreenSpace(vec4(inData.v0, 1.0));
 

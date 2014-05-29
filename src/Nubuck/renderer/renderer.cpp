@@ -276,7 +276,6 @@ static void Framebuffers_CreateBuffers(int width, int height) {
 
     dp_fb[0] = GEN::MakePtr(new Framebuffer);
     dp_fb[0]->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *dp_cb);
-    dp_fb[0]->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *depthbuffer);
 
     dp_fb[1] = GEN::MakePtr(new Framebuffer);
     dp_fb[1]->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *dp_cb);
@@ -654,22 +653,22 @@ static void DrawFrame(
             Uniforms_BindBuffers();
             SetState(desc.state);
 
-            // HACK: set depth texture for depth peeling passes
-            if(cur->material.texture0.IsValid()) {
-                Material::TexBinding& tex0 = cur->material.texture0;
+            for(int texIdx = 0; texIdx < Material::NUM_TEX_BINDINGS; ++texIdx) {
+                if(cur->material.texBindings[texIdx].IsValid()) {
+                    const Material::TexBinding& tex = cur->material.texBindings[texIdx];
 
-                assert(!strcmp("depthTex", tex0.samplerName));
+                    // REMOVEME
+                    assert(
+                        !strcmp("depthTex", tex.samplerName) ||
+                        !strcmp("solidDepth", tex.samplerName) ||
+                        !strcmp("peelDepth", tex.samplerName));
 
-                GLint loc = glGetUniformLocation(prog.GetID(), tex0.samplerName);
-                if(0 <= loc) prog.SetUniform(tex0.samplerName, 0);
-                tex0.texture->Bind(0);
-            }
-
-            // also set depth texture for solid geometry
-            if("LitDirectionalTwosidedPremulA" == cur->fx || "DepthPeel" == cur->fx) {
-                GLint loc = glGetUniformLocation(prog.GetID(), "solidDepth");
-                if(0 <= loc) prog.SetUniform("solidDepth", 1);
-                depthbuffer->Bind(1);
+                    GLint loc = glGetUniformLocation(prog.GetID(), tex.samplerName);
+                    if(0 <= loc) {
+                        prog.SetUniform(tex.samplerName, texIdx);
+                        tex.texture->Bind(texIdx);
+                    }
+                }
             }
 
             next = DrawMeshList(prog, desc.state, desc.type, desc.flags, modelView, geomSortMode, cur);
@@ -863,16 +862,16 @@ void Renderer::Render(RenderList& renderList) {
 
         for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
             MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
-            mjob.material.texture0.texture = depthbuffer.Raw();
-            mjob.material.texture0.samplerName = "depthTex";
+            mjob.material.texBindings[0].texture = depthbuffer.Raw();
+            mjob.material.texBindings[0].samplerName = "solidDepth";
         }
 
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0]);
 
         for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
             MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
-            mjob.material.texture0.texture = NULL;
-            mjob.material.texture0.samplerName = "";
+            mjob.material.texBindings[0].texture = NULL;
+            mjob.material.texBindings[0].samplerName = "";
         }
 
         framebuffer->Bind();
@@ -898,7 +897,10 @@ void Renderer::Render(RenderList& renderList) {
 
         // use effect with premult alpha
         for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
-            _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i].fx = "LitDirectionalTwosidedPremulA";
+            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i];
+            mjob.fx = "LitDirectionalTwosidedPremulA";
+            mjob.material.texBindings[1].samplerName = "solidDepth";
+            mjob.material.texBindings[1].texture = depthbuffer.Raw();
         }
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING]);
 
@@ -916,8 +918,12 @@ void Renderer::Render(RenderList& renderList) {
         // set depth texture for first peeling pass
         for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
             MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i];
-            mjob.material.texture0.texture      = dp_db[1].Raw();
-            mjob.material.texture0.samplerName  = "depthTex";
+            mjob.material.texBindings[0].texture      = dp_db[1].Raw();
+            mjob.material.texBindings[0].samplerName  = "depthTex";
+
+            // remains unchanged throughout peeling
+            mjob.material.texBindings[1].texture        = depthbuffer.Raw();
+            mjob.material.texBindings[1].samplerName    = "solidDepth";
         }
 
         assert(0 < cvar_r_numDepthPeels);
@@ -935,6 +941,31 @@ void Renderer::Render(RenderList& renderList) {
             }
             Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING]);
 
+            // render use-depth pass, with dp enabled
+            std::vector<MeshJob> jobs;
+            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
+                const MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
+                if("NodeBillboardGS" == mjob.fx || "EdgeLineBillboardGS" == mjob.fx) {
+                    MeshJob job = mjob;
+                    job.fx = mjob.fx + "DP";
+
+                    job.material.texBindings[0].samplerName = "depthTex";
+                    job.material.texBindings[0].texture = dp_db[other].Raw();
+
+                    job.material.texBindings[1].samplerName = "solidDepth";
+                    job.material.texBindings[1].texture = depthbuffer.Raw();
+
+                    job.material.texBindings[2].samplerName = "peelDepth";
+                    job.material.texBindings[2].texture = dp_db[self].Raw();
+
+                    jobs.push_back(job);
+                }
+            }
+            if(!jobs.empty()) {
+                dp_fb[0]->Bind();
+                Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, jobs);
+            }
+
             // composite depth peeling framebuffer
             glPushAttrib(GL_COLOR_BUFFER_BIT);
 
@@ -949,7 +980,7 @@ void Renderer::Render(RenderList& renderList) {
             // set depth texture for next peeling pass
             for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
                 MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i];
-                mjob.material.texture0.texture = dp_db[self].Raw();
+                mjob.material.texBindings[0].texture = dp_db[self].Raw();
             }
 
         } // passes
@@ -984,16 +1015,16 @@ void Renderer::Render(RenderList& renderList) {
 
         for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
             MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
-            mjob.material.texture0.texture = depthbuffer.Raw();
-            mjob.material.texture0.samplerName = "depthTex";
+            mjob.material.texBindings[0].texture = depthbuffer.Raw();
+            mjob.material.texBindings[0].samplerName = "solidDepth";
         }
 
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0]);
 
         for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
             MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
-            mjob.material.texture0.texture = NULL;
-            mjob.material.texture0.samplerName = "";
+            mjob.material.texBindings[0].texture = NULL;
+            mjob.material.texBindings[0].samplerName = "";
         }
 
         framebuffer->Bind();
