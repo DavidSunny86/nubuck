@@ -26,6 +26,7 @@ private:
     UI::Outliner::itemHandle_t      _outlinerItem;
 
     R::BillboardNodes               _billboardNodes;
+    R::Nodes*                       _nodeRenderer;
     R::CylinderEdges                _cylinderEdges;
     R::LineEdges                    _lineEdges;
     R::GL_LineEdges                 _glLineEdges;

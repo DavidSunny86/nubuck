@@ -8,16 +8,11 @@
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr_fwd.h>
+#include "r_nodes.h"
 
 namespace R {
 
-class BillboardNodes : private GEN::Uncopyable {
-public:
-    struct Node {
-        leda::node  pvert; // corresponding vertex of polymesh
-        M::Vector3  position;
-        R::Color    color;
-    };
+class BillboardNodes : public Nodes, private GEN::Uncopyable {
 private:
     struct Billboard { Mesh::Vertex verts[4]; };
 
@@ -37,22 +32,22 @@ public:
     BillboardNodes() : _mesh(NULL), _tfmesh(NULL), _needsRebuild(false), _isInvalid(false) { }
     ~BillboardNodes();
 
-    bool IsEmpty() const { 
+    bool IsEmpty() const override {
 		SYS::ScopedLock lock(_mtx);
 		return _nodes.empty(); 
 	}
 
-	void Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos);
-    void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos);
+	void Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) override;
+    void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) override;
 
-    void SetColor(leda::node pv, const Color& color);
+    void SetColor(leda::node pv, const Color& color) override;
 
-    void Transform(const M::Matrix4& objToWorld);
+    void Transform(const M::Matrix4& objToWorld) override;
 
-    void BuildRenderMesh();
-    void DestroyRenderMesh();
+    void BuildRenderMesh() override;
+    void DestroyRenderMesh() override;
 
-    R::MeshJob GetRenderJob() const;    
+    R::MeshJob GetRenderJob() const override;
 };
 
 } // namespace R

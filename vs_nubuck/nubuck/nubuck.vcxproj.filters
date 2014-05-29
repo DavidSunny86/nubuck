@@ -728,6 +728,12 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_billboard_nodes.h">
       <Filter>Private\renderer\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_point_nodes.h">
+      <Filter>Private\renderer\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_nodes.h">
+      <Filter>Private\renderer\nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -1196,6 +1202,12 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_billboard_nodes.cpp">
+      <Filter>Private\renderer\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_point_nodes.cpp">
+      <Filter>Private\renderer\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_nodes.cpp">
       <Filter>Private\renderer\nodes</Filter>
     </ClCompile>
   </ItemGroup>
