@@ -9,6 +9,7 @@
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>
 #include <renderer\nodes\r_billboard_nodes.h>
+#include <renderer\nodes\r_point_nodes.h>
 #include <renderer\edges\r_cylinder_edges.h>
 #include <renderer\edges\r_line_edges.h>
 #include <renderer\edges\r_gl_line_edges.h>
@@ -26,6 +27,7 @@ private:
     UI::Outliner::itemHandle_t      _outlinerItem;
 
     R::BillboardNodes               _billboardNodes;
+    R::PointNodes                   _pointNodes;
     R::Nodes*                       _nodeRenderer;
     R::CylinderEdges                _cylinderEdges;
     R::LineEdges                    _lineEdges;

@@ -1,7 +1,10 @@
 // only vertex colors
 fx UnlitThickLines {
   pass Pass0 {
-    state.raster.lineWidth = 2.0;
+    state.raster {
+        pointSize = 5.0;
+        lineWidth = 2.0;
+    }
 
     vs = "#include <Shaders\mesh.vert>";
 

@@ -485,10 +485,20 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
     _mtx.Lock();
     if(_shadingMode != mode) {
         switch(mode) {
-        case ShadingMode::FAST:     _edgeRenderer = &_lineEdges; break;
-        case ShadingMode::NICE:     _edgeRenderer = &_cylinderEdges; break;
+        case ShadingMode::FAST:
+            _nodeRenderer = &_billboardNodes;
+            _edgeRenderer = &_lineEdges;
+            break;
+        case ShadingMode::NICE:
+            _nodeRenderer = &_billboardNodes;
+            _edgeRenderer = &_cylinderEdges;
+            break;
         case ShadingMode::LINES:
+            _nodeRenderer = &_pointNodes;
+            _edgeRenderer = &_glLineEdges;
+            break;
         case ShadingMode::NICE_BILLBOARDS:
+            _nodeRenderer = &_billboardNodes;
             _edgeRenderer = &_glLineEdges;
             break;
         default:
@@ -499,7 +509,10 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
     }
     _mtx.Unlock();
 
-    if(rebuild) RebuildRenderEdges();
+    if(rebuild) {
+        _nodeRenderer->Rebuild(_ratPolyMesh, _fpos);
+        RebuildRenderEdges();
+    }
 }
 
 void ENT_Geometry::SetEditMode(editMode_t::Enum mode) {
