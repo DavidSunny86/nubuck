@@ -574,6 +574,9 @@ void ENT_Geometry::BuildRenderList() {
 	    _nodeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _nodeRenderer->GetRenderJob();
         rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+        if(ShadingMode::FAST == _shadingMode) {
+            rjob.fx = "FastNodeBillboard";
+        }
         if(ShadingMode::NICE_BILLBOARDS == _shadingMode) {
             rjob.fx = "NodeBillboardGS";
             rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_DEPTH_0;
