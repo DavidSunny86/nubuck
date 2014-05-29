@@ -1,0 +1,7 @@
+fx NodeBillboardGS {
+    pass Pass0 {
+        vs = "#include <Shaders\node_billboard_gs.vert>";
+        fs = "#include <Shaders\node_billboard_gs.frag>";
+        gs = "#include <Shaders\node_billboard_gs.geom>";
+    }
+}

@@ -498,7 +498,7 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
             _edgeRenderer = &_glLineEdges;
             break;
         case ShadingMode::NICE_BILLBOARDS:
-            _nodeRenderer = &_billboardNodes;
+            _nodeRenderer = &_pointNodes;
             _edgeRenderer = &_glLineEdges;
             break;
         default:
@@ -574,6 +574,10 @@ void ENT_Geometry::BuildRenderList() {
 	    _nodeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _nodeRenderer->GetRenderJob();
         rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+        if(ShadingMode::NICE_BILLBOARDS == _shadingMode) {
+            rjob.fx = "NodeBillboardGS";
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_DEPTH_0;
+        }
         _renderList.meshJobs.push_back(rjob);
     }
 

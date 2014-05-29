@@ -33,11 +33,14 @@ void PointNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M:
 
     const unsigned numVerts = _nodes.size();
 
+	const float nodeSize = cvar_r_nodeSize;
+
     _vertices.clear();
     _vertices.resize(numVerts);
 
     for(unsigned i = 0; i < numVerts; ++i) {
         _vertices[i].position   = _nodes[i].position;
+        _vertices[i].normal.z   = nodeSize; // matches billboard nodes layout
         _vertices[i].color      = _nodes[i].color;
     }
 
