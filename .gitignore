@@ -29,6 +29,7 @@ tags
 *~
 config_dump.txt
 cscope
+*.swp
 *.bak
 *.bak[0-9]
 *.pdb
