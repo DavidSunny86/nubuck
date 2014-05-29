@@ -209,7 +209,7 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\mesh\tfmesh.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\metrics\metrics.h" />
-    <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_nodes.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_billboard_nodes.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\program\program.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\renderbuffer\renderbuffer.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\renderer.h" />
@@ -494,7 +494,7 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\staticbuffer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\mesh\tfmesh.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\metrics\metrics.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_nodes.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_billboard_nodes.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\program\program.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\renderbuffer\renderbuffer.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\renderer.cpp" />

@@ -243,7 +243,7 @@ void ENT_Geometry::Select(const leda::node v) {
         _vertexSelection.push_back(v);
 
         if(editMode_t::VERTICES == world.GetEditMode().GetMode())
-            _nodes.SetColor(v, selectedVertexColor);
+            _billboardNodes.SetColor(v, selectedVertexColor);
     }
 }
 
@@ -257,7 +257,7 @@ void ENT_Geometry::ClearVertexSelection() {
 
     if(editMode_t::VERTICES == world.GetEditMode().GetMode()) {
         for(unsigned i = 0; i < _vertexSelection.size(); ++i)
-            _nodes.SetColor(_vertexSelection[i], unselectedVertexColor);
+            _billboardNodes.SetColor(_vertexSelection[i], unselectedVertexColor);
     }
 
     _vertexSelection.clear();
@@ -329,14 +329,14 @@ void ENT_Geometry::Rebuild() {
 
     if(state_t::TOPOLOGY_CHANGED == state) {
         _ratPolyMesh.cache_all();
-        _nodes.Rebuild(_ratPolyMesh, _fpos);
+        _billboardNodes.Rebuild(_ratPolyMesh, _fpos);
         RebuildRenderEdges();
         RebuildRenderMesh();
 
         // TODO. used to colorize vertices
         SetEditMode(world.GetEditMode().GetMode());
     } else {
-        _nodes.Update(_ratPolyMesh, _fpos);
+        _billboardNodes.Update(_ratPolyMesh, _fpos);
         _edgeRenderer->Update(_ratPolyMesh, _fpos);
 
         UpdateRenderMesh();
@@ -440,7 +440,7 @@ void ENT_Geometry::SetName(const std::string& name) {
 
 void ENT_Geometry::OnDestroy() {
 	SYS::ScopedLock lock(_mtx);
-	_nodes.DestroyRenderMesh();
+	_billboardNodes.DestroyRenderMesh();
 	_edgeRenderer->DestroyRenderMesh();
     DestroyRenderMesh();
 	_renderMode &= ~(RenderMode::EDGES | RenderMode::NODES); // !!!
@@ -506,17 +506,17 @@ void ENT_Geometry::SetEditMode(editMode_t::Enum mode) {
     if(editMode_t::VERTICES == mode) {
         leda::node pv;
         forall_nodes(pv, _ratPolyMesh) {
-            _nodes.SetColor(pv, unselectedVertexColor);
+            _billboardNodes.SetColor(pv, unselectedVertexColor);
         }
 
         for(unsigned i = 0; i < _vertexSelection.size(); ++i)
-            _nodes.SetColor(_vertexSelection[i], selectedVertexColor);
+            _billboardNodes.SetColor(_vertexSelection[i], selectedVertexColor);
     }
 
     if(editMode_t::OBJECTS == mode) {
         leda::node pv;
         forall_nodes(pv, _ratPolyMesh) {
-            _nodes.SetColor(pv, _ratPolyMesh.color_of(pv));
+            _billboardNodes.SetColor(pv, _ratPolyMesh.color_of(pv));
         }
     }
 }
@@ -526,7 +526,7 @@ void ENT_Geometry::FrameUpdate() {
 
 	SYS::ScopedLock lock(_mtx);
     M::Matrix4 tf = M::Mat4::ExpandedTR(Entity::GetPosition(), Entity::GetOrientation());
-    _nodes.Transform(tf);
+    _billboardNodes.Transform(tf);
 
     timer.Start();
     _edgeRenderer->SetTransform(tf, world.GetCameraMatrix());
@@ -555,9 +555,9 @@ void ENT_Geometry::BuildRenderList() {
         _renderList.meshJobs.push_back(rjob);
     }
 
-    if(RenderMode::NODES & _renderMode && !_nodes.IsEmpty()) {
-	    _nodes.BuildRenderMesh();
-        R::MeshJob rjob = _nodes.GetRenderJob();
+    if(RenderMode::NODES & _renderMode && !_billboardNodes.IsEmpty()) {
+	    _billboardNodes.BuildRenderMesh();
+        R::MeshJob rjob = _billboardNodes.GetRenderJob();
         rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
         _renderList.meshJobs.push_back(rjob);
     }

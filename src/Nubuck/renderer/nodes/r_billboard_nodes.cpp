@@ -1,11 +1,11 @@
 #include <Nubuck\math\matrix3.h>
 #include <Nubuck\polymesh.h>
 #include <renderer\mesh\meshmgr.h>
-#include "r_nodes.h"
+#include "r_billboard_nodes.h"
 
 namespace R {
 
-void Nodes::DestroyMesh() {
+void BillboardNodes::DestroyMesh() {
     if(_mesh) {
         meshMgr.Destroy(_mesh);
         _mesh = NULL;
@@ -16,11 +16,11 @@ void Nodes::DestroyMesh() {
     }
 }
 
-Nodes::~Nodes() {
+BillboardNodes::~BillboardNodes() {
     // DestroyMesh();
 }
 
-void Nodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
+void BillboardNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
 	SYS::ScopedLock lock(_mtx);
 
     _nodes.clear();
@@ -72,7 +72,7 @@ void Nodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vect
     _needsRebuild = true;
 }
 
-void Nodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
+void BillboardNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
     typedef leda::nb::RatPolyMesh::State state_t;
     for(unsigned i = 0; i < _nodes.size(); ++i) {
         leda::node pv = _nodes[i].pvert;
@@ -89,7 +89,7 @@ void Nodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vecto
     }
 }
 
-void Nodes::SetColor(leda::node pv, const Color& color) {
+void BillboardNodes::SetColor(leda::node pv, const Color& color) {
     const unsigned ridx = _inMap[pv->id()];
 
     _nodes[ridx].color = color;
@@ -105,12 +105,12 @@ void Nodes::SetColor(leda::node pv, const Color& color) {
     }
 }
 
-void Nodes::Transform(const M::Matrix4& objToWorld) {
+void BillboardNodes::Transform(const M::Matrix4& objToWorld) {
 	SYS::ScopedLock lock(_mtx);
     if(_tfmesh) R::meshMgr.GetMesh(_tfmesh).SetTransform(objToWorld);
 }
 
-void Nodes::BuildRenderMesh() {
+void BillboardNodes::BuildRenderMesh() {
 	SYS::ScopedLock lock(_mtx);
 
     unsigned numBillboards = _nodes.size();
@@ -144,11 +144,11 @@ void Nodes::BuildRenderMesh() {
     }
 }
 
-void Nodes::DestroyRenderMesh() {
+void BillboardNodes::DestroyRenderMesh() {
     DestroyMesh();
 }
 
-MeshJob Nodes::GetRenderJob() const {
+MeshJob BillboardNodes::GetRenderJob() const {
 	SYS::ScopedLock lock(_mtx);
 
 	assert(!_nodes.empty());

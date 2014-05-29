@@ -8,7 +8,6 @@
 #include <renderer\mesh\plane\plane.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\cylinder\cylinder.h>
-#include <renderer\nodes\r_nodes.h>
 #include <renderer\edges\r_cylinder_edges.h>
 #include <renderer\edges\r_line_edges.h>
 #include <renderer\mesh\grid\grid.h>

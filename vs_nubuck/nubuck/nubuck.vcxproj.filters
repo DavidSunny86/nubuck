@@ -479,9 +479,6 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\effects\statedesc.h">
       <Filter>Private\renderer\effects</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_nodes.h">
-      <Filter>Private\renderer\nodes</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\renderer_local.h">
       <Filter>Private\renderer</Filter>
     </ClInclude>
@@ -728,6 +725,9 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_gl_line_edges.h">
       <Filter>Private\renderer\edges</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_billboard_nodes.h">
+      <Filter>Private\renderer\nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -951,9 +951,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\effects\statedesc.cpp">
       <Filter>Private\renderer\effects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_nodes.cpp">
-      <Filter>Private\renderer\nodes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.cpp">
       <Filter>Private\renderer\edges</Filter>
@@ -1197,6 +1194,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_op_gen_randompoints.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_billboard_nodes.cpp">
+      <Filter>Private\renderer\nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

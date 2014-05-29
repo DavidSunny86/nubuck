@@ -11,7 +11,7 @@
 
 namespace R {
 
-class Nodes : private GEN::Uncopyable {
+class BillboardNodes : private GEN::Uncopyable {
 public:
     struct Node {
         leda::node  pvert; // corresponding vertex of polymesh
@@ -34,8 +34,8 @@ private:
 
     void DestroyMesh();
 public:
-    Nodes() : _mesh(NULL), _tfmesh(NULL), _needsRebuild(false), _isInvalid(false) { }
-    ~Nodes();
+    BillboardNodes() : _mesh(NULL), _tfmesh(NULL), _needsRebuild(false), _isInvalid(false) { }
+    ~BillboardNodes();
 
     bool IsEmpty() const { 
 		SYS::ScopedLock lock(_mtx);
