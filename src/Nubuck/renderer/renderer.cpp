@@ -403,6 +403,11 @@ void SetState(const State& state) {
         curState.stencil.op.back.zpass   = state.stencil.op.back.zpass;
     }
 
+    if(curState.raster.pointSize != state.raster.pointSize) {
+        GL_CALL(glPointSize(state.raster.pointSize));
+        curState.raster.pointSize = state.raster.pointSize;
+    }
+
     if(curState.raster.lineWidth != state.raster.lineWidth) {
         GL_CALL(glLineWidth(state.raster.lineWidth));
         curState.raster.lineWidth = state.raster.lineWidth;

@@ -28,6 +28,7 @@ void SetDefaultState(State& state) {
     state.stencil.op.back.zfail    	= GL_KEEP;
     state.stencil.op.back.zpass    	= GL_KEEP;
 
+    state.raster.pointSize          = 1.0f;
     state.raster.lineWidth          = 1.0f;
 
     state.raster.lineStipple.enabled    = GL_FALSE;

@@ -9,6 +9,7 @@
 #include <common\config\config.h>
 #include <world\world.h>
 #include <renderer\effects\effect.h>
+#include <renderer\effects\statedesc_gen\statedesc_gen.h>
 #include <algdriver\algdriver.h>
 #include <UI\mainwindow\mainwindow.h>
 #include <UI\logwidget\logwidget.h>
@@ -72,12 +73,20 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     R::CreateDefaultEffects();
 
     unsigned i = 0;
-    while(i < argc - 1) {
+    while(i < argc) {
         if(!strcmp("--stylesheet", argv[i])) {
             std::string stylesheet = common.BaseDir() + argv[i + 1];
             common.printf("INFO - reading stylesheet: %s\n", stylesheet.c_str());
             QString styleSheet(QString::fromStdString(ReadFile(stylesheet.c_str())));
             app.setStyleSheet(styleSheet);
+        }
+        if(!strcmp("--genstatedesc", argv[i])) {
+            common.printf("INFO - generating statedesc.\n");
+            const std::string inname = common.BaseDir() + "stategen_test\\state.h";
+            const std::string outname = common.BaseDir() + "stategen_test\\statedesc.cpp";
+            if(STG_Parse(inname.c_str(), outname.c_str())) {
+                common.printf("ERROR - STG_Parse(%s, %s) failed.\n", inname.c_str(), outname.c_str());
+            }
         }
         i++;
     }

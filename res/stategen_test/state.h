@@ -51,6 +51,7 @@ struct State {
     } stencil;
 
     struct Rasterizing {
+        float       pointSize;
         float       lineWidth;
 
         struct LineStipple {
