@@ -57,6 +57,17 @@ public:
     }
 };
 
+class NameEntityButton : public QPushButton {
+private:
+    W::Entity* _entity;
+protected:
+    void mousePressEvent(QMouseEvent*) override;
+public:
+    NameEntityButton(W::Entity* entity, const QString& name)
+        : _entity(entity)
+    { }
+};
+
 class Outliner : public QWidget, public EV::EventHandler<> {
 public:
 private:
@@ -64,7 +75,7 @@ private:
 
     struct Header {
         SelectEntityButton* selection;
-        QPushButton*        name;
+        NameEntityButton*   name;
     };
 
     struct LinkedItem {

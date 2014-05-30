@@ -1,4 +1,5 @@
 #include <QMouseEvent>
+#include <QInputDialog>
 #include <UI\window_events.h>
 #include <UI\logwidget\logwidget.h>
 #include <world\world_events.h>
@@ -19,6 +20,15 @@ void SelectEntityButton::mousePressEvent(QMouseEvent* event) {
     }
 }
 
+void NameEntityButton::mousePressEvent(QMouseEvent*) {
+    bool ok;
+    QString oldName = QString::fromStdString(_entity->GetName());
+    QString newName = QInputDialog::getText(this, "Choose Entity Name", "Entity name:", QLineEdit::Normal, oldName, &ok);
+    if(ok) {
+        _entity->SetName(newName.toStdString());
+    }
+}
+
 void Outliner::Event_CreateView(const EV::Event& event) {
     const EV::Params_Outliner_CreateView& args = EV::def_Outliner_CreateView.GetArgs(event);
     LinkedItem* item = args.item;
@@ -26,7 +36,7 @@ void Outliner::Event_CreateView(const EV::Event& event) {
     // build header widget
     item->header.selection = new SelectEntityButton(item->entity);
 
-    item->header.name = new QPushButton(QString("Polyhedron %1").arg(0));
+    item->header.name = new NameEntityButton(item->entity, QString("Polyhedron %1").arg(0));
     item->header.name->setObjectName("objectName");
     item->header.name->setIcon(QIcon(":/ui/Images/edit.svg"));
     item->header.name->setLayoutDirection(Qt::RightToLeft); // places icon on right-hand side
