@@ -7,6 +7,7 @@
 
 #include <QLabel>
 #include <QPushButton>
+#include <QToolButton>
 #include <QDoubleSpinBox>
 #include <QSlider>
 #include <QVBoxLayout>
@@ -25,12 +26,49 @@ struct OutlinerView : public QWidget, public EV::EventHandler<> {
     DECL_HANDLE_EVENTS(OutlinerView);
 };
 
+struct SelectEntityButton : public QToolButton {
+private:
+    W::Entity*  _entity;
+
+    QIcon 	_icoUnselected;
+    QIcon   _icoSelected;
+    QIcon*  _icons[2];
+
+    int     _idx;
+protected:
+    void mousePressEvent(QMouseEvent*);
+public:
+    SelectEntityButton(W::Entity* entity)
+        : _entity(entity)
+        , _icoUnselected(":/ui/Images/unselected_object.svg")
+        , _icoSelected(":/ui/Images/selected_object.svg")
+        , _idx(0)
+    {
+        _icons[0] = &_icoUnselected;
+        _icons[1] = &_icoSelected;
+        setIcon(*_icons[_idx]);
+
+        setObjectName("selectObject");
+    }
+
+    void setChecked(bool checked) {
+        _idx = 1 ? checked : 0;
+        setIcon(*_icons[_idx]);
+    }
+};
+
 class Outliner : public QWidget, public EV::EventHandler<> {
 public:
 private:
     typedef EV::EventHandler<> baseHandler_t;
 
+    struct Header {
+        SelectEntityButton* selection;
+        QPushButton*        name;
+    };
+
     struct LinkedItem {
+    public:
         LinkedItem          *prev, *next;
 
         QString             name;
@@ -39,7 +77,7 @@ private:
         QTreeWidgetItem*    headerIt;
         QTreeWidgetItem* 	contentIt;
 
-        QPushButton*        header;
+        Header              header;
 
         W::Entity*          entity; // used to create view
         OutlinerView*       view;
@@ -50,7 +88,7 @@ private:
             , isVisible(false)
             , headerIt(NULL)
             , contentIt(NULL)
-            , header(NULL)
+            , header()
             , entity(NULL)
             , view(NULL)
         { }
@@ -66,6 +104,7 @@ private:
     void Event_Hide(const EV::Event& event);
     void Event_SetName(const EV::Event& event);
     void Event_Delete(const EV::Event& event);
+    void Event_SelectionChanged(const EV::Event& event);
 public:
     typedef LinkedItem* itemHandle_t;
 

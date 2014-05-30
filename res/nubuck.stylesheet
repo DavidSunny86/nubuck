@@ -246,3 +246,21 @@ QTreeWidget::branch:open {
 QTreeWidget::branch:open:hover {
     image: url(:/ui/Images/arrow-down-hover.svg);
 }
+
+QWidget#outlinerHeader {
+    background-color: rgba(0, 0, 0, 0);
+
+    padding-top:    0px;
+    padding-bottom: 0px;
+    padding-left:   0px;
+    padding-right:  0px;
+}
+
+QPushButton#objectName {
+    text-align: left;
+}
+
+QToolButton#selectObject {
+    border:             none;
+    background-color:   rgba(0, 0, 0, 0);
+}

@@ -13,6 +13,7 @@
 #include <renderer\mesh\grid\grid.h>
 #include <UI\outliner\outliner.h>
 #include <UI\window_events.h>
+#include <UI\userinterface.h>
 #include <operators\operators.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include "entity.h"
@@ -90,8 +91,10 @@ void World::Selection::ComputeCenter() {
 }
 
 void World::Selection::SignalChange() {
-    world.Send(EV::def_SelectionChanged.Create(EV::Params_SelectionChanged()));
-	OP::g_operators.Send(EV::def_SelectionChanged.Create(EV::Params_SelectionChanged()));
+    EV::Event ev= EV::def_SelectionChanged.Create(EV::Params_SelectionChanged());
+    world.Send(ev);
+	OP::g_operators.Send(ev);
+    g_ui.GetOutliner().Send(ev);
 }
 
 void World::Selection::Set(IGeometry* geom) {

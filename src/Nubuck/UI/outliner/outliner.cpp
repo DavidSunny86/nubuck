@@ -1,20 +1,48 @@
+#include <QMouseEvent>
 #include <UI\window_events.h>
 #include <UI\logwidget\logwidget.h>
+#include <world\world_events.h>
+#include <world\entities\ent_geometry\ent_geometry.h>
+#include <world\world.h>
 #include "outliner.h"
 
 namespace UI {
+
+void SelectEntityButton::mousePressEvent(QMouseEvent* event) {
+    if(_entity && W::EntityType::ENT_GEOMETRY == _entity->GetType()) {
+        W::ENT_Geometry* geom = (W::ENT_Geometry*)_entity;
+        if(Qt::ShiftModifier & event->modifiers()) {
+            W::world.GetSelection()->Add(geom);
+        } else {
+            W::world.GetSelection()->Set(geom);
+        }
+    }
+}
 
 void Outliner::Event_CreateView(const EV::Event& event) {
     const EV::Params_Outliner_CreateView& args = EV::def_Outliner_CreateView.GetArgs(event);
     LinkedItem* item = args.item;
 
+    // build header widget
+    item->header.selection = new SelectEntityButton(item->entity);
+
+    item->header.name = new QPushButton(QString("Polyhedron %1").arg(0));
+    item->header.name->setObjectName("objectName");
+    item->header.name->setIcon(QIcon(":/ui/Images/edit.svg"));
+    item->header.name->setLayoutDirection(Qt::RightToLeft); // places icon on right-hand side
+
+    QHBoxLayout* headerLayout = new QHBoxLayout;
+    headerLayout->setContentsMargins(11, 0, 0, 0); // tightly packed
+    headerLayout->addWidget(item->header.selection);
+    headerLayout->addWidget(item->header.name);
+    QWidget* headerWidget = new QWidget;
+    headerWidget->setObjectName("outlinerHeader");
+    headerWidget->setLayout(headerLayout);
+
     QTreeWidgetItem* headerIt = new QTreeWidgetItem;
     _treeWidget->insertTopLevelItem(0, headerIt);
-    QPushButton* button = new QPushButton(QString("Polyhedron %1").arg(0));
-    button->setStyleSheet("text-align: left");
-    _treeWidget->setItemWidget(headerIt, 0, button);
+    _treeWidget->setItemWidget(headerIt, 0, headerWidget);
     item->headerIt = headerIt;
-    item->header = button;
 
     QTreeWidgetItem* contentIt = new QTreeWidgetItem;
     headerIt->addChild(contentIt);
@@ -33,7 +61,7 @@ void Outliner::Event_Hide(const EV::Event& event) {
 
 void Outliner::Event_SetName(const EV::Event& event) {
     const EV::Params_Outliner_SetName& args = EV::def_Outliner_SetName.GetArgs(event);
-    args.item->header->setText(*args.name);
+    args.item->header.name->setText(*args.name);
     delete args.name;
 }
 
@@ -48,6 +76,19 @@ void Outliner::Event_Delete(const EV::Event& event) {
 	if(_items == item) _items = item->next;
     if(item->headerIt) delete item->headerIt;
     delete item;
+}
+
+void Outliner::Event_SelectionChanged(const EV::Event&) {
+    LinkedItem* it = _items;
+    while(it) {
+        bool isSelected = false;
+        if(W::EntityType::ENT_GEOMETRY == it->entity->GetType()) {
+            W::ENT_Geometry* geom = (W::ENT_Geometry*)it->entity;
+            isSelected = geom->IsSelected();
+        }
+        it->header.selection->setChecked(isSelected);
+        it = it->next;
+    }
 }
 
 Outliner::itemHandle_t Outliner::AddItem(const QString& name, W::Entity* entity) {
@@ -102,6 +143,7 @@ Outliner::Outliner(QWidget* parent) : QWidget(parent), _items(NULL) {
     AddEventHandler(EV::def_Outliner_Hide, this, &Outliner::Event_Hide);
     AddEventHandler(EV::def_Outliner_SetName, this, &Outliner::Event_SetName);
     AddEventHandler(EV::def_Outliner_Delete, this, &Outliner::Event_Delete);
+    AddEventHandler(EV::def_SelectionChanged, this, &Outliner::Event_SelectionChanged);
 }
 
 void Outliner::HandleEvents() {

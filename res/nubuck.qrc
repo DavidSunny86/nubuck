@@ -16,5 +16,8 @@
         <file>Images/unchecked.svg</file>
         <file>Images/checked.svg</file>
         <file>Images/slider-handle-horizontal.svg</file>
+        <file>Images/selected_object.svg</file>
+        <file>Images/unselected_object.svg</file>
+        <file>Images/edit.svg</file>
     </qresource>
 </RCC>
