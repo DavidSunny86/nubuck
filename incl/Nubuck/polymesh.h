@@ -87,6 +87,7 @@ public:
     void set_masked(const edge e);
     void set_unmasked(const edge e);
 
+    void set_visible(const face f, bool visible);
     void set_color(const face f, const R::Color& color);
 
     edge make_triangle(const VEC3& p0, const VEC3& p1, const VEC3& p2);
@@ -282,6 +283,11 @@ inline void PolyMesh<VEC3>::set_masked(const edge e) {
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_unmasked(const edge e) {
     _eatt_mask[e] = _eatt_mask[reversal(e)] = 0;
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::set_visible(const face f, bool visible) {
+    _fatt_visible[f] = visible;
 }
 
 template<typename VEC3>
