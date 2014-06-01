@@ -6,6 +6,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nubuck_standalone", "nubuck_standalone\nubuck_standalone.vcxproj", "{1FDCAC31-735C-4094-A7B5-EE0B1017AE9E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{70B99A18-6EA7-4CCA-9B19-53CFBC5F6523} = {70B99A18-6EA7-4CCA-9B19-53CFBC5F6523}
+		{99E8607B-3B26-41EF-83B2-A73FE364EB87} = {99E8607B-3B26-41EF-83B2-A73FE364EB87}
 		{41FA7EED-25F5-4CD7-8656-42AB6FD66983} = {41FA7EED-25F5-4CD7-8656-42AB6FD66983}
 		{DB26F0F5-75F7-4423-AD08-8BE3A644C4EE} = {DB26F0F5-75F7-4423-AD08-8BE3A644C4EE}
 	EndProjectSection
@@ -18,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "alg_d3_merge", "alg_d3_merg
 	ProjectSection(ProjectDependencies) = postProject
 		{41FA7EED-25F5-4CD7-8656-42AB6FD66983} = {41FA7EED-25F5-4CD7-8656-42AB6FD66983}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "alg_flipclip", "alg_flipclip\alg_flipclip.vcxproj", "{99E8607B-3B26-41EF-83B2-A73FE364EB87}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +44,10 @@ Global
 		{DB26F0F5-75F7-4423-AD08-8BE3A644C4EE}.Debug|Win32.Build.0 = Debug|Win32
 		{DB26F0F5-75F7-4423-AD08-8BE3A644C4EE}.Release|Win32.ActiveCfg = Release|Win32
 		{DB26F0F5-75F7-4423-AD08-8BE3A644C4EE}.Release|Win32.Build.0 = Release|Win32
+		{99E8607B-3B26-41EF-83B2-A73FE364EB87}.Debug|Win32.ActiveCfg = Debug|Win32
+		{99E8607B-3B26-41EF-83B2-A73FE364EB87}.Debug|Win32.Build.0 = Debug|Win32
+		{99E8607B-3B26-41EF-83B2-A73FE364EB87}.Release|Win32.ActiveCfg = Release|Win32
+		{99E8607B-3B26-41EF-83B2-A73FE364EB87}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +55,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{70B99A18-6EA7-4CCA-9B19-53CFBC5F6523} = {DC152EF9-2706-4D5A-87A1-C1896E08EBEC}
 		{DB26F0F5-75F7-4423-AD08-8BE3A644C4EE} = {DC152EF9-2706-4D5A-87A1-C1896E08EBEC}
+		{99E8607B-3B26-41EF-83B2-A73FE364EB87} = {DC152EF9-2706-4D5A-87A1-C1896E08EBEC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		QtVersion = 4.8.5
