@@ -78,8 +78,11 @@ void BillboardNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector
         leda::node pv = _nodes[i].pvert;
         if(state_t::GEOMETRY_CHANGED == mesh.state_of(pv)) {
             _nodes[i].position = fpos[_nodes[i].pvert->id()];
-            for(unsigned k = 0; k < 4; ++k)
+            _nodes[i].color = mesh.color_of(_nodes[i].pvert);
+            for(unsigned k = 0; k < 4; ++k) {
                 _billboards[i].verts[k].position = _nodes[i].position;
+                _billboards[i].verts[k].color = _nodes[i].color;
+            }
 
             const unsigned vertSz = sizeof(Mesh::Vertex);
             const unsigned off = vertSz * (&_billboards[i].verts[0] - &_billboards[0].verts[0]);

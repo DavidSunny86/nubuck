@@ -47,6 +47,7 @@ private:
     leda::face_map<float>   _fatt_colorR;
     leda::face_map<float>   _fatt_colorG;
     leda::face_map<float>   _fatt_colorB;
+    leda::face_map<float>   _fatt_colorA;
 
     void InitVertexAttributes();
     void InitEdgeAttributes();
@@ -137,6 +138,7 @@ inline void PolyMesh<VEC3>::InitFaceAttributes() {
     _fatt_colorR.init(*this, 1.0f);
     _fatt_colorG.init(*this, 1.0f);
     _fatt_colorB.init(*this, 1.0f);
+    _fatt_colorA.init(*this, 1.0f);
 }
 
 template<typename VEC3>
@@ -236,7 +238,7 @@ inline bool PolyMesh<VEC3>::is_visible(const face f) const {
 
 template<typename VEC3>
 inline R::Color PolyMesh<VEC3>::color_of(const face f) const {
-    return R::Color(_fatt_colorR[f], _fatt_colorG[f], _fatt_colorB[f]);
+    return R::Color(_fatt_colorR[f], _fatt_colorG[f], _fatt_colorB[f], _fatt_colorA[f]);
 }
 
 template<typename VEC3>
@@ -251,6 +253,8 @@ inline void PolyMesh<VEC3>::set_position(const node v, const VEC3& p) {
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_color(const node v, const R::Color& color) {
+    _vatt_state[v] = M::Max(_vatt_state[v], static_cast<char>(State::GEOMETRY_CHANGED));
+
     _vatt_colorR[v] = color.r;
     _vatt_colorG[v] = color.g;
     _vatt_colorB[v] = color.b;
@@ -265,6 +269,9 @@ inline void PolyMesh<VEC3>::set_radius(const edge e, const float radius) {
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_color(const edge e, const R::Color& color) {
     const edge r = reversal(e);
+
+    _eatt_state[e] = M::Max(_eatt_state[e], static_cast<char>(State::GEOMETRY_CHANGED));
+    _eatt_state[r] = M::Max(_eatt_state[r], static_cast<char>(State::GEOMETRY_CHANGED));
 
     _eatt_colorR[e] = color.r;
     _eatt_colorG[e] = color.g;
@@ -292,9 +299,12 @@ inline void PolyMesh<VEC3>::set_visible(const face f, bool visible) {
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_color(const face f, const R::Color& color) {
+    _fatt_state[f] = M::Max(_fatt_state[f], static_cast<char>(State::GEOMETRY_CHANGED));
+
     _fatt_colorR[f] = color.r;
     _fatt_colorG[f] = color.g;
     _fatt_colorB[f] = color.b;
+    _fatt_colorA[f] = color.a;
 }
 
 template<typename VEC3>

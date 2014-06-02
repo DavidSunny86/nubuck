@@ -12,6 +12,7 @@ namespace R {
 class EdgeRenderer {
 public:
     struct Edge {
+        leda::edge  pe; // corresponding edge of polymesh
         leda::node  v0, v1;
         M::Vector3  p0, p1;
         R::Color    color;

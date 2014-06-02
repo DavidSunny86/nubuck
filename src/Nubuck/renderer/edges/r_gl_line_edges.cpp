@@ -1,3 +1,4 @@
+#include <Nubuck\polymesh.h>
 #include <renderer\mesh\meshmgr.h>
 #include "r_gl_line_edges.h"
 
@@ -14,7 +15,7 @@ void GL_LineEdges::DestroyMesh() {
     }
 }
 
-GL_LineEdges::GL_LineEdges() 
+GL_LineEdges::GL_LineEdges()
     : _mesh(NULL)
     , _tfmesh(NULL)
     , _needsRebuild(false)
@@ -63,6 +64,7 @@ void GL_LineEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M
         Edge& edge = _edges[i];
         edge.p0 = fpos[edge.v0->id()];
         edge.p1 = fpos[edge.v1->id()];
+        edge.color = mesh.color_of(edge.pe);
     }
     Rebuild(_edges);
 }

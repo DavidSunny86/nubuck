@@ -1,3 +1,4 @@
+#include <Nubuck\polymesh.h>
 #include <Nubuck\math\matrix3.h>
 #include <renderer\renderer_local.h>
 #include <renderer\mesh\meshmgr.h>
@@ -82,6 +83,7 @@ void LineEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::V
         Edge& edge = _edges[i];
         edge.p0 = fpos[edge.v0->id()];
         edge.p1 = fpos[edge.v1->id()];
+        edge.color = mesh.color_of(edge.pe);
     }
     Rebuild(_edges);
 }

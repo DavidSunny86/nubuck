@@ -143,6 +143,7 @@ void CylinderEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<
         if(state_t::GEOMETRY_CHANGED == state) {
             edge.p0 = fpos[edge.v0->id()];
             edge.p1 = fpos[edge.v1->id()];
+            edge.color = mesh.color_of(edge.pe);
             M::Matrix4 R = AlignZ(edge.p1 - edge.p0);
             edge.Rt = M::Transpose(R);
             RebuildVertices(i, M::Mat4::Identity());

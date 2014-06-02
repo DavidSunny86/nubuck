@@ -111,6 +111,8 @@ void ENT_Geometry::UpdateRenderMesh() {
         }
     }
 
+    _isTransparent = false;
+
     leda::face f;
     forall_faces(f, _ratPolyMesh) {
         if(state_t::GEOMETRY_CHANGED == _ratPolyMesh.state_of(f)) {
@@ -120,7 +122,13 @@ void ENT_Geometry::UpdateRenderMesh() {
             const M::Vector3& p2 = _vertices[rf.idx + 2].position;
             const M::Vector3 normal = M::Normalize(M::Cross(p1 - p0, p2 - p0));
 
-            for(unsigned i = 0; i < rf.sz; ++i) _vertices[rf.idx + i].normal = normal;
+            const R::Color& color = _ratPolyMesh.color_of(f);
+            if(1.0f > color.a) _isTransparent = true;
+
+            for(unsigned i = 0; i < rf.sz; ++i) {
+                _vertices[rf.idx + i].normal = normal;
+                _vertices[rf.idx + i].color = color;
+            }
 
             const unsigned vertSz = sizeof(R::Mesh::Vertex);
             const unsigned off = vertSz * (&_vertices[rf.idx] - &_vertices[0]);
@@ -295,6 +303,7 @@ void ENT_Geometry::RebuildRenderEdges() {
     leda::edge e;
     forall_edges(e, _ratPolyMesh) {
         if(!visited[e] && !_ratPolyMesh.is_masked(e)) {
+            re.pe = e;
             re.radius = 2 * _ratPolyMesh.radius_of(e); // !!!
             re.color = _ratPolyMesh.color_of(e);
             re.v0 = leda::source(e);

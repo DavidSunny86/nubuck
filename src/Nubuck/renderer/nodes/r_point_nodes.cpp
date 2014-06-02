@@ -59,7 +59,9 @@ void PointNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::
         leda::node pv = _nodes[i].pvert;
         if(state_t::GEOMETRY_CHANGED == mesh.state_of(pv)) {
             _nodes[i].position = fpos[_nodes[i].pvert->id()];
+            _nodes[i].color = mesh.color_of(_nodes[i].pvert);
             _vertices[i].position = _nodes[i].position;
+            _vertices[i].color = _nodes[i].color;
 
             const unsigned vertSz = sizeof(Mesh::Vertex);
             const unsigned off = vertSz * (&_vertices[i] - &_vertices[0]);
