@@ -89,7 +89,15 @@ public:
 
     DECL_HANDLE_EVENTS(ENT_Geometry);
 
-    bool TraceVertices(const M::Ray& ray, float radius, std::vector<leda::node>& verts);
+    struct VertexHit {
+        leda::node  vert;
+        float       dist;
+
+        VertexHit() { }
+        VertexHit(leda::node vert, float dist) : vert(vert), dist(dist) { }
+    };
+
+    bool TraceVertices(const M::Ray& ray, float radius, std::vector<VertexHit>& hits);
 
     void Select() { Entity::Select(); }
 

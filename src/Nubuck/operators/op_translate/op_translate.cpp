@@ -14,12 +14,12 @@ struct AxisMesh {
     std::vector<R::Mesh::Index>     indices;
 
     AxisMesh(
-        float size, 
-        int subdiv, 
+        float size,
+        int subdiv,
         float spacing,
-        const R::Color& colX, 
-        const R::Color& colY, 
-        const R::Color& colZ) 
+        const R::Color& colX,
+        const R::Color& colY,
+        const R::Color& colZ)
     {
         unsigned idxCnt = 0;
         R::Color colors[] = { colX, colY, colZ };
@@ -283,7 +283,7 @@ static M::Vector3 FindCursorPosition(ISelection* sel) {
     const W::editMode_t::Enum editMode = W::world.GetEditMode().GetMode();
 
     if(W::editMode_t::OBJECTS == editMode) return sel->GetGlobalCenter();
-    
+
     if(W::editMode_t::VERTICES == editMode) {
         W::ENT_Geometry* geom = (W::ENT_Geometry*)sel->GetList().front();
         std::vector<leda::node> verts = geom->GetVertexSelection();
@@ -381,11 +381,18 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
 
         if(W::editMode_t::VERTICES == _editMode && !W::world.GetSelection()->GetList().empty()) {
             W::ENT_Geometry* geom = (W::ENT_Geometry*)W::world.GetSelection()->GetList().front();
-            std::vector<leda::node> verts;
-            if(geom->TraceVertices(ray, 0.2f, verts)) {
+            std::vector<W::ENT_Geometry::VertexHit> hits;
+            if(geom->TraceVertices(ray, 0.2f, hits)) {
+                // find nearest hit
+                unsigned nidx = 0;
+                for(unsigned i = 1; i < hits.size(); ++i) {
+                    if(hits[nidx].dist > hits[i].dist)
+                        nidx = i;
+                }
+
                 ISelection::SelectMode selectMode = ISelection::SELECT_ADD;
                 if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = ISelection::SELECT_NEW;
-                W::world.GetSelection()->SelectVertex(selectMode, geom, verts[0]);
+                W::world.GetSelection()->SelectVertex(selectMode, geom, hits[nidx].vert);
                 SetCursorPosition(FindCursorPosition(W::world.GetSelection()));
             }
         }

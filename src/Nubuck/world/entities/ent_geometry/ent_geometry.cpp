@@ -30,7 +30,7 @@ void ENT_Geometry::CacheFPos() {
 
 static leda::edge UnmaskedSucc(const leda::nb::RatPolyMesh& G, leda::edge e) {
     // assumes NULL != e and at least one visible adjacent edge.
-    // if thats not the case you deserve to crash... 
+    // if thats not the case you deserve to crash...
 
     const leda::edge eR = G.reversal(e);
     leda::edge it = eR;
@@ -95,7 +95,7 @@ void ENT_Geometry::RebuildRenderMesh() {
     _meshDesc.indices = &_indices[0];
     _meshDesc.numIndices = _indices.size();
     _meshDesc.primType = GL_TRIANGLE_FAN;
-         
+
     _meshCompiled = false;
 }
 
@@ -186,7 +186,7 @@ void ENT_Geometry::Event_EdgeShadingChanged(const EV::Event& event) {
     SetShadingMode(args.shadingMode);
 }
 
-ENT_Geometry::ENT_Geometry() 
+ENT_Geometry::ENT_Geometry()
     : _outlinerItem(NULL)
     , _edgeRenderer(NULL)
     , _mesh(NULL)
@@ -220,17 +220,18 @@ ENT_Geometry::ENT_Geometry()
     AddEventHandler(EV::def_ENT_Geometry_EdgeShadingChanged, this, &ENT_Geometry::Event_EdgeShadingChanged);
 }
 
-bool ENT_Geometry::TraceVertices(const M::Ray& ray, float radius, std::vector<leda::node>& verts) {
+bool ENT_Geometry::TraceVertices(const M::Ray& ray, float radius, std::vector<VertexHit>& hits) {
     SYS::ScopedLock lock(_mtx);
-    verts.clear();
+    hits.clear();
     M::Matrix4 objToWorld = GetObjectToWorldMatrix();
+    M::IS::Info info;
     leda::node v;
     forall_nodes(v, _ratPolyMesh) {
         M::Vector3 pos = M::Transform(objToWorld, ToVector(_ratPolyMesh.position_of(v)));
-        if(M::IS::Intersects(ray, M::Sphere(pos, radius)))
-            verts.push_back(v);
+        if(M::IS::Intersects(ray, M::Sphere(pos, radius), &info))
+            hits.push_back(VertexHit(v, info.distance));
     }
-    return !verts.empty();
+    return !hits.empty();
 }
 
 static bool elem(const std::vector<leda::node>& set, const leda::node x) {
@@ -396,20 +397,20 @@ void ENT_Geometry::SetEdgeColor(const R::Color& color) {
     g_ui.GetOutliner().SendToView(_outlinerItem, event);
 }
 
-M::Vector3 ENT_Geometry::GetLocalCenter() const { 
+M::Vector3 ENT_Geometry::GetLocalCenter() const {
 	SYS::ScopedLock lock(_mtx);
-    return _bbox.min + 0.5f * (_bbox.max - _bbox.min); 
+    return _bbox.min + 0.5f * (_bbox.max - _bbox.min);
 }
 
-M::Vector3 ENT_Geometry::GetGlobalCenter() { 
+M::Vector3 ENT_Geometry::GetGlobalCenter() {
 	SYS::ScopedLock lock(_mtx);
     M::Vector3 localCenter = GetLocalCenter();
     return M::Transform(GetObjectToWorldMatrix(), localCenter);
 }
 
-const M::Box& ENT_Geometry::GetBoundingBox() const { 
+const M::Box& ENT_Geometry::GetBoundingBox() const {
 	SYS::ScopedLock lock(_mtx);
-	return _bbox; 
+	return _bbox;
 }
 
 M::Vector3 ENT_Geometry::GetPosition() const {
@@ -460,31 +461,31 @@ void ENT_Geometry::HideOutline() {
     g_ui.GetOutliner().HideItem(_outlinerItem);
 }
 
-void ENT_Geometry::Show() { 
+void ENT_Geometry::Show() {
 	SYS::ScopedLock lock(_mtx);
-	_isHidden = false; 
+	_isHidden = false;
 }
 
-void ENT_Geometry::Hide() { 
+void ENT_Geometry::Hide() {
 	SYS::ScopedLock lock(_mtx);
-	_isHidden = true; 
+	_isHidden = true;
 }
 
-void ENT_Geometry::SetRenderMode(int flags) { 
+void ENT_Geometry::SetRenderMode(int flags) {
 	SYS::ScopedLock lock(_mtx);
-	_renderMode = flags; 
+	_renderMode = flags;
 
     EV::Params_ENT_Geometry_RenderModeChanged args = { _renderMode };
     EV::Event event = EV::def_ENT_Geometry_RenderModeChanged.Create(args);
     g_ui.GetOutliner().SendToView(_outlinerItem, event);
 }
 
-void ENT_Geometry::SetRenderLayer(unsigned layer) { 
+void ENT_Geometry::SetRenderLayer(unsigned layer) {
 	SYS::ScopedLock lock(_mtx);
-	_renderLayer = layer; 
+	_renderLayer = layer;
 }
 
-void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) { 
+void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
     bool rebuild = false;
     _mtx.Lock();
     if(_shadingMode != mode) {
