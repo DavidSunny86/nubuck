@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 
 #include <UI\colorbutton\colorbutton.h>
+#include <UI\block_signals.h>
 #include "ent_geometry_outln.h"
 #include "ent_geometry.h"
 
@@ -51,6 +52,7 @@ ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) 
 
 	AddEventHandler(EV::def_ENT_Geometry_EdgeRadiusChanged, this, &ENT_GeometryOutln::Event_EdgeRadiusChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_GeometryOutln::Event_EdgeColorChanged);
+    AddEventHandler(EV::def_ENT_Geometry_RenderModeChanged, this, &ENT_GeometryOutln::Event_RenderModeChanged);
 }
 
 void ENT_GeometryOutln::InitOutline() {
@@ -150,6 +152,14 @@ void ENT_GeometryOutln::Event_EdgeColorChanged(const EV::Event& event) {
 	_btnEdgeColor->blockSignals(true);
 	_btnEdgeColor->SetColor(args.edgeColor.r, args.edgeColor.g, args.edgeColor.b);
 	_btnEdgeColor->blockSignals(false);
+}
+
+void ENT_GeometryOutln::Event_RenderModeChanged(const EV::Event& event) {
+    const EV::Params_ENT_Geometry_RenderModeChanged& args = EV::def_ENT_Geometry_RenderModeChanged.GetArgs(event);
+    UI::BlockSignals blockSignals(_btnRenderVertices, _btnRenderEdges, _btnRenderFaces);
+    _btnRenderVertices->setChecked(IGeometry::RenderMode::NODES & args.renderMode);
+    _btnRenderEdges->setChecked(IGeometry::RenderMode::EDGES & args.renderMode);
+    _btnRenderFaces->setChecked(IGeometry::RenderMode::FACES & args.renderMode);
 }
 
 void ENT_GeometryOutln::ExecEvents(const std::vector<EV::Event>& events) {

@@ -473,6 +473,10 @@ void ENT_Geometry::Hide() {
 void ENT_Geometry::SetRenderMode(int flags) { 
 	SYS::ScopedLock lock(_mtx);
 	_renderMode = flags; 
+
+    EV::Params_ENT_Geometry_RenderModeChanged args = { _renderMode };
+    EV::Event event = EV::def_ENT_Geometry_RenderModeChanged.Create(args);
+    g_ui.GetOutliner().SendToView(_outlinerItem, event);
 }
 
 void ENT_Geometry::SetRenderLayer(unsigned layer) { 
