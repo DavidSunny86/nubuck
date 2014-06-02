@@ -135,15 +135,15 @@ void World::Selection::Clear() {
     SignalChange();
 }
 
-M::Vector3 World::Selection::GetGlobalCenter() { 
+M::Vector3 World::Selection::GetGlobalCenter() {
     SYS::ScopedLock lock(_mtx);
     ComputeCenter();
-    return center; 
+    return center;
 }
 
-std::vector<IGeometry*> World::Selection::GetList() const { 
+std::vector<IGeometry*> World::Selection::GetList() const {
     SYS::ScopedLock lock(_mtx);
-    return geomList; 
+    return geomList;
 }
 
 void World::Selection::SelectVertex(SelectMode mode, IGeometry* geom, leda::node vert) {
@@ -172,20 +172,20 @@ static M::Vector3 Transform(const M::Matrix4& mat, const M::Vector3& vec, float 
 // that lies on the near clipping plane with the same window space
 // coordinates as p
 static M::Vector3 UnprojectPoint(
-    const M::Matrix4& projectionMat, 
-    const M::Matrix4& worldMat, 
-    float screenWidth, 
-    float screenHeight, 
-    const M::Vector2& p) 
+    const M::Matrix4& projectionMat,
+    const M::Matrix4& worldMat,
+    float screenWidth,
+    float screenHeight,
+    const M::Vector2& p)
 {
-    M::Vector3 q; 
-    
+    M::Vector3 q;
+
     // in NDC
     q.x = 2.0f * (p.x / screenWidth) - 1.0f;
     q.y = -(2.0f * (p.y / screenHeight) - 1.0f);
     q.z = -1.0f; // on near clipping plane
 
-    // clip.w = -eye.z, where eye.z is z-coord 
+    // clip.w = -eye.z, where eye.z is z-coord
     // of near clipping plane
     const float fov = M::Deg2Rad(45.0f);
     float clipW = 1.0f / tan(0.5f * fov);
@@ -202,6 +202,7 @@ static M::Vector3 UnprojectPoint(
 }
 
 void World::SetupLights(R::RenderList& renderList) {
+    /*
     renderList.dirLights[0].direction      = M::Vector3(-1.0f,  1.0f,  0.0f);
     renderList.dirLights[0].diffuseColor   = R::Color(0.6f, 0.85f, 0.91f);
 
@@ -210,6 +211,18 @@ void World::SetupLights(R::RenderList& renderList) {
 
     renderList.dirLights[2].direction      = M::Vector3( 0.0f, -0.5f, -1.5f);
     renderList.dirLights[2].diffuseColor   = R::Color(1.0f, 1.0f, 1.0f);
+    */
+
+    const R::Color gray = R::Color(0.5f, 0.5f, 0.5f);
+
+    renderList.dirLights[0].direction      = M::Vector3(-1.0f,  1.0f,  0.0f);
+    renderList.dirLights[0].diffuseColor   = gray;
+
+    renderList.dirLights[1].direction      = M::Vector3( 1.0f,  1.0f,  0.0f);
+    renderList.dirLights[1].diffuseColor   = gray;
+
+    renderList.dirLights[2].direction      = M::Vector3( 0.0f, -0.5f, -1.5f);
+    renderList.dirLights[2].diffuseColor   = R::Color::White;
 }
 
 static float mouseX, mouseY;
@@ -268,7 +281,7 @@ GEN::Pointer<Entity> World::FindByEntityID(unsigned entId) {
     }
     return GEN::Pointer<Entity>();
 }
-    
+
 void World::Event_Apocalypse(const EV::Event& event) {
     _entities.clear();
 }
