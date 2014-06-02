@@ -1,4 +1,6 @@
 fx NodeBillboardGS {
+    sortkey = 20;
+
     pass Pass0 {
         vs = "#include <Shaders\node_billboard_gs.vert>";
         gs = "#include <Shaders\node_billboard_gs.geom>";

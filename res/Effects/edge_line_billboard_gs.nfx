@@ -1,4 +1,6 @@
 fx EdgeLineBillboardGS {
+    sortkey = 10;
+
     pass Pass0 {
         state.blend {
             enabled   = GL_TRUE;
