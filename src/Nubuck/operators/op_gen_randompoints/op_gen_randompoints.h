@@ -39,6 +39,7 @@ public:
         enum Enum {
             IN_BALL = 0,
             IN_CUBE,
+            IN_HEMISPHERE,
             ON_SPHERE,
             ON_PARABOLOID
         };
@@ -47,6 +48,7 @@ private:
     typedef leda::d3_rat_point point3_t;
 
     leda::nb::RatPolyMesh   _spherePrefab;
+    leda::nb::RatPolyMesh   _hemispherePrefab;
 
     Nubuck _nb;
 
