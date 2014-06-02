@@ -96,7 +96,7 @@ void Outliner::Event_SelectionChanged(const EV::Event&) {
             W::ENT_Geometry* geom = (W::ENT_Geometry*)it->entity;
             isSelected = geom->IsSelected();
         }
-        it->header.selection->setChecked(isSelected);
+        if(it->header.selection) it->header.selection->setChecked(isSelected);
         it = it->next;
     }
 }
@@ -144,7 +144,7 @@ void Outliner::SendToView(itemHandle_t item, const EV::Event& event) {
 Outliner::Outliner(QWidget* parent) : QWidget(parent), _items(NULL) {
     _treeWidget = new QTreeWidget(this);
     _treeWidget->setHeaderHidden(true);
-    
+
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(_treeWidget);
     setLayout(layout);
