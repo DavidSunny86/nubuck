@@ -37,10 +37,6 @@ TriangulateXY
 leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L, int orient) {
     typedef leda::d3_rat_point point_t;
 
-    const int BLACK = 0;
-    const int RED   = 1;
-    const int BLUE  = 2;
-
     assert(0 == mesh.number_of_edges());
     // assert(IsSorted(mesh, L));
 
@@ -58,7 +54,7 @@ leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L,
 
         leda::edge e0 = mesh.new_edge(last_v, v, 0);
         leda::edge e1 = mesh.new_edge(v, last_v, 0);
-        mesh[e0] = mesh[e1] = BLACK;
+        mesh[e0] = mesh[e1] = Color::BLACK;
         mesh.set_reversal(e0, e1);
 
         last_v = v;
@@ -82,8 +78,8 @@ leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L,
         do {
             e = mesh.face_cycle_pred(e);
             orientXY = leda::orientation_xy(
-                p, 
-                mesh.position_of(leda::source(e)), 
+                p,
+                mesh.position_of(leda::source(e)),
                 mesh.position_of(leda::target(e)));
         } while(orient == orientXY);
 
@@ -92,7 +88,7 @@ leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L,
             leda::edge succ = mesh.face_cycle_succ(e);
             leda::edge x = mesh.new_edge(succ, v, 0, leda::after);
             leda::edge y = mesh.new_edge(v, leda::source(succ), 0);
-            mesh[x] = mesh[y] = RED;
+            mesh[x] = mesh[y] = Color::RED;
             mesh.set_reversal(x, y);
             e = succ;
 
@@ -109,7 +105,7 @@ leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L,
     leda::edge e = hull;
     do {
         leda::edge r = mesh.reversal(e);
-        mesh[e] = mesh[r] = BLUE;
+        mesh[e] = mesh[r] = Color::BLUE;
         e = mesh.face_cycle_succ(e);
     } while(hull != e);
 
@@ -150,4 +146,23 @@ void Phase_Init::Enter() {
     leda::edge hull = TriangulateXY(mesh, L, -1);
     mesh.compute_faces();
     mesh.set_visible(mesh.face_of(hull), false);
+
+    R::Color colors[3];
+    colors[Color::BLACK]    = R::Color::Black;
+    colors[Color::RED]      = R::Color::Red;
+    colors[Color::BLUE]     = R::Color::Blue;
+
+    leda::node_array<int> nodeColors(mesh, Color::BLACK);
+
+    leda::edge e;
+    forall_edges(e, mesh) {
+        mesh.set_color(e, colors[mesh[e]]);
+        nodeColors[leda::source(e)] = M::Max(nodeColors[leda::source(e)], mesh[e]);
+        nodeColors[leda::target(e)] = M::Max(nodeColors[leda::target(e)], mesh[e]);
+    }
+
+    leda::node v;
+    forall_nodes(v, mesh) {
+        mesh.set_color(v, colors[nodeColors[v]]);
+    }
 }
