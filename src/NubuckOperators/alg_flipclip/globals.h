@@ -22,7 +22,7 @@ struct Globals {
     Nubuck                  nb;
     leda::list<leda::node>  L[2];
     Side::Enum              side;
-    IGeometry*              geom;
+    IGeometry*              geom[2];
     leda::edge              hullEdges[2];
 };
 

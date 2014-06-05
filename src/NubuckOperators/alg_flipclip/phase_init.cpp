@@ -140,7 +140,7 @@ void Phase_Init::Enter() {
 }
 
 Phase_Init::StepRet::Enum Phase_Init::Step() {
-    leda::nb::RatPolyMesh& mesh = _g.geom->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
 
     if(Side::FRONT == _g.side) {
         leda::list<leda::node>& L = _g.L[Side::FRONT];

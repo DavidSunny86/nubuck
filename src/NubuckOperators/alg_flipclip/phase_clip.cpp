@@ -8,7 +8,7 @@ Phase_Clip::Phase_Clip(Globals& g) : _g(g) { }
 void Phase_Clip::Enter() {
     _g.nb.log->printf("entering phase 'clip'\n");
 
-    leda::nb::RatPolyMesh& mesh = _g.geom->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
 
     _L.clear();
     _rdeg.init(mesh, 0);
@@ -25,7 +25,7 @@ void Phase_Clip::Enter() {
 }
 
 Phase_Clip::StepRet::Enum Phase_Clip::StepSearch() {
-    leda::nb::RatPolyMesh& mesh = _g.geom->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
 
     while(!_L.empty()) {
         _clipV = _L.pop();
@@ -54,7 +54,7 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepSearch() {
 }
 
 Phase_Clip::StepRet::Enum Phase_Clip::StepPerformClip() {
-    leda::nb::RatPolyMesh& mesh = _g.geom->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
 
     leda::edge e;
     forall_out_edges(e, _clipV) {
