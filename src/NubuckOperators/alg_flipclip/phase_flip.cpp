@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <Nubuck\polymesh.h>
+#include "phase_clip.h"
 #include "phase_flip.h"
 
 Phase_Flip::Phase_Flip(Globals& g) : _g(g) { }
@@ -137,4 +138,8 @@ Phase_Flip::StepRet::Enum Phase_Flip::Step() {
     } else {
         return StepPerformFlip();
     }
+}
+
+GEN::Pointer<OP::ALG::Phase> Phase_Flip::NextPhase() {
+    return GEN::MakePtr(new Phase_Clip(_g));
 }

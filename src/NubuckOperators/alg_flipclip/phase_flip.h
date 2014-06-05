@@ -32,4 +32,5 @@ public:
 
     void Enter() override;
     StepRet::Enum Step() override;
+    GEN::Pointer<OP::ALG::Phase> NextPhase() override;
 };

@@ -22,11 +22,13 @@
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_init.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_flip.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\globals.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_clip.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_init.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\flipclip.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\globals.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_flip.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_clip.h" />
   </ItemGroup>
 </Project>
