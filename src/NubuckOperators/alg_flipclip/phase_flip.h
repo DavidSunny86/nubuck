@@ -7,6 +7,8 @@ class Phase_Flip : public OP::ALG::Phase {
 private:
     Globals& _g;
 
+    unsigned _numFlips;
+
     leda::list<leda::edge> _S;
 
     struct FlipConf {

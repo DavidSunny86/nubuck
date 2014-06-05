@@ -17,6 +17,7 @@ void Phase_Flip::Enter() {
         if(Color::RED == mesh[e]) _S.push(e);
     }
 
+    _numFlips = 0;
     _stepMode = StepMode::SEARCH;
 }
 
@@ -99,6 +100,7 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
     ApplyEdgeColors(mesh);
     leda::nb::set_color(mesh, R::Color::White);
 
+    _g.nb.log->printf("number of flips: %d\n", _numFlips);
     return StepRet::DONE;
 }
 
@@ -119,6 +121,8 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepPerformFlip() {
     } else {
         mesh[_fp.e] = mesh[_fp.r] = Color::BLACK;
     }
+
+    _numFlips++;
 
     mesh.compute_faces();
     mesh.set_visible(mesh.face_of(_g.hullEdge), false);
@@ -141,5 +145,9 @@ Phase_Flip::StepRet::Enum Phase_Flip::Step() {
 }
 
 GEN::Pointer<OP::ALG::Phase> Phase_Flip::NextPhase() {
-    return GEN::MakePtr(new Phase_Clip(_g));
+    if(!_numFlips) {
+        return OP::ALG::Phase::NextPhase();
+    } else {
+        return GEN::MakePtr(new Phase_Clip(_g));
+    }
 }
