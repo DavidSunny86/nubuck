@@ -13,11 +13,14 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\alg_flipclip.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\flipclip.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\globals.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_flip.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_init.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\flipclip.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\globals.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_flip.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_init.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

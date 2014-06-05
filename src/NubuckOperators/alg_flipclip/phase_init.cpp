@@ -1,5 +1,6 @@
 #include <Nubuck\polymesh.h>
 #include "globals.h"
+#include "phase_flip.h"
 #include "phase_init.h"
 
 /*
@@ -114,17 +115,19 @@ leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L,
 
 Phase_Init::Phase_Init(Globals& g) : _g(g) { }
 
-struct CompareVertexPositions : leda::leda_cmp_base<leda::node> {
+struct CompareVertexPositionsDescending : leda::leda_cmp_base<leda::node> {
     const leda::nb::RatPolyMesh& mesh;
 
-    CompareVertexPositions(const leda::nb::RatPolyMesh& mesh) : mesh(mesh) { }
+    CompareVertexPositionsDescending(const leda::nb::RatPolyMesh& mesh) : mesh(mesh) { }
 
     int operator()(const leda::node& lhp, const leda::node& rhp) const override {
-        return leda::compare(mesh.position_of(lhp), mesh.position_of(rhp));
+        return -leda::compare(mesh.position_of(lhp), mesh.position_of(rhp));
     }
 };
 
 void Phase_Init::Enter() {
+    std::cout << "entering phase 'init'" << std::endl;
+
     // choose first selected geometry as input
     ISelection* sel = _g.nb.world->GetSelection();
     std::vector<IGeometry*> geomSel = sel->GetList();
@@ -134,35 +137,27 @@ void Phase_Init::Enter() {
     }
     _g.geom = geomSel[0];
 
+    _g.geom->GetRatPolyMesh().del_all_edges();
+}
 
+Phase_Init::StepRet::Enum Phase_Init::Step() {
     leda::nb::RatPolyMesh& mesh = _g.geom->GetRatPolyMesh();
 
     leda::list<leda::node> L = mesh.all_nodes();
-    L.sort(CompareVertexPositions(mesh));
+    L.sort(CompareVertexPositionsDescending(mesh));
 
     const unsigned renderAll = IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES;
     _g.geom->SetRenderMode(renderAll);
 
-    leda::edge hull = TriangulateXY(mesh, L, -1);
+    _g.hullEdge = TriangulateXY(mesh, L, +1);
     mesh.compute_faces();
-    mesh.set_visible(mesh.face_of(hull), false);
+    mesh.set_visible(mesh.face_of(_g.hullEdge), false);
 
-    R::Color colors[3];
-    colors[Color::BLACK]    = R::Color::Black;
-    colors[Color::RED]      = R::Color::Red;
-    colors[Color::BLUE]     = R::Color::Blue;
+    ApplyEdgeColors(mesh);
 
-    leda::node_array<int> nodeColors(mesh, Color::BLACK);
+    return StepRet::DONE;
+}
 
-    leda::edge e;
-    forall_edges(e, mesh) {
-        mesh.set_color(e, colors[mesh[e]]);
-        nodeColors[leda::source(e)] = M::Max(nodeColors[leda::source(e)], mesh[e]);
-        nodeColors[leda::target(e)] = M::Max(nodeColors[leda::target(e)], mesh[e]);
-    }
-
-    leda::node v;
-    forall_nodes(v, mesh) {
-        mesh.set_color(v, colors[nodeColors[v]]);
-    }
+GEN::Pointer<OP::ALG::Phase> Phase_Init::NextPhase() {
+    return GEN::MakePtr(new Phase_Flip(_g));
 }
