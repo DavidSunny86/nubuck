@@ -4,6 +4,7 @@
 
 #include <Nubuck\generic\pointer.h>
 #include <Nubuck\events\events.h>
+#include <system\thread\thread.h>
 
 // forward decls
 namespace UI {
@@ -21,10 +22,16 @@ private:
     GEN::Pointer<UI::OperatorPanel> _operatorPanel;
     GEN::Pointer<UI::MainWindow>    _mainWindow;
 
+    SYS::Thread::threadID_t _uiThreadID;
+
     void Event_EditModeChanged(const EV::Event& event);
 public slots:
     void OnQuit();
 public:
+    UserInterface() : _uiThreadID(SYS::Thread::INVALID_THREAD_ID) { }
+
+    SYS::Thread::threadID_t UI_ThreadID() const { return _uiThreadID; }
+
     void Init();
 
     const UI::MainWindow&       GetMainWindow() const { return *_mainWindow; }

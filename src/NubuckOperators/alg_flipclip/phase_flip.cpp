@@ -5,7 +5,7 @@
 Phase_Flip::Phase_Flip(Globals& g) : _g(g) { }
 
 void Phase_Flip::Enter() {
-    std::cout << "entering phase 'flip'" << std::endl;
+    _g.nb.log->printf("entering phase 'flip'\n");
 
     leda::nb::RatPolyMesh& mesh = _g.geom->GetRatPolyMesh();
 

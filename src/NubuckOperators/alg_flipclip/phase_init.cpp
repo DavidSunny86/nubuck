@@ -126,13 +126,13 @@ struct CompareVertexPositionsDescending : leda::leda_cmp_base<leda::node> {
 };
 
 void Phase_Init::Enter() {
-    std::cout << "entering phase 'init'" << std::endl;
+    _g.nb.log->printf("entering phase 'init'\n");
 
     // choose first selected geometry as input
     ISelection* sel = _g.nb.world->GetSelection();
     std::vector<IGeometry*> geomSel = sel->GetList();
     if(geomSel.empty()) {
-        printf("ERROR - no input object selected.\n");
+        _g.nb.log->printf("ERROR - no input object selected.\n");
         return;
     }
     _g.geom = geomSel[0];

@@ -3,6 +3,7 @@
 #include <Nubuck\operators\operator_invoker.h>
 #include <UI\window_events.h>
 #include <UI\userinterface.h>
+#include <UI\logwidget\logwidget.h>
 #include <world\world_events.h>
 #include <world\world.h>
 #include "operator_events.h"
@@ -58,11 +59,11 @@ void Operators::Event_ForwardToDriver(const EV::Event& event) {
 
 void Operators::OnInvokeOperator(unsigned id) {
     if(BUSY_THRESHOLD < _actionsPending) {
-        printf("INFO - Operators::OnInvokeOperator: wait for driver.\n");
+        UI::LogWidget::Instance()->sys_printf("INFO - Operators::OnInvokeOperator: wait for driver.\n");
         return;
 	}
 
-    printf("invoking operator with id = %d\n", id);
+    UI::LogWidget::Instance()->sys_printf("INFO - invoking operator with id = %d\n", id);
 
 	if(!_driver.IsValid()) {
         _driver = GEN::MakePtr(new Driver(_activeOps, _activeOpsMtx));

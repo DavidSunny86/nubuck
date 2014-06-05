@@ -60,6 +60,9 @@ void LoadOBJ::Event_Load(const EV::Event& event) {
 
 	_nb.world->GetSelection()->Set(_geom);
 
+    _nb.log->printf("loaded object: |V| = %d, |E| = %d, |F| = %d\n",
+        mesh.number_of_nodes(), mesh.number_of_edges(), mesh.number_of_faces());
+
 	delete args.filename;
 }
 
@@ -80,7 +83,7 @@ void LoadOBJ::Event_LoadScene(const EV::Event& event) {
 
     _nb.world->GetSelection()->Set(geom);
 
-    printf("### LoadOBJ: loading scene finished\n");
+    _nb.log->printf("LoadOBJ: loading scene finished\n");
 }
 
 LoadOBJ::LoadOBJ() : _geom(NULL) {
@@ -91,7 +94,7 @@ LoadOBJ::LoadOBJ() : _geom(NULL) {
 void LoadOBJ::Register(const Nubuck& nb, Invoker& invoker) {
     _nb = nb;
 
-    printf("LoadOBJ: preloading mesh\n");
+    _nb.log->printf("LoadOBJ: preloading mesh\n");
     std::string filename = common.BaseDir() + "Meshes\\laurana_hp.obj";
     preload.FromObj(filename.c_str());
 
@@ -100,7 +103,6 @@ void LoadOBJ::Register(const Nubuck& nb, Invoker& invoker) {
 }
 
 void LoadOBJ::Invoke() {
-    printf("LoadOBJ::Invoke\n");
     _geom = NULL;
 }
 

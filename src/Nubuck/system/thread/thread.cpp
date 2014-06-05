@@ -7,6 +7,10 @@ DWORD WINAPI ThreadFunc(LPVOID param) {
 
 namespace SYS {
 
+Thread::threadID_t Thread::CallerID() {
+    return GetCurrentThreadId();
+}
+
 Thread::Thread() : _handle(NULL) { }
 
 Thread::~Thread(void) {

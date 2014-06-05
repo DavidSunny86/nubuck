@@ -2,6 +2,7 @@
 #include <UI\userinterface.h>
 #include <UI\mainwindow\mainwindow.h>
 #include <UI\renderview\renderview.h>
+#include <UI\logwidget\logwidget.h>
 #include <operators\operators.h>
 #include <world\world.h>
 #include "mainloop.h"
@@ -13,6 +14,7 @@ void MainLoop::Update() {
 	W::world.Update(); 
 
     g_ui.GetMainWindow().GetRenderView()->Render();
+    UI::LogWidget::Instance()->Flush();
 }
 
 MainLoop::MainLoop() { connect(&_timer, SIGNAL(timeout()), this, SLOT(Update())); }

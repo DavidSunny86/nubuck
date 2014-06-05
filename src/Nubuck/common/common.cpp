@@ -6,6 +6,7 @@
 
 #include <system\winerror.h>
 #include <Nubuck\common\common.h>
+#include <UI\logwidget\logwidget.h>
 
 int COM_Tokenize(ctoken_t** tokens, const char* string, char term) {
 	ctoken_t* token;
@@ -186,13 +187,20 @@ const char* Common::GetEnvVar(const std::string& name) const {
 }
 
 void Common::printf(const char* format, ...) {
+    static char buffer[2048];
+
+    memset(buffer, 0, sizeof(buffer));
+    va_list args;
+    va_start(args, format);
+    vsprintf(buffer, format, args);
+    va_end(args);
+
     if(_logfile) {
-        va_list args;
-        va_start(args, format);
-        vfprintf(_logfile, format, args);
-        va_end(args);
+        fprintf(_logfile, buffer);
         fflush(_logfile);
     }
+
+    UI::LogWidget::Instance()->sys_printf(buffer);
 }
 
 void COM_printf(const char* format, ...) {

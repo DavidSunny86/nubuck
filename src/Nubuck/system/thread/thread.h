@@ -9,6 +9,12 @@ namespace SYS {
 	private:
 		HANDLE _handle;
 	public:
+        enum { INVALID_THREAD_ID = 0 };
+
+        typedef DWORD threadID_t;
+
+        static threadID_t CallerID();
+
                 Thread();
 		virtual ~Thread();
 

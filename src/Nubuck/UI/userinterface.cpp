@@ -26,4 +26,6 @@ void UserInterface::Init() {
     _outliner = GEN::MakePtr(new UI::Outliner());
     _operatorPanel = GEN::MakePtr(new UI::OperatorPanel());
     _mainWindow = GEN::MakePtr(new UI::MainWindow());
+
+    _uiThreadID = SYS::Thread::CallerID();
 }
