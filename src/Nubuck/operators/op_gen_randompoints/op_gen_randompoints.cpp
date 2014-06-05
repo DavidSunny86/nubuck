@@ -25,6 +25,7 @@ RandomPointsPanel::RandomPointsPanel(QWidget* parent) : SimplePanel(parent) {
     domains.push_back("in cube");
     domains.push_back("in hemisphere");
     domains.push_back("on sphere");
+    domains.push_back("on hemisphere");
     domains.push_back("on paraboloid");
 
     _cbDomain = AddComboBox("Domain", domains);
@@ -73,8 +74,12 @@ void RandomPoints::UpdateHull(Domain::Enum domain, int radius) {
         mesh.compute_faces();
     }
 
-    if(Domain::IN_BALL == domain || Domain::ON_SPHERE == domain || Domain::IN_HEMISPHERE == domain) {
-        if(Domain::IN_HEMISPHERE == domain) {
+    if( Domain::IN_BALL == domain ||
+        Domain::IN_HEMISPHERE == domain ||
+        Domain::ON_SPHERE == domain ||
+        Domain::ON_HEMISPHERE == domain)
+    {
+        if(Domain::IN_HEMISPHERE == domain || Domain::ON_HEMISPHERE == domain) {
             mesh = _hemispherePrefab;
         } else {
             mesh = _spherePrefab;
@@ -127,7 +132,15 @@ void RandomPoints::UpdateCloud(Domain::Enum domain, int size, int radius) {
         }
         break;
     case Domain::ON_SPHERE:
-        leda::random_d3_rat_points_on_sphere(size, radius, L);
+        leda::random_d3_rat_points_on_sphere(size, 100 * radius, L);
+        forall_items(it, L) L[it] = leda::rational(1, 100) * L[it].to_vector();
+        break;
+    case Domain::ON_HEMISPHERE:
+        leda::random_d3_rat_points_on_sphere(size, 100 * radius, L);
+        forall_items(it, L) {
+            leda::rat_vector vec = L[it].to_vector();
+            L[it] = leda::rational(1, 100) * leda::rat_vector(vec.xcoord(), vec.ycoord(), leda::abs(vec.zcoord()));
+        }
         break;
     case Domain::ON_PARABOLOID:
         leda::random_d3_rat_points_on_paraboloid(size, 100 * radius, L);

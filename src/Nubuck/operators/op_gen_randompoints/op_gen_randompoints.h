@@ -41,6 +41,7 @@ public:
             IN_CUBE,
             IN_HEMISPHERE,
             ON_SPHERE,
+            ON_HEMISPHERE,
             ON_PARABOLOID
         };
     };
