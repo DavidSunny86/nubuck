@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <Nubuck\polymesh.h>
+#include "phase_init.h"
 #include "phase_clip.h"
 #include "phase_flip.h"
 
@@ -125,7 +126,8 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepPerformFlip() {
     _numFlips++;
 
     mesh.compute_faces();
-    mesh.set_visible(mesh.face_of(_g.hullEdge), false);
+    if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
+    if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
     leda::nb::set_color(mesh, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
 
     mesh.set_color(mesh.face_of(_fp.e), R::Color::Blue);
@@ -146,7 +148,12 @@ Phase_Flip::StepRet::Enum Phase_Flip::Step() {
 
 GEN::Pointer<OP::ALG::Phase> Phase_Flip::NextPhase() {
     if(!_numFlips) {
-        return OP::ALG::Phase::NextPhase();
+        if(Side::FRONT == _g.side) {
+            _g.side = Side::BACK;
+            return GEN::MakePtr(new Phase_Init(_g));
+        } else {
+            return OP::ALG::Phase::NextPhase();
+        }
     } else {
         return GEN::MakePtr(new Phase_Clip(_g));
     }

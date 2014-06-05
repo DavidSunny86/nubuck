@@ -10,11 +10,20 @@ struct Color {
     };
 };
 
+struct Side {
+    enum Enum {
+        FRONT = 0,
+        BACK
+    };
+};
+
 // encapsulates data shared among all phases
 struct Globals {
-    Nubuck      nb;
-    IGeometry*  geom;
-    leda::edge  hullEdge;
+    Nubuck                  nb;
+    leda::list<leda::node>  L[2];
+    Side::Enum              side;
+    IGeometry*              geom;
+    leda::edge              hullEdges[2];
 };
 
 void ApplyEdgeColors(leda::nb::RatPolyMesh& mesh);

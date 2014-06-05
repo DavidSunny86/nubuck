@@ -1,4 +1,5 @@
 #include <Nubuck\polymesh.h>
+#include "phase_init.h"
 #include "phase_flip.h"
 #include "phase_clip.h"
 
@@ -67,7 +68,8 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepPerformClip() {
     _numClips++;
 
     mesh.compute_faces();
-    mesh.set_visible(mesh.face_of(_g.hullEdge), false);
+    if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
+    if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
     ApplyEdgeColors(mesh);
 
     _stepMode = StepMode::SEARCH;
@@ -84,7 +86,12 @@ Phase_Clip::StepRet::Enum Phase_Clip::Step() {
 
 GEN::Pointer<OP::ALG::Phase> Phase_Clip::NextPhase() {
     if(!_numClips) {
-        return OP::ALG::Phase::NextPhase();
+        if(Side::FRONT == _g.side) {
+            _g.side = Side::BACK;
+            return GEN::MakePtr(new Phase_Init(_g));
+        } else {
+            return OP::ALG::Phase::NextPhase();
+        }
     } else {
         return GEN::MakePtr(new Phase_Flip(_g));
     }

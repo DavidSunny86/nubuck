@@ -38,7 +38,7 @@ TriangulateXY
 leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L, int orient) {
     typedef leda::d3_rat_point point_t;
 
-    assert(0 == mesh.number_of_edges());
+    // assert(0 == mesh.number_of_edges());
     // assert(IsSorted(mesh, L));
 
     if(L.empty()) return NULL;
@@ -115,6 +115,16 @@ leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L,
 
 Phase_Init::Phase_Init(Globals& g) : _g(g) { }
 
+struct CompareVertexPositionsAscending : leda::leda_cmp_base<leda::node> {
+    const leda::nb::RatPolyMesh& mesh;
+
+    CompareVertexPositionsAscending(const leda::nb::RatPolyMesh& mesh) : mesh(mesh) { }
+
+    int operator()(const leda::node& lhp, const leda::node& rhp) const override {
+        return leda::compare(mesh.position_of(lhp), mesh.position_of(rhp));
+    }
+};
+
 struct CompareVertexPositionsDescending : leda::leda_cmp_base<leda::node> {
     const leda::nb::RatPolyMesh& mesh;
 
@@ -127,31 +137,24 @@ struct CompareVertexPositionsDescending : leda::leda_cmp_base<leda::node> {
 
 void Phase_Init::Enter() {
     _g.nb.log->printf("entering phase 'init'\n");
-
-    // choose first selected geometry as input
-    ISelection* sel = _g.nb.world->GetSelection();
-    std::vector<IGeometry*> geomSel = sel->GetList();
-    if(geomSel.empty()) {
-        _g.nb.log->printf("ERROR - no input object selected.\n");
-        return;
-    }
-    _g.geom = geomSel[0];
-
-    _g.geom->GetRatPolyMesh().del_all_edges();
 }
 
 Phase_Init::StepRet::Enum Phase_Init::Step() {
     leda::nb::RatPolyMesh& mesh = _g.geom->GetRatPolyMesh();
 
-    leda::list<leda::node> L = mesh.all_nodes();
-    L.sort(CompareVertexPositionsDescending(mesh));
+    if(Side::FRONT == _g.side) {
+        leda::list<leda::node>& L = _g.L[Side::FRONT];
+        L.sort(CompareVertexPositionsDescending(mesh));
+        _g.hullEdges[Side::FRONT] = TriangulateXY(mesh, L, +1);
+    } else {
+        leda::list<leda::node>& L = _g.L[Side::BACK];
+        L.sort(CompareVertexPositionsAscending(mesh));
+        _g.hullEdges[Side::BACK] = TriangulateXY(mesh, L, -1);
+    }
 
-    const unsigned renderAll = IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES;
-    _g.geom->SetRenderMode(renderAll);
-
-    _g.hullEdge = TriangulateXY(mesh, L, +1);
     mesh.compute_faces();
-    mesh.set_visible(mesh.face_of(_g.hullEdge), false);
+    if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
+    if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
 
     ApplyEdgeColors(mesh);
 
