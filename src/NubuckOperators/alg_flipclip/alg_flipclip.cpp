@@ -2,7 +2,7 @@
 #include "flipclip.h"
 
 NUBUCK_OPERATOR OP::OperatorPanel* CreateOperatorPanel() {
-    return new OP::ALG::StandardAlgorithmPanel;
+    return new FlipClipPanel;
 }
 
 NUBUCK_OPERATOR OP::Operator* CreateOperator() {

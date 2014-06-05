@@ -1,5 +1,21 @@
+#include <QGridLayout>
+#include <QLabel>
+
 #include <Nubuck\polymesh.h>
 #include "flipclip.h"
+
+FlipClipPanel::FlipClipPanel() {
+    _dist = new QSlider(Qt::Horizontal);
+
+    QGridLayout* gridLayout = new QGridLayout;
+    gridLayout->addWidget(new QLabel("hull distance:"), 0, 0);
+    gridLayout->addWidget(_dist, 0, 1);
+
+    QWidget* dummy = new QWidget;
+    dummy->setLayout(gridLayout);
+
+    layout()->addWidget(dummy);
+}
 
 const char* FlipClip::GetName() const { return "Flip & Clip"; }
 
