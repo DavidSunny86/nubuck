@@ -33,6 +33,14 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepSearch() {
         if(mesh.outdeg(_clipV) != _rdeg[_clipV]) continue;
         if(3 != _rdeg[_clipV]) {
             _g.nb.log->printf("WARNING - unhandled case rdeg[v] != 3!\n");
+
+            leda::edge e;
+            forall_out_edges(e, _clipV) {
+                if(Color::RED == mesh[e]) {
+                    _g.conflicts[e] = true;
+                }
+            }
+
             continue;
         }
 
@@ -85,6 +93,16 @@ Phase_Clip::StepRet::Enum Phase_Clip::Step() {
 }
 
 GEN::Pointer<OP::ALG::Phase> Phase_Clip::NextPhase() {
+    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+    leda::edge e;
+    int numConflicts = 0;
+    forall_edges(e, mesh) {
+        if(_g.conflicts[e] && Color::RED == mesh[e]) {
+            numConflicts++;
+        }
+    }
+    _g.nb.log->printf("num conflicting edges = %d\n", numConflicts);
+
     if(!_numClips) {
         if(Side::FRONT == _g.side) {
             _g.side = Side::BACK;

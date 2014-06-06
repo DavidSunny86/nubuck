@@ -158,6 +158,8 @@ Phase_Init::StepRet::Enum Phase_Init::Step() {
 
     ApplyEdgeColors(mesh);
 
+    _g.conflicts.init(mesh, false);
+
     return StepRet::DONE;
 }
 

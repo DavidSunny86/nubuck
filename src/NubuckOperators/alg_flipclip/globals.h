@@ -24,6 +24,8 @@ struct Globals {
     Side::Enum              side;
     IGeometry*              geom[2];
     leda::edge              hullEdges[2];
+
+    leda::edge_map<bool>    conflicts;
 };
 
 void ApplyEdgeColors(leda::nb::RatPolyMesh& mesh);
