@@ -264,3 +264,55 @@ QToolButton#selectObject {
     border:             none;
     background-color:   rgba(0, 0, 0, 0);
 }
+
+QScrollBar {
+    border:         1px solid #1E1E1E;
+    border-radius:  4px;
+    background:     rgba(0, 0, 0, 0);
+}
+
+QScrollBar:horizontal {
+    padding: 0px 14px 0px 14px;
+}
+
+QScrollBar:vertical {
+    padding: 14px 0px 14px 0px;
+}
+
+QScrollBar::handle {
+    border:             1px solid grey;
+    border-radius:      4px;
+    background-color:   grey;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    background: none;
+}
+
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
+}
+
+QScrollBar:left-arrow {
+    width:  10px;
+    height: 10px;
+    image:  url(:/ui/Images/arrow-left.svg);
+}
+
+QScrollBar:right-arrow {
+    width:  10px;
+    height: 10px;
+    image:  url(:/ui/Images/arrow-right.svg);
+}
+
+QScrollBar:up-arrow {
+    width:  10px;
+    height: 10px;
+    image:  url(:/ui/Images/arrow-up.svg);
+}
+
+QScrollBar:down-arrow {
+    width:  10px;
+    height: 10px;
+    image:  url(:/ui/Images/arrow-down.svg);
+}
