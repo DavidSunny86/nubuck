@@ -147,6 +147,8 @@ Phase_Flip::StepRet::Enum Phase_Flip::Step() {
 }
 
 GEN::Pointer<OP::ALG::Phase> Phase_Flip::NextPhase() {
+    assert(_S.empty());
+
     leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
     leda::edge e;
     int numConflicts = 0;
@@ -157,14 +159,5 @@ GEN::Pointer<OP::ALG::Phase> Phase_Flip::NextPhase() {
     }
     _g.nb.log->printf("num conflicting edges = %d\n", numConflicts);
 
-    if(!_numFlips) {
-        if(Side::FRONT == _g.side) {
-            _g.side = Side::BACK;
-            return GEN::MakePtr(new Phase_Init(_g));
-        } else {
-            return OP::ALG::Phase::NextPhase();
-        }
-    } else {
-        return GEN::MakePtr(new Phase_Clip(_g));
-    }
+    return GEN::MakePtr(new Phase_Clip(_g));
 }
