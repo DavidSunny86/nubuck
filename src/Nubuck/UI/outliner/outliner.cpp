@@ -1,3 +1,4 @@
+#include <QScrollBar>
 #include <QMouseEvent>
 #include <QInputDialog>
 #include <UI\window_events.h>
@@ -144,6 +145,14 @@ void Outliner::SendToView(itemHandle_t item, const EV::Event& event) {
 Outliner::Outliner(QWidget* parent) : QWidget(parent), _items(NULL) {
     _treeWidget = new QTreeWidget(this);
     _treeWidget->setHeaderHidden(true);
+
+    const QString transparentBg = QString("background-color: rgba(0, 0, 0, 0);");
+    _treeWidget->verticalScrollBar()->parentWidget()->setStyleSheet(transparentBg);
+    _treeWidget->horizontalScrollBar()->parentWidget()->setStyleSheet(transparentBg);
+
+    // mitigate ugly gradient in corner
+    _treeWidget->setCornerWidget(new QWidget);
+    _treeWidget->cornerWidget()->setStyleSheet("border: 1px solid #1E1E1E; background-color: rgba(0, 0, 0, 0);");
 
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(_treeWidget);
