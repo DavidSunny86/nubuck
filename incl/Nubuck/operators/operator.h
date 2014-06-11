@@ -23,6 +23,8 @@ class Invoker;
 
 class OperatorPanel : public QWidget, public EV::EventHandler<> {
 public:
+    DECL_HANDLE_EVENTS(OperatorPanel);
+
     OperatorPanel(QWidget* parent = 0) : QWidget(parent) { }
     virtual ~OperatorPanel() { }
 
@@ -30,10 +32,18 @@ public:
 };
 
 class Operator : public EV::EventHandler<> {
+private:
+    OperatorPanel* _panel;
 public:
     DECL_HANDLE_EVENTS(Operator);
 
+    Operator() : _panel(NULL) { }
+
     virtual ~Operator() { }
+
+    void SetPanel(OperatorPanel* panel); // called by operators manager only
+
+    void SendToPanel(const EV::Event& event);
 
     virtual void Register(const Nubuck& nb, Invoker& invoker) = 0;
     virtual void Invoke() = 0;
@@ -48,5 +58,14 @@ public:
 };
 
 NUBUCK_API void SendToOperator(const EV::Event& event);
+
+inline void Operator::SetPanel(OperatorPanel* panel) {
+    _panel = panel;
+}
+
+inline void Operator::SendToPanel(const EV::Event& event) {
+    assert(_panel);
+    _panel->Send(event);
+}
 
 } // namespace OP

@@ -96,6 +96,16 @@ unsigned Operators::GetDriverQueueSize() const {
 
 void Operators::FrameUpdate() {
     HandleEvents();
+
+    if(!_activeOps.empty()) {
+        Operator* op = _activeOps.back();
+        OperatorPanel* panel = NULL;
+        for(unsigned i = 0; !panel && i < _ops.size(); ++i) {
+            if(_ops[i].op == op) panel = _ops[i].panel;
+        }
+        assert(panel);
+        panel->HandleEvents();
+    }
 }
 
 unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module) {
@@ -104,6 +114,7 @@ unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module)
     Invoker* invoker = new Invoker(id);
     connect(invoker, SIGNAL(SigInvokeOperator(unsigned)), this, SLOT(OnInvokeOperator(unsigned)));
 
+    op->SetPanel(panel);
     op->Register(nubuck, *invoker);
 
     OperatorDesc desc;
