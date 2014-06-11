@@ -158,6 +158,12 @@ QCheckBox::indicator:!checked {
 }
 
 QAbstractSpinBox::up-button {
+    border-left-width: 2px;
+    border-left-color: #1E1E1E;
+    border-left-style: solid;       /* just a single line */
+
+    padding: 2px 2px 2px 2px;
+
     image: url(:/ui/Images/arrow-up.svg);
 }
 
@@ -166,6 +172,12 @@ QAbstractSpinBox::up-button:hover {
 }
 
 QAbstractSpinBox::down-button {
+    border-left-width: 2px;
+    border-left-color: #1E1E1E;
+    border-left-style: solid;       /* just a single line */
+
+    padding: 2px 2px 2px 2px;
+
     image: url(:/ui/Images/arrow-down.svg);
 }
 
