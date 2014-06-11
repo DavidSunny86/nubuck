@@ -52,8 +52,9 @@ void D3_Delaunay::Register(const Nubuck& nb, Invoker& invoker) {
 
 }
 
-void D3_Delaunay::Invoke() {
+bool D3_Delaunay::Invoke() {
     printf("ATTENTION PLEASE! Invoked operator D3_Delaunay...\n");
+    return true;
 }
 
 void D3_Delaunay::Finish() {

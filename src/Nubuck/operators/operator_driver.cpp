@@ -17,13 +17,17 @@ Operator* Driver::ActiveOperator() {
 void Driver::Event_Push(const EV::Event& event) {
 	const EV::Params_OP_Push& args = EV::def_OP_Push.GetArgs(event);
 
-	args.op->Invoke();
+	if(args.op->Invoke()) {
+        Operator* op = ActiveOperator();
+        if(op) op->Finish();
 
-    Operator* op = ActiveOperator();
-    if(op) op->Finish();
-
-    W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
-	g_operators.SendAndWait(event);
+        W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
+	    g_operators.SendAndWait(event);
+    } else {
+        EV::Params_OP_Push args;
+        args.op = NULL; // indicates declined invocation
+        g_operators.SendAndWait(EV::def_OP_Push.Create(args));
+    }
 }
 
 void Driver::Event_SelectionChanged(const EV::Event& event) {

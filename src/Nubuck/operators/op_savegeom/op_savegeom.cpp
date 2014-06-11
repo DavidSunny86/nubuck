@@ -64,20 +64,22 @@ void SaveGeom::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void SaveGeom::Invoke() {
+bool SaveGeom::Invoke() {
     _nb.ui->SetOperatorName("Save (.geom)");
 
     ISelection* sel = _nb.world->GetSelection();
     std::vector<IGeometry*> geomSel = sel->GetList();
     if(geomSel.empty()) {
-        _nb.log->printf("no geometry selected!\n");
-        return;
+        _nb.log->printf("no geometry selected.\n");
+        return false;
     }
 
     _geom = geomSel[0];
 
     EV::Params_OP_SaveGeom_Save args = { NULL };
     SendToPanel(EV::def_OP_SaveGeom_Save.Create(args));
+
+    return true;
 }
 
 } // namespace OP

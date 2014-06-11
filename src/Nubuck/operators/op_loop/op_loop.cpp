@@ -36,7 +36,7 @@ void Loop::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void Loop::Invoke() {
+bool Loop::Invoke() {
     printf("OP::Loop::Invoke\n");
     _nb.ui->SetOperatorName("Loop");
 
@@ -55,6 +55,8 @@ void Loop::Invoke() {
 	leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
 	leda::CONVEX_HULL(L, mesh);
 	mesh.compute_faces();
+
+    return true;
 }
 
 } // namespace OP

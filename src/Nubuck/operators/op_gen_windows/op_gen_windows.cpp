@@ -16,7 +16,7 @@ void Windows::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void Windows::Invoke() {
+bool Windows::Invoke() {
     typedef leda::d3_rat_point point3_t;
 
     _nb.ui->SetOperatorName("Windows Scene");
@@ -46,6 +46,8 @@ void Windows::Invoke() {
         mesh.set_color(mesh.first_face(), c[i]);
         geoms[i] = geom;
     }
+
+    return true;
 }
 
 } // namespace GEN

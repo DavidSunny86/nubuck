@@ -203,7 +203,7 @@ void RandomPoints::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void RandomPoints::Invoke() {
+bool RandomPoints::Invoke() {
     _nb.ui->SetOperatorName("Random Points");
 
     _hull = _nb.world->CreateGeometry();
@@ -218,6 +218,8 @@ void RandomPoints::Invoke() {
     UpdateCloud(Domain::Enum(_lastDomain), _lastSize, _lastRadius);
 
     _nb.world->GetSelection()->Set(_cloud);
+
+    return true;
 }
 
 void RandomPoints::Finish() {

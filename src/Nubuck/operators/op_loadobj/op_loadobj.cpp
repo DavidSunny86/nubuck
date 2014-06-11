@@ -102,8 +102,9 @@ void LoadOBJ::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void LoadOBJ::Invoke() {
+bool LoadOBJ::Invoke() {
     _geom = NULL;
+    return true;
 }
 
 } // namespace OP

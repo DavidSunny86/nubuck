@@ -16,10 +16,17 @@ void ConvexHull::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void ConvexHull::Invoke() {
+bool ConvexHull::Invoke() {
+    ISelection* sel = _nb.world->GetSelection();
+    std::vector<IGeometry*> geomSel = sel->GetList();
+    if(geomSel.empty()) {
+        _nb.log->printf("no geometry selected.\n");
+        return false;
+    }
+
     _nb.ui->SetOperatorName("Convex Hull");
 
-	IGeometry* cloud = _nb.world->GetSelection()->GetList().front();
+	IGeometry* cloud = geomSel[0];
     assert(cloud);
 
     leda::nb::RatPolyMesh& cloudMesh = cloud->GetRatPolyMesh();
@@ -38,6 +45,8 @@ void ConvexHull::Invoke() {
 
     cloud->Destroy();
 	_nb.world->GetSelection()->Set(chull);
+
+    return true;
 }
 
 } // namespace OP

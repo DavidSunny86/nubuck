@@ -48,7 +48,7 @@ OP::ALG::Phase* FlipClip::Init(const Nubuck& nb) {
     std::vector<IGeometry*> geomSel = sel->GetList();
     if(geomSel.empty()) {
         _g.nb.log->printf("ERROR - no input object selected.\n");
-        return new OP::ALG::Phase;
+        return NULL;
     }
     _g.geom[Side::FRONT] = geomSel[0];
 

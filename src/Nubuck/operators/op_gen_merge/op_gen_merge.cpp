@@ -19,7 +19,7 @@ void Merge::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void Merge::Invoke() {
+bool Merge::Invoke() {
     _nb.ui->SetOperatorName("Create Merge Scene");
 
     leda::list_item it;
@@ -53,6 +53,8 @@ void Merge::Invoke() {
     sel->Clear();
     sel->Add(geom0);
     sel->Add(geom1);
+
+    return true;
 }
 
 } // namespace GEN

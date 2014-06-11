@@ -46,13 +46,13 @@ private:
     void Event_Next(const EV::Event& event);
 protected:
     virtual const char* GetName() const = 0;
-    virtual Phase*      Init(const Nubuck& nb) = 0;
+    virtual Phase*      Init(const Nubuck& nb) = 0; // return false to decline invocation
 public:
     StandardAlgorithm();
 
     void Register(const Nubuck& nb, Invoker& invoker) override;
 
-    void Invoke() override;
+    bool Invoke() override;
     void Finish() override { }
 };
 

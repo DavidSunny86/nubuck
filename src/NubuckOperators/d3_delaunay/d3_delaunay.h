@@ -37,7 +37,7 @@ public:
 	D3_Delaunay();
 
     void Register(const Nubuck& nb, Invoker& invoker);
-    void Invoke();
+    bool Invoke();
     void Finish();
 };
 

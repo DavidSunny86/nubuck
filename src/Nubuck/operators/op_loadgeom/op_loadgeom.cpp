@@ -66,8 +66,9 @@ void LoadGeom::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void LoadGeom::Invoke() {
+bool LoadGeom::Invoke() {
     _nb.ui->SetOperatorName("Load (.geom)");
+    return true;
 }
 
 } // namespace OP

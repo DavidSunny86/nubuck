@@ -15,11 +15,11 @@ void Join::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void Join::Invoke() {
+bool Join::Invoke() {
     _nb.ui->SetOperatorName("Join");
 
 	std::vector<IGeometry*> geomList = W::world.GetSelection()->GetList();
-    if(geomList.size() < 2) return; // nothing to join
+    if(geomList.size() < 2) return true; // nothing to join
 
     W::ENT_Geometry* geom0 = (W::ENT_Geometry*)geomList[0];
     geom0->ApplyTransformation();
@@ -35,6 +35,8 @@ void Join::Invoke() {
 	_nb.world->GetSelection()->Set(geom0);
 
     printf(">>>>>>>>>> OP::Join finished\n");
+
+    return true;
 }
 
 } // namespace OP

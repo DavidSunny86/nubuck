@@ -98,7 +98,7 @@ public:
     Translate();
 
     void Register(const Nubuck& nb, Invoker& invoker) override;
-    void Invoke() override;
+    bool Invoke() override;
     void Finish() override { }
 
     void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) override;

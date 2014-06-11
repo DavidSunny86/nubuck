@@ -207,8 +207,9 @@ static M::Vector3 Axis(int i) {
     return M::Vector3::Zero;
 }
 
-void Translate::Invoke() {
+bool Translate::Invoke() {
     _nb.ui->SetOperatorName("Translate");
+    return true;
 }
 
 void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {

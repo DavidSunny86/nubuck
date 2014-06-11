@@ -13,7 +13,7 @@ void Delete::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void Delete::Invoke() {
+bool Delete::Invoke() {
     _nb.ui->SetOperatorName("Delete");
 
     std::vector<IGeometry*> geomList = W::world.GetSelection()->GetList();
@@ -21,6 +21,8 @@ void Delete::Invoke() {
         geomList[i]->Destroy();
     }
 	W::world.GetSelection()->Clear();
+
+    return true;
 }
 
 } // namespace OP

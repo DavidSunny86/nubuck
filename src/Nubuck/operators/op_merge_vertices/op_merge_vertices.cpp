@@ -62,19 +62,20 @@ static leda::node merge_vertices(leda::nb::RatPolyMesh& mesh, leda::node v0, led
     return v0;
 }
 
-void MergeVertices::Invoke() {
-    _nb.ui->SetOperatorName("Merge");
-
+bool MergeVertices::Invoke() {
     ISelection* sel = _nb.world->GetSelection();
     if(sel->GetList().empty()) {
         std::cout << "MergeVertices: empty selection" << std::endl;
-        return;
+        return false;
     }
+
+    _nb.ui->SetOperatorName("Merge");
+
     W::ENT_Geometry* geom = (W::ENT_Geometry*)sel->GetList().front();
     std::vector<leda::node> verts = geom->GetVertexSelection();
     if(2 != verts.size()) {
         std::cout << "MergeVertices: number of selected vertices != 2" << std::endl;
-        return;
+        return false;
     }
 
     leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
@@ -85,6 +86,8 @@ void MergeVertices::Invoke() {
     std::cout << "|r| = " << r.size() << std::endl;
     mesh.compute_faces();
     sel->SelectVertex(ISelection::SELECT_NEW, geom, vert);
+
+    return true;
 }
 
 } // namespace OP

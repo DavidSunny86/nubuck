@@ -33,6 +33,14 @@ void Operators::UpdateOperatorPanel() {
 
 void Operators::Event_Push(const EV::Event& event) {
     const EV::Params_OP_Push& args = EV::def_OP_Push.GetArgs(event);
+
+    if(NULL == args.op) {
+        // invocation has been declined
+        _actionsPending--;
+        event.Accept();
+        return;
+    }
+
     while(1 < _activeOps.size()) // keep bottommost op in stack (usually OP::Translate)
         _activeOps.pop_back();
     _activeOps.push_back(args.op);

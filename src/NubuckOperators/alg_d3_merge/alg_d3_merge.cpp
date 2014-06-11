@@ -14,6 +14,13 @@ const char* D3_Merge::GetName() const {
 
 OP::ALG::Phase* D3_Merge::Init(const Nubuck& nb) {
     g.nb = nb;
+
+    ISelection* sel = nb.world->GetSelection();
+    if(2 > sel->GetList().size()) {
+        nb.log->printf("select two objects as input.");
+        return NULL;
+    }
+
     InitPhases();
     return new Phase0;
 }

@@ -91,15 +91,18 @@ void AddFace(leda::nb::RatPolyMesh& mesh, leda::node v0, leda::node v1, leda::no
     mesh.new_edge(v3, v2);
 }
 
-void Delaunay3D::Invoke() {
+bool Delaunay3D::Invoke() {
     typedef leda::d3_rat_point point3_t;
-
-    _nb.ui->SetOperatorName("Delaunay 3D");
 
     _simplices.clear();
 
     std::vector<IGeometry*> geomSel = _nb.world->GetSelection()->GetList();
-    if(geomSel.empty()) return;
+    if(geomSel.empty()) {
+        _nb.log->printf("no geometry selected.\n");
+        return false;
+    }
+
+    _nb.ui->SetOperatorName("Delaunay 3D");
 
     IGeometry* cloud = geomSel.front();
 
@@ -147,6 +150,8 @@ void Delaunay3D::Invoke() {
     _nb.world->GetSelection()->Clear();
 
     std::cout << "DONE" << std::endl;
+
+    return true;
 }
 
 } // namespace OP

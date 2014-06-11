@@ -42,7 +42,7 @@ public:
     Delaunay3D();
 
     void Register(const Nubuck& nb, Invoker& invoker) override;
-    void Invoke() override;
+    bool Invoke() override;
     void Finish() override { }
 };
 

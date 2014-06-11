@@ -85,10 +85,16 @@ void StandardAlgorithm::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void StandardAlgorithm::Invoke() {
+bool StandardAlgorithm::Invoke() {
     _nb.ui->SetOperatorName(GetName());
 
-	SetPhase(GEN::Pointer<Phase>(Init(_nb)));
+    Phase* phase = Init(_nb);
+    if(phase) {
+	    SetPhase(GEN::MakePtr(phase));
+        return true;
+    }
+
+    return false;
 }
 
 } // namespace ALG
