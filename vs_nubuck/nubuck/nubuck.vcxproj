@@ -168,7 +168,33 @@
     </CustomBuild>
     <ClInclude Include="..\..\src\Nubuck\operators\op_gen_windows\op_gen_windows.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_join\op_join.h" />
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_loadgeom\op_loadgeom.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing op_loadgeom.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_LIB -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DLEDA_MULTI_THREAD -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing op_loadgeom.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_LIB -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DLEDA_MULTI_THREAD -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
+    </CustomBuild>
     <ClInclude Include="..\..\src\Nubuck\operators\op_merge_vertices\op_merge_vertices.h" />
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_savegeom\op_savegeom.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Command>
+    </CustomBuild>
     <ClInclude Include="..\..\src\Nubuck\operators\op_translate\op_translate.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\debugtext\debugtext.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\edges\r_cylinder_edges.h" />
@@ -456,9 +482,11 @@
     <ClCompile Include="..\..\src\Nubuck\operators\op_gen_randompoints\op_gen_randompoints.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_gen_windows\op_gen_windows.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_join\op_join.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\operators\op_loadgeom\op_loadgeom.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_loadobj\op_loadobj.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_loop\op_loop.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_merge_vertices\op_merge_vertices.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\operators\op_savegeom\op_savegeom.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_translate\op_translate.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\standard_algorithm.cpp" />
     <ClCompile Include="..\..\src\Nubuck\polymesh\polymesh.cpp" />
@@ -571,6 +599,9 @@
     <ClCompile Include="GeneratedFiles\Debug\moc_op_gen_randompoints.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_op_loadgeom.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_op_loadobj.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -629,6 +660,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_op_gen_randompoints.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_op_loadgeom.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_op_loadobj.cpp">

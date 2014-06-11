@@ -24,11 +24,13 @@
 #include <operators\op_gen_merge\op_gen_merge.h>
 #include <operators\op_gen_windows\op_gen_windows.h>
 #include <operators\op_loadobj\op_loadobj.h>
+#include <operators\op_loadgeom\op_loadgeom.h>
 #include <operators\op_chull\op_chull.h>
 #include <operators\op_delaunay3d\op_delaunay3d.h>
 #include <operators\op_translate\op_translate.h>
 #include <operators\op_join\op_join.h>
 #include <operators\op_delete\op_delete.h>
+#include <operators\op_savegeom\op_savegeom.h>
 #include <operators\op_merge_vertices\op_merge_vertices.h>
 
 Nubuck nubuck;
@@ -120,10 +122,12 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     OP::g_operators.Register(new OP::GEN::MergePanel, new OP::GEN::Merge);
     OP::g_operators.Register(new OP::GEN::WindowsPanel, new OP::GEN::Windows);
 	OP::g_operators.Register(new OP::LoadOBJPanel, new OP::LoadOBJ);
+    OP::g_operators.Register(new OP::LoadGeomPanel, new OP::LoadGeom);
 	OP::g_operators.Register(new OP::ConvexHullPanel, new OP::ConvexHull);
     OP::g_operators.Register(new OP::Delaunay3DPanel, new OP::Delaunay3D);
 	OP::g_operators.Register(new OP::JoinPanel, new OP::Join);
 	OP::g_operators.Register(new OP::DeletePanel, new OP::Delete);
+    OP::g_operators.Register(new OP::SaveGeomPanel, new OP::SaveGeom);
     OP::g_operators.Register(new OP::MergeVerticesPanel, new OP::MergeVertices);
 	OP::g_operators.OnInvokeOperator(0); // call OP::Translate
     OP::LoadOperators();

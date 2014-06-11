@@ -294,6 +294,12 @@
     <Filter Include="Private\operators\op_gen_randompoints">
       <UniqueIdentifier>{097bb690-6639-4c6c-9745-1af79b0b19fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_loadgeom">
+      <UniqueIdentifier>{d9399ed6-3df1-402c-90ba-ab190eb13f28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\operators\op_savegeom">
+      <UniqueIdentifier>{10d06b67-df72-47c6-a8ee-cd1487e2c9cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -1213,6 +1219,18 @@
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_serialize.cpp">
       <Filter>Private\world\entities\ent_geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_loadgeom\op_loadgeom.cpp">
+      <Filter>Private\operators\op_loadgeom</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_savegeom\op_savegeom.cpp">
+      <Filter>Private\operators\op_savegeom</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_op_loadgeom.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_op_loadgeom.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
@@ -1316,6 +1334,12 @@
     </CustomBuild>
     <CustomBuild Include="..\..\src\Nubuck\operators\op_gen_randompoints\op_gen_randompoints.h">
       <Filter>Private\operators\op_gen_randompoints</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_savegeom\op_savegeom.h">
+      <Filter>Private\operators\op_savegeom</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\src\Nubuck\operators\op_loadgeom\op_loadgeom.h">
+      <Filter>Private\operators\op_loadgeom</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
