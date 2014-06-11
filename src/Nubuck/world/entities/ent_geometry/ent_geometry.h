@@ -164,4 +164,7 @@ public:
     const R::RenderList& GetRenderList() const { return _renderList; }
 };
 
+void SaveGeometryToFile(const std::string& filename, IGeometry* geom);
+void LoadGeometryFromFile(const std::string& filename, IGeometry* geom);
+
 } // namespace W

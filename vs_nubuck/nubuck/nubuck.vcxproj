@@ -538,6 +538,7 @@
     <ClCompile Include="..\..\src\Nubuck\world\editmode\editmode.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_outln.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_serialize.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entity.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\world.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_colorbutton.cpp">

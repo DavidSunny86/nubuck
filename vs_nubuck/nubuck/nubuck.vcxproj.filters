@@ -1210,6 +1210,9 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\nodes\r_nodes.cpp">
       <Filter>Private\renderer\nodes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_serialize.cpp">
+      <Filter>Private\world\entities\ent_geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\Nubuck\UI\mainwindow\mainwindow.h">
