@@ -37,6 +37,16 @@ void Operators::Event_Push(const EV::Event& event) {
         _activeOps.pop_back();
     _activeOps.push_back(args.op);
     _actionsPending--;
+
+    // find panel of active operator
+    Operator* op = _activeOps.back();
+    OperatorPanel* panel = NULL;
+    for(unsigned i = 0; !panel && i < _ops.size(); ++i) {
+        if(_ops[i].op == op) panel = _ops[i].panel;
+    }
+    assert(panel);
+
+    panel->Invoke();
     UpdateOperatorPanel();
     event.Accept();
 }
@@ -71,7 +81,6 @@ void Operators::OnInvokeOperator(unsigned id) {
 	}
     Operator* op = _ops[id].op;
 	EV::Params_OP_Push args = { op };
-    _ops[id].panel->Invoke();
     _actionsPending++;
 	_driver->Send(EV::def_OP_Push.Create(args));
 }

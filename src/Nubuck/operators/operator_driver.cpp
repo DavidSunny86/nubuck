@@ -17,10 +17,10 @@ Operator* Driver::ActiveOperator() {
 void Driver::Event_Push(const EV::Event& event) {
 	const EV::Params_OP_Push& args = EV::def_OP_Push.GetArgs(event);
 
+	args.op->Invoke();
+
     Operator* op = ActiveOperator();
     if(op) op->Finish();
-
-	args.op->Invoke();
 
     W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 	g_operators.SendAndWait(event);
