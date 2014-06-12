@@ -3,6 +3,45 @@
 #include "phase_flip.h"
 #include "phase_clip.h"
 
+namespace {
+
+void SimplifyFace(leda::nb::RatPolyMesh& mesh, leda::node v) {
+    if(mesh.outdeg(v) <= 3) return; // nothing to do
+
+    leda::edge e1 = mesh.first_adj_edge(v);
+    leda::edge e2 = mesh.cyclic_adj_succ(e1);
+    leda::edge e3 = mesh.cyclic_adj_succ(e2);
+
+    // count: number of traversed edges since last flip
+    int count = 0;
+    while(count++ < mesh.outdeg(v) && mesh.outdeg(v) > 3) {
+        leda::d3_rat_point p0 = mesh.position_of(v);
+        leda::d3_rat_point p1 = mesh.position_of(leda::target(e1));
+        leda::d3_rat_point p2 = mesh.position_of(leda::target(e2));
+        leda::d3_rat_point p3 = mesh.position_of(leda::target(e3));
+
+        int orient_130 = leda::orientation_xy(p1, p3, p0);
+        int orient_132 = leda::orientation_xy(p1, p3, p2);
+
+        if(orient_130 != orient_132 && orient_132 != 0) {
+            leda::edge r2 = mesh.reversal(e2);
+            mesh.move_edge(e2, mesh.reversal(e1), leda::target(e3), leda::before);
+            mesh.move_edge(r2, mesh.reversal(e3), leda::target(e1));
+            mesh[e2] = mesh[e2] = Color::RED;
+            count = 0;
+        } else {
+            e1 = e2;
+        }
+
+        e2 = e3;
+        e3 = mesh.cyclic_adj_succ(e2);
+    }
+
+    assert(mesh.outdeg(v) <= 3);
+}
+
+} // unnamed namespace
+
 Phase_Clip::Phase_Clip(Globals& g) : _g(g) { }
 
 void Phase_Clip::Enter() {
@@ -31,19 +70,6 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepSearch() {
         _clipV = _L.pop();
 
         if(mesh.outdeg(_clipV) != _rdeg[_clipV]) continue;
-        if(3 != _rdeg[_clipV]) {
-            _g.nb.log->printf("WARNING - unhandled case rdeg[v] != 3!\n");
-
-            leda::edge e;
-            forall_out_edges(e, _clipV) {
-                if(Color::RED == mesh[e]) {
-                    _g.conflicts[e] = true;
-                }
-            }
-
-            continue;
-        }
-
 
         // highlight neighbourhood of vertex v
         leda::nb::set_color(mesh, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
@@ -72,6 +98,8 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepPerformClip() {
         }
     }
 
+    if(3 < mesh.outdeg(_clipV)) SimplifyFace(mesh, _clipV);
+
     mesh.del_node(_clipV);
     _numClips++;
 
@@ -93,16 +121,6 @@ Phase_Clip::StepRet::Enum Phase_Clip::Step() {
 }
 
 GEN::Pointer<OP::ALG::Phase> Phase_Clip::NextPhase() {
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
-    leda::edge e;
-    int numConflicts = 0;
-    forall_edges(e, mesh) {
-        if(_g.conflicts[e] && Color::RED == mesh[e]) {
-            numConflicts++;
-        }
-    }
-    _g.nb.log->printf("num conflicting edges = %d\n", numConflicts);
-
     if(!_numClips) {
         if(Side::FRONT == _g.side) {
             _g.side = Side::BACK;
