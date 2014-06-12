@@ -1,4 +1,5 @@
 #include <QVBoxLayout>
+#include <QSpacerItem>
 #include <QLabel>
 #include "simple_panel.h"
 
@@ -42,6 +43,19 @@ QPushButton* SimplePanel::AddPushButton(const QString& str) {
     QPushButton* button = new QPushButton(str);
     _grid->addWidget(button, r, 0, 1, 2);
     return button;
+}
+
+QCheckBox* SimplePanel::AddCheckBox(const QString& str) {
+    int r = _grid->rowCount();
+    QCheckBox* checkBox = new QCheckBox(str);
+    _grid->addWidget(checkBox, r, 0, 1, 2);
+    return checkBox;
+}
+
+void SimplePanel::AddVerticalSpace(int space) {
+    QSpacerItem* spacer = new QSpacerItem(0, space);
+    int r = _grid->rowCount();
+    _grid->addItem(spacer, r, 0, 1, 2);
 }
 
 } // namespace UI

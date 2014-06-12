@@ -4,6 +4,7 @@
 #include <QComboBox>
 #include <QSpinBox>
 #include <QPushButton>
+#include <QCheckBox>
 #include <QWidget>
 
 #include <Nubuck\operators\operator.h>
@@ -20,6 +21,9 @@ public:
     QComboBox*      AddComboBox(const QString& str, const std::vector<QString>& items);
     QSpinBox*   	AddSpinBox(const QString& str, int min, int max);
     QPushButton*    AddPushButton(const QString& str);
+    QCheckBox*      AddCheckBox(const QString& str);
+
+    void            AddVerticalSpace(int space);
 };
 
 } // namespace UI
