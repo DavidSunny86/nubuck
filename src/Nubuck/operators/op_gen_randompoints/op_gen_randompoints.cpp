@@ -6,12 +6,21 @@ namespace GEN {
 
 // RandomPointsPanel ---
 
-void RandomPointsPanel::OnArgsChanged(int) {
+void RandomPointsPanel::_OnArgsChanged() {
     EV::Params_OP_RandomPoints_Update args;
     args.domain = _cbDomain->currentIndex();
     args.size   = _sbSize->value();
     args.radius = _sbRadius->value();
+    args.save   = _cbSave->isChecked();
     g_operators.InvokeAction(EV::def_OP_RandomPoints_Update.Create(args));
+}
+
+void RandomPointsPanel::OnArgsChanged(int) {
+    _OnArgsChanged();
+}
+
+void RandomPointsPanel::OnArgsChanged(bool) {
+    _OnArgsChanged();
 }
 
 RandomPointsPanel::RandomPointsPanel(QWidget* parent) : SimplePanel(parent) {
@@ -38,6 +47,12 @@ RandomPointsPanel::RandomPointsPanel(QWidget* parent) : SimplePanel(parent) {
     _sbSize = AddSpinBox("size", 1, 10000);
     _sbSize->setValue(size);
     connect(_sbSize, SIGNAL(valueChanged(int)), this, SLOT(OnArgsChanged(int)));
+
+    AddVerticalSpace(20);
+
+    _cbSave = AddCheckBox("save as last_cloud.geom");
+    _cbSave->setChecked(true);
+    connect(_cbSave, SIGNAL(toggled(bool)), this, SLOT(OnArgsChanged(bool)));
 }
 
 // --- RandomPointsPanel
@@ -161,13 +176,15 @@ void RandomPoints::Event_Update(const EV::Event& event) {
 
     Domain::Enum domain = Domain::Enum(args.domain);
 
-    if(_lastDomain != args.domain || _lastRadius != args.radius)
+    if(_lastDomain != args.domain || _lastRadius != args.radius || _lastSize != args.size) {
         UpdateHull(domain, args.radius);
-    UpdateCloud(Domain::Enum(args.domain), args.size, args.radius);
+        UpdateCloud(Domain::Enum(args.domain), args.size, args.radius);
+    }
 
     _lastDomain = domain;
     _lastSize   = args.size;
     _lastRadius = args.radius;
+    _lastSave   = args.save;
 }
 
 RandomPoints::RandomPoints()
@@ -176,6 +193,7 @@ RandomPoints::RandomPoints()
     , _lastDomain(Domain::Enum(DEFAULT_DOMAIN))
     , _lastSize(DEFAULT_SIZE)
     , _lastRadius(DEFAULT_RADIUS)
+    , _lastSave(DEFAULT_SAVE)
 {
     AddEventHandler(EV::def_OP_RandomPoints_Update, this, &RandomPoints::Event_Update);
 
@@ -224,6 +242,10 @@ bool RandomPoints::Invoke() {
 
 void RandomPoints::Finish() {
     _hull->Destroy();
+
+    if(_lastSave) {
+        W::SaveGeometryToFile("last_cloud.geom", _cloud);
+    }
 }
 
 } // namespace GEN

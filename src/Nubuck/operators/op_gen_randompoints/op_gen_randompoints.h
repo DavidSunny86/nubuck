@@ -13,9 +13,10 @@
 #include <LEDA\geo\d3_hull.h>
 
 BEGIN_EVENT_DEF(OP_RandomPoints_Update)
-    int domain;
-    int size;
-    int radius;
+    int     domain;
+    int     size;
+    int     radius;
+    bool    save;
 END_EVENT_DEF
 
 namespace OP {
@@ -27,8 +28,12 @@ private:
     QComboBox*  _cbDomain;
     QSpinBox*   _sbSize;
     QSpinBox*   _sbRadius;
+    QCheckBox*  _cbSave;
+
+    void _OnArgsChanged();
 public slots:
     void OnArgsChanged(int);
+    void OnArgsChanged(bool);
 public:
     RandomPointsPanel(QWidget* parent = NULL);
 };
@@ -59,6 +64,7 @@ private:
     Domain::Enum    _lastDomain;
     int             _lastSize;
     int             _lastRadius;
+    bool            _lastSave;
 
     void UpdateHull(Domain::Enum domain, int radius);
     void UpdateCloud(Domain::Enum domain, int size, int radius);
@@ -68,7 +74,8 @@ public:
     enum {
         DEFAULT_DOMAIN  = Domain::IN_BALL,
         DEFAULT_SIZE    = 5,
-        DEFAULT_RADIUS  = 2
+        DEFAULT_RADIUS  = 2,
+        DEFAULT_SAVE    = 1
     };
 
     RandomPoints();
