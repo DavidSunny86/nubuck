@@ -18,6 +18,8 @@ struct IdlePhase : Phase {
     StepRet::Enum Step() override {
 		return StepRet::DONE;
 	}
+
+    bool IsWall() const { return true; }
 };
 
 void StandardAlgorithmPanel::OnStep() {
@@ -28,16 +30,26 @@ void StandardAlgorithmPanel::OnNext() {
     OP::g_operators.InvokeAction(EV::def_ALG_Next.Create(EV::Params_ALG_Next()));
 }
 
+void StandardAlgorithmPanel::OnRun() {
+    OP::g_operators.InvokeAction(EV::def_ALG_Run.Create(EV::Params_ALG_Run()));
+}
+
 StandardAlgorithmPanel::StandardAlgorithmPanel(QWidget* parent) : OperatorPanel(parent) {
     QPushButton* btnStep = new QPushButton("Step");
     connect(btnStep, SIGNAL(clicked()), this, SLOT(OnStep()));
 
     QPushButton* btnNext = new QPushButton("Next");
     connect(btnNext, SIGNAL(clicked()), this, SLOT(OnNext()));
-    
+
+    QPushButton* btnRun = new QPushButton("Run");
+    connect(btnRun, SIGNAL(clicked()), this, SLOT(OnRun()));
+
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(btnStep);
     layout->addWidget(btnNext);
+    layout->addSpacing(20);
+    layout->addWidget(btnRun);
+    layout->addSpacing(20);
     setLayout(layout);
 }
 
@@ -49,7 +61,7 @@ GEN::Pointer<Phase> Phase::NextPhase() {
 	return GEN::MakePtr(new IdlePhase());
 }
 
-bool Phase::IsWall() const { return true; }
+bool Phase::IsWall() const { return false; }
 
 void StandardAlgorithm::SetPhase(const GEN::Pointer<Phase>& phase) {
 	if(_phase.IsValid()) {
@@ -60,23 +72,28 @@ void StandardAlgorithm::SetPhase(const GEN::Pointer<Phase>& phase) {
 }
 
 void StandardAlgorithm::Event_Step(const EV::Event& event) {
-	if(Phase::StepRet::DONE == _phase->Step()) 
+	if(Phase::StepRet::DONE == _phase->Step())
 		SetPhase(_phase->NextPhase());
 }
 
 void StandardAlgorithm::Event_Next(const EV::Event& event) {
+    while(Phase::StepRet::DONE != _phase->Step());
+    SetPhase(_phase->NextPhase());
+}
+
+void StandardAlgorithm::Event_Run(const EV::Event& event) {
     bool done = false;
-    while(!done)
-    {
+    while(!done) {
         while(Phase::StepRet::DONE != _phase->Step());
-        done = _phase->IsWall();
         SetPhase(_phase->NextPhase());
+        done = _phase->IsWall();
     }
 }
 
-StandardAlgorithm::StandardAlgorithm() { 
+StandardAlgorithm::StandardAlgorithm() {
 	AddEventHandler(EV::def_ALG_Step, this, &StandardAlgorithm::Event_Step);
     AddEventHandler(EV::def_ALG_Next, this, &StandardAlgorithm::Event_Next);
+    AddEventHandler(EV::def_ALG_Run, this, &StandardAlgorithm::Event_Run);
 }
 
 void StandardAlgorithm::Register(const Nubuck& nb, Invoker& invoker) {
