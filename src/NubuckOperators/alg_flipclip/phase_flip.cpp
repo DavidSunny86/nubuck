@@ -114,14 +114,7 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepPerformFlip() {
     mesh.move_edge(_fp.e, _fp.e2, leda::source(_fp.e4));
     mesh.move_edge(_fp.r, _fp.e4, leda::source(_fp.e2));
 
-    if( (0 == _fp.orient_130 && Color::BLUE == mesh[_fp.e1]) ||
-        (0 == _fp.orient_132 && Color::BLUE == mesh[_fp.e3]))
-    {
-        // quadliteral is part of hull
-        mesh[_fp.e] = mesh[_fp.r] = Color::BLUE;
-    } else {
-        mesh[_fp.e] = mesh[_fp.r] = Color::BLACK;
-    }
+    mesh[_fp.e] = mesh[_fp.r] = Color::BLACK;
 
     _numFlips++;
 
