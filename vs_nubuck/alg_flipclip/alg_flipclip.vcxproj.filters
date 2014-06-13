@@ -41,6 +41,7 @@
     </ClCompile>
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_strip.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_stitch.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_simplify.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_init.h" />
@@ -49,6 +50,7 @@
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_clip.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_strip.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_stitch.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_simplify.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\NubuckOperators\alg_flipclip\flipclip.h" />
