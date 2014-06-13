@@ -145,11 +145,13 @@ Phase_Init::StepRet::Enum Phase_Init::Step() {
     if(Side::FRONT == _g.side) {
         leda::list<leda::node>& L = _g.L[Side::FRONT];
         L.sort(CompareVertexPositionsDescending(mesh));
+        _g.stitchVerts[Side::FRONT] = L.head();
         _g.hullEdges[Side::FRONT] = TriangulateXY(mesh, L, +1);
     } else {
         leda::list<leda::node>& L = _g.L[Side::BACK];
         L.sort(CompareVertexPositionsAscending(mesh));
         _g.hullEdges[Side::BACK] = TriangulateXY(mesh, L, -1);
+        _g.stitchVerts[Side::BACK] = leda::source(_g.hullEdges[Side::BACK]);
     }
 
     mesh.compute_faces();

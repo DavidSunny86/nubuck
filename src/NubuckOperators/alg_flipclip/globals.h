@@ -24,6 +24,7 @@ struct Globals {
     Side::Enum              side;
     IGeometry*              geom[2];
     leda::edge              hullEdges[2];
+    leda::node              stitchVerts[2];
 };
 
 void ApplyEdgeColors(leda::nb::RatPolyMesh& mesh);

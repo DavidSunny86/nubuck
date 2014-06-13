@@ -2,6 +2,7 @@
 #include "phase_init.h"
 #include "phase_flip.h"
 #include "phase_clip.h"
+#include "phase_stitch.h"
 #include "phase_strip.h"
 
 namespace {
@@ -128,7 +129,7 @@ GEN::Pointer<OP::ALG::Phase> Phase_Strip::NextPhase() {
             _g.side = Side::BACK;
             return GEN::MakePtr(new Phase_Init(_g));
         } else {
-            return OP::ALG::Phase::NextPhase();
+            return GEN::MakePtr(new Phase_Stitch(_g));
         }
     }
 }
