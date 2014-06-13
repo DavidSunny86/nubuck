@@ -1,6 +1,7 @@
 #include <Nubuck\polymesh.h>
 #include "phase_init.h"
 #include "phase_flip.h"
+#include "phase_strip.h"
 #include "phase_clip.h"
 
 namespace {
@@ -122,12 +123,7 @@ Phase_Clip::StepRet::Enum Phase_Clip::Step() {
 
 GEN::Pointer<OP::ALG::Phase> Phase_Clip::NextPhase() {
     if(!_numClips) {
-        if(Side::FRONT == _g.side) {
-            _g.side = Side::BACK;
-            return GEN::MakePtr(new Phase_Init(_g));
-        } else {
-            return OP::ALG::Phase::NextPhase();
-        }
+        return GEN::MakePtr(new Phase_Strip(_g));
     } else {
         return GEN::MakePtr(new Phase_Flip(_g));
     }

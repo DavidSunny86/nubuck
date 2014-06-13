@@ -39,12 +39,14 @@
     <ClCompile Include="GeneratedFiles\Release\moc_flipclip.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_strip.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_init.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\globals.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_flip.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_clip.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_strip.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\NubuckOperators\alg_flipclip\flipclip.h" />

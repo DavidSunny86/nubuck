@@ -17,6 +17,7 @@
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_clip.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_flip.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_init.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_strip.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_flipclip.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -25,6 +26,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_strip.h" />
     <CustomBuild Include="..\..\src\NubuckOperators\alg_flipclip\flipclip.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing flipclip.h...</Message>
