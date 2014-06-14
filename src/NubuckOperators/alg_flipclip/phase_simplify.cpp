@@ -110,6 +110,11 @@ Phase_Simplify::StepRet::Enum Phase_Simplify::Step() {
     _g.nb.log->printf(isConvex ? "true" : "false");
     _g.nb.log->printf("\n");
 
+    _g.nb.log->printf("convex hull:\n");
+    _g.nb.log->printf("... |V| = %d\n", mesh.number_of_nodes());
+    _g.nb.log->printf("... |E| = %d\n", mesh.number_of_edges());
+    _g.nb.log->printf("... |F| = %d\n", mesh.number_of_faces());
+
     return StepRet::DONE;
 }
 

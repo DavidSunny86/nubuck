@@ -46,6 +46,11 @@ bool ConvexHull::Invoke() {
     cloud->Destroy();
 	_nb.world->GetSelection()->Set(chull);
 
+    _nb.log->printf("convex hull:\n");
+    _nb.log->printf("... |V| = %d\n", chullMesh.number_of_nodes());
+    _nb.log->printf("... |E| = %d\n", chullMesh.number_of_edges());
+    _nb.log->printf("... |F| = %d\n", chullMesh.number_of_faces());
+
     return true;
 }
 
