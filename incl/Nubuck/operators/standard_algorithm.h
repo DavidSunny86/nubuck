@@ -24,8 +24,20 @@ public:
     StandardAlgorithmPanel(QWidget* parent = NULL);
 };
 
-struct NUBUCK_API Phase {
+class NUBUCK_API Phase {
+public:
+    struct RunMode { enum Enum { STEP = 0, NEXT, RUN }; };
+
+    struct RunConf {
+        RunMode::Enum mode;
+    };
+private:
+    const RunConf* _runConf;
+public:
 	virtual ~Phase() { }
+
+    void            SetRunConf(const RunConf* runConf) { _runConf = runConf; }
+    const RunConf&  GetRunConf() const { return *_runConf; }
 
     virtual void Enter() { }
 
@@ -41,6 +53,7 @@ class NUBUCK_API StandardAlgorithm : public Operator {
 private:
     Nubuck              _nb;
     GEN::Pointer<Phase> _phase;
+    Phase::RunConf      _runConf;
 
     void SetPhase(const GEN::Pointer<Phase>& phase);
 

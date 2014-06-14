@@ -68,20 +68,24 @@ void StandardAlgorithm::SetPhase(const GEN::Pointer<Phase>& phase) {
     }
     _phase = phase;
 	COM_assert(_phase.IsValid());
+    _phase->SetRunConf(&_runConf);
     _phase->Enter();
 }
 
 void StandardAlgorithm::Event_Step(const EV::Event& event) {
+    _runConf.mode = Phase::RunMode::STEP;
 	if(Phase::StepRet::DONE == _phase->Step())
 		SetPhase(_phase->NextPhase());
 }
 
 void StandardAlgorithm::Event_Next(const EV::Event& event) {
+    _runConf.mode = Phase::RunMode::NEXT;
     while(Phase::StepRet::DONE != _phase->Step());
     SetPhase(_phase->NextPhase());
 }
 
 void StandardAlgorithm::Event_Run(const EV::Event& event) {
+    _runConf.mode = Phase::RunMode::RUN;
     bool done = false;
     while(!done) {
         while(Phase::StepRet::DONE != _phase->Step());
