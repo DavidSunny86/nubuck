@@ -43,7 +43,10 @@ void SimplifyFace(leda::nb::RatPolyMesh& mesh, leda::node v) {
 
 } // unnamed namespace
 
-Phase_Clip::Phase_Clip(Globals& g) : _g(g) { }
+Phase_Clip::Phase_Clip(Globals& g, bool forceFlips)
+    : _g(g)
+    , _forceFlips(forceFlips)
+{ }
 
 void Phase_Clip::Enter() {
     _g.nb.log->printf("entering phase 'clip'\n");
@@ -136,9 +139,9 @@ Phase_Clip::StepRet::Enum Phase_Clip::Step() {
 }
 
 GEN::Pointer<OP::ALG::Phase> Phase_Clip::NextPhase() {
-    if(!_numClips) {
-        return GEN::MakePtr(new Phase_Strip(_g));
-    } else {
+    if(_forceFlips || _numClips) {
         return GEN::MakePtr(new Phase_Flip(_g));
+    } else {
+        return GEN::MakePtr(new Phase_Strip(_g));
     }
 }

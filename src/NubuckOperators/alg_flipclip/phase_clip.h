@@ -8,6 +8,7 @@ private:
     Globals& _g;
 
     unsigned _numClips;
+    bool _forceFlips;
 
     leda::node_list         _L;
     leda::node_array<int>   _rdeg;
@@ -25,7 +26,7 @@ private:
     StepRet::Enum StepSearch();
     StepRet::Enum StepPerformClip();
 public:
-    explicit Phase_Clip(Globals& g);
+    explicit Phase_Clip(Globals& g, bool forceFlips = false);
 
     void Enter() override;
     StepRet::Enum Step() override;

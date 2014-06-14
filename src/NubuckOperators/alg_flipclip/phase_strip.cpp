@@ -123,7 +123,7 @@ Phase_Strip::StepRet::Enum Phase_Strip::Step() {
 
 GEN::Pointer<OP::ALG::Phase> Phase_Strip::NextPhase() {
     if(_needsClipping) {
-        return GEN::MakePtr(new Phase_Clip(_g));
+        return GEN::MakePtr(new Phase_Clip(_g, true));
     } else {
         if(Side::FRONT == _g.side) {
             _g.side = Side::BACK;
