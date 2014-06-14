@@ -72,16 +72,25 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepSearch() {
 
         if(mesh.outdeg(_clipV) != _rdeg[_clipV]) continue;
 
-        // highlight neighbourhood of vertex v
-        leda::nb::set_color(mesh, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
-        leda::edge e;
-        forall_out_edges(e, _clipV) {
-            mesh.set_color(mesh.face_of(e), R::Color::Red);
+        if(RunMode::STEP == GetRunConf().mode) {
+            // highlight neighbourhood of vertex v
+            leda::nb::set_color(mesh, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
+            leda::edge e;
+            forall_out_edges(e, _clipV) {
+                mesh.set_color(mesh.face_of(e), R::Color::Red);
+            }
+            mesh.set_color(_clipV, R::Color::Yellow);
         }
-        mesh.set_color(_clipV, R::Color::Yellow);
 
         _stepMode = StepMode::PERFORM_CLIP;
         return StepRet::CONTINUE;
+    }
+
+    if(RunMode::NEXT == GetRunConf().mode) {
+        mesh.compute_faces();
+        if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
+        if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
+        ApplyEdgeColors(mesh);
     }
 
     _g.nb.log->printf("number of clips: %d\n", _numClips);
@@ -104,10 +113,12 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepPerformClip() {
     mesh.del_node(_clipV);
     _numClips++;
 
-    mesh.compute_faces();
-    if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
-    if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
-    ApplyEdgeColors(mesh);
+    if(RunMode::STEP == GetRunConf().mode) {
+        mesh.compute_faces();
+        if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
+        if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
+        ApplyEdgeColors(mesh);
+    }
 
     _stepMode = StepMode::SEARCH;
     return StepRet::CONTINUE;

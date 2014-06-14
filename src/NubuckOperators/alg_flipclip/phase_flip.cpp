@@ -72,23 +72,25 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
                 _S.push(_fp.e3);
                 _S.push(_fp.e4);
 
-                ApplyEdgeColors(mesh);
-                leda::nb::set_color(mesh, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
+                if(RunMode::STEP == GetRunConf().mode) {
+                    ApplyEdgeColors(mesh);
+                    leda::nb::set_color(mesh, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
 
-                mesh.set_color(leda::source(_fp.e1), R::Color::Black);
-                mesh.set_color(leda::target(_fp.e1), R::Color::Black);
-                mesh.set_color(leda::source(_fp.e3), R::Color::Black);
-                mesh.set_color(leda::target(_fp.e3), R::Color::Black);
+                    mesh.set_color(leda::source(_fp.e1), R::Color::Black);
+                    mesh.set_color(leda::target(_fp.e1), R::Color::Black);
+                    mesh.set_color(leda::source(_fp.e3), R::Color::Black);
+                    mesh.set_color(leda::target(_fp.e3), R::Color::Black);
 
-                mesh.set_color(_fp.e , R::Color::Black);
-                mesh.set_color(_fp.r , R::Color::Black);
-                mesh.set_color(_fp.e1, R::Color::Black);
-                mesh.set_color(_fp.e2, R::Color::Black);
-                mesh.set_color(_fp.e3, R::Color::Black);
-                mesh.set_color(_fp.e4, R::Color::Black);
+                    mesh.set_color(_fp.e , R::Color::Black);
+                    mesh.set_color(_fp.r , R::Color::Black);
+                    mesh.set_color(_fp.e1, R::Color::Black);
+                    mesh.set_color(_fp.e2, R::Color::Black);
+                    mesh.set_color(_fp.e3, R::Color::Black);
+                    mesh.set_color(_fp.e4, R::Color::Black);
 
-                mesh.set_color(mesh.face_of(_fp.e), R::Color::Red);
-                mesh.set_color(mesh.face_of(_fp.r), R::Color::Red);
+                    mesh.set_color(mesh.face_of(_fp.e), R::Color::Red);
+                    mesh.set_color(mesh.face_of(_fp.r), R::Color::Red);
+                }
 
                 _stepMode = StepMode::PERFORM_FLIP;
                 return StepRet::CONTINUE;
@@ -98,8 +100,15 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
     }
 
     // at this point S is empty
-    ApplyEdgeColors(mesh);
-    leda::nb::set_color(mesh, R::Color::White);
+    if(RunMode::STEP == GetRunConf().mode) {
+        ApplyEdgeColors(mesh);
+        leda::nb::set_color(mesh, R::Color::White);
+    } else if(RunMode::NEXT == GetRunConf().mode) {
+        mesh.compute_faces();
+        if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
+        if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
+        ApplyEdgeColors(mesh);
+    }
 
     _g.nb.log->printf("number of flips: %d\n", _numFlips);
     return StepRet::DONE;
@@ -118,13 +127,15 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepPerformFlip() {
 
     _numFlips++;
 
-    mesh.compute_faces();
-    if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
-    if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
-    leda::nb::set_color(mesh, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
+    if(RunMode::STEP == GetRunConf().mode) {
+        mesh.compute_faces();
+        if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
+        if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
+        leda::nb::set_color(mesh, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
 
-    mesh.set_color(mesh.face_of(_fp.e), R::Color::Blue);
-    mesh.set_color(mesh.face_of(_fp.r), R::Color::Blue);
+        mesh.set_color(mesh.face_of(_fp.e), R::Color::Blue);
+        mesh.set_color(mesh.face_of(_fp.r), R::Color::Blue);
+    }
 
     _stepMode = StepMode::SEARCH;
 
