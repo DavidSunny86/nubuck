@@ -23,7 +23,42 @@ bool IsCollinear(leda::nb::RatPolyMesh& mesh, leda::edge e) {
     return 0 == leda::orientation(p0, p1, p2, p3);
 }
 
-} // unnamed namespace
+// these nodes somehow mess up rendering
+void DeleteInnerNodes(leda::nb::RatPolyMesh& G) {
+    leda::node n;
+    forall_nodes(n, G) {
+        if(2 == G.outdeg(n)) {
+            const leda::edge e0 = G.first_adj_edge(n);
+            const leda::edge e1 = G.cyclic_adj_succ(e0);
+
+            const leda::node p0 = G.target(e0);
+            const leda::node p1 = G.target(e1);
+
+            if(leda::collinear(G[p0], G[n], G[p1])) {
+                const leda::edge r0 = G.reversal(e0);
+                const leda::edge r1 = G.reversal(e1);
+
+                G.set_reversal(
+                    G.new_edge(r0, p1),
+                    G.new_edge(r1, p0));
+
+                G.del_edge(e0);
+                G.del_edge(e1);
+                G.del_edge(r0);
+                G.del_edge(r1);
+            }
+        }
+    }
+}
+
+void DeleteLooseNodes(leda::nb::RatPolyMesh& G) {
+    leda::node n;
+    forall_nodes(n, G) {
+        if(!G.outdeg(n)) G.del_node(n);
+    }
+}
+
+} // unamed namespace
 
 Phase_Simplify::Phase_Simplify(Globals& g) : _g(g) { }
 
@@ -60,18 +95,14 @@ Phase_Simplify::StepRet::Enum Phase_Simplify::Step() {
     forall(e, _L) {
         r = mesh.reversal(e);
 
-        v = leda::source(e);
-        w = leda::source(r);
-
-        _deg[v]--;
-        _deg[w]--;
-
         mesh.del_edge(r);
         mesh.del_edge(e);
 
-        if(0 >= _deg[v]) mesh.del_node(v);
-        if(0 >= _deg[w]) mesh.del_node(w);
     }
+
+    DeleteInnerNodes(mesh);
+    DeleteLooseNodes(mesh);
+
     mesh.compute_faces();
 
     bool isConvex = leda::CHECK_HULL(mesh);
