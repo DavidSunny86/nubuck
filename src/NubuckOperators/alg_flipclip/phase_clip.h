@@ -11,6 +11,7 @@ private:
 
     leda::node_list         _L;
     leda::node_array<int>   _rdeg;
+    leda::node_array<int>   _cdeg;
     leda::node              _clipV;
 
     struct StepMode {

@@ -52,11 +52,14 @@ void Phase_Clip::Enter() {
 
     _L.clear();
     _rdeg.init(mesh, 0);
+    _cdeg.init(mesh, 0);
     leda::edge e;
     forall_edges(e, mesh) {
+        leda::node v = leda::source(e);
         if(Color::RED == mesh[e]) {
-            leda::node v = leda::source(e);
             if(3 == ++_rdeg[v]) _L.push(v);
+        } else {
+            _cdeg[v]++;
         }
     }
 
@@ -70,7 +73,7 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepSearch() {
     while(!_L.empty()) {
         _clipV = _L.pop();
 
-        if(mesh.outdeg(_clipV) != _rdeg[_clipV]) continue;
+        if(_cdeg[_clipV]) continue;
 
         if(RunMode::STEP == GetRunConf().mode) {
             // highlight neighbourhood of vertex v
