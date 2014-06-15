@@ -10,14 +10,25 @@ void FlipClipPanel::OnDistanceChanged(int value) {
     OP::SendToOperator(EV::def_FlipClip_DistanceChanged.Create(args));
 }
 
+void FlipClipPanel::OnHaltBeforeStitchingToggled(bool isChecked) {
+    EV::Params_FlipClip_RunConfChanged args;
+    args.haltBeforeStitching = isChecked;
+    OP::SendToOperator(EV::def_FlipClip_RunConfChanged.Create(args));
+}
+
 FlipClipPanel::FlipClipPanel() {
     _dist = new QSlider(Qt::Horizontal);
     _dist->setMaximum(MAX_DISTANCE);
     connect(_dist, SIGNAL(valueChanged(int)), this, SLOT(OnDistanceChanged(int)));
 
+    _haltBeforeStitching = new QCheckBox("halt before stitching");
+    _haltBeforeStitching->setChecked(false);
+    connect(_haltBeforeStitching, SIGNAL(toggled(bool)), this, SLOT(OnHaltBeforeStitchingToggled(bool)));
+
     QGridLayout* gridLayout = new QGridLayout;
     gridLayout->addWidget(new QLabel("hull distance:"), 0, 0);
     gridLayout->addWidget(_dist, 0, 1);
+    gridLayout->addWidget(_haltBeforeStitching, 1, 0, 1, 2);
 
     QWidget* dummy = new QWidget;
     dummy->setLayout(gridLayout);
@@ -27,6 +38,7 @@ FlipClipPanel::FlipClipPanel() {
 
 void FlipClipPanel::Invoke() {
     _dist->setValue(0);
+    _haltBeforeStitching->setChecked(false);
 }
 
 void FlipClip::Event_DistanceChanged(const EV::Event& event) {
@@ -36,6 +48,11 @@ void FlipClip::Event_DistanceChanged(const EV::Event& event) {
 
     _g.geom[Side::FRONT]->SetPosition(M::Vector3(0.0f, 0.0f, hdist));
     _g.geom[Side::BACK]->SetPosition(M::Vector3(0.0f, 0.0f, -hdist));
+}
+
+void FlipClip::Event_RunConfChanged(const EV::Event& event) {
+    const EV::Params_FlipClip_RunConfChanged& args = EV::def_FlipClip_RunConfChanged.GetArgs(event);
+    _g.haltBeforeStitching = args.haltBeforeStitching;
 }
 
 const char* FlipClip::GetName() const { return "Flip & Clip"; }
@@ -79,9 +96,12 @@ OP::ALG::Phase* FlipClip::Init(const Nubuck& nb) {
 
     _g.hullEdges[Side::FRONT] = _g.hullEdges[Side::BACK] = NULL;
 
+    _g.haltBeforeStitching = false;
+
     return new Phase_Init(_g);
 }
 
 FlipClip::FlipClip() {
     AddEventHandler(EV::def_FlipClip_DistanceChanged, this, &FlipClip::Event_DistanceChanged);
+    AddEventHandler(EV::def_FlipClip_RunConfChanged, this, &FlipClip::Event_RunConfChanged);
 }

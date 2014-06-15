@@ -25,6 +25,8 @@ struct Globals {
     IGeometry*              geom[2];
     leda::edge              hullEdges[2];
     leda::node              stitchVerts[2];
+
+    bool                    haltBeforeStitching;
 };
 
 void ApplyEdgeColors(leda::nb::RatPolyMesh& mesh);

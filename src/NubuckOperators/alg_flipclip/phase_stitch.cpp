@@ -69,6 +69,16 @@ Phase_Stitch::Phase_Stitch(Globals& g) : _g(g) { }
 
 void Phase_Stitch::Enter() {
     _g.nb.log->printf("entering phase 'stitch'\n");
+
+    if(RunMode::RUN == GetRunConf().mode && _g.haltBeforeStitching) {
+        // previous phase might have not computed faces in run mode
+        for(int side = 0; side < 2; ++side) {
+            leda::nb::RatPolyMesh& mesh = _g.geom[side]->GetRatPolyMesh();
+            mesh.compute_faces();
+            ApplyEdgeColors(mesh);
+            if(_g.hullEdges[side]) mesh.set_visible(mesh.face_of(_g.hullEdges[side]), false);
+        }
+    }
 }
 
 Phase_Stitch::StepRet::Enum Phase_Stitch::Step() {
@@ -125,4 +135,8 @@ Phase_Stitch::StepRet::Enum Phase_Stitch::Step() {
 
 GEN::Pointer<OP::ALG::Phase> Phase_Stitch::NextPhase() {
     return GEN::MakePtr(new Phase_Simplify(_g));
+}
+
+bool Phase_Stitch::IsWall() const {
+    return _g.haltBeforeStitching;
 }
