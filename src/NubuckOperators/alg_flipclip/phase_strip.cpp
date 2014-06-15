@@ -29,7 +29,7 @@ void StripTetrahedrons(leda::nb::RatPolyMesh& mesh, leda::node v) {
             leda::edge r2 = mesh.reversal(e2);
             mesh.move_edge(e2, mesh.reversal(e1), leda::target(e3), leda::before);
             mesh.move_edge(r2, mesh.reversal(e3), leda::target(e1));
-            mesh[e2] = mesh[e2] = Color::RED;
+            mesh[e2] = mesh[r2] = Color::RED;
             count = 0;
         } else {
             e1 = e2;
