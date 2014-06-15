@@ -48,9 +48,15 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
         const point_t p2 = mesh.position_of(v2);
         const point_t p3 = mesh.position_of(v3);
 
-        if(0 >= leda::orientation(p0, p1, p2, p3)) {
+        const int orient = leda::orientation(p0, p1, p2, p3);
+
+        if(0 >= orient) {
             // edge is already convex
             SetColorU(mesh, _fp.e, Color::BLACK);
+
+            if(0 == orient) {
+                MarkPlanar(mesh, _fp.e);
+            }
         } else {
             SetColorU(mesh, _fp.e, Color::RED);
 

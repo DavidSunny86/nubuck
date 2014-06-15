@@ -77,7 +77,14 @@ void Phase_Simplify::Enter() {
     _L.clear();
     leda::edge e;
     forall_edges(e, mesh) {
-        if(!_inL[e] && IsCollinear(mesh, e)) {
+        bool isPlanar =
+            (Color::BLACK == GetColor(mesh, e) && IsMarkedPlanar(mesh, e)) ||
+            IsCollinear(mesh, e); // blue edges are unmarked
+
+        if(IsCollinear(mesh, e)) assert(isPlanar);
+
+        if(!_inL[e] && isPlanar) {
+            assert(IsCollinear(mesh, e));
             _L.push(e);
             _inL[e] = _inL[mesh.reversal(e)] = true;
             mesh.set_color(e, R::Color::Yellow);

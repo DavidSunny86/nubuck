@@ -30,7 +30,37 @@ struct Globals {
     bool                    haltBeforeStitching;
 };
 
-inline void SetColorU(leda::nb::RatPolyMesh& mesh, leda::edge e, int color) { mesh[e] = mesh[mesh.reversal(e)] = color; }
-inline int  GetColor(leda::nb::RatPolyMesh& mesh, leda::edge e) { return mesh[e]; }
+enum {
+    COLOR_MASK      = 3,
+    PLANARITY_FLAG  = 4
+};
+
+inline void SetColorU(leda::nb::RatPolyMesh& mesh, leda::edge e, int color) {
+    assert(0 <= color && color < 3);
+    const leda::edge r = mesh.reversal(e);
+    mesh[e] = mesh[e] & ~COLOR_MASK | color;
+    mesh[r] = mesh[r] & ~COLOR_MASK | color;
+
+    if(Color::RED == color) {
+        // resets planarity flag
+        mesh[e] = mesh[r] = color;
+    }
+}
+
+inline int GetColor(leda::nb::RatPolyMesh& mesh, leda::edge e) {
+    return mesh[e] & COLOR_MASK;
+}
+
+inline void MarkPlanar(leda::nb::RatPolyMesh& mesh, leda::edge e) {
+    mesh[e] |= PLANARITY_FLAG;
+}
+
+inline void ClearPlanarFlag(leda::nb::RatPolyMesh& mesh, leda::edge e) {
+    mesh[e] &= ~PLANARITY_FLAG;
+}
+
+inline bool IsMarkedPlanar(leda::nb::RatPolyMesh& mesh, leda::edge e) {
+    return mesh[e] & PLANARITY_FLAG;
+}
 
 void ApplyEdgeColors(leda::nb::RatPolyMesh& mesh);

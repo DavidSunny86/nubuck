@@ -2,6 +2,25 @@
 #include "phase_simplify.h"
 #include "phase_stitch.h"
 
+bool IsCollinear(leda::nb::RatPolyMesh& mesh, leda::edge e) {
+    leda::edge r = mesh.reversal(e);
+
+    leda::edge e1 = mesh.face_cycle_succ(r);
+    leda::edge e3 = mesh.face_cycle_succ(e);
+
+    const leda::node v0 = leda::source(e1);
+    const leda::node v1 = leda::target(e1);
+    const leda::node v2 = leda::source(e3);
+    const leda::node v3 = leda::target(e3);
+
+    const leda::d3_rat_point p0 = mesh.position_of(v0);
+    const leda::d3_rat_point p1 = mesh.position_of(v1);
+    const leda::d3_rat_point p2 = mesh.position_of(v2);
+    const leda::d3_rat_point p3 = mesh.position_of(v3);
+
+    return 0 == leda::orientation(p0, p1, p2, p3);
+}
+
 inline bool equal_xy(const leda::d3_rat_point& lhp, const leda::d3_rat_point& rhp) {
     return 0 == leda::d3_rat_point::cmp_x(lhp, rhp) && 0 == leda::d3_rat_point::cmp_y(lhp, rhp);
 }
@@ -60,6 +79,10 @@ Phase_Stitch::StepRet::Enum Phase_Stitch::Step() {
             leda::edge e = mesh.new_edge(mesh.reversal(adv0), v1, dir, dir);
             leda::edge r = mesh.new_edge(mesh.cyclic_adj_succ(adv1), v0, dir, dir);
             mesh.set_reversal(e, r);
+
+            if(IsCollinear(mesh, e)) {
+                MarkPlanar(mesh, e);
+            }
 
             adv0 = mesh.face_cycle_pred(adv0);
             adv1 = mesh.face_cycle_succ(adv1);
