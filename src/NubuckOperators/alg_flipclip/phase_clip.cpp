@@ -28,7 +28,7 @@ void SimplifyFace(leda::nb::RatPolyMesh& mesh, leda::node v) {
             leda::edge r2 = mesh.reversal(e2);
             mesh.move_edge(e2, mesh.reversal(e1), leda::target(e3), leda::before);
             mesh.move_edge(r2, mesh.reversal(e3), leda::target(e1));
-            SetColorU(mesh, e2, Color::RED);
+            InvalidateU(mesh, e2);
             count = 0;
         } else {
             e1 = e2;
@@ -110,7 +110,7 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepPerformClip() {
     forall_out_edges(e, _clipV) {
         leda::edge b = mesh.face_cycle_succ(e); // boundary edge
         if(Color::BLACK == GetColor(mesh, b)) {
-            SetColorU(mesh, b, Color::RED);
+            InvalidateU(mesh, b);
         }
     }
 

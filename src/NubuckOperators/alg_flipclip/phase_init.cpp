@@ -56,7 +56,7 @@ leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L,
         leda::edge e0 = mesh.new_edge(last_v, v, 0);
         leda::edge e1 = mesh.new_edge(v, last_v, 0);
         mesh.set_reversal(e0, e1);
-        SetColorU(mesh, e0, Color::RED);
+        InvalidateU(mesh, e0);
 
         last_v = v;
         last_p = mesh.position_of(v);
@@ -90,7 +90,7 @@ leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L,
             leda::edge x = mesh.new_edge(succ, v, 0, leda::after);
             leda::edge y = mesh.new_edge(v, leda::source(succ), 0);
             mesh.set_reversal(x, y);
-            SetColorU(mesh, x, Color::RED);
+            InvalidateU(mesh, x);
             e = succ;
 
             orientXY = leda::orientation_xy(

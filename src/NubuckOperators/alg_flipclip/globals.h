@@ -41,10 +41,11 @@ inline void SetColorU(leda::nb::RatPolyMesh& mesh, leda::edge e, int color) {
     mesh[e] = mesh[e] & ~COLOR_MASK | color;
     mesh[r] = mesh[r] & ~COLOR_MASK | color;
 
-    if(Color::RED == color) {
-        // resets planarity flag
-        mesh[e] = mesh[r] = color;
-    }
+    assert(Color::RED != color); // use InvalidateU for this
+}
+
+inline void InvalidateU(leda::nb::RatPolyMesh& mesh, leda::edge e) {
+    mesh[e] = mesh[mesh.reversal(e)] = Color::RED;
 }
 
 inline int GetColor(leda::nb::RatPolyMesh& mesh, leda::edge e) {

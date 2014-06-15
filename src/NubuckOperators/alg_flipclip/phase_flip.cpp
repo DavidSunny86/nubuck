@@ -58,7 +58,7 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
                 MarkPlanar(mesh, _fp.e);
             }
         } else {
-            SetColorU(mesh, _fp.e, Color::RED);
+            InvalidateU(mesh, _fp.e);
 
             _fp.orient_130 = leda::orientation_xy(p1, p3, p0);
             _fp.orient_132 = leda::orientation_xy(p1, p3, p2);
