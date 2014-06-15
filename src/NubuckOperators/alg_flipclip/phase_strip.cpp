@@ -38,8 +38,6 @@ void StripTetrahedrons(leda::nb::RatPolyMesh& mesh, leda::node v) {
         e2 = e3;
         e3 = mesh.cyclic_adj_succ(e2);
     }
-
-    assert(mesh.outdeg(v) <= 3);
 }
 
 } // unnamed namespace
