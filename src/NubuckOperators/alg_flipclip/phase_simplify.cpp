@@ -105,8 +105,8 @@ Phase_Simplify::StepRet::Enum Phase_Simplify::Step() {
 
     mesh.compute_faces();
 
+    _g.nb.log->printf("CHECK_HULL: ... ");
     bool isConvex = leda::CHECK_HULL(mesh);
-    _g.nb.log->printf("CHECK_HULL: ");
     _g.nb.log->printf(isConvex ? "true" : "false");
     _g.nb.log->printf("\n");
 
