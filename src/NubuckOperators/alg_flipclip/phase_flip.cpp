@@ -15,7 +15,7 @@ void Phase_Flip::Enter() {
     _S.clear();
     leda::edge e;
     forall_edges(e, mesh) {
-        if(Color::RED == mesh[e]) _S.push(e);
+        if(Color::RED == GetColor(mesh, e)) _S.push(e);
     }
 
     _numFlips = 0;
@@ -31,7 +31,7 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
         _fp.e = _S.pop();
         _fp.r = mesh.reversal(_fp.e);
 
-        if(Color::BLUE == mesh[_fp.e]) {
+        if(Color::BLUE == GetColor(mesh, _fp.e)) {
             continue;
         }
 
@@ -50,16 +50,18 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
 
         if(0 >= leda::orientation(p0, p1, p2, p3)) {
             // edge is already convex
-            mesh[_fp.e] = mesh[_fp.r] = Color::BLACK;
+            SetColor(mesh, _fp.e, Color::BLACK);
+            SetColor(mesh, _fp.r, Color::BLACK);
         } else {
-            mesh[_fp.e] = mesh[_fp.r] = Color::RED;
+            SetColor(mesh, _fp.e, Color::RED);
+            SetColor(mesh, _fp.r, Color::RED);
 
             _fp.orient_130 = leda::orientation_xy(p1, p3, p0);
             _fp.orient_132 = leda::orientation_xy(p1, p3, p2);
 
             if( _fp.orient_130 != _fp.orient_132 && // is convex quadliteral
-                (0 != _fp.orient_130 || 4 == mesh.outdeg(v0) || Color::BLUE == mesh[_fp.e1]) &&
-                (0 != _fp.orient_132 || 4 == mesh.outdeg(v2) || Color::BLUE == mesh[_fp.e3]))
+                (0 != _fp.orient_130 || 4 == mesh.outdeg(v0) || Color::BLUE == GetColor(mesh, _fp.e1)) &&
+                (0 != _fp.orient_132 || 4 == mesh.outdeg(v2) || Color::BLUE == GetColor(mesh, _fp.e3)))
             {
                 // NOTE: if quadliteral is not stricly convex then it's either part of the hull
                 // or a perfect diamond.
@@ -123,13 +125,15 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepPerformFlip() {
     mesh.move_edge(_fp.e, _fp.e2, leda::source(_fp.e4));
     mesh.move_edge(_fp.r, _fp.e4, leda::source(_fp.e2));
 
-    if( (0 == _fp.orient_130 && Color::BLUE == mesh[_fp.e1]) ||
-        (0 == _fp.orient_132 && Color::BLUE == mesh[_fp.e3]))
+    if( (0 == _fp.orient_130 && Color::BLUE == GetColor(mesh, _fp.e1)) ||
+        (0 == _fp.orient_132 && Color::BLUE == GetColor(mesh, _fp.e3)))
     {
         // quadliteral is part of hull
-        mesh[_fp.e] = mesh[_fp.r] = Color::BLUE;
+        SetColor(mesh, _fp.e, Color::BLUE);
+        SetColor(mesh, _fp.r, Color::BLUE);
     } else {
-        mesh[_fp.e] = mesh[_fp.r] = Color::BLACK;
+        SetColor(mesh, _fp.e, Color::BLACK);
+        SetColor(mesh, _fp.r, Color::BLACK);
     }
 
     _numFlips++;

@@ -25,11 +25,12 @@ void StripTetrahedrons(leda::nb::RatPolyMesh& mesh, leda::node v) {
         int orient_130 = leda::orientation_xy(p1, p3, p0);
         int orient_132 = leda::orientation_xy(p1, p3, p2);
 
-        if(Color::BLACK == mesh[e2] && orient_130 != orient_132 && orient_132 != 0) {
+        if(Color::BLACK == GetColor(mesh, e2) && orient_130 != orient_132 && orient_132 != 0) {
             leda::edge r2 = mesh.reversal(e2);
             mesh.move_edge(e2, mesh.reversal(e1), leda::target(e3), leda::before);
             mesh.move_edge(r2, mesh.reversal(e3), leda::target(e1));
-            mesh[e2] = mesh[r2] = Color::RED;
+            SetColor(mesh, e2, Color::RED);
+            SetColor(mesh, r2, Color::RED);
             count = 0;
         } else {
             e1 = e2;
@@ -56,8 +57,8 @@ void Phase_Strip::Enter() {
 
         leda::edge e;
         forall_adj_edges(e, v) {
-            if(Color::BLUE == mesh[e]) bdeg++;
-            if(Color::RED == mesh[e]) rdeg++;
+            if(Color::BLUE == GetColor(mesh, e)) bdeg++;
+            if(Color::RED == GetColor(mesh, e)) rdeg++;
         }
 
         if(0 == bdeg && 1 < rdeg) {

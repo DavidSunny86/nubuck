@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Nubuck\polymesh.h>
 #include <Nubuck\nubuck.h>
 
 struct Color {
@@ -28,5 +29,8 @@ struct Globals {
 
     bool                    haltBeforeStitching;
 };
+
+inline void SetColor(leda::nb::RatPolyMesh& mesh, leda::edge e, int color) { mesh[e] = color; }
+inline int  GetColor(leda::nb::RatPolyMesh& mesh, leda::edge e) { return mesh[e]; }
 
 void ApplyEdgeColors(leda::nb::RatPolyMesh& mesh);

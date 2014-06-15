@@ -12,11 +12,11 @@ void ApplyEdgeColors(leda::nb::RatPolyMesh& mesh) {
 
     leda::edge e;
     forall_edges(e, mesh) {
-        // mesh.set_color(e, colors[M::Max(mesh[e], mesh[mesh.reversal(e)])]);
-        assert(mesh[e] == mesh[mesh.reversal(e)]);
-        mesh.set_color(e, colors[mesh[e]]);
-        nodeColors[leda::source(e)] = M::Max(nodeColors[leda::source(e)], mesh[e]);
-        nodeColors[leda::target(e)] = M::Max(nodeColors[leda::target(e)], mesh[e]);
+        // mesh.set_color(e, colors[M::Max(GetColor(mesh, e), GetColor(mesh, mesh.reversal(e)))]);
+        assert(GetColor(mesh, e) == GetColor(mesh, mesh.reversal(e)));
+        mesh.set_color(e, colors[GetColor(mesh, e)]);
+        nodeColors[leda::source(e)] = M::Max(nodeColors[leda::source(e)], GetColor(mesh, e));
+        nodeColors[leda::target(e)] = M::Max(nodeColors[leda::target(e)], GetColor(mesh, e));
     }
 
     leda::node v;
