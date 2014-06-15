@@ -63,7 +63,6 @@ void Phase_Strip::Enter() {
         }
 
         if(0 == bdeg && 1 < rdeg) {
-            assert(3 > rdeg); // clip precedes strip
             _L.push(v);
         }
     }
