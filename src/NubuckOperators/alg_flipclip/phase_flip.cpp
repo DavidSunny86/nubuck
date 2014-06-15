@@ -50,11 +50,9 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
 
         if(0 >= leda::orientation(p0, p1, p2, p3)) {
             // edge is already convex
-            SetColor(mesh, _fp.e, Color::BLACK);
-            SetColor(mesh, _fp.r, Color::BLACK);
+            SetColorU(mesh, _fp.e, Color::BLACK);
         } else {
-            SetColor(mesh, _fp.e, Color::RED);
-            SetColor(mesh, _fp.r, Color::RED);
+            SetColorU(mesh, _fp.e, Color::RED);
 
             _fp.orient_130 = leda::orientation_xy(p1, p3, p0);
             _fp.orient_132 = leda::orientation_xy(p1, p3, p2);
@@ -129,11 +127,9 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepPerformFlip() {
         (0 == _fp.orient_132 && Color::BLUE == GetColor(mesh, _fp.e3)))
     {
         // quadliteral is part of hull
-        SetColor(mesh, _fp.e, Color::BLUE);
-        SetColor(mesh, _fp.r, Color::BLUE);
+        SetColorU(mesh, _fp.e, Color::BLUE);
     } else {
-        SetColor(mesh, _fp.e, Color::BLACK);
-        SetColor(mesh, _fp.r, Color::BLACK);
+        SetColorU(mesh, _fp.e, Color::BLACK);
     }
 
     _numFlips++;

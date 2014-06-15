@@ -55,9 +55,8 @@ leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L,
 
         leda::edge e0 = mesh.new_edge(last_v, v, 0);
         leda::edge e1 = mesh.new_edge(v, last_v, 0);
-        SetColor(mesh, e0, Color::RED);
-        SetColor(mesh, e1, Color::RED);
         mesh.set_reversal(e0, e1);
+        SetColorU(mesh, e0, Color::RED);
 
         last_v = v;
         last_p = mesh.position_of(v);
@@ -90,9 +89,8 @@ leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L,
             leda::edge succ = mesh.face_cycle_succ(e);
             leda::edge x = mesh.new_edge(succ, v, 0, leda::after);
             leda::edge y = mesh.new_edge(v, leda::source(succ), 0);
-            SetColor(mesh, x, Color::RED);
-            SetColor(mesh, y, Color::RED);
             mesh.set_reversal(x, y);
+            SetColorU(mesh, x, Color::RED);
             e = succ;
 
             orientXY = leda::orientation_xy(
@@ -107,9 +105,7 @@ leda::edge TriangulateXY(leda::nb::RatPolyMesh& mesh, leda::list<leda::node>& L,
     leda::edge hull = mesh.last_edge();
     leda::edge e = hull;
     do {
-        leda::edge r = mesh.reversal(e);
-        SetColor(mesh, e, Color::BLUE);
-        SetColor(mesh, r, Color::BLUE);
+        SetColorU(mesh, e, Color::BLUE);
         e = mesh.face_cycle_succ(e);
     } while(hull != e);
 

@@ -30,7 +30,7 @@ struct Globals {
     bool                    haltBeforeStitching;
 };
 
-inline void SetColor(leda::nb::RatPolyMesh& mesh, leda::edge e, int color) { mesh[e] = color; }
+inline void SetColorU(leda::nb::RatPolyMesh& mesh, leda::edge e, int color) { mesh[e] = mesh[mesh.reversal(e)] = color; }
 inline int  GetColor(leda::nb::RatPolyMesh& mesh, leda::edge e) { return mesh[e]; }
 
 void ApplyEdgeColors(leda::nb::RatPolyMesh& mesh);
