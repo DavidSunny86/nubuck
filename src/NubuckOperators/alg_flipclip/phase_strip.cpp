@@ -75,22 +75,31 @@ void Phase_Strip::Enter() {
 }
 
 Phase_Strip::StepRet::Enum Phase_Strip::StepSearch() {
+    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+
     if(_L.empty()) {
+        if(RunMode::NEXT == GetRunConf().mode) {
+            mesh.compute_faces();
+            if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
+            if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
+            ApplyEdgeColors(mesh);
+        }
+
         _g.nb.log->printf("number of strips: %d\n", _numStrips);
         return StepRet::DONE;
     }
 
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
-
     leda::node v = _L.head();
 
-    // highlight neighbourhood of vertex v
-    leda::nb::set_color(mesh, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
-    leda::edge e;
-    forall_out_edges(e, v) {
-        mesh.set_color(mesh.face_of(e), R::Color::Red);
+    if(RunMode::STEP == GetRunConf().mode) {
+        // highlight neighbourhood of vertex v
+        leda::nb::set_color(mesh, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
+        leda::edge e;
+        forall_out_edges(e, v) {
+            mesh.set_color(mesh.face_of(e), R::Color::Red);
+        }
+        mesh.set_color(v, R::Color::Yellow);
     }
-    mesh.set_color(v, R::Color::Yellow);
 
     _stepMode = StepMode::PERFORM_STRIP;
     return StepRet::CONTINUE;
@@ -104,10 +113,12 @@ Phase_Strip::StepRet::Enum Phase_Strip::StepPerformStrip() {
     StripTetrahedrons(mesh, v);
     _numStrips++;
 
-    mesh.compute_faces();
-    if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
-    if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
-    ApplyEdgeColors(mesh);
+    if(RunMode::STEP == GetRunConf().mode) {
+        mesh.compute_faces();
+        if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
+        if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
+        ApplyEdgeColors(mesh);
+    }
 
     _stepMode = StepMode::SEARCH;
     return StepRet::CONTINUE;
