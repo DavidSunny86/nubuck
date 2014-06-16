@@ -166,6 +166,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_LIB -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DLEDA_MULTI_THREAD -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_GUI_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
     </CustomBuild>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_fchull\op_fchull.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_gen_windows\op_gen_windows.h" />
     <ClInclude Include="..\..\src\Nubuck\operators\op_join\op_join.h" />
     <CustomBuild Include="..\..\src\Nubuck\operators\op_loadgeom\op_loadgeom.h">
@@ -479,6 +480,7 @@
     <ClCompile Include="..\..\src\Nubuck\operators\op_delaunay3d\d3_delaunay.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_delaunay3d\op_delaunay3d.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_delete\op_delete.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\operators\op_fchull\op_fchull.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_gen_merge\op_gen_merge.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_gen_randompoints\op_gen_randompoints.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\op_gen_windows\op_gen_windows.cpp" />

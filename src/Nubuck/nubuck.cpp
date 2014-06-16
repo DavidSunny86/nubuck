@@ -26,6 +26,7 @@
 #include <operators\op_loadobj\op_loadobj.h>
 #include <operators\op_loadgeom\op_loadgeom.h>
 #include <operators\op_chull\op_chull.h>
+#include <operators\op_fchull\op_fchull.h>
 #include <operators\op_delaunay3d\op_delaunay3d.h>
 #include <operators\op_translate\op_translate.h>
 #include <operators\op_join\op_join.h>
@@ -124,6 +125,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
 	OP::g_operators.Register(new OP::LoadOBJPanel, new OP::LoadOBJ);
     OP::g_operators.Register(new OP::LoadGeomPanel, new OP::LoadGeom);
 	OP::g_operators.Register(new OP::ConvexHullPanel, new OP::ConvexHull);
+    OP::g_operators.Register(new OP::FlipClipPanel, new OP::FlipClip);
     OP::g_operators.Register(new OP::Delaunay3DPanel, new OP::Delaunay3D);
 	OP::g_operators.Register(new OP::JoinPanel, new OP::Join);
 	OP::g_operators.Register(new OP::DeletePanel, new OP::Delete);

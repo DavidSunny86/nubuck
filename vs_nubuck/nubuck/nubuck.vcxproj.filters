@@ -300,6 +300,9 @@
     <Filter Include="Private\operators\op_savegeom">
       <UniqueIdentifier>{10d06b67-df72-47c6-a8ee-cd1487e2c9cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\operators\op_fchull">
+      <UniqueIdentifier>{c78a4aa7-11fd-4624-bc60-637b207b84b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -742,6 +745,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\polymesh\flipclip.h">
       <Filter>Private\polymesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\operators\op_fchull\op_fchull.h">
+      <Filter>Private\operators\op_fchull</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1236,6 +1242,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\polymesh\flipclip.cpp">
       <Filter>Private\polymesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\op_fchull\op_fchull.cpp">
+      <Filter>Private\operators\op_fchull</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
