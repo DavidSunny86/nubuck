@@ -33,10 +33,11 @@ bool FlipClip::Invoke() {
     assert(cloud);
 
     leda::nb::RatPolyMesh& cloudMesh = cloud->GetRatPolyMesh();
-    leda::list<leda::d3_rat_point> L0, L1;
+    leda::list<leda::d3_rat_point> L0, L1, L2;
     leda::node v;
     forall_nodes(v, cloudMesh) L0.push_back(cloudMesh.position_of(v));
     L1 = L0;
+    L2 = L0;
 
     IGeometry* chull = _nb.world->CreateGeometry();
     chull->SetRenderMode(IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES);
@@ -46,23 +47,26 @@ bool FlipClip::Invoke() {
     SYS::Timer  timer;
     float       secsPassed;
 
+    leda::GRAPH<leda::d3_rat_point, int> H;
+
     timer.Start();
-    leda::CONVEX_HULL(L0, chullMesh);
+    leda::CONVEX_HULL(L0, H);
     secsPassed = timer.Stop();
     _nb.log->printf("... CONVEX_HULL: %fs\n", secsPassed);
 
-    chullMesh.clear();
+    H.clear();
 
     timer.Start();
-    FlipClipHull(L1, chullMesh);
+    FlipClipHull(L1, H);
     secsPassed = timer.Stop();
     _nb.log->printf("... FlipClip: %fs\n", secsPassed);
 
     _nb.log->printf("... CHECK_HULL: ");
-    bool isConvex = leda::CHECK_HULL(chullMesh);
+    bool isConvex = leda::CHECK_HULL(H);
     _nb.log->printf(isConvex ? "true" : "false");
     _nb.log->printf("\n");
 
+    leda::CONVEX_HULL(L2, chullMesh);
     chullMesh.compute_faces();
 
     chull->SetPosition(cloud->GetPosition());
