@@ -13,6 +13,8 @@ struct Color {
     };
 };
 
+typedef leda::node_array<int> cdegs_t[3];
+
 struct Side {
     enum Enum {
         FRONT = 0,
@@ -54,6 +56,32 @@ inline void ClearPlanarFlag(mesh_t& mesh, leda::edge e) {
 
 inline bool IsMarkedPlanar(mesh_t& mesh, leda::edge e) {
     return mesh[e] & PLANARITY_FLAG;
+}
+
+int ComputeCDeg(mesh_t& mesh, leda::node v, int color) {
+    int cdeg = 0;
+
+    leda::edge e;
+    forall_out_edges(e, v) {
+        if(color == GetColor(mesh, e)) cdeg++;
+    }
+
+    return cdeg;
+}
+
+inline int GetCDeg(mesh_t& mesh, cdegs_t& cdegs, leda::node v, int color) {
+    assert(cdegs[color][v] == ComputeCDeg(mesh, v, color));
+    return cdegs[color][v];
+}
+
+inline void IncTermCDegs(mesh_t& mesh, cdegs_t& cdegs, leda::edge e) {
+    cdegs[GetColor(mesh, e)][leda::source(e)]++;
+    cdegs[GetColor(mesh, e)][leda::target(e)]++;
+}
+
+inline void DecTermCDegs(mesh_t& mesh, cdegs_t& cdegs, leda::edge e) {
+    cdegs[GetColor(mesh, e)][leda::source(e)]--;
+    cdegs[GetColor(mesh, e)][leda::target(e)]--;
 }
 
 inline bool equal_xy(const leda::d3_rat_point& lhp, const leda::d3_rat_point& rhp) {
@@ -184,7 +212,55 @@ void Triangulate(leda::list<point_t>& points, mesh_t& mesh, leda::edge hullEdges
     stitchVerts[Side::BACK] = leda::source(hullEdges[Side::BACK]);
 }
 
-int Flipping(mesh_t& mesh) {
+inline void CheckCDegs(mesh_t& mesh, cdegs_t& cdegs) {
+#ifdef _DEBUG
+    leda::node v;
+    forall_nodes(v, mesh) {
+        for(int i = 0; i < 3; ++i) {
+            int d0 = cdegs[i][v];
+            int d1 = ComputeCDeg(mesh, v, i);
+            assert(d0 == d1);
+        }
+    }
+#endif
+}
+
+void InitColorDegs(mesh_t& mesh, leda::edge hullEdges[2], cdegs_t& cdegs) {
+    cdegs[0].init(mesh, 0);
+    cdegs[1].init(mesh, 0);
+    cdegs[2].init(mesh, 0);
+
+    leda::node v;
+    leda::edge e;
+
+    forall_nodes(v, mesh) {
+        cdegs[Color::RED][v] = mesh.outdeg(v);
+    }
+
+    e = hullEdges[Side::FRONT];
+    do {
+        // note that every hull vertex has two adj. blue edges
+        cdegs[Color::RED][leda::source(e)]--;
+        cdegs[Color::RED][leda::target(e)]--;
+        cdegs[Color::BLUE][leda::source(e)]++;
+        cdegs[Color::BLUE][leda::target(e)]++;
+        e = mesh.face_cycle_succ(e);
+    } while(hullEdges[Side::FRONT] != e);
+
+    e = hullEdges[Side::BACK];
+    do {
+        // note that every hull vertex has two adj. blue edges
+        cdegs[Color::RED][leda::source(e)]--;
+        cdegs[Color::RED][leda::target(e)]--;
+        cdegs[Color::BLUE][leda::source(e)]++;
+        cdegs[Color::BLUE][leda::target(e)]++;
+        e = mesh.face_cycle_succ(e);
+    } while(hullEdges[Side::BACK] != e);
+
+    CheckCDegs(mesh, cdegs);
+}
+
+int Flipping(mesh_t& mesh, cdegs_t& cdegs) {
     // gather red edges
     leda::list<leda::edge> S;
     leda::edge e;
@@ -216,6 +292,8 @@ int Flipping(mesh_t& mesh) {
         const point_t& p3 = PositionOf(mesh, v3);
 
         const int orient = leda::orientation(p0, p1, p2, p3);
+
+        DecTermCDegs(mesh, cdegs, e);
 
         if(0 >= orient) {
             // edge is already convex
@@ -264,12 +342,16 @@ int Flipping(mesh_t& mesh) {
             } // flip possible
         } // edge not convex
 
+        IncTermCDegs(mesh, cdegs, e);
+
     } // while !S.empty()
+
+    CheckCDegs(mesh, cdegs);
 
     return numFlips;
 }
 
-void SimplifyFace(mesh_t& mesh, leda::node v) {
+void SimplifyFace(mesh_t& mesh, cdegs_t& cdegs, leda::node v) {
     if(mesh.outdeg(v) <= 3) return; // nothing to do
 
     leda::edge e1 = mesh.first_adj_edge(v);
@@ -288,10 +370,12 @@ void SimplifyFace(mesh_t& mesh, leda::node v) {
         int orient_132 = leda::orientation_xy(p1, p3, p2);
 
         if(orient_130 != orient_132 && orient_132 != 0) {
+            DecTermCDegs(mesh, cdegs, e2);
             leda::edge r2 = mesh.reversal(e2);
             mesh.move_edge(e2, mesh.reversal(e1), leda::target(e3), leda::before);
             mesh.move_edge(r2, mesh.reversal(e3), leda::target(e1));
             InvalidateU(mesh, e2);
+            IncTermCDegs(mesh, cdegs, e2);
             count = 0;
         } else {
             e1 = e2;
@@ -301,22 +385,17 @@ void SimplifyFace(mesh_t& mesh, leda::node v) {
         e3 = mesh.cyclic_adj_succ(e2);
     }
 
+    CheckCDegs(mesh, cdegs);
+
     assert(mesh.outdeg(v) <= 3);
 }
 
-int Clipping(mesh_t& mesh) {
+int Clipping(mesh_t& mesh, cdegs_t& cdegs) {
     leda::node_list L;
-    leda::node_array<int>   rdeg(mesh, 0);
-    leda::node_array<int>   cdeg(mesh, 0);
 
-    leda::edge e;
-    forall_edges(e, mesh) {
-        leda::node v = leda::source(e);
-        if(Color::RED == GetColor(mesh, e)) {
-            if(3 == ++rdeg[v]) L.push(v);
-        } else {
-            cdeg[v]++;
-        }
+    leda::node v;
+    forall_nodes(v, mesh) {
+        if(3 <= GetCDeg(mesh, cdegs, v, Color::RED)) L.push(v);
     }
 
     int numClips = 0;
@@ -324,26 +403,36 @@ int Clipping(mesh_t& mesh) {
     while(!L.empty()) {
         leda::node clipV = L.pop();
 
-        if(cdeg[clipV]) continue;
+        const int bbdeg = GetCDeg(mesh, cdegs, clipV, Color::BLACK) + GetCDeg(mesh, cdegs, clipV, Color::BLUE);
+        if(0 != bbdeg) continue;
 
         leda::edge e;
         forall_out_edges(e, clipV) {
             leda::edge b = mesh.face_cycle_succ(e); // boundary edge
             if(Color::BLACK == GetColor(mesh, b)) {
+                DecTermCDegs(mesh, cdegs, b);
                 InvalidateU(mesh, b);
+                IncTermCDegs(mesh, cdegs, b);
             }
         }
 
-        if(3 < mesh.outdeg(clipV)) SimplifyFace(mesh, clipV);
+        if(3 < mesh.outdeg(clipV)) SimplifyFace(mesh, cdegs, clipV);
+
+        forall_out_edges(e, clipV) {
+            assert(Color::RED == GetColor(mesh, e));
+            DecTermCDegs(mesh, cdegs, e);
+        }
 
         mesh.del_node(clipV);
         numClips++;
     }
 
+    CheckCDegs(mesh, cdegs);
+
     return numClips;
 }
 
-void StripTetrahedrons(mesh_t& mesh, leda::node v) {
+void StripTetrahedrons(mesh_t& mesh, cdegs_t& cdegs, leda::node v) {
     if(mesh.outdeg(v) <= 3) return; // nothing to do
 
     leda::edge e1 = mesh.first_adj_edge(v);
@@ -362,10 +451,12 @@ void StripTetrahedrons(mesh_t& mesh, leda::node v) {
         int orient_132 = leda::orientation_xy(p1, p3, p2);
 
         if(Color::BLACK == GetColor(mesh, e2) && orient_130 != orient_132 && orient_132 != 0) {
+            DecTermCDegs(mesh, cdegs, e2);
             leda::edge r2 = mesh.reversal(e2);
             mesh.move_edge(e2, mesh.reversal(e1), leda::target(e3), leda::before);
             mesh.move_edge(r2, mesh.reversal(e3), leda::target(e1));
             InvalidateU(mesh, e2);
+            IncTermCDegs(mesh, cdegs, e2);
             count = 0;
         } else {
             e1 = e2;
@@ -376,19 +467,11 @@ void StripTetrahedrons(mesh_t& mesh, leda::node v) {
     }
 }
 
-int Stripping(mesh_t& mesh) {
+int Stripping(mesh_t& mesh, cdegs_t& cdegs) {
     leda::node_list L;
     leda::node v;
     forall_nodes(v, mesh) {
-        int bdeg = 0, rdeg = 0;
-
-        leda::edge e;
-        forall_adj_edges(e, v) {
-            if(Color::BLUE == GetColor(mesh, e)) bdeg++;
-            if(Color::RED == GetColor(mesh, e)) rdeg++;
-        }
-
-        if(0 == bdeg && 1 < rdeg) {
+        if(0 == GetCDeg(mesh, cdegs, v, Color::BLUE) && 1 < GetCDeg(mesh, cdegs, v, Color::RED)) {
             L.push(v);
         }
     }
@@ -398,9 +481,11 @@ int Stripping(mesh_t& mesh) {
     while(!L.empty()) {
         leda::node v = L.pop();
 
-        StripTetrahedrons(mesh, v);
+        StripTetrahedrons(mesh, cdegs, v);
         numStrips++;
     }
+
+    CheckCDegs(mesh, cdegs);
 
     return numStrips;
 }
@@ -557,12 +642,16 @@ void FlipClipHull(leda::list<leda::d3_rat_point> points, leda::GRAPH<leda::d3_ra
 
     Triangulate(points, mesh, hullEdges, stitchVerts);
 
+    cdegs_t cdegs;
+
+    InitColorDegs(mesh, hullEdges, cdegs);
+
     bool done = false;
     while(!done) {
-        Flipping(mesh);
-        if(!Clipping(mesh)) {
-            if(Stripping(mesh)) {
-                Clipping(mesh);
+        Flipping(mesh, cdegs);
+        if(!Clipping(mesh, cdegs)) {
+            if(Stripping(mesh, cdegs)) {
+                Clipping(mesh, cdegs);
             } else {
                 done = true;
             }
