@@ -740,6 +740,9 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\nodes\r_nodes.h">
       <Filter>Private\renderer\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\polymesh\flipclip.h">
+      <Filter>Private\polymesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -1230,6 +1233,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_op_loadgeom.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\polymesh\flipclip.cpp">
+      <Filter>Private\polymesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
