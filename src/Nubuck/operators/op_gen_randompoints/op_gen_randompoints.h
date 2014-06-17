@@ -60,6 +60,7 @@ private:
 
     IGeometry* _hull;
     IGeometry* _cloud;
+    IGeometry* _cloudCopy;
 
     Domain::Enum    _lastDomain;
     int             _lastSize;

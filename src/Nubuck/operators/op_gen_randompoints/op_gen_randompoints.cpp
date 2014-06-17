@@ -179,6 +179,7 @@ void RandomPoints::Event_Update(const EV::Event& event) {
     if(_lastDomain != args.domain || _lastRadius != args.radius || _lastSize != args.size) {
         UpdateHull(domain, args.radius);
         UpdateCloud(Domain::Enum(args.domain), args.size, args.radius);
+        _cloudCopy->GetRatPolyMesh() = _cloud->GetRatPolyMesh();
     }
 
     _lastDomain = domain;
@@ -232,8 +233,13 @@ bool RandomPoints::Invoke() {
     _cloud->SetName("point cloud");
     _cloud->SetRenderMode(IGeometry::RenderMode::NODES);
 
+    _cloudCopy = _nb.world->CreateGeometry();
+    _cloudCopy->SetName("point cloud");
+    _cloudCopy->HideOutline();
+
     UpdateHull(_lastDomain, _lastRadius);
     UpdateCloud(Domain::Enum(_lastDomain), _lastSize, _lastRadius);
+    _cloudCopy->GetRatPolyMesh() = _cloud->GetRatPolyMesh();
 
     _nb.world->GetSelection()->Set(_cloud);
 
@@ -244,8 +250,10 @@ void RandomPoints::Finish() {
     _hull->Destroy();
 
     if(_lastSave) {
-        W::SaveGeometryToFile("last_cloud.geom", _cloud);
+        W::SaveGeometryToFile("last_cloud.geom", _cloudCopy);
     }
+
+    _cloudCopy->Destroy();
 }
 
 } // namespace GEN
