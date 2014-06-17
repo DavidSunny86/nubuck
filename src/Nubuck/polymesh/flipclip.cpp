@@ -194,6 +194,7 @@ leda::edge TriangulateXY(mesh_t& mesh, leda::list<leda::node>& L, int orient) {
 
 void Triangulate(leda::list<point_t>& points, mesh_t& mesh, leda::edge hullEdges[], leda::node stitchVerts[]) {
     points.sort(); // lexicographic ascending
+    points.unique();
 
     leda::list<leda::node> L[2];
 
@@ -634,9 +635,7 @@ void Simplify(mesh_t& mesh) {
     DeleteLooseNodes(mesh);
 }
 
-} // unnamed namespace
-
-void FlipClipHull(leda::list<leda::d3_rat_point> points, leda::GRAPH<leda::d3_rat_point, int>& mesh) {
+void _FlipClipHull(leda::list<point_t>& points, mesh_t& mesh) {
     leda::edge  hullEdges[2];
     leda::node  stitchVerts[2];
 
@@ -660,4 +659,134 @@ void FlipClipHull(leda::list<leda::d3_rat_point> points, leda::GRAPH<leda::d3_ra
 
     Stitching(mesh, hullEdges, stitchVerts);
     Simplify(mesh);
+}
+
+void random_sample(int n, const leda::list<point_t>& L, leda::list<point_t>& L1)
+{
+    using namespace leda;
+
+  int N        = L.length();
+  list_item* A = new list_item[N];
+  int i        = 0;
+
+  list_item it;
+  forall_items(it,L) A[i++] = it;
+
+  L1.clear();
+
+  while (n--)
+    L1.append(L.inf(A[rand_int(0,N-1)]));
+
+  delete[] A;
+}
+
+// cnf. d3_hull.cpp (LEDA)
+int simplify(leda::list<point_t>& L, int n)
+{
+    using namespace leda;
+
+  GRAPH<point_t,int> G0;
+  list<point_t> L0;
+
+  random_sample(n,L,L0);
+  L0.sort();
+  L0.unique();
+  _FlipClipHull(L0,G0);
+
+  if (G0.number_of_nodes() >= 3*n/4) return 0;
+  if (G0.number_of_nodes() <  6)     return 0;
+
+  int M = G0.number_of_edges()/3;
+
+  double* AX = new double[M];
+  double* AY = new double[M];
+  double* AZ = new double[M];
+  double* AW = new double[M];
+  double* NX = new double[M];
+  double* NY = new double[M];
+  double* NZ = new double[M];
+
+  int m = 0;
+
+  edge_array<bool>  considered(G0,false);
+  edge e0;
+  forall_edges(e0,G0)
+  { if (considered[e0]) continue;
+
+    edge x = e0;
+    do { considered[x] = true;
+         x = G0.face_cycle_succ(x);
+    } while (x != e0);
+
+    edge e1 = G0.face_cycle_succ(e0);
+    edge e2 = G0.face_cycle_succ(e1);
+    point_t a = G0[source(e0)];
+    point_t b = G0[source(e1)];
+    point_t c = G0[source(e2)];
+    AX[m] = a.XD();
+    AY[m] = a.YD();
+    AZ[m] = a.ZD();
+    AW[m] = a.WD();
+    double X1 = b.XD()*a.WD() - a.XD()*b.WD();
+    double Y1 = b.YD()*a.WD() - a.YD()*b.WD();
+    double Z1 = b.ZD()*a.WD() - a.ZD()*b.WD();
+    double X2 = c.XD()*a.WD() - a.XD()*c.WD();
+    double Y2 = c.YD()*a.WD() - a.YD()*c.WD();
+    double Z2 = c.ZD()*a.WD() - a.ZD()*c.WD();
+    NX[m] = Z1*Y2 - Y1*Z2;
+    NY[m] = X1*Z2 - Z1*X2;
+    NZ[m] = Y1*X2 - X1*Y2;
+    m++;
+  }
+
+  int count = 0;
+
+  list_item it = L.first();
+  while (it)
+  {
+    list_item next = L.succ(it);
+    point_t p = L[it];
+    double px = p.XD();
+    double py = p.YD();
+    double pz = p.ZD();
+    double pw = p.WD();
+    int i = 0;
+    while (i < m)
+    { double aw = AW[i];
+      if ( NX[i]*(px*aw-AX[i]*pw) +
+           NY[i]*(py*aw-AY[i]*pw) +
+           NZ[i]*(pz*aw-AZ[i]*pw) <= 0 ) break;
+      i++;
+     }
+    if (i == m)
+    { count++;
+      L.del_item(it);
+     }
+    it = next;
+   }
+
+  delete[] AX;
+  delete[] AY;
+  delete[] AZ;
+  delete[] AW;
+  delete[] NX;
+  delete[] NY;
+  delete[] NZ;
+
+//cout << string("simplify:  |L| = %d   %5.2f",L.length(),used_time(t));
+
+  return count;
+}
+
+} // unnamed namespace
+
+void FlipClipHull(leda::list<point_t> points, mesh_t& mesh) {
+  if (points.empty()) return;
+
+  double l = points.length();
+  int n = int(::pow(l,0.6));
+
+  if (n > 6) simplify(points,n);
+
+  _FlipClipHull(points, mesh);
 }
