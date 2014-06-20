@@ -44,7 +44,7 @@ RandomPointsPanel::RandomPointsPanel(QWidget* parent) : SimplePanel(parent) {
     _sbRadius->setValue(radius);
     connect(_sbRadius, SIGNAL(valueChanged(int)), this, SLOT(OnArgsChanged(int)));
 
-    _sbSize = AddSpinBox("size", 1, 10000);
+    _sbSize = AddSpinBox("size", 1, 100000);
     _sbSize->setValue(size);
     connect(_sbSize, SIGNAL(valueChanged(int)), this, SLOT(OnArgsChanged(int)));
 
