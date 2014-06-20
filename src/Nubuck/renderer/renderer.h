@@ -32,7 +32,7 @@ extern COM::Config::Variable<int>   cvar_r_transparencyMode;
 extern COM::Config::Variable<int>   cvar_r_numDepthPeels;
 
 namespace R {
-	
+
 class   Effect;
 class   Mesh;
 
@@ -97,12 +97,14 @@ private:
     int     _width, _height;
     float   _aspect;
 
+    bool _screenshotRequested;
+
     std::vector<MeshJob> _renderLayers[Layers::NUM_LAYERS];
 
     void Render(
-        const RenderList& renderList, 
+        const RenderList& renderList,
         const M::Matrix4& projection,
-        const M::Matrix4& worldToEye, 
+        const M::Matrix4& worldToEye,
         const GeomSortMode::Enum geomSortMode,
         std::vector<MeshJob>& rjobs);
 public:
@@ -117,6 +119,8 @@ public:
     void BeginFrame();
     void Render(RenderList& renderList);
     void EndFrame();
+
+    void Screenshot() { _screenshotRequested = true; }
 };
 
 } // namespace R

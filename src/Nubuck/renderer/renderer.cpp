@@ -161,7 +161,7 @@ void Uniforms_BindBuffers(void) {
 
 void Uniforms_BindBlocks(const Program& prog) {
     GLuint idx = 0;
-    
+
     idx = glGetUniformBlockIndex(prog.GetID(), "UniformsHot");
     if(GL_INVALID_INDEX != idx) GL_CALL(glUniformBlockBinding(prog.GetID(), idx, BINDING_INDEX_HOT));
 
@@ -176,7 +176,7 @@ void Uniforms_BindBlocks(const Program& prog) {
 }
 
 static void Uniforms_Update(
-    const M::Matrix4& projectionMat, 
+    const M::Matrix4& projectionMat,
     const M::Matrix4& worldMat,
     const DirectionalLight dirLights[])
 {
@@ -435,7 +435,7 @@ void SetState(const State& state) {
     }
 }
 
-Renderer::Renderer(void) : _time(0.0f) { }
+Renderer::Renderer(void) : _time(0.0f), _screenshotRequested(false) { }
 
 Renderer::~Renderer() {
     Framebuffers_DestroyBuffers();
@@ -505,7 +505,7 @@ void Renderer::Init(void) {
     glClearStencil(0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
-    
+
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 1.0f);
 
@@ -562,7 +562,7 @@ static MeshJob* DrawMeshList(
     int passFlags,
     const M::Matrix4& worldMat,
     const R::Renderer::GeomSortMode::Enum geomSortMode,
-    MeshJob* first) 
+    MeshJob* first)
 {
     typedef std::vector<Mesh::Triangle>::iterator triIt_t;
     M::Matrix4 invWorld;
@@ -615,7 +615,7 @@ static void DrawFrame(
     const M::Matrix4& modelView,
     const M::Matrix4& projectionMat,
     R::Renderer::GeomSortMode::Enum geomSortMode,
-    float time, std::vector<MeshJob>& rjobs) 
+    float time, std::vector<MeshJob>& rjobs)
 {
     if(rjobs.empty()) return;
 
@@ -646,7 +646,7 @@ static void DrawFrame(
         for(int i = 0; i < numPasses; ++i) {
             Pass* pass = fx->GetPass(i);
             pass->Use();
-            
+
             Program&        prog = pass->GetProgram();
             const PassDesc& desc = pass->GetDesc();
             Uniforms_BindBlocks(prog);
@@ -779,14 +779,19 @@ void Renderer::EndFrame() {
 
     metrics.frame.time = frame_time.Stop();
     metrics.EndFrame();
+
+    if(_screenshotRequested) {
+        _screenshotRequested = false;
+        colorbuffer->WriteTGA("screenshot.tga");
+    }
 }
 
 void Renderer::Render(
-    const RenderList& renderList, 
+    const RenderList& renderList,
     const M::Matrix4& projection,
-    const M::Matrix4& worldToEye, 
+    const M::Matrix4& worldToEye,
     const GeomSortMode::Enum geomSortMode,
-    std::vector<MeshJob>& rjobs) 
+    std::vector<MeshJob>& rjobs)
 {
     Uniforms_Update(projection, worldToEye, renderList.dirLights);
 

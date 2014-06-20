@@ -3,6 +3,13 @@
 #include "..\glcall.h"
 #include "texture.h"
 
+// defined in tga_texalloc.cpp
+void WriteTGA_BGR(
+    const std::string& filename,
+    unsigned short width,
+    unsigned short height,
+    COM::byte_t* pixelData);
+
 namespace R {
 
     inline int NumComponents(GLenum format) {
@@ -24,7 +31,7 @@ namespace R {
 
 		GL_CALL(glGenTextures(1, &_id));
 		GL_CALL(glBindTexture(GL_TEXTURE_2D, _id));
-		
+
 		GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, _width, _height, 0, _format,
 			GL_UNSIGNED_BYTE, pixelData));
 
@@ -50,7 +57,7 @@ namespace R {
 		Init(pixelData);
 	}
 
-	Texture::Texture(int width, int height, GLenum format, const COM::byte_t* pixelData) 
+	Texture::Texture(int width, int height, GLenum format, const COM::byte_t* pixelData)
 		: _internalFormat(format), _format(format), _width(width), _height(height)
 	{
 		Init(pixelData);
@@ -65,6 +72,20 @@ namespace R {
 		GL_CALL(glActiveTexture(GL_TEXTURE0 + level));
 		GL_CALL(glBindTexture(GL_TEXTURE_2D, _id));
 	}
+
+    void Texture::WriteTGA(const std::string& filename) {
+        unsigned sz = NumComponents(_internalFormat) * _width * _height;
+        COM::byte_t* pixels = new COM::byte_t[sz];
+
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+        Bind(0);
+        GL_CALL(glGetTexImage(GL_TEXTURE_2D, 0, GL_BGR, GL_UNSIGNED_BYTE, pixels));
+
+        WriteTGA_BGR(filename, (unsigned short)_width, (unsigned short)_height, pixels);
+
+        delete[] pixels;
+    }
 
 	/* TextureManager Impl */
 

@@ -97,6 +97,12 @@ namespace UI {
     }
 
     void RenderView::keyPressEvent(QKeyEvent* qevent) {
+        // screenshot
+        if(Qt::Key_F12 == qevent->key() && !qevent->isAutoRepeat()) {
+            _renderer.Screenshot();
+            return;
+        }
+
         if(Qt::Key_Tab == qevent->key() && !qevent->isAutoRepeat()) {
             W::world.GetEditMode().CycleModes();
             return;
