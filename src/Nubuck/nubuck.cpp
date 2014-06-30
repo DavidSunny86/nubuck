@@ -34,6 +34,12 @@
 #include <operators\op_savegeom\op_savegeom.h>
 #include <operators\op_merge_vertices\op_merge_vertices.h>
 
+bool g_showRenderViewControls = true;
+
+void ToggleRenderViewControls() {
+    g_showRenderViewControls = !g_showRenderViewControls;
+}
+
 Nubuck nubuck;
 
 namespace {

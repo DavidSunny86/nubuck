@@ -75,16 +75,20 @@ namespace UI {
         }
     }
 
-    void MainWindow::OnEditModeToObjects() { 
+    void MainWindow::OnEditModeToObjects() {
         W::world.GetEditMode().SetMode(W::editMode_t::OBJECTS);
     }
 
-    void MainWindow::OnEditModeToVertices() { 
+    void MainWindow::OnEditModeToVertices() {
         W::world.GetEditMode().SetMode(W::editMode_t::VERTICES);
     }
 
     void MainWindow::closeEvent(QCloseEvent*) {
         qApp->exit();
+    }
+
+    void MainWindow::OnToggleRenderViewControls() {
+        ToggleRenderViewControls();
     }
 
     void MainWindow::OnShowConsole() {

@@ -33,6 +33,8 @@
     <addaction name="actShowRenderMetrics"/>
     <addaction name="actShowRenderConfig"/>
     <addaction name="actShowConsole"/>
+    <addaction name="separator"/>
+    <addaction name="actToggleRenderViewControls"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -67,6 +69,11 @@
   <action name="actShowConsole">
    <property name="text">
     <string>Console</string>
+   </property>
+  </action>
+  <action name="actToggleRenderViewControls">
+   <property name="text">
+    <string>Toggle 3D Controls</string>
    </property>
   </action>
  </widget>
@@ -152,6 +159,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actToggleRenderViewControls</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OnToggleRenderViewControls()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>300</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>OnRandomPoints()</slot>
@@ -159,5 +182,6 @@
   <slot>OnShowRenderConfig()</slot>
   <slot>OnLoadOperatorPlugin()</slot>
   <slot>OnShowConsole()</slot>
+  <slot>OnToggleRenderViewControls()</slot>
  </slots>
 </ui>

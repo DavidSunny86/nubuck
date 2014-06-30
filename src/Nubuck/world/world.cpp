@@ -16,6 +16,7 @@
 #include <UI\userinterface.h>
 #include <operators\operators.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
+#include <nubuck_private.h>
 #include "entity.h"
 #include "world_events.h"
 #include "world.h"
@@ -554,9 +555,10 @@ void World::Render(R::RenderList& renderList) {
     renderList.worldMat = _camArcball.GetWorldToEyeMatrix();
     renderList.meshJobs.clear();
 
-    renderList.meshJobs.push_back(Grid_GetRenderJob());
-
-    BBoxes_GetRenderJobs(renderList.meshJobs);
+    if(g_showRenderViewControls) {
+        renderList.meshJobs.push_back(Grid_GetRenderJob());
+        BBoxes_GetRenderJobs(renderList.meshJobs);
+    }
 
     SYS::ScopedLock lockEntities(_entitiesMtx);
 
