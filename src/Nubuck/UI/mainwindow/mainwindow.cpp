@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QScrollArea>
 #include <QDockWidget>
+#include <QColorDialog>
 
 #include <nubuck_private.h>
 #include <algdriver\algdriver.h>
@@ -85,6 +86,13 @@ namespace UI {
 
     void MainWindow::closeEvent(QCloseEvent*) {
         qApp->exit();
+    }
+
+    void MainWindow::OnChooseBackgroundColor() {
+        R::Color oldColor = _renderView->GetRenderer().GetBackgroundColor();
+        QColorDialog colorDialog;
+        connect(&colorDialog, SIGNAL(currentColorChanged(const QColor&)), _renderView, SLOT(OnSetBackgroundColor(const QColor&)));
+        if(QDialog::Rejected == colorDialog.exec()) _renderView->OnSetBackgroundColor(oldColor);
     }
 
     void MainWindow::OnToggleRenderViewControls() {

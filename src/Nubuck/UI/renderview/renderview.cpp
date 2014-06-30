@@ -125,6 +125,14 @@ namespace UI {
         if(!qevent->isAutoRepeat()) W::world.Send(EV::def_Key.Create(args));
     }
 
+    void RenderView::OnSetBackgroundColor(const R::Color& color) {
+        _renderer.SetBackgroundColor(color);
+    }
+
+    void RenderView::OnSetBackgroundColor(const QColor& color) {
+        _renderer.SetBackgroundColor(R::Color(color.redF(), color.greenF(), color.blueF()));
+    }
+
     RenderView::RenderView(QWidget* parent)
         : glWidget_t(parent)
         , _fpsLabel(NULL)
@@ -136,6 +144,10 @@ namespace UI {
 
     RenderView::~RenderView(void) {
 		R::effectMgr.FreeResources();
+    }
+
+    const R::Renderer& RenderView::GetRenderer() const {
+        return _renderer;
     }
 
     void RenderView::Render() {

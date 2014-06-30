@@ -39,6 +39,9 @@ namespace UI {
         void wheelEvent(QWheelEvent* event) override;
         void keyPressEvent(QKeyEvent* event) override;
         void keyReleaseEvent(QKeyEvent* event) override;
+    public slots:
+        void OnSetBackgroundColor(const R::Color& color);
+        void OnSetBackgroundColor(const QColor& color);
     public:
         typedef GLWidget glWidget_t;
 
@@ -49,6 +52,8 @@ namespace UI {
 
         RenderView(QWidget* parent = NULL);
         ~RenderView(void);
+
+        const R::Renderer& GetRenderer() const;
 
         void Render();
 

@@ -435,7 +435,10 @@ void SetState(const State& state) {
     }
 }
 
-Renderer::Renderer(void) : _time(0.0f), _screenshotRequested(false) { }
+Renderer::Renderer(void) : _time(0.0f), _screenshotRequested(false) {
+    const float f = 1.0f / 255.0f;
+    _bgColor = Color(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
+}
 
 Renderer::~Renderer() {
     Framebuffers_DestroyBuffers();
@@ -500,7 +503,7 @@ void Renderer::Init(void) {
     float f = 1.0f / 255.0f;
     // glClearColor(f * 176, f * 196, f * 222, 1.0f); // light steel blue
     // glClearColor(f * 70, f * 130, f * 180, 1.0f); // steel blue
-    glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
+    glClearColor(_bgColor.r, _bgColor.g, _bgColor.b, 1.0f); // cornflower blue (crayola)
     glClearDepth(1.0f);
     glClearStencil(0);
     glEnable(GL_DEPTH_TEST);
@@ -512,6 +515,14 @@ void Renderer::Init(void) {
     Uniforms_InitBuffers();
 
     _timer.Start();
+}
+
+const Color& Renderer::GetBackgroundColor() const {
+    return _bgColor;
+}
+
+void Renderer::SetBackgroundColor(const Color& color) {
+    _bgColor = color;
 }
 
 void Renderer::Resize(int width, int height) {
@@ -757,7 +768,7 @@ void Renderer::BeginFrame() {
         curState.depth.maskEnabled = GL_TRUE;
     }
     const float f = 1.0f / 255.0f;
-    glClearColor(f * 154, f * 206, f * 235, 1.0f); // cornflower blue (crayola)
+    glClearColor(_bgColor.r, _bgColor.g, _bgColor.b, 1.0f); // cornflower blue (crayola)
     Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 

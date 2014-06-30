@@ -35,6 +35,7 @@
     <addaction name="actShowConsole"/>
     <addaction name="separator"/>
     <addaction name="actToggleRenderViewControls"/>
+    <addaction name="actChooseBackgroundColor"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -74,6 +75,11 @@
   <action name="actToggleRenderViewControls">
    <property name="text">
     <string>Toggle 3D Controls</string>
+   </property>
+  </action>
+  <action name="actChooseBackgroundColor">
+   <property name="text">
+    <string>Choose Background Color</string>
    </property>
   </action>
  </widget>
@@ -166,8 +172,24 @@
    <slot>OnToggleRenderViewControls()</slot>
    <hints>
     <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
      <x>399</x>
-     <y>300</y>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actChooseBackgroundColor</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OnChooseBackgroundColor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -183,5 +205,6 @@
   <slot>OnLoadOperatorPlugin()</slot>
   <slot>OnShowConsole()</slot>
   <slot>OnToggleRenderViewControls()</slot>
+  <slot>OnChooseBackgroundColor()</slot>
  </slots>
 </ui>

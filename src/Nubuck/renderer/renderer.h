@@ -101,6 +101,8 @@ private:
 
     std::vector<MeshJob> _renderLayers[Layers::NUM_LAYERS];
 
+    Color _bgColor;
+
     void Render(
         const RenderList& renderList,
         const M::Matrix4& projection,
@@ -112,6 +114,9 @@ public:
     ~Renderer();
 
     void Init(void); // requires gl context
+
+    const Color&    GetBackgroundColor() const;
+    void            SetBackgroundColor(const Color& color);
 
     void Resize(int width, int height);
     void FinishResize();
