@@ -58,6 +58,9 @@ bool FlipClip::Invoke() {
     secsPassed = timer.Stop();
     _nb.log->printf("... FlipClip: %fs\n", secsPassed);
 
+    FlipClipHull_WriteProfilerReport();
+    _nb.log->printf("... wrote profiler report to file\n");
+
     _nb.log->printf("... CHECK_HULL: ");
     bool isConvex = leda::CHECK_HULL(chullMesh);
     _nb.log->printf(isConvex ? "true" : "false");
