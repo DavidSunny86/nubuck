@@ -28,5 +28,25 @@
     <ClCompile Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\alg_d2_delaunay_bruteforce.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\phase0.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\phase_flip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\globals.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\phase0.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\phase_flip.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -25,13 +25,22 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+      <ParseFiles>true</ParseFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\alg_flipclip.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\flipclip.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_init.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_flip.cpp" />
-    <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\globals.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_clip.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_flipclip.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -42,15 +51,20 @@
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_strip.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_stitch.cpp" />
     <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\phase_simplify.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_flipclip\globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_init.h" />
-    <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\globals.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_flip.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_clip.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_strip.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_stitch.h" />
     <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\phase_simplify.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_flipclip\globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\src\NubuckOperators\alg_flipclip\flipclip.h" />

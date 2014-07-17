@@ -12,6 +12,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\alg_d2_delaunay_bruteforce.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\globals.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\phase0.cpp" />
+    <ClCompile Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\phase_flip.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\globals.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\phase0.h" />
+    <ClInclude Include="..\..\src\NubuckOperators\alg_d2_delaunay_bruteforce\phase_flip.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{85CDF3D9-3C8E-46D0-A44A-2B276AACE6F2}</ProjectGuid>
