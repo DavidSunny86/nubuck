@@ -145,6 +145,7 @@ public:
     M::Vector3 GetPosition() const override;
 
     void SetPosition(const M::Vector3& position) override;
+    void SetScale(const M::Vector3& scale) override;
 
     void HideOutline() override;
 

@@ -430,6 +430,10 @@ void ENT_Geometry::SetPosition(const M::Vector3& position) {
     Entity::SetPosition(position);
 }
 
+void ENT_Geometry::SetScale(const M::Vector3& scale) {
+    Entity::SetScale(scale);
+}
+
 void ENT_Geometry::CompileMesh() {
 	SYS::ScopedLock lock(_mtx);
 
