@@ -15,7 +15,7 @@ Operator* Driver::ActiveOperator() {
 }
 
 void Driver::Event_Push(const EV::Event& event) {
-	const EV::Params_OP_Push& args = EV::def_OP_Push.GetArgs(event);
+    const ED::Params_Push& args = ED::def_Push.GetArgs(event);
 
 	if(args.op->Invoke()) {
         Operator* op = ActiveOperator();
@@ -24,9 +24,9 @@ void Driver::Event_Push(const EV::Event& event) {
         W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 	    g_operators.SendAndWait(event);
     } else {
-        EV::Params_OP_Push args;
+        ED::Params_Push args;
         args.op = NULL; // indicates declined invocation
-        g_operators.SendAndWait(EV::def_OP_Push.Create(args));
+        g_operators.SendAndWait(ED::def_Push.Create(args));
     }
 }
 
@@ -98,8 +98,8 @@ void Driver::Event_Mouse(const EV::Event& event) {
         W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 
         if(0 < N) {
-            EV::Params_OP_Pop popArgs = { N };
-            g_operators.SendAndWait(EV::def_OP_Pop.Create(popArgs));
+            ED::Params_Pop popArgs = { N };
+            g_operators.SendAndWait(ED::def_Pop.Create(popArgs));
         }
     }
 	event.Accept();
@@ -122,15 +122,15 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
 
         W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 
-		g_operators.Send(EV::def_OP_ActionFinished.Create(EV::Params_OP_ActionFinished()));
+		g_operators.Send(ED::def_ActionFinished.Create(ED::Params_ActionFinished()));
 	}
 }
 
-Driver::Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx) 
+Driver::Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx)
     : _activeOps(activeOps)
     , _activeOpsMtx(activeOpsMtx)
-{ 
-	AddEventHandler(EV::def_OP_Push, this, &Driver::Event_Push);
+{
+	AddEventHandler(ED::def_Push, this, &Driver::Event_Push);
 	AddEventHandler(EV::def_SelectionChanged, this, &Driver::Event_SelectionChanged);
 	AddEventHandler(EV::def_CameraChanged, this, &Driver::Event_CameraChanged);
     AddEventHandler(EV::def_EditModeChanged, this, &Driver::Event_EditModeChanged);
@@ -139,8 +139,8 @@ Driver::Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx)
 }
 
 DWORD Driver::Thread_Func() {
-    while(true) { 
-        HandleEvents(); 
+    while(true) {
+        HandleEvents();
     }
 }
 

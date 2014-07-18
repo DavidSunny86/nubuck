@@ -32,7 +32,7 @@ void Operators::UpdateOperatorPanel() {
 }
 
 void Operators::Event_Push(const EV::Event& event) {
-    const EV::Params_OP_Push& args = EV::def_OP_Push.GetArgs(event);
+    const ED::Params_Push& args = ED::def_Push.GetArgs(event);
 
     if(NULL == args.op) {
         // invocation has been declined
@@ -61,7 +61,7 @@ void Operators::Event_Push(const EV::Event& event) {
 
 void Operators::Event_Pop(const EV::Event& event) {
     assert(0 < event.args);
-    const EV::Params_OP_Pop& args = EV::def_OP_Pop.GetArgs(event);
+    const ED::Params_Pop& args = ED::def_Pop.GetArgs(event);
     for(unsigned i = 0; i < args.count; ++i) _activeOps.pop_back();
     UpdateOperatorPanel();
     event.Accept();
@@ -88,15 +88,15 @@ void Operators::OnInvokeOperator(unsigned id) {
         _driver->Thread_StartAsync();
 	}
     Operator* op = _ops[id].op;
-	EV::Params_OP_Push args = { op };
+	ED::Params_Push args = { op };
     _actionsPending++;
-	_driver->Send(EV::def_OP_Push.Create(args));
+	_driver->Send(ED::def_Push.Create(args));
 }
 
 Operators::Operators() : _actionsPending(0) {
-    AddEventHandler(EV::def_OP_Push, this, &Operators::Event_Push);
-    AddEventHandler(EV::def_OP_Pop, this, &Operators::Event_Pop);
-    AddEventHandler(EV::def_OP_ActionFinished, this, &Operators::Event_ActionFinished);
+    AddEventHandler(ED::def_Push, this, &Operators::Event_Push);
+    AddEventHandler(ED::def_Pop, this, &Operators::Event_Pop);
+    AddEventHandler(ED::def_ActionFinished, this, &Operators::Event_ActionFinished);
 
     // forward other known events
     AddEventHandler(EV::def_EditModeChanged, this, &Operators::Event_ForwardToDriver);
@@ -169,7 +169,7 @@ void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
     // gather jobs synchronously
     // NOTE: blocks when driver is busy. eg. op_loop
     _renderThread->GatherJobs();
-    
+
 	SYS::ScopedLock lockJobs(_meshJobsMtx);
 	meshJobs.insert(meshJobs.end(), _meshJobs.begin(), _meshJobs.end());
 }
