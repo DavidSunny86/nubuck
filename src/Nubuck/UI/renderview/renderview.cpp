@@ -55,7 +55,7 @@ namespace UI {
 		args.ret = NULL;
 
         EV::Event event = EV::def_Mouse.Create(args);
-        if(!OP::g_operators.MouseEvent(event)) W::world.Send(event);
+        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
     }
 
     void RenderView::mouseReleaseEvent(QMouseEvent* qevent) {
@@ -68,7 +68,7 @@ namespace UI {
 		args.ret = NULL;
 
         EV::Event event = EV::def_Mouse.Create(args);
-        if(!OP::g_operators.MouseEvent(event)) W::world.Send(event);
+        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
     }
 
     void RenderView::mouseMoveEvent(QMouseEvent* qevent) {
@@ -81,7 +81,7 @@ namespace UI {
 		args.ret = NULL;
 
         EV::Event event = EV::def_Mouse.Create(args);
-        if(!OP::g_operators.MouseEvent(event)) W::world.Send(event);
+        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
     }
 
     void RenderView::wheelEvent(QWheelEvent* qevent) {
@@ -93,7 +93,7 @@ namespace UI {
         args.y = qevent->y();
 
         EV::Event event = EV::def_Mouse.Create(args);
-        if(!OP::g_operators.MouseEvent(event)) W::world.Send(event);
+        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
     }
 
     void RenderView::keyPressEvent(QKeyEvent* qevent) {
@@ -114,8 +114,9 @@ namespace UI {
         args.nativeScanCode = qevent->nativeScanCode();
         args.autoRepeat = qevent->isAutoRepeat();
 
-        // HACK: use MouseEvent to forward key event to driver
-        OP::g_operators.MouseEvent(EV::def_Key.Create(args));
+
+        EV::Event event = EV::def_Key.Create(args);
+        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
     }
 
     void RenderView::keyReleaseEvent(QKeyEvent* qevent) {

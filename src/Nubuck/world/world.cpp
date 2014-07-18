@@ -272,7 +272,9 @@ void World::Event_Mouse(const EV::Event& event) {
 
     // TODO: do this once per world.Update()
     if(cameraChanged) {
-        OP::g_operators.OnCameraChanged();
+        OP::g_operators.InvokeAction(
+            EV::def_CameraChanged.Create(EV::Params_CameraChanged()),
+            OP::Operators::InvokationMode::ALWAYS);
     }
 }
 
@@ -376,7 +378,9 @@ void World::Event_Key(const EV::Event& event) {
 
     // TODO: do this once per world.Update()
     if(cameraChanged) {
-        OP::g_operators.OnCameraChanged();
+        OP::g_operators.InvokeAction(
+            EV::def_CameraChanged.Create(EV::Params_CameraChanged()),
+            OP::Operators::InvokationMode::ALWAYS);
     }
 }
 
@@ -543,8 +547,11 @@ void World::Update(void) {
         }
     }
 
-    if(_camArcball.FrameUpdate(_secsPassed))
-        OP::g_operators.OnCameraChanged();
+    if(_camArcball.FrameUpdate(_secsPassed)) {
+        OP::g_operators.InvokeAction(
+            EV::def_CameraChanged.Create(EV::Params_CameraChanged()),
+            OP::Operators::InvokationMode::ALWAYS);
+    }
 }
 
 void World::Render(R::RenderList& renderList) {

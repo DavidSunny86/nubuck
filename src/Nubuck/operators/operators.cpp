@@ -36,7 +36,6 @@ void Operators::Event_Push(const EV::Event& event) {
 
     if(NULL == args.op) {
         // invocation has been declined
-        _actionsPending--;
         event.Accept();
         return;
     }
@@ -44,7 +43,6 @@ void Operators::Event_Push(const EV::Event& event) {
     while(1 < _activeOps.size()) // keep bottommost op in stack (usually OP::Translate)
         _activeOps.pop_back();
     _activeOps.push_back(args.op);
-    _actionsPending--;
 
     // find panel of active operator
     Operator* op = _activeOps.back();
@@ -72,25 +70,20 @@ void Operators::Event_ActionFinished(const EV::Event& event) {
 }
 
 void Operators::Event_ForwardToDriver(const EV::Event& event) {
-    _driver->Send(event);
+    InvokeAction(event, InvokationMode::ALWAYS);
 }
 
 void Operators::OnInvokeOperator(unsigned id) {
-    if(BUSY_THRESHOLD < _actionsPending) {
-        UI::LogWidget::Instance()->sys_printf("INFO - Operators::OnInvokeOperator: wait for driver.\n");
-        return;
-	}
-
     UI::LogWidget::Instance()->sys_printf("INFO - invoking operator with id = %d\n", id);
 
 	if(!_driver.IsValid()) {
         _driver = GEN::MakePtr(new Driver(_activeOps, _activeOpsMtx));
         _driver->Thread_StartAsync();
 	}
+
     Operator* op = _ops[id].op;
 	ED::Params_Push args = { op };
-    _actionsPending++;
-	_driver->Send(ED::def_Push.Create(args));
+	InvokeAction(ED::def_Push.Create(args));
 }
 
 Operators::Operators() : _actionsPending(0) {
@@ -146,9 +139,9 @@ unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module)
     return id;
 }
 
-void Operators::InvokeAction(const EV::Event& event) {
-    if(BUSY_THRESHOLD < _actionsPending) {
-	    printf("INFO - Operators::InvokeAction: wait for driver.\n");
+void Operators::InvokeAction(const EV::Event& event, InvokationMode::Enum mode) {
+    if(InvokationMode::DROP_WHEN_BUSY == mode && BUSY_THRESHOLD < _actionsPending) {
+	    printf("INFO - Operators::InvokeAction: wait for driver, %d actions pending\n", _actionsPending);
         return;
     }
     _actionsPending++;
@@ -172,15 +165,6 @@ void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
 
 	SYS::ScopedLock lockJobs(_meshJobsMtx);
 	meshJobs.insert(meshJobs.end(), _meshJobs.begin(), _meshJobs.end());
-}
-
-void Operators::OnCameraChanged() {
-    _driver->Send(EV::def_CameraChanged.Create(EV::Params_CameraChanged()));
-}
-
-bool Operators::MouseEvent(const EV::Event& event) {
-    _driver->Send(event);
-    return true;
 }
 
 NUBUCK_API void SendToOperator(const EV::Event& event) {

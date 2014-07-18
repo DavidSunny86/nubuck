@@ -9,6 +9,11 @@
 
 namespace OP {
 
+// IMPORTANT: must be called for every event
+inline void SignalCompletion() {
+    g_operators.Send(ED::def_ActionFinished.Create(ED::Params_ActionFinished()));
+}
+
 Operator* Driver::ActiveOperator() {
     if(_activeOps.empty()) return NULL;
     return _activeOps.back();
@@ -28,6 +33,8 @@ void Driver::Event_Push(const EV::Event& event) {
         args.op = NULL; // indicates declined invocation
         g_operators.SendAndWait(ED::def_Push.Create(args));
     }
+
+    SignalCompletion();
 }
 
 void Driver::Event_SelectionChanged(const EV::Event& event) {
@@ -36,6 +43,8 @@ void Driver::Event_SelectionChanged(const EV::Event& event) {
     {
         (*it)->OnGeometrySelected();
     }
+
+    SignalCompletion();
 }
 
 void Driver::Event_CameraChanged(const EV::Event& event) {
@@ -44,6 +53,8 @@ void Driver::Event_CameraChanged(const EV::Event& event) {
     {
         (*it)->OnCameraChanged();
     }
+
+    SignalCompletion();
 }
 
 static MouseEvent ConvertMouseEvent(const EV::Params_Mouse& from) {
@@ -72,6 +83,8 @@ void Driver::Event_EditModeChanged(const EV::Event& event) {
     {
         (*it)->OnEditModeChanged(W::editMode_t::Enum(args.editMode));
     }
+
+    SignalCompletion();
 }
 
 void Driver::Event_Mouse(const EV::Event& event) {
@@ -103,6 +116,8 @@ void Driver::Event_Mouse(const EV::Event& event) {
         }
     }
 	event.Accept();
+
+    SignalCompletion();
 }
 
 void Driver::Event_Key(const EV::Event& event) {
@@ -112,6 +127,8 @@ void Driver::Event_Key(const EV::Event& event) {
         op->OnKey(ConvertKeyEvent(args));
     }
     W::world.Send(event);
+
+    SignalCompletion();
 }
 
 void Driver::Event_Default(const EV::Event& event, const char* className) {
@@ -121,9 +138,9 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
         op->HandleEvents();
 
         W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
-
-		g_operators.Send(ED::def_ActionFinished.Create(ED::Params_ActionFinished()));
 	}
+
+    SignalCompletion();
 }
 
 Driver::Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx)
