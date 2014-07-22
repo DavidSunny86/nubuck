@@ -749,6 +749,18 @@
     <ClInclude Include="..\..\src\Nubuck\operators\op_fchull\op_fchull.h">
       <Filter>Private\operators\op_fchull</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\system\scoped_profiler.h">
+      <Filter>Public\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\system\scoped_profiler_inl.h">
+      <Filter>Public\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\world\animation.h">
+      <Filter>Public\world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\math_conv.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">
@@ -1245,6 +1257,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\operators\op_fchull\op_fchull.cpp">
       <Filter>Private\operators\op_fchull</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\animation.cpp">
+      <Filter>Private\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\math_conv.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 #include <algdriver\algdriver.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <Nubuck\math\intersections.h>
+#include <Nubuck\world\animation.h>
 #include <renderer\mesh\plane\plane.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\cylinder\cylinder.h>
@@ -16,6 +17,7 @@
 #include <UI\userinterface.h>
 #include <operators\operators.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
+#include <nubuck_private.h>
 #include "entity.h"
 #include "world_events.h"
 #include "world.h"
@@ -271,7 +273,9 @@ void World::Event_Mouse(const EV::Event& event) {
 
     // TODO: do this once per world.Update()
     if(cameraChanged) {
-        OP::g_operators.OnCameraChanged();
+        OP::g_operators.InvokeAction(
+            EV::def_CameraChanged.Create(EV::Params_CameraChanged()),
+            OP::Operators::InvokationMode::ALWAYS);
     }
 }
 
@@ -375,7 +379,9 @@ void World::Event_Key(const EV::Event& event) {
 
     // TODO: do this once per world.Update()
     if(cameraChanged) {
-        OP::g_operators.OnCameraChanged();
+        OP::g_operators.InvokeAction(
+            EV::def_CameraChanged.Create(EV::Params_CameraChanged()),
+            OP::Operators::InvokationMode::ALWAYS);
     }
 }
 
@@ -542,8 +548,15 @@ void World::Update(void) {
         }
     }
 
-    if(_camArcball.FrameUpdate(_secsPassed))
-        OP::g_operators.OnCameraChanged();
+    if(_camArcball.FrameUpdate(_secsPassed)) {
+        OP::g_operators.InvokeAction(
+            EV::def_CameraChanged.Create(EV::Params_CameraChanged()),
+            OP::Operators::InvokationMode::ALWAYS);
+    }
+
+    if(OP::g_operators.IsDriverIdle()) {
+        g_animator.Move(_secsPassed);
+    }
 }
 
 void World::Render(R::RenderList& renderList) {
@@ -554,9 +567,10 @@ void World::Render(R::RenderList& renderList) {
     renderList.worldMat = _camArcball.GetWorldToEyeMatrix();
     renderList.meshJobs.clear();
 
-    renderList.meshJobs.push_back(Grid_GetRenderJob());
-
-    BBoxes_GetRenderJobs(renderList.meshJobs);
+    if(g_showRenderViewControls) {
+        renderList.meshJobs.push_back(Grid_GetRenderJob());
+        BBoxes_GetRenderJobs(renderList.meshJobs);
+    }
 
     SYS::ScopedLock lockEntities(_entitiesMtx);
 

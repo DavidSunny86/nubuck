@@ -5,6 +5,7 @@
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\cone\cone.h>
 #include <renderer\mesh\sphere\sphere.h>
+#include <nubuck_private.h>
 #include "op_translate.h"
 
 namespace OP {
@@ -213,7 +214,7 @@ bool Translate::Invoke() {
 }
 
 void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
-    if(_hidden) return;
+    if(_hidden || !g_showRenderViewControls) return;
 
     R::MeshJob meshJob;
 

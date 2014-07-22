@@ -2,15 +2,24 @@
 
 #include <Nubuck\events\events.h>
 
-namespace OP { class Operator; }
 
-BEGIN_EVENT_DEF(OP_ActionFinished)
-END_EVENT_DEF
+namespace OP {
 
-BEGIN_EVENT_DEF(OP_Push)
-    OP::Operator* op;
-END_EVENT_DEF
+class Operator;
 
-BEGIN_EVENT_DEF(OP_Pop)
+namespace ED {
+
+BEGIN_EVENT_DEF_CS(ActionFinished)
+END_EVENT_DEF_CS
+
+BEGIN_EVENT_DEF_CS(Push)
+    Operator* op;
+END_EVENT_DEF_CS
+
+BEGIN_EVENT_DEF_CS(Pop)
     unsigned count;
-END_EVENT_DEF
+END_EVENT_DEF_CS
+
+} // namespace ED
+
+} // namespace OP

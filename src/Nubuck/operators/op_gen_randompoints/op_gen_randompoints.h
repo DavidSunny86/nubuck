@@ -47,7 +47,8 @@ public:
             IN_HEMISPHERE,
             ON_SPHERE,
             ON_HEMISPHERE,
-            ON_PARABOLOID
+            ON_PARABOLOID,
+            IN_DISC
         };
     };
 private:
@@ -55,6 +56,7 @@ private:
 
     leda::nb::RatPolyMesh   _spherePrefab;
     leda::nb::RatPolyMesh   _hemispherePrefab;
+    leda::nb::RatPolyMesh   _discPrefab;
 
     Nubuck _nb;
 

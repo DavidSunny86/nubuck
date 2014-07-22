@@ -1,4 +1,5 @@
 #include <Nubuck\common\common.h>
+#include <common\filehandle.h>
 #include "texture.h"
 
 #define TYPE_UNCOMPRESSED_RGB24 2
@@ -102,6 +103,33 @@ R::Texture* AllocTGA(GEN::Pointer<FS::File> file) {
 
 	free(pixelData);
 	return texture;
+}
+
+void WriteTGA_BGR(
+    const std::string& filename,
+    tgaWord_t width,
+    tgaWord_t height,
+    COM::byte_t* pixelData)
+{
+    COM::FileHandle file(fopen(filename.c_str(), "w"));
+    if(NULL == file.Handle()) {
+        common.printf("ERROR - WriteTGA_BGR: unable to open file '%s'\n", filename.c_str());
+        return;
+    }
+
+    TGAHeader_t header;
+
+    memcpy(&header.fileSpec, &supportedFileSpec, sizeof(FileSpec_t));
+    memset(&header.imageSpec, 0, sizeof(ImageSpec_t));
+
+    header.imageSpec.width          = width;
+    header.imageSpec.height         = height;
+    header.imageSpec.bitsPerPixel   = 24;
+
+    fwrite(&header, sizeof(TGAHeader_t), 1, file.Handle());
+
+    unsigned sz = width * height * 3;
+    fwrite(pixelData, sz, 1, file.Handle());
 }
 
 R::RegisterTexAlloc registerTGA("tga", AllocTGA);

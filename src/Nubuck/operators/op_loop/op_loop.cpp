@@ -1,5 +1,6 @@
 #include <LEDA\geo\d3_hull.h>
 #include <Nubuck\polymesh.h>
+#include <Nubuck\world\animation.h>
 
 #include <QMenu>
 #include <QAction>
@@ -55,6 +56,8 @@ bool Loop::Invoke() {
 	leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
 	leda::CONVEX_HULL(L, mesh);
 	mesh.compute_faces();
+
+    W::SetVertexPosition(_geom, mesh.first_node(), leda::d3_rat_point(-100, -1, -1), 100.0f);
 
     return true;
 }

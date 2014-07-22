@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QScrollArea>
 #include <QDockWidget>
+#include <QColorDialog>
 
 #include <nubuck_private.h>
 #include <algdriver\algdriver.h>
@@ -75,16 +76,27 @@ namespace UI {
         }
     }
 
-    void MainWindow::OnEditModeToObjects() { 
+    void MainWindow::OnEditModeToObjects() {
         W::world.GetEditMode().SetMode(W::editMode_t::OBJECTS);
     }
 
-    void MainWindow::OnEditModeToVertices() { 
+    void MainWindow::OnEditModeToVertices() {
         W::world.GetEditMode().SetMode(W::editMode_t::VERTICES);
     }
 
     void MainWindow::closeEvent(QCloseEvent*) {
         qApp->exit();
+    }
+
+    void MainWindow::OnChooseBackgroundColor() {
+        R::Color oldColor = _renderView->GetRenderer().GetBackgroundColor();
+        QColorDialog colorDialog;
+        connect(&colorDialog, SIGNAL(currentColorChanged(const QColor&)), _renderView, SLOT(OnSetBackgroundColor(const QColor&)));
+        if(QDialog::Rejected == colorDialog.exec()) _renderView->OnSetBackgroundColor(oldColor);
+    }
+
+    void MainWindow::OnToggleRenderViewControls() {
+        ToggleRenderViewControls();
     }
 
     void MainWindow::OnShowConsole() {

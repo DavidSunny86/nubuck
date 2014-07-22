@@ -84,7 +84,10 @@ M::Vector3 Entity::GetScale() const {
 
 M::Matrix4 Entity::GetObjectToWorldMatrix() const {
     SYS::ScopedLock lock(_mtx);
-    return M::Mat4::Translate(_position) * M::Mat4::RotateQuaternion(_orientation);
+    return
+        M::Mat4::Translate(_position) *
+        M::Mat4::RotateQuaternion(_orientation) *
+        M::Mat4::Scale(_scale.x, _scale.y, _scale.z);
 }
 
 void Entity::SetPosition(const M::Vector3& position) {

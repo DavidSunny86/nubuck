@@ -5,6 +5,7 @@
 #include <Nubuck\math\box.h>
 #include <Nubuck\system\locks\spinlock.h>
 #include <Nubuck\world\editmode.h>
+#include <Nubuck\world\animation.h>
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>
@@ -77,6 +78,9 @@ private:
     // selection
     std::vector<leda::node> _vertexSelection;
 
+    // list of attached animations
+    Animation* _anims;
+
 #pragma region EventHandlers
     void Event_EdgeRadiusChanged(const EV::Event& event);
     void Event_EdgeColorChanged(const EV::Event& event);
@@ -145,6 +149,7 @@ public:
     M::Vector3 GetPosition() const override;
 
     void SetPosition(const M::Vector3& position) override;
+    void SetScale(const M::Vector3& scale) override;
 
     void HideOutline() override;
 
@@ -162,6 +167,8 @@ public:
     void FrameUpdate();
     void BuildRenderList();
     const R::RenderList& GetRenderList() const { return _renderList; }
+
+    void AttachAnimation(MoveVertexAnimation* animation);
 };
 
 void SaveGeometryToFile(const std::string& filename, IGeometry* geom);

@@ -32,6 +32,8 @@ namespace R {
 		GLenum Format(void) const { return _format; }
 		int Width(void) const { return _width; }
 		int Height(void) const { return _height; }
+
+        void WriteTGA(const std::string& filename);
 	};
 
 	typedef Texture* (*texAlloc_t)(GEN::Pointer<FS::File> file);

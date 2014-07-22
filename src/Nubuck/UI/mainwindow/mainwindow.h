@@ -33,7 +33,7 @@ namespace UI {
             OperatorMenu(QWidget* parent, const W::editMode_t::Enum mode, const QString& name);
         };
         enum { MENU_SCENE = 0, MENU_OBJECT, MENU_ALGORITHMS, MENU_VERTEX, NUM_MENUS };
-        GEN::Pointer<OperatorMenu> _opMenus[NUM_MENUS]; 
+        GEN::Pointer<OperatorMenu> _opMenus[NUM_MENUS];
         void OperatorMenus_Build();
 
 
@@ -46,6 +46,8 @@ namespace UI {
     protected:
         void closeEvent(QCloseEvent*) override;
     public slots:
+        void OnChooseBackgroundColor();
+        void OnToggleRenderViewControls();
         void OnShowConsole();
 	    void OnRandomPoints(void);
         void OnShowRenderMetrics(void);

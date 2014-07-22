@@ -28,7 +28,7 @@ struct Event {
     unsigned        id;
     const char*     name;
     BlockingEvent*  block;
-    char            args[ARGS_SIZE]; 
+    char            args[ARGS_SIZE];
 
     void Accept() const {
         if(block) {
@@ -82,6 +82,16 @@ public:
 #define END_EVENT_DEF                                               \
         }; /* struct Params_##IDENT */                              \
     } /* namespace EV */
+
+// same as above, but without namespace. CS suffix stands for 'current scope'
+#define BEGIN_EVENT_DEF_CS(IDENT)                                     \
+    struct Params_##IDENT;                                            \
+    static ::EV::EventDefinition<Params_##IDENT> def_##IDENT(#IDENT); \
+    struct Params_##IDENT {
+
+#define END_EVENT_DEF_CS                                        \
+    }; /* struct Params_##IDENT */                              \
+
 
 namespace EV {
 
@@ -143,19 +153,19 @@ protected:
     unsigned GetEventQueueSize() const { return _ev_events.size(); }
 
     template<typename TYPE>
-    void _EV_HandleEvents(TYPE* instance, const char* className) {                               
-        bool done = false;                                  
-        while(!done) {                                      
+    void _EV_HandleEvents(TYPE* instance, const char* className) {
+        bool done = false;
+        while(!done) {
             _ev_policy.WaitEvent();
-            EV::Event event;                                
-            _ev_eventsMtx.Lock();                           
-            if(_ev_events.empty()) done = true;             
-            else {                                          
-                event = _ev_events.front();                     
-                _ev_events.pop();                               
-            }                                               
-            _ev_eventsMtx.Unlock();                         
-            if(done) break;                                 
+            EV::Event event;
+            _ev_eventsMtx.Lock();
+            if(_ev_events.empty()) done = true;
+            else {
+                event = _ev_events.front();
+                _ev_events.pop();
+            }
+            _ev_eventsMtx.Unlock();
+            if(done) break;
             bool called = false;
             for(unsigned i = 0; i < _ev_handlers.size(); ++i) {
                 if(_ev_handlers[i]->eventID == event.id) {
@@ -164,10 +174,10 @@ protected:
                 }
             }
             if(!called) Event_Default(event, className);
-        } /* while(!done) */                                
+        } /* while(!done) */
     }
 
-    virtual void Event_Default(const EV::Event& event, const char* className) { 
+    virtual void Event_Default(const EV::Event& event, const char* className) {
         COM_printf("WARNING - unhandled event '%s' (id = '%d') in class '%s'.\n",
             event.name, event.id, className);
     }

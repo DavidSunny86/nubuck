@@ -36,6 +36,7 @@ RandomPointsPanel::RandomPointsPanel(QWidget* parent) : SimplePanel(parent) {
     domains.push_back("on sphere");
     domains.push_back("on hemisphere");
     domains.push_back("on paraboloid");
+    domains.push_back("in disc");
 
     _cbDomain = AddComboBox("Domain", domains);
     connect(_cbDomain, SIGNAL(currentIndexChanged(int)), this, SLOT(OnArgsChanged(int)));
@@ -44,7 +45,7 @@ RandomPointsPanel::RandomPointsPanel(QWidget* parent) : SimplePanel(parent) {
     _sbRadius->setValue(radius);
     connect(_sbRadius, SIGNAL(valueChanged(int)), this, SLOT(OnArgsChanged(int)));
 
-    _sbSize = AddSpinBox("size", 1, 10000);
+    _sbSize = AddSpinBox("size", 1, 100000);
     _sbSize->setValue(size);
     connect(_sbSize, SIGNAL(valueChanged(int)), this, SLOT(OnArgsChanged(int)));
 
@@ -119,6 +120,16 @@ void RandomPoints::UpdateHull(Domain::Enum domain, int radius) {
         mesh.compute_faces();
     }
 
+    if(Domain::IN_DISC == domain) {
+        mesh = _discPrefab;
+
+        leda::node v;
+        forall_nodes(v, mesh) {
+            leda::rat_vector pos = r * mesh.position_of(v).to_vector();
+            mesh.set_position(v, pos);
+        }
+    }
+
     leda::nb::set_color(_hull->GetRatPolyMesh(), R::Color::Red);
     ((W::ENT_Geometry*)_hull)->SetTransparency(0.2f); // HACK, incomplete iface
 }
@@ -160,6 +171,10 @@ void RandomPoints::UpdateCloud(Domain::Enum domain, int size, int radius) {
     case Domain::ON_PARABOLOID:
         leda::random_d3_rat_points_on_paraboloid(size, 100 * radius, L);
         forall_items(it, L) L[it] = leda::rational(1, 50) * L[it].to_vector();
+        break;
+    case Domain::IN_DISC:
+        leda::random_d3_rat_points_in_disc(size, 100 * radius, L);
+        forall_items(it, L) L[it] = leda::rational(1, 100) * L[it].to_vector();
         break;
     default:
         assert(0 && "UpdateCloud(): unknown domain");
@@ -212,6 +227,14 @@ RandomPoints::RandomPoints()
     }
     leda::D3_HULL(L, _hemispherePrefab);
     _hemispherePrefab.compute_faces();
+
+    L.clear();
+    leda::random_d3_rat_points_on_circle(1000, 1000, L);
+    forall_items(it, L) {
+        L[it] = leda::rational(1, 1000) * L[it].to_vector();
+    }
+    leda::D3_HULL(L, _discPrefab);
+    _discPrefab.compute_faces();
 }
 
 void RandomPoints::Register(const Nubuck& nb, Invoker& invoker) {

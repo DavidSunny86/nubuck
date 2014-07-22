@@ -1,6 +1,9 @@
+#include <Nubuck\system\scoped_profiler.h>
 #include "flipclip.h"
 
 namespace {
+
+SYS::Profiler g_prof;
 
 typedef leda::d3_rat_point          point_t;
 typedef leda::GRAPH<point_t, int>   mesh_t;
@@ -116,6 +119,8 @@ TriangulateXY
 */
 // cnf. d3hf13.cpp (LEDA)
 leda::edge TriangulateXY(mesh_t& mesh, leda::list<leda::node>& L, int orient) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     typedef leda::d3_rat_point point_t;
 
     // assert(0 == mesh.number_of_edges());
@@ -193,6 +198,8 @@ leda::edge TriangulateXY(mesh_t& mesh, leda::list<leda::node>& L, int orient) {
 }
 
 void Triangulate(leda::list<point_t>& points, mesh_t& mesh, leda::edge hullEdges[], leda::node stitchVerts[]) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     points.sort(); // lexicographic ascending
     points.unique();
 
@@ -227,6 +234,8 @@ inline void CheckCDegs(mesh_t& mesh, cdegs_t& cdegs) {
 }
 
 void InitColorDegs(mesh_t& mesh, leda::edge hullEdges[2], cdegs_t& cdegs) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     cdegs[0].init(mesh, 0);
     cdegs[1].init(mesh, 0);
     cdegs[2].init(mesh, 0);
@@ -262,6 +271,8 @@ void InitColorDegs(mesh_t& mesh, leda::edge hullEdges[2], cdegs_t& cdegs) {
 }
 
 int Flipping(mesh_t& mesh, cdegs_t& cdegs) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     // gather red edges
     leda::list<leda::edge> S;
     leda::edge e;
@@ -292,7 +303,12 @@ int Flipping(mesh_t& mesh, cdegs_t& cdegs) {
         const point_t& p2 = PositionOf(mesh, v2);
         const point_t& p3 = PositionOf(mesh, v3);
 
-        const int orient = leda::orientation(p0, p1, p2, p3);
+        int orient = 0;
+        {
+            SYS_PROFILER_SCOPE_NAME(g_prof, "orient (3d)");
+
+            orient = leda::orientation(p0, p1, p2, p3);
+        }
 
         DecTermCDegs(mesh, cdegs, e);
 
@@ -306,28 +322,43 @@ int Flipping(mesh_t& mesh, cdegs_t& cdegs) {
         } else {
             InvalidateU(mesh, e);
 
-            int orient_130 = leda::orientation_xy(p1, p3, p0);
-            int orient_132 = leda::orientation_xy(p1, p3, p2);
+            int orient_130 = 0, orient_132 = 0;
+            {
+                SYS_PROFILER_SCOPE_NAME(g_prof, "orient (2d)");
+
+                orient_130 = leda::orientation_xy(p1, p3, p0);
+                orient_132 = leda::orientation_xy(p1, p3, p2);
+            }
 
             if( orient_130 != orient_132 && // is convex quadliteral
                 (0 != orient_130 || 4 == mesh.outdeg(v0) || Color::BLUE == GetColor(mesh, e1)) &&
                 (0 != orient_132 || 4 == mesh.outdeg(v2) || Color::BLUE == GetColor(mesh, e3)))
             {
+                SYS_PROFILER_SCOPE_NAME(g_prof, "flip");
+
                 // NOTE: if quadliteral is not stricly convex then it's either part of the hull
                 // or a perfect diamond.
 
                 leda::edge e2 = mesh.face_cycle_succ(e1);
                 leda::edge e4 = mesh.face_cycle_succ(e3);
 
-                S.push(e1);
-                S.push(e2);
-                S.push(e3);
-                S.push(e4);
+                {
+                    SYS_PROFILER_SCOPE_NAME(g_prof, "push edges");
+
+                    S.push(e1);
+                    S.push(e2);
+                    S.push(e3);
+                    S.push(e4);
+                }
 
                 // perform flip
 
-                mesh.move_edge(e, e2, leda::source(e4));
-                mesh.move_edge(r, e4, leda::source(e2));
+                {
+                    SYS_PROFILER_SCOPE_NAME(g_prof, "move edges");
+
+                    mesh.move_edge(e, e2, leda::source(e4));
+                    mesh.move_edge(r, e4, leda::source(e2));
+                }
 
                 if( (0 == orient_130 && Color::BLUE == GetColor(mesh, e1)) ||
                     (0 == orient_132 && Color::BLUE == GetColor(mesh, e3)))
@@ -353,6 +384,8 @@ int Flipping(mesh_t& mesh, cdegs_t& cdegs) {
 }
 
 void SimplifyFace(mesh_t& mesh, cdegs_t& cdegs, leda::node v) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     if(mesh.outdeg(v) <= 3) return; // nothing to do
 
     leda::edge e1 = mesh.first_adj_edge(v);
@@ -392,6 +425,8 @@ void SimplifyFace(mesh_t& mesh, cdegs_t& cdegs, leda::node v) {
 }
 
 int Clipping(mesh_t& mesh, cdegs_t& cdegs) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     leda::node_list L;
 
     leda::node v;
@@ -434,6 +469,8 @@ int Clipping(mesh_t& mesh, cdegs_t& cdegs) {
 }
 
 void StripTetrahedrons(mesh_t& mesh, cdegs_t& cdegs, leda::node v) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     if(mesh.outdeg(v) <= 3) return; // nothing to do
 
     leda::edge e1 = mesh.first_adj_edge(v);
@@ -469,6 +506,8 @@ void StripTetrahedrons(mesh_t& mesh, cdegs_t& cdegs, leda::node v) {
 }
 
 int Stripping(mesh_t& mesh, cdegs_t& cdegs) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     leda::node_list L;
     leda::node v;
     forall_nodes(v, mesh) {
@@ -492,6 +531,8 @@ int Stripping(mesh_t& mesh, cdegs_t& cdegs) {
 }
 
 void Stitching(mesh_t& mesh, leda::edge hullEdges[], leda::node stitchVerts[]) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     leda::edge adv0 = hullEdges[Side::FRONT];
     while(stitchVerts[Side::FRONT] != leda::target(adv0))
         adv0 = mesh.face_cycle_pred(adv0); // here dir is arbitrary
@@ -565,6 +606,8 @@ void Stitching(mesh_t& mesh, leda::edge hullEdges[], leda::node stitchVerts[]) {
 
 // these nodes somehow mess up rendering
 void DeleteInnerNodes(mesh_t& G) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     leda::node n;
     forall_nodes(n, G) {
         if(2 == G.outdeg(n)) {
@@ -592,6 +635,8 @@ void DeleteInnerNodes(mesh_t& G) {
 }
 
 void DeleteLooseNodes(mesh_t& G) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     leda::node n;
     forall_nodes(n, G) {
         if(!G.outdeg(n)) G.del_node(n);
@@ -599,6 +644,8 @@ void DeleteLooseNodes(mesh_t& G) {
 }
 
 void Simplify(mesh_t& mesh) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     leda::node_array<int> deg(mesh, 0);
     leda::node v;
     forall_nodes(v, mesh) {
@@ -636,6 +683,8 @@ void Simplify(mesh_t& mesh) {
 }
 
 void _FlipClipHull(leda::list<point_t>& points, mesh_t& mesh) {
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
+
     leda::edge  hullEdges[2];
     leda::node  stitchVerts[2];
 
@@ -684,6 +733,8 @@ void random_sample(int n, const leda::list<point_t>& L, leda::list<point_t>& L1)
 int simplify(leda::list<point_t>& L, int n)
 {
     using namespace leda;
+
+    SYS_PROFILER_SCOPE_AUTO(g_prof);
 
   GRAPH<point_t,int> G0;
   list<point_t> L0;
@@ -781,6 +832,8 @@ int simplify(leda::list<point_t>& L, int n)
 } // unnamed namespace
 
 void FlipClipHull(leda::list<point_t> points, mesh_t& mesh) {
+  SYS_PROFILER_SCOPE_AUTO(g_prof);
+
   if (points.empty()) return;
 
   double l = points.length();
@@ -789,4 +842,8 @@ void FlipClipHull(leda::list<point_t> points, mesh_t& mesh) {
   if (n > 6) simplify(points,n);
 
   _FlipClipHull(points, mesh);
+}
+
+void FlipClipHull_WriteProfilerReport() {
+    g_prof.WriteReport("flipclip_report.txt");
 }

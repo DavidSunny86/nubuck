@@ -53,6 +53,7 @@ struct IGeometry {
     virtual void ApplyTransformation() = 0;
 
     virtual void SetPosition(const M::Vector3& position) = 0;
+    virtual void SetScale(const M::Vector3& scale) = 0;
 
     virtual void HideOutline() = 0;
 
