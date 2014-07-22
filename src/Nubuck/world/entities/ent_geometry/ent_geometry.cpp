@@ -208,6 +208,7 @@ ENT_Geometry::ENT_Geometry()
     , _stylizedHiddenLines(false)
     , _transparency(1.0f)
     , _isTransparent(false)
+    , _anims(NULL)
 {
     _nodeRenderer = &_billboardNodes;
 
@@ -463,6 +464,14 @@ void ENT_Geometry::OnDestroy() {
 
     g_ui.GetOutliner().DeleteItem(_outlinerItem);
     _outlinerItem = NULL;
+
+    // delete animations
+    Animation *next, *anim = _anims;
+    while(anim) {
+        next = anim->subjectLink.next;
+        g_animator.DeleteAnimation(anim);
+        anim = next;
+    }
 }
 
 leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() { return _ratPolyMesh; }
@@ -618,6 +627,11 @@ void ENT_Geometry::BuildRenderList() {
         }
         _renderList.meshJobs.push_back(rjob);
     }
+}
+
+void ENT_Geometry::AttachAnimation(MoveVertexAnimation* anim) {
+    anim->subjectLink.next = _anims;
+    _anims = anim;
 }
 
 } // namespace W

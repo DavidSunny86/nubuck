@@ -42,6 +42,7 @@
     <ClInclude Include="..\..\incl\Nubuck\math\vector3_mem_inl.h" />
     <ClInclude Include="..\..\incl\Nubuck\math\vector3_op_inl.h" />
     <ClInclude Include="..\..\incl\Nubuck\math\view_frustrum.h" />
+    <ClInclude Include="..\..\incl\Nubuck\math_conv.h" />
     <ClInclude Include="..\..\incl\Nubuck\nubuck.h" />
     <ClInclude Include="..\..\incl\Nubuck\nubuck_api.h" />
     <ClInclude Include="..\..\incl\Nubuck\operators\operator_events.h" />
@@ -78,6 +79,7 @@
     <ClInclude Include="..\..\incl\Nubuck\system\locks\spinlock.h" />
     <ClInclude Include="..\..\incl\Nubuck\system\scoped_profiler.h" />
     <ClInclude Include="..\..\incl\Nubuck\system\scoped_profiler_inl.h" />
+    <ClInclude Include="..\..\incl\Nubuck\world\animation.h" />
     <ClInclude Include="..\..\incl\Nubuck\world\editmode.h" />
     <ClInclude Include="..\..\src\Nubuck\algdriver\algdriver.h" />
     <ClInclude Include="..\..\src\Nubuck\camera\arcball_camera.h" />
@@ -474,6 +476,7 @@
     <ClCompile Include="..\..\src\Nubuck\math\vector3_mem.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\vector3_op.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\view_frustrum.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\math_conv.cpp" />
     <ClCompile Include="..\..\src\Nubuck\nubuck.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\operators.cpp" />
     <ClCompile Include="..\..\src\Nubuck\operators\operator_driver.cpp" />
@@ -569,6 +572,7 @@
     <ClCompile Include="..\..\src\Nubuck\UI\renderview\renderview.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\simple_panel\simple_panel.cpp" />
     <ClCompile Include="..\..\src\Nubuck\UI\userinterface.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\world\animation.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\editmode\editmode.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_outln.cpp" />

@@ -88,6 +88,8 @@ public:
 
     unsigned GetDriverQueueSize() const;
 
+    unsigned IsDriverIdle() const { return 0 == _actionsPending; }
+
     void FrameUpdate();
 
     unsigned Register(OperatorPanel* panel, Operator* op, HMODULE module = NULL);

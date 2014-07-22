@@ -5,6 +5,7 @@
 #include <algdriver\algdriver.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <Nubuck\math\intersections.h>
+#include <Nubuck\world\animation.h>
 #include <renderer\mesh\plane\plane.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\cylinder\cylinder.h>
@@ -551,6 +552,10 @@ void World::Update(void) {
         OP::g_operators.InvokeAction(
             EV::def_CameraChanged.Create(EV::Params_CameraChanged()),
             OP::Operators::InvokationMode::ALWAYS);
+    }
+
+    if(OP::g_operators.IsDriverIdle()) {
+        g_animator.Move(_secsPassed);
     }
 }
 
