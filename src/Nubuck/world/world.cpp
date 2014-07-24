@@ -5,7 +5,8 @@
 #include <algdriver\algdriver.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <Nubuck\math\intersections.h>
-#include <Nubuck\world\animation.h>
+#include <Nubuck\animation\animation.h>
+#include <Nubuck\animation\animator.h>
 #include <renderer\mesh\plane\plane.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\cylinder\cylinder.h>
@@ -16,6 +17,7 @@
 #include <UI\window_events.h>
 #include <UI\userinterface.h>
 #include <operators\operators.h>
+#include <operators\operator_driver.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <nubuck_private.h>
 #include "entity.h"
@@ -554,8 +556,8 @@ void World::Update(void) {
             OP::Operators::InvokationMode::ALWAYS);
     }
 
-    if(OP::g_operators.IsDriverIdle()) {
-        g_animator.Move(_secsPassed);
+    if(OP::g_operators.GetDriver().IsBlocked() || OP::g_operators.IsDriverIdle()) {
+        A::g_animator.Move(_secsPassed);
     }
 }
 

@@ -144,7 +144,8 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
 }
 
 Driver::Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx)
-    : _activeOps(activeOps)
+    : _isBlocked(false)
+    , _activeOps(activeOps)
     , _activeOpsMtx(activeOpsMtx)
 {
 	AddEventHandler(ED::def_Push, this, &Driver::Event_Push);
@@ -153,6 +154,21 @@ Driver::Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx)
     AddEventHandler(EV::def_EditModeChanged, this, &Driver::Event_EditModeChanged);
 	AddEventHandler(EV::def_Mouse, this, &Driver::Event_Mouse);
     AddEventHandler(EV::def_Key, this, &Driver::Event_Key);
+}
+
+bool Driver::IsBlocked() const {
+    return _isBlocked;
+}
+
+void Driver::Wait(SYS::ConditionVariable& cvar, bool (*testFunc)()) {
+    SYS::SpinLock mtx;
+    mtx.Lock();
+    _isBlocked = true;
+    while(!testFunc()) {
+        cvar.Wait(mtx);
+    }
+    _isBlocked = false;
+    mtx.Unlock();
 }
 
 DWORD Driver::Thread_Func() {

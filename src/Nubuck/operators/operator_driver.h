@@ -12,6 +12,8 @@ class Driver : public SYS::Thread, public EV::EventHandler<EV::EventHandlerPolic
 private:
     DECL_HANDLE_EVENTS(Driver)
 
+    bool _isBlocked;
+
     std::vector<Operator*>& _activeOps;
     SYS::SpinLock&          _activeOpsMtx;
 
@@ -30,6 +32,10 @@ public:
     Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx);
 
     unsigned GetEventQueueSize() const { return EV::EventHandler<EV::EventHandlerPolicies::Blocking>::GetEventQueueSize(); }
+
+    bool IsBlocked() const;
+
+    void Wait(SYS::ConditionVariable& cvar, bool (*testFunc)());
 
     DWORD Thread_Func(void) override;
 };

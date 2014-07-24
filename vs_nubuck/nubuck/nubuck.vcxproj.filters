@@ -204,12 +204,6 @@
     <Filter Include="Private\UI\simple_panel">
       <UniqueIdentifier>{f37dedb2-9459-4887-aee5-838fb25ee20d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Public\renderer">
-      <UniqueIdentifier>{c70f0992-5327-40aa-ba25-b9156690e2ef}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Public\renderer\color">
-      <UniqueIdentifier>{6b790fd9-1337-4dba-bad9-62cf75603351}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Private\renderer\mesh\grid">
       <UniqueIdentifier>{851ab214-9a34-4625-bfa9-c71f14f14fbf}</UniqueIdentifier>
     </Filter>
@@ -302,6 +296,18 @@
     </Filter>
     <Filter Include="Private\operators\op_fchull">
       <UniqueIdentifier>{c78a4aa7-11fd-4624-bc60-637b207b84b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\animation">
+      <UniqueIdentifier>{49e6f613-e7d7-4f4e-972a-44be967c3d2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\animation">
+      <UniqueIdentifier>{9732383b-46b9-48e4-a7b7-846741500683}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\renderer">
+      <UniqueIdentifier>{c70f0992-5327-40aa-ba25-b9156690e2ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Public\renderer\color">
+      <UniqueIdentifier>{6b790fd9-1337-4dba-bad9-62cf75603351}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -755,11 +761,20 @@
     <ClInclude Include="..\..\incl\Nubuck\system\scoped_profiler_inl.h">
       <Filter>Public\system</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\incl\Nubuck\world\animation.h">
-      <Filter>Public\world</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\math_conv.h">
       <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\animation\animation.h">
+      <Filter>Public\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\animation\animator.h">
+      <Filter>Public\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\animation\animator_inl.h">
+      <Filter>Public\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\animation\move_vertex_anim.h">
+      <Filter>Public\animation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1258,11 +1273,20 @@
     <ClCompile Include="..\..\src\Nubuck\operators\op_fchull\op_fchull.cpp">
       <Filter>Private\operators\op_fchull</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\world\animation.cpp">
-      <Filter>Private\world</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\math_conv.cpp">
       <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\operators\operator.cpp">
+      <Filter>Private\operators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\animation\move_vertex_anim.cpp">
+      <Filter>Private\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\animation\animation.cpp">
+      <Filter>Private\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\animation\animator.cpp">
+      <Filter>Private\animation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

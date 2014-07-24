@@ -1,6 +1,7 @@
 #include <nubuck_private.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <Nubuck\operators\operator_invoker.h>
+#include <Nubuck\animation\animator.h>
 #include <UI\window_events.h>
 #include <UI\userinterface.h>
 #include <UI\logwidget\logwidget.h>
@@ -140,10 +141,13 @@ unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module)
 }
 
 void Operators::InvokeAction(const EV::Event& event, InvokationMode::Enum mode) {
+    A::g_animator.Filter(event);
+
     if(InvokationMode::DROP_WHEN_BUSY == mode && BUSY_THRESHOLD < _actionsPending) {
 	    printf("INFO - Operators::InvokeAction: wait for driver, %d actions pending\n", _actionsPending);
         return;
     }
+
     _actionsPending++;
     _driver->Send(event);
 }

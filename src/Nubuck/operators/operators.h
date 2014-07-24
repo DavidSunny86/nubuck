@@ -90,6 +90,8 @@ public:
 
     unsigned IsDriverIdle() const { return 0 == _actionsPending; }
 
+    Driver& GetDriver() { assert(_driver.IsValid()); return *_driver; }
+
     void FrameUpdate();
 
     unsigned Register(OperatorPanel* panel, Operator* op, HMODULE module = NULL);

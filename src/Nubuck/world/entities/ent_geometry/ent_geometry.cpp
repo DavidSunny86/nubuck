@@ -1,6 +1,7 @@
 #include <Nubuck\math\sphere.h>
 #include <Nubuck\math\intersections.h>
 #include <Nubuck\system\locks\scoped_lock.h>
+#include <Nubuck\animation\animator.h>
 #include <UI\outliner\outliner.h>
 #include <UI\userinterface.h>
 #include <renderer\metrics\metrics.h>
@@ -466,10 +467,10 @@ void ENT_Geometry::OnDestroy() {
     _outlinerItem = NULL;
 
     // delete animations
-    Animation *next, *anim = _anims;
+    A::Animation *next, *anim = _anims;
     while(anim) {
         next = anim->subjectLink.next;
-        g_animator.DeleteAnimation(anim);
+        A::g_animator.DeleteAnimation(anim);
         anim = next;
     }
 }
@@ -629,7 +630,7 @@ void ENT_Geometry::BuildRenderList() {
     }
 }
 
-void ENT_Geometry::AttachAnimation(MoveVertexAnimation* anim) {
+void ENT_Geometry::AttachAnimation(A::Animation* anim) {
     anim->subjectLink.next = _anims;
     _anims = anim;
 }
