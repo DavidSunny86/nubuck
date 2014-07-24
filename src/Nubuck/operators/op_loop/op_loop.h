@@ -36,7 +36,6 @@ class Loop : public Operator {
 private:
     Nubuck _nb;
     W::ENT_Geometry* _geom;
-    bool _playAnim;
 
     void Event_OP_Loop_Start(const EV::Event& event);
 public:

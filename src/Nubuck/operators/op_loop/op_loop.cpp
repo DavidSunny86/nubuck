@@ -1,7 +1,5 @@
 #include <LEDA\geo\d3_hull.h>
 #include <Nubuck\polymesh.h>
-#include <Nubuck\animation\move_vertex_anim.h>
-#include <Nubuck\animation\animator.h>
 
 #include <QMenu>
 #include <QAction>
@@ -22,26 +20,13 @@ void Loop::Event_OP_Loop_Start(const EV::Event& event) {
         _nb.world->GetSelection()->Set(_geom);
 	}
 
-    if(!_playAnim) {
-        leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
-        // A::SetVertexPosition(_geom, mesh.first_node(), leda::d3_rat_point(-10, -1, -1), 5.0f);
-        A::MoveVertexAnimation* anim = A::g_animator.NewAnimation<A::MoveVertexAnimation>();
-        anim->Init(_geom, mesh.first_node(), leda::d3_rat_point(-10, -1, -1), 5.0f);
-        anim->PlayUntil(A::IsWidgetEvent);
-        WaitForAnimations();
-
-        _playAnim = true;
-    } else _playAnim = false;
-
-    /*
     for(unsigned i = 0; i < 50; ++i) {
         printf("OP::LOOP %8d, Doing some action!\n", i);
         Sleep(100);
     }
-    */
 }
 
-Loop::Loop() : _geom(NULL), _playAnim(false) {
+Loop::Loop() : _geom(NULL) {
     AddEventHandler(EV::def_OP_Loop_Start, this, &Loop::Event_OP_Loop_Start);
 }
 
