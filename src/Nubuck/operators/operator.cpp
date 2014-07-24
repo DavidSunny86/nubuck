@@ -11,7 +11,7 @@ bool IsAnimatorIdle() { return A::g_animator.IsIdle(); }
 
 namespace OP {
 
-void Operator::WaitForAnimations() {
+NUBUCK_API void WaitForAnimations() {
     g_operators.GetDriver().Wait(A::g_animator.GetConditionVariable(), IsAnimatorIdle);
 }
 

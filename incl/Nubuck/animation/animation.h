@@ -1,10 +1,12 @@
 #pragma once
 
+#include <Nubuck\nubuck_api.h>
+
 namespace EV { struct Event; }
 
 namespace A {
 
-class Animation {
+class NUBUCK_API Animation {
 public:
     struct AnimatorLink {
         Animation *prev, *next;
@@ -33,7 +35,7 @@ protected:
     virtual void DoMove(float secsPassed) = 0;
 public:
     Animation();
-    virtual ~Animation() { }
+    virtual ~Animation();
 
     bool IsDone() const;
 

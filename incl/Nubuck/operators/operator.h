@@ -45,8 +45,6 @@ public:
 
     void SendToPanel(const EV::Event& event);
 
-    void WaitForAnimations();
-
     virtual void Register(const Nubuck& nb, Invoker& invoker) = 0;
     virtual bool Invoke() = 0; // return false to decline invocation
     virtual void Finish() = 0;
@@ -60,6 +58,8 @@ public:
 };
 
 NUBUCK_API void SendToOperator(const EV::Event& event);
+
+NUBUCK_API void WaitForAnimations();
 
 inline void Operator::SetPanel(OperatorPanel* panel) {
     _panel = panel;

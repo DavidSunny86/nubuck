@@ -27,10 +27,8 @@ public:
 
     void Filter(const EV::Event& event);
 
-    template<typename TYPE> 
-    TYPE*   NewAnimation();
-
-    void    DeleteAnimation(Animation* anim);
+    void LinkAnimation(Animation* anim);
+    void UnlinkAnimation(Animation* anim);
 };
 
 extern Animator g_animator;

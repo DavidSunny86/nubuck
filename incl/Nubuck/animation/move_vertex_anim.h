@@ -3,13 +3,14 @@
 #include <LEDA\graph\graph.h>
 #include <LEDA\geo\d3_rat_point.h>
 
+#include <Nubuck\nubuck_api.h>
 #include <Nubuck\animation\animation.h>
 
 struct IGeometry;
 
 namespace A {
 
-class MoveVertexAnimation : public Animation {
+class NUBUCK_API MoveVertexAnimation : public Animation {
 private:
     typedef leda::d3_rat_point point3_t;
 
@@ -30,6 +31,6 @@ public:
 
 // supplementary convenience function
 
-void SetVertexPosition(IGeometry* subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration);
+NUBUCK_API void SetVertexPosition(IGeometry* subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration);
 
 } // namespace A

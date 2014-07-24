@@ -465,14 +465,6 @@ void ENT_Geometry::OnDestroy() {
 
     g_ui.GetOutliner().DeleteItem(_outlinerItem);
     _outlinerItem = NULL;
-
-    // delete animations
-    A::Animation *next, *anim = _anims;
-    while(anim) {
-        next = anim->subjectLink.next;
-        A::g_animator.DeleteAnimation(anim);
-        anim = next;
-    }
 }
 
 leda::nb::RatPolyMesh& ENT_Geometry::GetRatPolyMesh() { return _ratPolyMesh; }

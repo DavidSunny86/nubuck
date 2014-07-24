@@ -20,6 +20,8 @@ void Animator::Move(float secsPassed) {
         if(!anim->IsDone()) {
             anim->Move(secsPassed);
             _isIdle = false;
+        } else {
+            UnlinkAnimation(anim);
         }
         anim = anim->animatorLink.next;
     }
@@ -37,15 +39,27 @@ void Animator::Filter(const EV::Event& event) {
     }
 }
 
-void Animator::DeleteAnimation(Animation* anim) {
-    Animation::AnimatorLink& link = anim->animatorLink;
+void Animator::LinkAnimation(Animation* anim) {
+    {
+        SYS::ScopedLock lock(_animsMtx);
+        anim->animatorLink.prev = NULL;
+        anim->animatorLink.next = _anims;
+        if(_anims) _anims->animatorLink.prev = anim;
+        _anims = anim;
+    }
 
-    // unlink
+    _isIdle = false;
+}
+
+void Animator::UnlinkAnimation(Animation* anim) {
+    SYS::ScopedLock lock(_animsMtx);
+
+    Animation::AnimatorLink& link = anim->animatorLink;
     if(link.prev) link.prev->animatorLink.next = link.next;
     if(link.next) link.next->animatorLink.prev = link.prev;
     if(_anims == anim) _anims = link.next;
 
-    delete anim;
+    link.prev = link.next = NULL;
 }
 
 Animator g_animator;

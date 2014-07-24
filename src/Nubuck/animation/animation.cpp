@@ -1,4 +1,5 @@
 #include <Nubuck\animation\animation.h>
+#include <Nubuck\animation\animator.h>
 
 #include <UI\window_events.h>
 #include <world\world_events.h>
@@ -7,7 +8,13 @@ namespace A {
 
 Animation::Animation()
     : _isDone(true) // animation starts paused
-{ }
+{
+    g_animator.LinkAnimation(this);
+}
+
+Animation::~Animation() {
+    g_animator.UnlinkAnimation(this);
+}
 
 bool Animation::IsDone() const { return _isDone; }
 

@@ -3,6 +3,7 @@
 #include <Nubuck\math_conv.h>
 #include <Nubuck\animation\animator.h>
 #include <Nubuck\animation\move_vertex_anim.h>
+#include <Nubuck\operators\operator.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 
 namespace A {
@@ -40,10 +41,11 @@ void MoveVertexAnimation::DoMove(float secsPassed) {
     geom->Rebuild();
 }
 
-void SetVertexPosition(IGeometry* subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration) {
-    MoveVertexAnimation* anim = g_animator.NewAnimation<MoveVertexAnimation>();
-    anim->Init(subject, vertex, position, duration);
-    anim->PlayFor(duration);
+NUBUCK_API void SetVertexPosition(IGeometry* subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration) {
+    MoveVertexAnimation anim;
+    anim.Init(subject, vertex, position, duration);
+    anim.PlayFor(duration);
+    OP::WaitForAnimations();
 }
 
 } // namespace A
