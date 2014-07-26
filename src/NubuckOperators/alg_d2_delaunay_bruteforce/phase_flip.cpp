@@ -41,7 +41,7 @@ bool Phase_Flip::Quadrilateral::IsNull() const {
 void Phase_Flip::Enter() {
     _g.nb.log->printf("entering phase 'flip'\n");
 
-    leda::nb::RatPolyMesh& mesh = _g.inputGeom->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = _g.delaunay->GetRatPolyMesh();
 
     leda::edge e;
     forall_edges(e, mesh) {
@@ -62,7 +62,7 @@ void ApplyEdgeColor(leda::nb::RatPolyMesh& mesh, leda::edge e) {
 Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
     typedef leda::rat_point point2_t;
 
-    leda::nb::RatPolyMesh& mesh = _g.inputGeom->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = _g.delaunay->GetRatPolyMesh();
 
     // reset colors of previous flip
     if(!_q.IsNull()) {
@@ -72,6 +72,15 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
         ApplyEdgeColor(mesh, _q.e2);
         ApplyEdgeColor(mesh, _q.e3);
         ApplyEdgeColor(mesh, _q.e4);
+
+        // color chull mesh
+        leda::nb::RatPolyMesh& chullMesh = _g.chull->GetRatPolyMesh();
+        chullMesh.set_color(_g.emap[_q.e ], mesh.color_of(_q.e ));
+        chullMesh.set_color(_g.emap[_q.r ], mesh.color_of(_q.r ));
+        chullMesh.set_color(_g.emap[_q.e1], mesh.color_of(_q.e1));
+        chullMesh.set_color(_g.emap[_q.e2], mesh.color_of(_q.e2));
+        chullMesh.set_color(_g.emap[_q.e3], mesh.color_of(_q.e3));
+        chullMesh.set_color(_g.emap[_q.e4], mesh.color_of(_q.e4));
     }
 
     while(!_S.empty()) {
@@ -91,14 +100,23 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
 
         if(isStrictlyConvex && inCircle) {
             const leda::circle Cf(C.to_circle());
-            _g.circle->SetPosition(_g.inputGeom->GetPosition() + M::Vector3(Cf.center().xcoord(), Cf.center().ycoord(), 0.0f));
+            _g.circle->SetPosition(_g.delaunay->GetPosition() + M::Vector3(Cf.center().xcoord(), Cf.center().ycoord(), 0.0f));
             _g.circle->SetScale(static_cast<float>(Cf.radius()) * M::Vector3(1.0f, 1.0f, 1.0f));
             _g.circle->Show();
 
+            // color delaunay mesh
             mesh.set_color(q.e1, R::Color::Yellow);
             mesh.set_color(q.e2, R::Color::Yellow);
             mesh.set_color(q.e3, R::Color::Yellow);
             mesh.set_color(q.e4, R::Color::Yellow);
+
+            // color chull mesh
+            leda::nb::RatPolyMesh& chullMesh = _g.chull->GetRatPolyMesh();
+            chullMesh.set_color(_g.emap[q.e1], R::Color::Yellow);
+            chullMesh.set_color(_g.emap[q.e2], R::Color::Yellow);
+            chullMesh.set_color(_g.emap[q.e3], R::Color::Yellow);
+            chullMesh.set_color(_g.emap[q.e4], R::Color::Yellow);
+
 
             _q = q;
 
@@ -113,10 +131,16 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
 }
 
 Phase_Flip::StepRet::Enum Phase_Flip::StepPerformFlip() {
-    leda::nb::RatPolyMesh& mesh = _g.inputGeom->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = _g.delaunay->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& chullMesh = _g.chull->GetRatPolyMesh();
 
+    // flip delaunay edge
     mesh.move_edge(_q.e, _q.e2, leda::source(_q.e4));
     mesh.move_edge(_q.r, _q.e4, leda::source(_q.e2));
+
+    // flip chull edge
+    mesh.move_edge(_g.emap[_q.e], _g.emap[_q.e2], leda::source(_g.emap[_q.e4]));
+    mesh.move_edge(_g.emap[_q.r], _g.emap[_q.e4], leda::source(_g.emap[_q.e2]));
 
     _q = Quadrilateral(mesh, _q.e);
 
@@ -128,11 +152,14 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepPerformFlip() {
     const leda::rat_circle C(_q.p0, _q.p1, _q.p2);
 
     const leda::circle Cf(C.to_circle());
-    _g.circle->SetPosition(_g.inputGeom->GetPosition() + M::Vector3(Cf.center().xcoord(), Cf.center().ycoord(), 0.0f));
+    _g.circle->SetPosition(_g.delaunay->GetPosition() + M::Vector3(Cf.center().xcoord(), Cf.center().ycoord(), 0.0f));
     _g.circle->SetScale(static_cast<float>(Cf.radius()) * M::Vector3(1.0f, 1.0f, 1.0f));
     _g.circle->Show();
 
-    mesh.compute_faces(); // force rebuild
+    // force rebuild
+    mesh.compute_faces();
+    chullMesh.compute_faces();
+    chullMesh.set_visible(chullMesh.face_of(_g.emap[_g.hullEdge]), false);
 
     _stepMode = StepMode::SEARCH;
     return StepRet::CONTINUE;

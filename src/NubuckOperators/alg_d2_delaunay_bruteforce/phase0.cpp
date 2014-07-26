@@ -101,26 +101,96 @@ struct CompareVertexPositionsDescending : leda::leda_cmp_base<leda::node> {
     }
 };
 
+void Copy_MapAB(
+    const leda::nb::RatPolyMesh& meshA,
+    leda::nb::RatPolyMesh& meshB,
+    leda::node_map<leda::node>& vmap,
+    leda::edge_map<leda::edge>& emap)
+{
+    using namespace leda;
+
+    meshB.clear();
+    meshB.set_node_bound(meshA.number_of_nodes());
+    meshB.set_edge_bound(meshA.number_of_edges());
+
+    vmap.init(meshA, 0);
+    emap.init(meshA, 0);
+
+    node va, vb, wa;
+    edge ea, eb, ra;
+
+    forall_nodes(va, meshA) {
+        vb = meshB.new_node();
+        meshB.set_position(vb, meshA.position_of(va));
+        vmap[va] = vb;
+    }
+
+    forall_nodes(va, meshA) {
+        forall_adj_edges(ea, va) {
+            wa = target(ea);
+            eb = meshB.new_edge(vmap[va], vmap[wa]);
+            emap[ea] = eb;
+        }
+    }
+
+    edge_array<bool> visited(meshA, false);
+    forall_edges(ea, meshA) {
+        if(!visited[ea]) {
+            ra = meshA.reversal(ea);
+            meshB.set_reversal(emap[ea], emap[ra]);
+            visited[ea] = visited[ra] = true;
+        }
+    }
+
+    meshB.compute_faces();
+}
+
+leda::d3_rat_point ProjectOnParaboloid(const leda::d3_rat_point& p) {
+    const leda::rational z = p.xcoord() * p.xcoord() + p.ycoord() * p.ycoord();
+    return leda::d3_rat_point(p.xcoord(), p.ycoord(), z);
+}
+
 void Phase0::Enter() {
     _g.nb.log->printf("entering phase 'init'\n");
 
     const int renderMode =
         IGeometry::RenderMode::NODES |
         IGeometry::RenderMode::EDGES;
-    _g.inputGeom->SetRenderMode(renderMode);
+    _g.delaunay->SetRenderMode(renderMode);
 
-    leda::nb::RatPolyMesh& mesh = _g.inputGeom->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = _g.delaunay->GetRatPolyMesh();
 
     leda::list<leda::node> L = mesh.all_nodes();
 
     L.sort(CompareVertexPositionsDescending(mesh));
 
-    leda::edge hullEdge = TriangulateXY(mesh, L, -1);
+    _g.hullEdge = TriangulateXY(mesh, L, -1);
 
     mesh.compute_faces();
-    mesh.set_visible(mesh.face_of(hullEdge), false);
+    mesh.set_visible(mesh.face_of(_g.hullEdge), false);
 
     ApplyEdgeColors(mesh);
+
+    // copy mesh
+    const int renderAll =
+        IGeometry::RenderMode::NODES |
+        IGeometry::RenderMode::EDGES |
+        IGeometry::RenderMode::FACES;
+    _g.chull = _g.nb.world->CreateGeometry();
+    _g.chull->SetName("Convex Hull");
+    _g.chull->SetRenderMode(renderAll);
+    _g.chull->SetPosition(_g.chull->GetPosition() + M::Vector3(0.0f, 0.0f, 2.0f));
+
+    leda::nb::RatPolyMesh& chullMesh = _g.chull->GetRatPolyMesh();
+
+    Copy_MapAB(mesh, chullMesh, _g.vmap, _g.emap);
+
+    chullMesh.set_visible(chullMesh.face_of(_g.emap[_g.hullEdge]), false);
+
+    leda::node v;
+    forall_nodes(v, chullMesh) {
+        chullMesh.set_position(v, ProjectOnParaboloid(chullMesh.position_of(v)));
+    }
 }
 
 Phase0::StepRet::Enum Phase0::Step() {

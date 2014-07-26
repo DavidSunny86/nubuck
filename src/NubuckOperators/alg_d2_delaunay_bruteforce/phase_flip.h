@@ -38,7 +38,7 @@ private:
 public:
     Phase_Flip(Globals& g)
         : _g(g)
-        , _S(g.inputGeom->GetRatPolyMesh())
+        , _S(g.delaunay->GetRatPolyMesh())
         , _stepMode(StepMode::SEARCH)
     { }
 

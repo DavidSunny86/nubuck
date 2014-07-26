@@ -12,8 +12,15 @@ struct Color {
 struct Globals {
     Nubuck nb;
 
-    IGeometry* inputGeom;
+    IGeometry* delaunay;
+    IGeometry* chull;
     IGeometry* circle;
+
+    leda::edge hullEdge; // of delaunay mesh
+
+    // maps delaunay objects to chull objects
+    leda::node_map<leda::node> vmap;
+    leda::edge_map<leda::edge> emap;
 };
 
 Color::Enum GetColor(leda::nb::RatPolyMesh& mesh, leda::edge e);

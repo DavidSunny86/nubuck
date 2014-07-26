@@ -90,7 +90,7 @@ OP::ALG::Phase* D2_Delaunay_BruteForce::Init(const Nubuck& nb) {
         return NULL;
     }
 
-    _g.inputGeom = geomSel[0];
+    _g.delaunay = geomSel[0];
 
     _g.circle = CreateCircle(_g.nb.world);
 
