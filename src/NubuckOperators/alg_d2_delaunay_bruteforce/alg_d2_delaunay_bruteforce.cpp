@@ -1,3 +1,4 @@
+#include <QLabel>
 #include <QGridLayout>
 
 #include <LEDA\geo\d3_hull.h>
@@ -13,18 +14,41 @@ void D2_Delaunay_BruteForce_Panel::OnToggleConvexHull() {
     OP::SendToOperator(def_ToggleConvexHull.Create(Params_ToggleConvexHull()));
 }
 
+void D2_Delaunay_BruteForce_Panel::OnConvexHullScaleChanged(int) {
+    float scale = static_cast<float>(_sldConvexHullScale->value()) / _sldConvexHullScale->maximum();
+
+    Params_SetConvexHullScale args;
+    args.scale = scale;
+    OP::SendToOperator(def_SetConvexHullScale.Create(args));
+}
+
 D2_Delaunay_BruteForce_Panel::D2_Delaunay_BruteForce_Panel() {
     QGridLayout* gridLayout = new QGridLayout();
 
     _btnToggleConvexHull = new QPushButton("Toggle Convex Hull");
     connect(_btnToggleConvexHull, SIGNAL(clicked()), this, SLOT(OnToggleConvexHull()));
 
-    gridLayout->addWidget(_btnToggleConvexHull, 0, 0, 1, 1);
+    gridLayout->addWidget(_btnToggleConvexHull, 0, 0, 1, 2);
+
+    _sldConvexHullScale = new QSlider(Qt::Horizontal);
+    _sldConvexHullScale->setMaximum(1000);
+    _sldConvexHullScale->setMinimum(1);
+    _sldConvexHullScale->setValue(1000);
+    connect(_sldConvexHullScale, SIGNAL(valueChanged(int)), this, SLOT(OnConvexHullScaleChanged(int)));
+
+    gridLayout->addWidget(new QLabel("z-scale:"), 1, 0, 1, 1);
+    gridLayout->addWidget(_sldConvexHullScale, 1, 1, 1, 1);
 
     QWidget* dummy = new QWidget;
     dummy->setLayout(gridLayout);
 
     layout()->addWidget(dummy);
+}
+
+void D2_Delaunay_BruteForce_Panel::Invoke() {
+    _sldConvexHullScale->blockSignals(true);
+    _sldConvexHullScale->setValue(1000);
+    _sldConvexHullScale->blockSignals(false);
 }
 
 // ================================================================================
@@ -106,6 +130,11 @@ void D2_Delaunay_BruteForce::Event_ToggleConvexHull(const EV::Event&) {
     _isConvexHullVisible = !_isConvexHullVisible;
 }
 
+void D2_Delaunay_BruteForce::Event_SetConvexHullScale(const EV::Event& event) {
+    const Params_SetConvexHullScale& args = def_SetConvexHullScale.GetArgs(event);
+    _g.chull->SetScale(M::Vector3(1.0f, 1.0f, args.scale));
+}
+
 const char* D2_Delaunay_BruteForce::GetName() const {
     return "Delaunay Triangulation (brute force)";
 }
@@ -130,6 +159,7 @@ OP::ALG::Phase* D2_Delaunay_BruteForce::Init(const Nubuck& nb) {
 
 D2_Delaunay_BruteForce::D2_Delaunay_BruteForce() {
     AddEventHandler(def_ToggleConvexHull, this, &D2_Delaunay_BruteForce::Event_ToggleConvexHull);
+    AddEventHandler(def_SetConvexHullScale, this, &D2_Delaunay_BruteForce::Event_SetConvexHullScale);
 }
 
 NUBUCK_OPERATOR OP::OperatorPanel* CreateOperatorPanel() {
