@@ -1,3 +1,5 @@
+#include <maxint.h>
+
 #include <Nubuck\polymesh.h>
 #include <renderer\mesh\meshmgr.h>
 #include "r_gl_line_edges.h"

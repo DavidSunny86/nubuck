@@ -1,3 +1,5 @@
+#include <maxint.h>
+
 #include <QAction>
 #include <QMenu>
 

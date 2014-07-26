@@ -1,3 +1,4 @@
+#include <maxint.h>
 #include <Nubuck\polymesh.h>
 #include <Nubuck\nubuck.h>
 #include <Nubuck\math_conv.h>

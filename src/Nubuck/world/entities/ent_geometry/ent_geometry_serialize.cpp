@@ -1,3 +1,5 @@
+#include <maxint.h>
+
 #include <fstream>
 #include <Nubuck\polymesh.h>
 #include <world\entities\ent_geometry\ent_geometry.h>

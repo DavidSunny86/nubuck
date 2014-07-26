@@ -1,3 +1,5 @@
+#include <maxint.h>
+
 #include <LEDA\geo\d3_hull.h>
 #include <Nubuck\polymesh.h>
 

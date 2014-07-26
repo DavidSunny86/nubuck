@@ -1,3 +1,5 @@
+#include <maxint.h>
+
 #include <QMenu>
 #include <QAction>
 
@@ -81,6 +83,8 @@ bool FlipClip::Invoke() {
     _nb.log->printf("... |V| = %d\n", chullMesh.number_of_nodes());
     _nb.log->printf("... |E| = %d\n", chullMesh.number_of_edges());
     _nb.log->printf("... |F| = %d\n", chullMesh.number_of_faces());
+
+    return true;
 }
 
 } // namespace OP

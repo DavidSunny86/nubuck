@@ -35,6 +35,7 @@ static const char* TokToString(int tok) {
     TOKTOSTRING_CASE(NFX_TOK_MLSTRING);
     default:
         assert(0 && "TokToString: unknown token");
+        return "unknown";
     };
 }
 

@@ -1,3 +1,5 @@
+#include <maxint.h>
+
 #include <Nubuck\polymesh.h>
 #include <Nubuck\math\matrix3.h>
 #include <renderer\renderer_local.h>

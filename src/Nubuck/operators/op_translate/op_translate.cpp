@@ -1,3 +1,5 @@
+#include <maxint.h>
+
 #include <Nubuck\polymesh.h>
 #include <Nubuck\math\intersections.h>
 #include <world\world.h>

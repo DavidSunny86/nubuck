@@ -776,6 +776,9 @@
     <ClInclude Include="..\..\incl\Nubuck\animation\move_vertex_anim.h">
       <Filter>Public\animation</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\maxint.h">
+      <Filter>Private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Nubuck\renderer\glew\glew.c">

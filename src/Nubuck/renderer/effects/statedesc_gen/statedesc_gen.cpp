@@ -37,6 +37,7 @@ static const char* VarToString(int var) {
     STG_ENUM_TO_STRING_CASE(SFT_ENUM);
     default:
         assert(0 && "VarToString: unknown variable type");
+        return "unknown";
     };
 }
 static const char* TokToString(int tok) {
@@ -51,6 +52,7 @@ static const char* TokToString(int tok) {
     STG_ENUM_TO_STRING_CASE(STG_TOK_IDENT);
     default:
         assert(0 && "TokToString: unknown token");
+        return "unknown";
     };
 }
 

@@ -3,11 +3,14 @@
 %option prefix="yystg"
 %option outfile="lex.yystg.cpp"
 %option nounistd
-%option noyywrap
 %option yylineno
 
 %{
 #include "statedesc_gen_local.h"
+
+// replaces %option noyywrap, avoids compiler warning
+// "not enough actual paramters for macro"
+extern "C" int yywrap() { return 1; }
 %}
 
 IDENT [a-zA-Z][a-zA-Z0-9]*

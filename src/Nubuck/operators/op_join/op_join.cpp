@@ -1,3 +1,5 @@
+#include <maxint.h>
+
 #include <QMenu>
 #include <Nubuck\polymesh.h>
 #include <Nubuck\operators\operator_invoker.h>

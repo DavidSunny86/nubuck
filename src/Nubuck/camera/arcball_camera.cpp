@@ -182,7 +182,7 @@ void ArcballCamera::StopPanning() {
 
 void ArcballCamera::StartZooming(int mouseX, int mouseY) {
     if(!_zooming) {
-        _y0 = mouseY;
+        _y0 = static_cast<float>(mouseY);
         _lastZoom = _zoom;
         _zooming = true;
     }

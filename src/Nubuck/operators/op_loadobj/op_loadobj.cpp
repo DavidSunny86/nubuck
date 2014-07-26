@@ -1,3 +1,5 @@
+#include <maxint.h>
+
 #include <QFileDialog>
 #include <QMenu>
 #include <QLabel>

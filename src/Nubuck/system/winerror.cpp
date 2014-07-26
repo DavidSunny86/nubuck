@@ -1,3 +1,9 @@
+#pragma warning(push)
+
+// "name was marked as #pragma deprecated"
+// concerns old string functions
+#pragma warning(disable : 4995)
+
 #undef UNICODE
 
 #include <windows.h>
@@ -43,3 +49,5 @@ void ErrorExit(LPTSTR lpszFunction, const char* file, int line)
     LocalFree(lpDisplayBuf);
     ExitProcess(dw); 
 }
+
+#pragma warning(pop)
