@@ -560,7 +560,9 @@ void ENT_Geometry::FrameUpdate() {
     static SYS::Timer timer;
 
 	SYS::ScopedLock lock(_mtx);
-    M::Matrix4 tf = M::Mat4::ExpandedTR(Entity::GetPosition(), Entity::GetOrientation());
+    // FIXME: this way the bounding boxes of nodes, edges get scaled as
+    // well, which is not what we want
+    M::Matrix4 tf = GetObjectToWorldMatrix();
     _nodeRenderer->Transform(tf);
 
     timer.Start();
