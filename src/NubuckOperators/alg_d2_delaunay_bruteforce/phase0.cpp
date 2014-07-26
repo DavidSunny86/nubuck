@@ -180,6 +180,7 @@ void Phase0::Enter() {
     _g.chull->SetName("Convex Hull");
     _g.chull->SetRenderMode(renderAll);
     _g.chull->SetPosition(_g.chull->GetPosition() + M::Vector3(0.0f, 0.0f, 2.0f));
+    _g.chull->Hide();
 
     leda::nb::RatPolyMesh& chullMesh = _g.chull->GetRatPolyMesh();
 

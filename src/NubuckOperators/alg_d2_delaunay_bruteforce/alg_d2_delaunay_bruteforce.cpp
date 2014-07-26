@@ -1,16 +1,35 @@
+#include <QGridLayout>
+
 #include <LEDA\geo\d3_hull.h>
 #include <Nubuck\polymesh.h>
-#include <Nubuck\operators\standard_algorithm.h>
-#include "globals.h"
+#include "alg_d2_delaunay_bruteforce.h"
 #include "phase0.h"
 
-class D2_Delaunay_BruteForce : public OP::ALG::StandardAlgorithm {
-private:
-    Globals _g;
-protected:
-    const char*     GetName() const override;
-    OP::ALG::Phase* Init(const Nubuck& nb) override;
-};
+// ================================================================================
+// Panel Impl
+// ================================================================================
+
+void D2_Delaunay_BruteForce_Panel::OnToggleConvexHull() {
+    OP::SendToOperator(def_ToggleConvexHull.Create(Params_ToggleConvexHull()));
+}
+
+D2_Delaunay_BruteForce_Panel::D2_Delaunay_BruteForce_Panel() {
+    QGridLayout* gridLayout = new QGridLayout();
+
+    _btnToggleConvexHull = new QPushButton("Toggle Convex Hull");
+    connect(_btnToggleConvexHull, SIGNAL(clicked()), this, SLOT(OnToggleConvexHull()));
+
+    gridLayout->addWidget(_btnToggleConvexHull, 0, 0, 1, 1);
+
+    QWidget* dummy = new QWidget;
+    dummy->setLayout(gridLayout);
+
+    layout()->addWidget(dummy);
+}
+
+// ================================================================================
+// Algorithm Impl
+// ================================================================================
 
 namespace {
 
@@ -77,11 +96,23 @@ IGeometry* CreateCircle(IWorld* world) {
 
 } // unnamed namespace
 
+void D2_Delaunay_BruteForce::Event_ToggleConvexHull(const EV::Event&) {
+    if(_isConvexHullVisible) {
+        _g.chull->Hide();
+    }
+    else {
+        _g.chull->Show();
+    }
+    _isConvexHullVisible = !_isConvexHullVisible;
+}
+
 const char* D2_Delaunay_BruteForce::GetName() const {
     return "Delaunay Triangulation (brute force)";
 }
 
 OP::ALG::Phase* D2_Delaunay_BruteForce::Init(const Nubuck& nb) {
+    _isConvexHullVisible = false;
+
     _g.nb = nb;
 
     std::vector<IGeometry*> geomSel = _g.nb.world->GetSelection()->GetList();
@@ -97,8 +128,12 @@ OP::ALG::Phase* D2_Delaunay_BruteForce::Init(const Nubuck& nb) {
     return new Phase0(_g);
 }
 
+D2_Delaunay_BruteForce::D2_Delaunay_BruteForce() {
+    AddEventHandler(def_ToggleConvexHull, this, &D2_Delaunay_BruteForce::Event_ToggleConvexHull);
+}
+
 NUBUCK_OPERATOR OP::OperatorPanel* CreateOperatorPanel() {
-    return new OP::ALG::StandardAlgorithmPanel;
+    return new D2_Delaunay_BruteForce_Panel;
 }
 
 NUBUCK_OPERATOR OP::Operator* CreateOperator() {
