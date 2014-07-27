@@ -150,6 +150,66 @@ leda::d3_rat_point ProjectOnParaboloid(const leda::d3_rat_point& p) {
     return leda::d3_rat_point(p.xcoord(), p.ycoord(), z);
 }
 
+M::Vector3 ProjectOnParaboloid_F(const M::Vector3& v) {
+    return M::Vector3(v.x, v.y, v.x * v.x + v.y * v.y);
+}
+
+leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
+    return leda::d3_rat_point(leda::d3_point(v.x, v.y, v.z));
+}
+
+// somehow this doesn't work when using exact arithmetic. oh well...
+void CreateGrid(
+    leda::nb::RatPolyMesh& mesh,
+    const int subdiv,
+    const float size)
+{
+    const leda::rational zero(0, 1);
+
+    mesh.clear();
+
+    const int N = (1 << subdiv) + 1;
+
+    leda::node* nodes = new leda::node[N * N];
+
+    const float         hsize = 0.5f * size;
+    const M::Vector3    off = M::Vector3(hsize, hsize, 0.0f);
+    const float         ds = size / (N - 1);
+
+    float x = 0.0f, y = 0.0f;
+
+    for(unsigned i = 0; i < N; ++i) {
+        y = 0.0f;
+        for(unsigned j = 0; j < N; ++j) {
+            const leda::node v = mesh.new_node();
+            M::Vector3 pos = M::Vector3(x, y, 0.0f) - off;
+            mesh.set_position(v, ToRatPoint(ProjectOnParaboloid_F(pos)));
+            nodes[N * i + j] = v;
+
+            y += ds;
+        }
+
+        x += ds;
+    }
+
+    for(unsigned i = 0; i < N; ++i) {
+        for(unsigned j = 0; j < N; ++j) {
+            if(i + 1 < N)   mesh.new_edge(nodes[N * i + j], nodes[N * (i + 1) + j]);
+            if(j + 1 < N)   mesh.new_edge(nodes[N * i + j], nodes[N * i + (j + 1)]);
+            if(i > 0)       mesh.new_edge(nodes[N * i + j], nodes[N * (i - 1) + j]);
+            if(j > 0)       mesh.new_edge(nodes[N * i + j], nodes[N * i + (j - 1)]);
+        }
+    }
+
+    delete[] nodes;
+
+    bool isBidirected = mesh.make_map();
+    assert(isBidirected);
+    mesh.compute_faces();
+
+    mesh.set_visible(mesh.face_of(mesh.reversal(mesh.first_edge())), false);
+}
+
 void Phase0::Enter() {
     _g.nb.log->printf("entering phase 'init'\n");
 
@@ -171,6 +231,17 @@ void Phase0::Enter() {
 
     ApplyEdgeColors(mesh);
 
+    // compute size for paraboloid
+    float maxSize = 0.0f;
+
+    leda::node v;
+    forall_nodes(v, mesh) {
+        maxSize = M::Max(maxSize, (float)mesh.position_of(v).xcoord().to_float());
+        maxSize = M::Max(maxSize, (float)mesh.position_of(v).ycoord().to_float());
+    }
+    maxSize += 1.0f;
+    maxSize *= 2.0f;
+
     // copy mesh
     const int renderAll =
         IGeometry::RenderMode::NODES |
@@ -188,10 +259,22 @@ void Phase0::Enter() {
 
     chullMesh.set_visible(chullMesh.face_of(_g.emap[_g.hullEdge]), false);
 
-    leda::node v;
     forall_nodes(v, chullMesh) {
         chullMesh.set_position(v, ProjectOnParaboloid(chullMesh.position_of(v)));
     }
+
+    // paraboloid mesh
+    _g.paraboloid = _g.nb.world->CreateGeometry();
+    _g.paraboloid->SetRenderMode(IGeometry::RenderMode::FACES);
+    _g.paraboloid->SetName("Paraboloid");
+    _g.paraboloid->SetPosition(_g.paraboloid->GetPosition() + M::Vector3(0.0f, 0.0f, 2.0f));
+    _g.paraboloid->Hide();
+
+    leda::nb::RatPolyMesh& parabMesh = _g.paraboloid->GetRatPolyMesh();
+
+    CreateGrid(parabMesh, 6, maxSize);
+
+    leda::nb::set_color(parabMesh, R::Color::Green);
 }
 
 Phase0::StepRet::Enum Phase0::Step() {

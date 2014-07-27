@@ -10,6 +10,10 @@
 // Panel Impl
 // ================================================================================
 
+void D2_Delaunay_BruteForce_Panel::OnToggleParaboloid() {
+    OP::SendToOperator(def_ToggleParaboloid.Create(Params_ToggleParaboloid()));
+}
+
 void D2_Delaunay_BruteForce_Panel::OnToggleConvexHull() {
     OP::SendToOperator(def_ToggleConvexHull.Create(Params_ToggleConvexHull()));
 }
@@ -25,10 +29,15 @@ void D2_Delaunay_BruteForce_Panel::OnConvexHullScaleChanged(int) {
 D2_Delaunay_BruteForce_Panel::D2_Delaunay_BruteForce_Panel() {
     QGridLayout* gridLayout = new QGridLayout();
 
+    _btnToggleParaboloid = new QPushButton("Toggle Paraboloid");
+    connect(_btnToggleParaboloid, SIGNAL(clicked()), this, SLOT(OnToggleParaboloid()));
+
+    gridLayout->addWidget(_btnToggleParaboloid, 0, 0, 1, 2);
+
     _btnToggleConvexHull = new QPushButton("Toggle Convex Hull");
     connect(_btnToggleConvexHull, SIGNAL(clicked()), this, SLOT(OnToggleConvexHull()));
 
-    gridLayout->addWidget(_btnToggleConvexHull, 0, 0, 1, 2);
+    gridLayout->addWidget(_btnToggleConvexHull, 1, 0, 1, 2);
 
     _sldConvexHullScale = new QSlider(Qt::Horizontal);
     _sldConvexHullScale->setMaximum(1000);
@@ -36,8 +45,8 @@ D2_Delaunay_BruteForce_Panel::D2_Delaunay_BruteForce_Panel() {
     _sldConvexHullScale->setValue(1000);
     connect(_sldConvexHullScale, SIGNAL(valueChanged(int)), this, SLOT(OnConvexHullScaleChanged(int)));
 
-    gridLayout->addWidget(new QLabel("z-scale:"), 1, 0, 1, 1);
-    gridLayout->addWidget(_sldConvexHullScale, 1, 1, 1, 1);
+    gridLayout->addWidget(new QLabel("z-scale:"), 2, 0, 1, 1);
+    gridLayout->addWidget(_sldConvexHullScale, 2, 1, 1, 1);
 
     QWidget* dummy = new QWidget;
     dummy->setLayout(gridLayout);
@@ -120,6 +129,16 @@ IGeometry* CreateCircle(IWorld* world) {
 
 } // unnamed namespace
 
+void D2_Delaunay_BruteForce::Event_ToggleParaboloid(const EV::Event&) {
+    if(_isParaboloidVisible) {
+        _g.paraboloid->Hide();
+    }
+    else {
+        _g.paraboloid->Show();
+    }
+    _isParaboloidVisible = !_isParaboloidVisible;
+}
+
 void D2_Delaunay_BruteForce::Event_ToggleConvexHull(const EV::Event&) {
     if(_isConvexHullVisible) {
         _g.chull->Hide();
@@ -133,6 +152,7 @@ void D2_Delaunay_BruteForce::Event_ToggleConvexHull(const EV::Event&) {
 void D2_Delaunay_BruteForce::Event_SetConvexHullScale(const EV::Event& event) {
     const Params_SetConvexHullScale& args = def_SetConvexHullScale.GetArgs(event);
     _g.chull->SetScale(M::Vector3(1.0f, 1.0f, args.scale));
+    _g.paraboloid->SetScale(M::Vector3(1.0f, 1.0f, args.scale));
 }
 
 const char* D2_Delaunay_BruteForce::GetName() const {
@@ -140,6 +160,7 @@ const char* D2_Delaunay_BruteForce::GetName() const {
 }
 
 OP::ALG::Phase* D2_Delaunay_BruteForce::Init(const Nubuck& nb) {
+    _isParaboloidVisible = false;
     _isConvexHullVisible = false;
 
     _g.nb = nb;
@@ -158,6 +179,7 @@ OP::ALG::Phase* D2_Delaunay_BruteForce::Init(const Nubuck& nb) {
 }
 
 D2_Delaunay_BruteForce::D2_Delaunay_BruteForce() {
+    AddEventHandler(def_ToggleParaboloid, this, &D2_Delaunay_BruteForce::Event_ToggleParaboloid);
     AddEventHandler(def_ToggleConvexHull, this, &D2_Delaunay_BruteForce::Event_ToggleConvexHull);
     AddEventHandler(def_SetConvexHullScale, this, &D2_Delaunay_BruteForce::Event_SetConvexHullScale);
 }

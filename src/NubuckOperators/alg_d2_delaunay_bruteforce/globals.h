@@ -14,6 +14,7 @@ struct Globals {
 
     IGeometry* delaunay;
     IGeometry* chull;
+    IGeometry* paraboloid;
     IGeometry* circle;
 
     leda::edge hullEdge; // of delaunay mesh
