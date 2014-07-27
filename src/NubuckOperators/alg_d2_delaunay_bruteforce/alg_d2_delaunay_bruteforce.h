@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QPushButton>
+#include <QCheckBox>
 #include <QSlider>
 
 #include <Nubuck\events\events.h>
@@ -20,9 +20,9 @@ END_EVENT_DEF_CS
 class D2_Delaunay_BruteForce_Panel : public OP::ALG::StandardAlgorithmPanel {
     Q_OBJECT
 private:
-    QPushButton*    _btnToggleParaboloid;
-    QPushButton*    _btnToggleConvexHull;
-    QSlider*        _sldConvexHullScale;
+    QCheckBox*  _btnToggleParaboloid;
+    QCheckBox*  _btnToggleConvexHull;
+    QSlider*    _sldConvexHullScale;
 private slots:
     void OnToggleParaboloid();
     void OnToggleConvexHull();

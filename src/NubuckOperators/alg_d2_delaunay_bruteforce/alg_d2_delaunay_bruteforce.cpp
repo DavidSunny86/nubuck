@@ -1,5 +1,6 @@
 #include <QLabel>
-#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 #include <LEDA\geo\d3_hull.h>
 #include <Nubuck\polymesh.h>
@@ -27,17 +28,19 @@ void D2_Delaunay_BruteForce_Panel::OnConvexHullScaleChanged(int) {
 }
 
 D2_Delaunay_BruteForce_Panel::D2_Delaunay_BruteForce_Panel() {
-    QGridLayout* gridLayout = new QGridLayout();
+    QHBoxLayout* row0 = new QHBoxLayout();
+    QHBoxLayout* row1 = new QHBoxLayout();
+    QVBoxLayout* vboxLayout = new QVBoxLayout();
 
-    _btnToggleParaboloid = new QPushButton("Toggle Paraboloid");
+    _btnToggleParaboloid = new QCheckBox("Paraboloid");
     connect(_btnToggleParaboloid, SIGNAL(clicked()), this, SLOT(OnToggleParaboloid()));
 
-    gridLayout->addWidget(_btnToggleParaboloid, 0, 0, 1, 2);
+    row0->addWidget(_btnToggleParaboloid);
 
-    _btnToggleConvexHull = new QPushButton("Toggle Convex Hull");
+    _btnToggleConvexHull = new QCheckBox("Convex Hull");
     connect(_btnToggleConvexHull, SIGNAL(clicked()), this, SLOT(OnToggleConvexHull()));
 
-    gridLayout->addWidget(_btnToggleConvexHull, 1, 0, 1, 2);
+    row0->addWidget(_btnToggleConvexHull);
 
     _sldConvexHullScale = new QSlider(Qt::Horizontal);
     _sldConvexHullScale->setMaximum(1000);
@@ -45,11 +48,14 @@ D2_Delaunay_BruteForce_Panel::D2_Delaunay_BruteForce_Panel() {
     _sldConvexHullScale->setValue(1000);
     connect(_sldConvexHullScale, SIGNAL(valueChanged(int)), this, SLOT(OnConvexHullScaleChanged(int)));
 
-    gridLayout->addWidget(new QLabel("z-scale:"), 2, 0, 1, 1);
-    gridLayout->addWidget(_sldConvexHullScale, 2, 1, 1, 1);
+    row1->addWidget(new QLabel("z-scale:"));
+    row1->addWidget(_sldConvexHullScale);
+
+    vboxLayout->addLayout(row0);
+    vboxLayout->addLayout(row1);
 
     QWidget* dummy = new QWidget;
-    dummy->setLayout(gridLayout);
+    dummy->setLayout(vboxLayout);
 
     layout()->addWidget(dummy);
 }
