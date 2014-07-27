@@ -7,6 +7,8 @@ namespace UI {
 OperatorPanel::OperatorPanel(QWidget* parent) : QDockWidget("Operator", parent) {
     _header = new QWidget;
     _headerUi.setupUi(_header);
+    _scrollArea = new QScrollArea();
+    QDockWidget::setWidget(_scrollArea);
     setWidget(NULL);
 }
 
@@ -21,7 +23,8 @@ void OperatorPanel::setWidget(QWidget* widget) {
     layout->addStretch();
     QWidget* dummy = new QWidget;
     dummy->setLayout(layout);
-    QDockWidget::setWidget(dummy);
+    _scrollArea->setWidget(dummy);
+    _scrollArea->setWidgetResizable(true);
 }
 
 } // namespace UI

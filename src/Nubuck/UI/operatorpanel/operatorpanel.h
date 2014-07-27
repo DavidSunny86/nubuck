@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QDockWidget>
+#include <QScrollArea>
 #include "ui_operatorpanelheader.h"
 
 namespace UI {
@@ -9,6 +10,7 @@ class OperatorPanel : public QDockWidget {
 private:
     Ui::OperatorPanelHeader _headerUi;
     QWidget*                _header;
+    QScrollArea*            _scrollArea;
 public:
     OperatorPanel(QWidget* parent = NULL);
 
