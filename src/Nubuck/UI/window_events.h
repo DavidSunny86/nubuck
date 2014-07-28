@@ -27,4 +27,8 @@ BEGIN_EVENT_DEF(Key)
     int keyCode;
     int nativeScanCode;
     bool autoRepeat;
+    enum Modifier {
+        MODIFIER_SHIFT = 0x02000000 // == Qt::ShiftModifier
+    };
+    int mods;
 END_EVENT_DEF

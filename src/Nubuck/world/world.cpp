@@ -363,14 +363,26 @@ void World::Event_Key(const EV::Event& event) {
         _camArcball.Reset();
         cameraChanged = true;
     }
-    if(numpad[1] == args.nativeScanCode) { // front view
-        _camArcball.RotateTo(M::Quat::Identity(), transitionDur);
+    if(numpad[1] == args.nativeScanCode) {
+        if(EV::Params_Key::MODIFIER_SHIFT & args.mods) {
+            _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(0.0f, 1.0f, 0.0f), 180.0f), transitionDur); // back view
+        } else {
+            _camArcball.RotateTo(M::Quat::Identity(), transitionDur); // front view
+        }
     }
-    if(numpad[3] == args.nativeScanCode) { // right view
-        _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(0.0f, 1.0f, 0.0f), 90.0f), transitionDur);
+    if(numpad[3] == args.nativeScanCode) {
+        if(EV::Params_Key::MODIFIER_SHIFT & args.mods) {
+            _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(0.0f, 1.0f, 0.0f), -90.0f), transitionDur); // left view
+        } else {
+            _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(0.0f, 1.0f, 0.0f), 90.0f), transitionDur); // right view
+        }
     }
-    if(numpad[7] == args.nativeScanCode) { // top view
-        _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(1.0f, 0.0f, 0.0f), -90.0f), transitionDur);
+    if(numpad[7] == args.nativeScanCode) {
+        if(EV::Params_Key::MODIFIER_SHIFT & args.mods) {
+            _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(1.0f, 0.0f, 0.0f), 90.0f), transitionDur); // bottom view
+        } else {
+            _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(1.0f, 0.0f, 0.0f), -90.0f), transitionDur); // top view
+        }
     }
     if(numpad[5] == args.nativeScanCode) _camArcball.ToggleProjection(transitionDur);
 

@@ -113,6 +113,7 @@ namespace UI {
         args.keyCode = qevent->key();
         args.nativeScanCode = qevent->nativeScanCode();
         args.autoRepeat = qevent->isAutoRepeat();
+        args.mods = qevent->modifiers();
 
 
         EV::Event event = EV::def_Key.Create(args);
