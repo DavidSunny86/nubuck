@@ -10,6 +10,7 @@ class OperatorPanel : public QDockWidget {
 private:
     Ui::OperatorPanelHeader _headerUi;
     QWidget*                _header;
+    QWidget*                _opWidget;
     QScrollArea*            _scrollArea;
 public:
     OperatorPanel(QWidget* parent = NULL);
