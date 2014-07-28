@@ -8,10 +8,6 @@ namespace OP {
 class DeletePanel : public OperatorPanel {
 public:
 	DeletePanel(QWidget* parent = NULL) : OperatorPanel(parent) { }
-
-    ~DeletePanel() {
-        std::cout << "Deleting Panel DeletePanel! Delete!" << std::endl;
-    }
 };
 
 class Delete : public Operator {
