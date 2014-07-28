@@ -140,7 +140,7 @@ void CylinderEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<
 	SYS::ScopedLock lock(_mtx);
     for(unsigned i = 0; i < _edges.size(); ++i) {
         FatEdge& edge = _edges[i];
-        int state = M::Max(mesh.state_of(edge.v0), mesh.state_of(edge.v1));
+        int state = M::Max(mesh.state_of(edge.pe), M::Max(mesh.state_of(edge.v0), mesh.state_of(edge.v1)));
         COM_assert(state_t::TOPOLOGY_CHANGED > state);
         if(state_t::GEOMETRY_CHANGED == state) {
             edge.p0 = fpos[edge.v0->id()];
