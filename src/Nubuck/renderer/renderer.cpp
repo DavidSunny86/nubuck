@@ -839,23 +839,7 @@ void Renderer::Render(RenderList& renderList) {
 
         // set transparency technique
         if(rjob.material.isTransparent) {
-            int transparencyMode = cvar_r_transparencyMode;
-            switch(transparencyMode) {
-            case TransparencyMode::BACKFACES_FRONTFACES:
-                rjob.fx     = "LitDirectionalTransparent";
-                rjob.layer  = Layers::GEOMETRY_0_SOLID_1;
-                break;
-            case TransparencyMode::SORT_TRIANGLES:
-                rjob.fx     = "LitDirectionalTransparent";
-                rjob.layer  = Layers::GEOMETRY_0_TRANSPARENT_SORTED;
-                break;
-            case TransparencyMode::DEPTH_PEELING:
-                rjob.layer  = Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING;
-                break;
-            default:
-                assert(0 && "Renderer::Render(): unknown transparency mode");
-            }
-
+            // just collect them for now...
             transparentJobs.push_back(rjob);
         }
 
@@ -901,7 +885,7 @@ void Renderer::Render(RenderList& renderList) {
         Render(renderList, projection, worldToEye, GeomSortMode::SORT_TRIANGLES, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_SORTED]);
     }
 
-    if(!_renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].empty()) {
+    if(!_renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_0].empty()) {
         glPushAttrib(GL_COLOR_BUFFER_BIT);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -912,13 +896,12 @@ void Renderer::Render(RenderList& renderList) {
         Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // use effect with premult alpha
-        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
-            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i];
-            mjob.fx = "LitDirectionalTwosidedPremulA";
+        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_0].size(); ++i) {
+            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_0][i];
             mjob.material.texBindings[1].samplerName = "solidDepth";
             mjob.material.texBindings[1].texture = depthbuffer.Raw();
         }
-        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING]);
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_0]);
 
         // composite first peel
         glPushAttrib(GL_COLOR_BUFFER_BIT);
@@ -932,8 +915,8 @@ void Renderer::Render(RenderList& renderList) {
         glPopAttrib();
 
         // set depth texture for first peeling pass
-        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
-            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i];
+        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N].size(); ++i) {
+            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N][i];
             mjob.material.texBindings[0].texture      = dp_db[1].Raw();
             mjob.material.texBindings[0].samplerName  = "depthTex";
 
@@ -951,11 +934,7 @@ void Renderer::Render(RenderList& renderList) {
             dp_fb[1 + self]->Bind();
             Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
-                MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i];
-                mjob.fx = "DepthPeel";
-            }
-            Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING]);
+            Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N]);
 
             // render use-depth pass, with dp enabled
             std::vector<MeshJob> jobs;
@@ -994,8 +973,8 @@ void Renderer::Render(RenderList& renderList) {
             glPopAttrib();
 
             // set depth texture for next peeling pass
-            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING].size(); ++i) {
-                MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING][i];
+            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N].size(); ++i) {
+                MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N][i];
                 mjob.material.texBindings[0].texture = dp_db[self].Raw();
             }
 

@@ -584,12 +584,36 @@ void ENT_Geometry::BuildRenderList() {
         R::Material mat = R::Material::White;
         mat.isTransparent = _isTransparent;
 
-        rjob.fx = "LitDirectionalTwosided";
-        rjob.layer      = _renderLayer;
         rjob.material   = mat;
         rjob.tfmesh     = _tfmesh;
         rjob.primType   = 0;
-        _renderList.meshJobs.push_back(rjob);
+
+        if(_isTransparent) {
+            int transparencyMode = cvar_r_transparencyMode;
+            if(R::TransparencyMode::BACKFACES_FRONTFACES == transparencyMode) {
+                rjob.fx         = "LitDirectionalTransparent";
+                rjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
+                _renderList.meshJobs.push_back(rjob);
+            } else if(R::TransparencyMode::SORT_TRIANGLES == transparencyMode) {
+                rjob.fx         = "LitDirectionalTransparent";
+                rjob.layer      = R::Renderer::Layers::GEOMETRY_0_TRANSPARENT_SORTED;
+                _renderList.meshJobs.push_back(rjob);
+            } else if(R::TransparencyMode::DEPTH_PEELING == transparencyMode) {
+                rjob.layer      = R::Renderer::Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_0;
+                rjob.fx         = "LitDirectionalTwosidedPremulA";
+                _renderList.meshJobs.push_back(rjob);
+
+                rjob.layer      = R::Renderer::Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N;
+                rjob.fx         = "DepthPeel";
+                _renderList.meshJobs.push_back(rjob);
+            } else {
+                assert(0 && "unknown transparency mode");
+            }
+        } else {
+            rjob.fx         = "LitDirectionalTwosided";
+            rjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+            _renderList.meshJobs.push_back(rjob);
+        }
     }
 
     if(RenderMode::NODES & _renderMode && !_nodeRenderer->IsEmpty()) {
