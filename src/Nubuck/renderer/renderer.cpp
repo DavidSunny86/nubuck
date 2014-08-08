@@ -937,28 +937,21 @@ void Renderer::Render(RenderList& renderList) {
             Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N]);
 
             // render use-depth pass, with dp enabled
-            std::vector<MeshJob> jobs;
-            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
-                const MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
-                if("NodeBillboardGS" == mjob.fx || "EdgeLineBillboardGS" == mjob.fx) {
-                    MeshJob job = mjob;
-                    job.fx = mjob.fx + "DP";
+            if(!_renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH].empty()) {
+                for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH].size(); ++i) {
+                    MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH][i];
 
-                    job.material.texBindings[0].samplerName = "depthTex";
-                    job.material.texBindings[0].texture = dp_db[other].Raw();
+                    mjob.material.texBindings[0].samplerName = "depthTex";
+                    mjob.material.texBindings[0].texture = dp_db[other].Raw();
 
-                    job.material.texBindings[1].samplerName = "solidDepth";
-                    job.material.texBindings[1].texture = depthbuffer.Raw();
+                    mjob.material.texBindings[1].samplerName = "solidDepth";
+                    mjob.material.texBindings[1].texture = depthbuffer.Raw();
 
-                    job.material.texBindings[2].samplerName = "peelDepth";
-                    job.material.texBindings[2].texture = dp_db[self].Raw();
-
-                    jobs.push_back(job);
+                    mjob.material.texBindings[2].samplerName = "peelDepth";
+                    mjob.material.texBindings[2].texture = dp_db[self].Raw();
                 }
-            }
-            if(!jobs.empty()) {
                 dp_fb[0]->Bind();
-                Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, jobs);
+                Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH]);
             }
 
             // composite depth peeling framebuffer

@@ -576,6 +576,8 @@ void ENT_Geometry::BuildRenderList() {
 
     if(_isHidden) return;
 
+    const int transparencyMode = cvar_r_transparencyMode;
+
     if(RenderMode::FACES & _renderMode && NULL != _mesh) {
         R::meshMgr.GetMesh(_tfmesh).SetTransform(GetObjectToWorldMatrix());
 
@@ -589,7 +591,6 @@ void ENT_Geometry::BuildRenderList() {
         rjob.primType   = 0;
 
         if(_isTransparent) {
-            int transparencyMode = cvar_r_transparencyMode;
             if(R::TransparencyMode::BACKFACES_FRONTFACES == transparencyMode) {
                 rjob.fx         = "LitDirectionalTransparent";
                 rjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
@@ -624,6 +625,12 @@ void ENT_Geometry::BuildRenderList() {
             rjob.fx = "FastNodeBillboard";
         }
         if(ShadingMode::NICE_BILLBOARDS == _shadingMode) {
+            if(R::TransparencyMode::DEPTH_PEELING == transparencyMode) {
+                rjob.fx     = "NodeBillboardGSDP";
+                rjob.layer  = R::Renderer::Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH;
+                _renderList.meshJobs.push_back(rjob);
+            }
+
             rjob.fx = "NodeBillboardGS";
             rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_DEPTH_0;
         }
@@ -641,6 +648,12 @@ void ENT_Geometry::BuildRenderList() {
             }
         }
         if(ShadingMode::NICE_BILLBOARDS == _shadingMode) {
+            if(R::TransparencyMode::DEPTH_PEELING == transparencyMode) {
+                rjob.fx     = "EdgeLineBillboardGSDP";
+                rjob.layer  = R::Renderer::Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH;
+                _renderList.meshJobs.push_back(rjob);
+            }
+
             rjob.fx = "EdgeLineBillboardGS";
             rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_DEPTH_0;
         }
