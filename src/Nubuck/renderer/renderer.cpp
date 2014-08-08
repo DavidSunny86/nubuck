@@ -832,17 +832,8 @@ M::Matrix4 Lerp(const M::Matrix4& lhp, const M::Matrix4& rhp, float t) {
 void Renderer::Render(RenderList& renderList) {
     for(unsigned i = 0; i < Layers::NUM_LAYERS; ++i) _renderLayers[i].clear();
 
-    std::vector<MeshJob> transparentJobs;
-
     for(unsigned i = 0; i < renderList.meshJobs.size(); ++i) {
         MeshJob& rjob = renderList.meshJobs[i];
-
-        // set transparency technique
-        if(rjob.material.isTransparent) {
-            // just collect them for now...
-            transparentJobs.push_back(rjob);
-        }
-
         _renderLayers[rjob.layer].push_back(rjob);
     }
 
@@ -991,11 +982,9 @@ void Renderer::Render(RenderList& renderList) {
         glPopAttrib();
     }
 
-    // HACK: assumes that every transparent mesh is supposed to be rendered in depth-only pass
-    for(unsigned i = 0; i < transparentJobs.size(); ++i) {
-        transparentJobs[i].fx = "DepthOnly";
+    if(!_renderLayers[Layers::GEOMETRY_0_DEPTH_ONLY].empty()) {
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_DEPTH_ONLY]);
     }
-    Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, transparentJobs);
 
     // render use-depth pass
     if(!_renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].empty()) {

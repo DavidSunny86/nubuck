@@ -591,6 +591,10 @@ void ENT_Geometry::BuildRenderList() {
         rjob.primType   = 0;
 
         if(_isTransparent) {
+            rjob.fx     = "DepthOnly";
+            rjob.layer  = R::Renderer::Layers::GEOMETRY_0_DEPTH_ONLY;
+            _renderList.meshJobs.push_back(rjob);
+
             if(R::TransparencyMode::BACKFACES_FRONTFACES == transparencyMode) {
                 rjob.fx         = "LitDirectionalTransparent";
                 rjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
