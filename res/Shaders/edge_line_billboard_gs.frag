@@ -1,6 +1,7 @@
 /*
 OPTIONS:
 PERFORM_DEPTH_PEEL
+STIPPLE
 */
 
 layout(std140) uniform UniformsHot {
@@ -54,15 +55,15 @@ void main() {
         if(spinePos_ss.z <= depth) discard;
     }
 
-    vec3 v0_ss = WorldToScreenSpace(vec4(inData.v0, 1.0));
-
-    float d_ss = length(spinePos_ss.xy - v0_ss.xy);
-
     float alpha = 1.0;
 
-    // stippling:
-    // float s = sin(0.25 * d_ss);
-    // if(0.0 > s) alpha = 0.0;
+    if(STIPPLE) {
+        vec3 v0_ss = WorldToScreenSpace(vec4(inData.v0, 1.0));
+        float d_ss = length(spinePos_ss.xy - v0_ss.xy);
+
+        float s = sin(0.25 * d_ss);
+        if(0.0 > s) alpha = 0.0;
+    }
 
     gl_FragColor = vec4(inData.color, alpha);
 }
