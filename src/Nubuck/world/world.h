@@ -74,8 +74,8 @@ namespace W {
         R::meshPtr_t    _gridMesh;
         R::tfmeshPtr_t  _gridTFMesh;
 
-        void        Grid_Build();
-        R::MeshJob  Grid_GetRenderJob();
+        void Grid_Build();
+        void Grid_GetRenderJobs(std::vector<R::MeshJob>& rjobs);
 
         struct BoundingBox {
             const ENT_Geometry*     geom;

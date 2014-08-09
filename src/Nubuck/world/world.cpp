@@ -406,14 +406,18 @@ void World::Grid_Build() {
     R::meshMgr.GetMesh(_gridTFMesh).SetTransform(M::Mat4::Identity());
 }
 
-R::MeshJob World::Grid_GetRenderJob() {
+void World::Grid_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
     R::MeshJob meshJob;
     meshJob.fx = "Unlit";
-    meshJob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
     meshJob.material = R::Material::White;
     meshJob.tfmesh = _gridTFMesh;
     meshJob.primType = 0;
-    return meshJob;
+
+    meshJob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
+    rjobs.push_back(meshJob);
+
+    meshJob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
+    rjobs.push_back(meshJob);
 }
 
 void World::BoundingBox::Destroy() {
@@ -586,7 +590,7 @@ void World::Render(R::RenderList& renderList) {
     renderList.meshJobs.clear();
 
     if(g_showRenderViewControls) {
-        renderList.meshJobs.push_back(Grid_GetRenderJob());
+        Grid_GetRenderJobs(renderList.meshJobs);
         BBoxes_GetRenderJobs(renderList.meshJobs);
     }
 
