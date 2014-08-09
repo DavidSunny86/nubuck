@@ -11,10 +11,10 @@
 
 namespace W {
 
-void ENT_GeometryOutln::OnEdgeRadiusChanged(double value) {
-	EV::Params_ENT_Geometry_EdgeRadiusChanged args;
-	args.edgeRadius = (float)value;
-	_subject.Send(EV::def_ENT_Geometry_EdgeRadiusChanged.Create(args));
+void ENT_GeometryOutln::OnEdgeScaleChanged(double value) {
+	EV::Params_ENT_Geometry_EdgeScaleChanged args;
+	args.edgeScale = (float)value;
+	_subject.Send(EV::def_ENT_Geometry_EdgeScaleChanged.Create(args));
 }
 
 void ENT_GeometryOutln::OnEdgeColorChanged(float r, float g, float b) {
@@ -50,7 +50,7 @@ void ENT_GeometryOutln::OnHiddenLinesChanged(int) {
 ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) {
     InitOutline();
 
-	AddEventHandler(EV::def_ENT_Geometry_EdgeRadiusChanged, this, &ENT_GeometryOutln::Event_EdgeRadiusChanged);
+	AddEventHandler(EV::def_ENT_Geometry_EdgeScaleChanged, this, &ENT_GeometryOutln::Event_EdgeScaleChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_GeometryOutln::Event_EdgeColorChanged);
     AddEventHandler(EV::def_ENT_Geometry_RenderModeChanged, this, &ENT_GeometryOutln::Event_RenderModeChanged);
 }
@@ -58,12 +58,12 @@ ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) 
 void ENT_GeometryOutln::InitOutline() {
 	QGridLayout* layout = new QGridLayout();
 
-    QLabel* lblEdgeRadius = new QLabel("edge radius:");
-    _sbEdgeRadius = new QDoubleSpinBox;
-    _sbEdgeRadius->setMinimum(0.05f);
-    _sbEdgeRadius->setMaximum(5.00f);
-    _sbEdgeRadius->setSingleStep(0.1f);
-	_sbEdgeRadius->setValue(_subject.GetEdgeRadius());
+    QLabel* lblEdgeRadius = new QLabel("edge scale:");
+    _sbEdgeScale = new QDoubleSpinBox;
+    _sbEdgeScale->setMinimum(0.05f);
+    _sbEdgeScale->setMaximum(5.00f);
+    _sbEdgeScale->setSingleStep(0.1f);
+	_sbEdgeScale->setValue(_subject.GetEdgeScale());
 
     QLabel* lblEdgeColor = new QLabel("edge color:");
     _btnEdgeColor = new UI::ColorButton;
@@ -102,7 +102,7 @@ void ENT_GeometryOutln::InitOutline() {
     hboxLayout->addWidget(_btnRenderFaces);
 
     layout->addWidget(lblEdgeRadius, 0, 0, 1, 1);
-    layout->addWidget(_sbEdgeRadius, 0, 1, 1, 1);
+    layout->addWidget(_sbEdgeScale, 0, 1, 1, 1);
 
     layout->addWidget(lblEdgeColor, 1, 0, 1, 1);
     layout->addWidget(_btnEdgeColor, 1, 1, 1, 1);
@@ -120,7 +120,7 @@ void ENT_GeometryOutln::InitOutline() {
 
 	setLayout(layout);
 
-    QObject::connect(_sbEdgeRadius, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeRadiusChanged(double)));
+    QObject::connect(_sbEdgeScale, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeScaleChanged(double)));
     QObject::connect(_btnEdgeColor, SIGNAL(SigColorChanged(float, float, float)), this, SLOT(OnEdgeColorChanged(float, float, float)));
     QObject::connect(_cbEdgeShading, SIGNAL(currentIndexChanged(int)), this, SLOT(OnEdgeShadingChanged(int)));
     QObject::connect(_cbHiddenLines, SIGNAL(stateChanged(int)), this, SLOT(OnHiddenLinesChanged(int)));
@@ -140,11 +140,11 @@ void ENT_GeometryOutln::SendEdgeShading() {
     _subject.Send(EV::def_ENT_Geometry_EdgeShadingChanged.Create(args));
 }
 
-void ENT_GeometryOutln::Event_EdgeRadiusChanged(const EV::Event& event) {
-	const EV::Params_ENT_Geometry_EdgeRadiusChanged& args = EV::def_ENT_Geometry_EdgeRadiusChanged.GetArgs(event);
-	_sbEdgeRadius->blockSignals(true);
-	_sbEdgeRadius->setValue(args.edgeRadius);
-	_sbEdgeRadius->blockSignals(false);
+void ENT_GeometryOutln::Event_EdgeScaleChanged(const EV::Event& event) {
+	const EV::Params_ENT_Geometry_EdgeScaleChanged& args = EV::def_ENT_Geometry_EdgeScaleChanged.GetArgs(event);
+	_sbEdgeScale->blockSignals(true);
+	_sbEdgeScale->setValue(args.edgeScale);
+	_sbEdgeScale->blockSignals(false);
 }
 
 void ENT_GeometryOutln::Event_EdgeColorChanged(const EV::Event& event) {

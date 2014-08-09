@@ -164,10 +164,10 @@ void ENT_Geometry::ComputeBoundingBox() {
     }
 }
 
-void ENT_Geometry::Event_EdgeRadiusChanged(const EV::Event& event) {
+void ENT_Geometry::Event_EdgeScaleChanged(const EV::Event& event) {
 	SYS::ScopedLock lock(_mtx);
-	const EV::Params_ENT_Geometry_EdgeRadiusChanged& args = EV::def_ENT_Geometry_EdgeRadiusChanged.GetArgs(event);
-	_edgeRadius = args.edgeRadius;
+	const EV::Params_ENT_Geometry_EdgeScaleChanged& args = EV::def_ENT_Geometry_EdgeScaleChanged.GetArgs(event);
+	_edgeScale = args.edgeScale;
     RebuildRenderEdges();
 }
 
@@ -216,14 +216,14 @@ ENT_Geometry::ENT_Geometry()
     _edgeRenderer = &_cylinderEdges;
     // _edgeRenderer = &_lineEdges;
 
-    _edgeRadius = 0.02f;
+    _edgeScale = 1.0f;
     _edgeColor = R::Color(0.3f, 0.3f, 0.3f);
 
     _outlinerItem = g_ui.GetOutliner().AddItem("", this);
 
     SetName("Mesh");
 
-	AddEventHandler(EV::def_ENT_Geometry_EdgeRadiusChanged, this, &ENT_Geometry::Event_EdgeRadiusChanged);
+	AddEventHandler(EV::def_ENT_Geometry_EdgeScaleChanged, this, &ENT_Geometry::Event_EdgeScaleChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
     AddEventHandler(EV::def_ENT_Geometry_TransparencyChanged, this, &ENT_Geometry::Event_TransparencyChanged);
     AddEventHandler(EV::def_ENT_Geometry_RenderModeChanged, this, &ENT_Geometry::Event_RenderModeChanged);
@@ -306,7 +306,7 @@ void ENT_Geometry::RebuildRenderEdges() {
     forall_edges(e, _ratPolyMesh) {
         if(!visited[e] && !_ratPolyMesh.is_masked(e)) {
             re.pe = e;
-            re.radius = 2 * _ratPolyMesh.radius_of(e); // !!!
+            re.radius = 2 * _ratPolyMesh.radius_of(e) * _edgeScale; // !!!
             re.color = _ratPolyMesh.color_of(e);
             re.v0 = leda::source(e);
             re.v1 = leda::target(e);
@@ -378,9 +378,9 @@ void ENT_Geometry::ApplyTransformation() {
     Entity::SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 }
 
-float ENT_Geometry::GetEdgeRadius() const {
+float ENT_Geometry::GetEdgeScale() const {
 	SYS::ScopedLock lock(_mtx);
-    return _edgeRadius;
+    return _edgeScale;
 }
 
 R::Color ENT_Geometry::GetEdgeColor() const {
@@ -388,13 +388,13 @@ R::Color ENT_Geometry::GetEdgeColor() const {
     return _edgeColor;
 }
 
-void ENT_Geometry::SetEdgeRadius(float edgeRadius) {
+void ENT_Geometry::SetEdgeScale(float edgeScale) {
 	SYS::ScopedLock lock(_mtx);
-    _edgeRadius = edgeRadius;
+    _edgeScale = edgeScale;
     RebuildRenderEdges();
 
-    EV::Params_ENT_Geometry_EdgeRadiusChanged args = { _edgeRadius };
-    EV::Event event = EV::def_ENT_Geometry_EdgeRadiusChanged.Create(args);
+    EV::Params_ENT_Geometry_EdgeScaleChanged args = { _edgeScale };
+    EV::Event event = EV::def_ENT_Geometry_EdgeScaleChanged.Create(args);
     g_ui.GetOutliner().SendToView(_outlinerItem, event);
 }
 

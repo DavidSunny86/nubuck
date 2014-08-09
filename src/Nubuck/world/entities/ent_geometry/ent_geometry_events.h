@@ -3,8 +3,8 @@
 #include <Nubuck\renderer\color\color.h>
 #include <Nubuck\events\events.h>
 
-BEGIN_EVENT_DEF(ENT_Geometry_EdgeRadiusChanged)
-    float edgeRadius;
+BEGIN_EVENT_DEF(ENT_Geometry_EdgeScaleChanged)
+    float edgeScale;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(ENT_Geometry_EdgeColorChanged)
@@ -14,7 +14,7 @@ END_EVENT_DEF
 BEGIN_EVENT_DEF(ENT_Geometry_TransparencyChanged)
     float transparency;
 END_EVENT_DEF
-    
+
 BEGIN_EVENT_DEF(ENT_Geometry_RenderModeChanged)
     int renderMode;
 END_EVENT_DEF
