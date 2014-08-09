@@ -1,0 +1,28 @@
+// depth only
+fx EdgeLineBillboardGSDO {
+    // make sure this is rendered before grid (unlit)
+    sortkey = -1;
+
+    pass Pass0 {
+        state.color.maskEnabled {
+          red   = GL_FALSE;
+          green = GL_FALSE;
+          blue  = GL_FALSE;
+          alpha = GL_FALSE;
+        }
+
+        vs = "#include <Shaders\edge_line_billboard_gs.vert>";
+        gs = "#include <Shaders\edge_line_billboard_gs.geom>";
+
+        fs =
+        """
+        const bool LIGHTING_ENABLED             = false;
+        const bool LIGHTING_TWOSIDED_ENABLED    = false;
+        const bool PREMULT_ALPHA                = false;
+        const bool PERFORM_DEPTH_TEST           = false;
+        const bool PERFORM_DEPTH_PEEL           = false;
+
+        #include <Shaders\mesh.frag>
+        """;
+    }
+}

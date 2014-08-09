@@ -635,6 +635,11 @@ void ENT_Geometry::BuildRenderList() {
                 _renderList.meshJobs.push_back(rjob);
             }
 
+            // render depth-only pass of nodes, so that grid and bboxes intersect properly
+            rjob.fx     = "NodeBillboardGSDO";
+            rjob.layer  = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
+            _renderList.meshJobs.push_back(rjob);
+
             rjob.fx = "NodeBillboardGS";
             rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_DEPTH_0;
         }
@@ -657,6 +662,11 @@ void ENT_Geometry::BuildRenderList() {
                 rjob.layer  = R::Renderer::Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH;
                 _renderList.meshJobs.push_back(rjob);
             }
+
+            // render depth-only pass of edges, so that grid and bboxes intersect properly
+            rjob.fx     = "EdgeLineBillboardGSDO";
+            rjob.layer  = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
+            _renderList.meshJobs.push_back(rjob);
 
             rjob.fx = "EdgeLineBillboardGS";
             rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_DEPTH_0;
