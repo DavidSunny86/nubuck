@@ -9,7 +9,7 @@
 namespace R {
 
     struct EffectDesc {
-        unsigned                sortKey;
+        int                     sortKey;
         std::string             name;
         std::vector<PassDesc>   passes;
     };
@@ -22,8 +22,8 @@ namespace R {
     public:
         explicit Effect(const EffectDesc& desc);
 
-        unsigned    SortKey(void) const;
-        int         NumPasses(void) const;
+        int SortKey(void) const;
+        int NumPasses(void) const;
 
         void    Compile(void);
         Pass*   GetPass(int id);

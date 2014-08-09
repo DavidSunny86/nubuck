@@ -116,8 +116,8 @@ static bool ParseBlock(R::PassDesc& desc, int fidx) {
             done = true;
         } else {
             common.printf("%s:%d: expected '%s' or '%s', got '%s'\n",
-                g_filename, yynfxlineno, 
-                TokToString(NFX_TOK_IDENT), TokToString(NFX_TOK_RBRACE), 
+                g_filename, yynfxlineno,
+                TokToString(NFX_TOK_IDENT), TokToString(NFX_TOK_RBRACE),
                 yynfxtext);
             return false;
         }
@@ -150,8 +150,8 @@ static bool ParseField(R::PassDesc& desc, int fidx) {
             done = true;
         } else {
             common.printf("%s:%d: expected '%s' or '%s', got '%s'\n",
-                g_filename, yynfxlineno, 
-                TokToString(NFX_TOK_DOT), TokToString(NFX_TOK_EQUALS), 
+                g_filename, yynfxlineno,
+                TokToString(NFX_TOK_DOT), TokToString(NFX_TOK_EQUALS),
                 yynfxtext);
             return false;
         }
@@ -191,7 +191,7 @@ static bool ParsePass(R::PassDesc& desc) {
     NextToken();
     if(!ExpectToken(NFX_TOK_IDENT)) return false;
     desc.name = yynfxtext;
-    
+
     NextToken();
     if(!ExpectToken(NFX_TOK_LBRACE)) return false;
 
@@ -210,8 +210,8 @@ static bool ParsePass(R::PassDesc& desc) {
             done = true;
         } else {
             common.printf("%s:%d: expected '%s' or '%s', got '%s'\n",
-                g_filename, yynfxlineno, 
-                TokToString(NFX_TOK_IDENT), TokToString(NFX_TOK_RBRACE), 
+                g_filename, yynfxlineno,
+                TokToString(NFX_TOK_IDENT), TokToString(NFX_TOK_RBRACE),
                 yynfxtext);
             return false;
         }
@@ -260,16 +260,15 @@ bool NFX_StartParsing(const char* filename, R::EffectDesc& desc) {
             if(!ExpectToken(NFX_TOK_EQUALS)) return false;
             NextToken();
             if(!ExpectToken(NFX_TOK_VAL_INT)) return false;
-            if(0 > nfx_val_int) common.printf("%s:%d: WARNING, assigning int to unsigned int as sortkey\n");
-            desc.sortKey = (unsigned)nfx_val_int;
+            desc.sortKey = nfx_val_int;
             NextToken();
             if(!ExpectToken(NFX_TOK_SEMICOL)) return false;
         } else if(NFX_TOK_RBRACE == g_nextToken) {
             done = true;
         } else {
             common.printf("%s:%d: expected { '%s', '%s', '%s' }, got '%s'\n",
-                g_filename, yynfxlineno, 
-                TokToString(NFX_TOK_PASS), TokToString(NFX_TOK_SORTKEY), TokToString(NFX_TOK_RBRACE), 
+                g_filename, yynfxlineno,
+                TokToString(NFX_TOK_PASS), TokToString(NFX_TOK_SORTKEY), TokToString(NFX_TOK_RBRACE),
                 yynfxtext);
             return 0;
         }

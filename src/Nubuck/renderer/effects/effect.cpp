@@ -11,8 +11,8 @@ namespace R {
         }
     }
 
-    unsigned Effect::SortKey(void) const { 
-        return _desc.sortKey; 
+    int Effect::SortKey(void) const {
+        return _desc.sortKey;
     }
 
     int Effect::NumPasses(void) const { return _passes.size(); }
