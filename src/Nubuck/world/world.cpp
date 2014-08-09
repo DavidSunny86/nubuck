@@ -453,12 +453,16 @@ void World::BBoxes_BuildFromSelection() {
 void World::BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
     R::MeshJob rjob;
     rjob.fx         = "Unlit";
-    rjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
     rjob.material   = R::Material::White;
     rjob.primType   = 0;
     for(unsigned i = 0; i < _bboxes.size(); ++i) {
         _bboxes[i]->Transform();
         rjob.tfmesh = _bboxes[i]->tfmesh;
+
+        rjob.layer  = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+        rjobs.push_back(rjob);
+
+        rjob.layer  = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
         rjobs.push_back(rjob);
     }
 }
