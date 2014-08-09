@@ -164,6 +164,13 @@ void ENT_Geometry::ComputeBoundingBox() {
     }
 }
 
+void ENT_Geometry::Event_VertexScaleChanged(const EV::Event& event) {
+    SYS::ScopedLock lock(_mtx);
+    const EV::Params_ENT_Geometry_VertexScaleChanged& args = EV::def_ENT_Geometry_VertexScaleChanged.GetArgs(event);
+    _vertexScale = args.vertexScale;
+    _nodeRenderer->Rebuild(_ratPolyMesh, _fpos, _vertexScale);
+}
+
 void ENT_Geometry::Event_EdgeScaleChanged(const EV::Event& event) {
 	SYS::ScopedLock lock(_mtx);
 	const EV::Params_ENT_Geometry_EdgeScaleChanged& args = EV::def_ENT_Geometry_EdgeScaleChanged.GetArgs(event);
@@ -216,13 +223,15 @@ ENT_Geometry::ENT_Geometry()
     _edgeRenderer = &_cylinderEdges;
     // _edgeRenderer = &_lineEdges;
 
-    _edgeScale = 1.0f;
-    _edgeColor = R::Color(0.3f, 0.3f, 0.3f);
+    _vertexScale    = 1.0f;
+    _edgeScale      = 1.0f;
+    _edgeColor      = R::Color(0.3f, 0.3f, 0.3f);
 
     _outlinerItem = g_ui.GetOutliner().AddItem("", this);
 
     SetName("Mesh");
 
+    AddEventHandler(EV::def_ENT_Geometry_VertexScaleChanged, this, &ENT_Geometry::Event_VertexScaleChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeScaleChanged, this, &ENT_Geometry::Event_EdgeScaleChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
     AddEventHandler(EV::def_ENT_Geometry_TransparencyChanged, this, &ENT_Geometry::Event_TransparencyChanged);
@@ -343,14 +352,14 @@ void ENT_Geometry::Rebuild() {
 
     if(state_t::TOPOLOGY_CHANGED == state) {
         _ratPolyMesh.cache_all();
-        _nodeRenderer->Rebuild(_ratPolyMesh, _fpos);
+        _nodeRenderer->Rebuild(_ratPolyMesh, _fpos, _vertexScale);
         RebuildRenderEdges();
         RebuildRenderMesh();
 
         // TODO. used to colorize vertices
         SetEditMode(world.GetEditMode().GetMode());
     } else {
-        _nodeRenderer->Update(_ratPolyMesh, _fpos);
+        _nodeRenderer->Update(_ratPolyMesh, _fpos, _vertexScale);
         _edgeRenderer->Update(_ratPolyMesh, _fpos);
 
         UpdateRenderMesh();
@@ -378,6 +387,10 @@ void ENT_Geometry::ApplyTransformation() {
     Entity::SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 }
 
+float ENT_Geometry::GetVertexScale() const {
+    return _vertexScale;
+}
+
 float ENT_Geometry::GetEdgeScale() const {
 	SYS::ScopedLock lock(_mtx);
     return _edgeScale;
@@ -386,6 +399,16 @@ float ENT_Geometry::GetEdgeScale() const {
 R::Color ENT_Geometry::GetEdgeColor() const {
 	SYS::ScopedLock lock(_mtx);
     return _edgeColor;
+}
+
+void ENT_Geometry::SetVertexScale(float vertexScale) {
+    SYS::ScopedLock lock(_mtx);
+    _vertexScale = vertexScale;
+    _nodeRenderer->Rebuild(_ratPolyMesh, _fpos, _vertexScale);
+
+    EV::Params_ENT_Geometry_VertexScaleChanged args = { _vertexScale };
+    EV::Event event = EV::def_ENT_Geometry_VertexScaleChanged.Create(args);
+    g_ui.GetOutliner().SendToView(_outlinerItem, event);
 }
 
 void ENT_Geometry::SetEdgeScale(float edgeScale) {
@@ -530,7 +553,7 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
     _mtx.Unlock();
 
     if(rebuild) {
-        _nodeRenderer->Rebuild(_ratPolyMesh, _fpos);
+        _nodeRenderer->Rebuild(_ratPolyMesh, _fpos, _vertexScale);
         RebuildRenderEdges();
     }
 }

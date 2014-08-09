@@ -16,6 +16,7 @@ class ENT_GeometryOutln : public UI::OutlinerView {
 private:
     ENT_Geometry& _subject;
 
+    QDoubleSpinBox*     _sbVertexScale;
     QDoubleSpinBox*     _sbEdgeScale;
     UI::ColorButton*    _btnEdgeColor;
     QSlider*            _sldHullAlpha;
@@ -31,10 +32,12 @@ private:
 
     void SendEdgeShading();
 
+    void Event_VertexScaleChanged(const EV::Event& event);
     void Event_EdgeScaleChanged(const EV::Event& event);
     void Event_EdgeColorChanged(const EV::Event& event);
     void Event_RenderModeChanged(const EV::Event& event);
 private slots:
+    void OnVertexScaleChanged(double value);
     void OnEdgeScaleChanged(double value);
     void OnEdgeColorChanged(float r, float g, float b);
     void OnTransparencyChanged(int value);

@@ -23,8 +23,8 @@ public:
 
     bool IsEmpty() const override { return _nodes.empty(); }
 
-	void Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) override;
-    void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) override;
+	void Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) override;
+    void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) override;
 
     void SetColor(leda::node pv, const Color& color) override;
 

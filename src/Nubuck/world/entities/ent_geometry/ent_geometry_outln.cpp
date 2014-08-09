@@ -11,6 +11,12 @@
 
 namespace W {
 
+void ENT_GeometryOutln::OnVertexScaleChanged(double value) {
+    EV::Params_ENT_Geometry_VertexScaleChanged args;
+    args.vertexScale = (float)value;
+    _subject.Send(EV::def_ENT_Geometry_VertexScaleChanged.Create(args));
+}
+
 void ENT_GeometryOutln::OnEdgeScaleChanged(double value) {
 	EV::Params_ENT_Geometry_EdgeScaleChanged args;
 	args.edgeScale = (float)value;
@@ -50,6 +56,7 @@ void ENT_GeometryOutln::OnHiddenLinesChanged(int) {
 ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) {
     InitOutline();
 
+    AddEventHandler(EV::def_ENT_Geometry_VertexScaleChanged, this, &ENT_GeometryOutln::Event_VertexScaleChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeScaleChanged, this, &ENT_GeometryOutln::Event_EdgeScaleChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_GeometryOutln::Event_EdgeColorChanged);
     AddEventHandler(EV::def_ENT_Geometry_RenderModeChanged, this, &ENT_GeometryOutln::Event_RenderModeChanged);
@@ -57,6 +64,13 @@ ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) 
 
 void ENT_GeometryOutln::InitOutline() {
 	QGridLayout* layout = new QGridLayout();
+
+    QLabel* lblVertexScale = new QLabel("vertex scale:");
+    _sbVertexScale = new QDoubleSpinBox;
+    _sbVertexScale->setMinimum(0.05f);
+    _sbVertexScale->setMaximum(5.00f);
+    _sbVertexScale->setSingleStep(0.1f);
+	_sbVertexScale->setValue(_subject.GetVertexScale());
 
     QLabel* lblEdgeRadius = new QLabel("edge scale:");
     _sbEdgeScale = new QDoubleSpinBox;
@@ -101,25 +115,29 @@ void ENT_GeometryOutln::InitOutline() {
     hboxLayout->addWidget(_btnRenderEdges);
     hboxLayout->addWidget(_btnRenderFaces);
 
-    layout->addWidget(lblEdgeRadius, 0, 0, 1, 1);
-    layout->addWidget(_sbEdgeScale, 0, 1, 1, 1);
+    layout->addWidget(lblVertexScale, 0, 0, 1, 1);
+    layout->addWidget(_sbVertexScale, 0, 1, 1, 1);
 
-    layout->addWidget(lblEdgeColor, 1, 0, 1, 1);
-    layout->addWidget(_btnEdgeColor, 1, 1, 1, 1);
+    layout->addWidget(lblEdgeRadius, 1, 0, 1, 1);
+    layout->addWidget(_sbEdgeScale, 1, 1, 1, 1);
 
-    layout->addWidget(lblEdgeShading, 2, 0, 1, 1);
-    layout->addWidget(_cbEdgeShading, 2, 1, 1, 1);
+    layout->addWidget(lblEdgeColor, 2, 0, 1, 1);
+    layout->addWidget(_btnEdgeColor, 2, 1, 1, 1);
 
-    layout->addWidget(_cbHiddenLines, 3, 0, 1, 2);
+    layout->addWidget(lblEdgeShading, 3, 0, 1, 1);
+    layout->addWidget(_cbEdgeShading, 3, 1, 1, 1);
 
-    layout->addWidget(lblHullAlpha, 4, 0, 1, 1);
-    layout->addWidget(_sldHullAlpha, 4, 1, 1, 1);
+    layout->addWidget(_cbHiddenLines, 4, 0, 1, 2);
 
-    layout->addWidget(lblRenderMode, 5, 0, 1, 1);
-    layout->addLayout(hboxLayout, 5, 1, 1, 1);
+    layout->addWidget(lblHullAlpha, 5, 0, 1, 1);
+    layout->addWidget(_sldHullAlpha, 5, 1, 1, 1);
+
+    layout->addWidget(lblRenderMode, 6, 0, 1, 1);
+    layout->addLayout(hboxLayout, 6, 1, 1, 1);
 
 	setLayout(layout);
 
+    QObject::connect(_sbVertexScale, SIGNAL(valueChanged(double)), this, SLOT(OnVertexScaleChanged(double)));
     QObject::connect(_sbEdgeScale, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeScaleChanged(double)));
     QObject::connect(_btnEdgeColor, SIGNAL(SigColorChanged(float, float, float)), this, SLOT(OnEdgeColorChanged(float, float, float)));
     QObject::connect(_cbEdgeShading, SIGNAL(currentIndexChanged(int)), this, SLOT(OnEdgeShadingChanged(int)));
@@ -138,6 +156,13 @@ void ENT_GeometryOutln::SendEdgeShading() {
     args.shadingMode = IGeometry::ShadingMode::Enum(idx);
     args.showHiddenLines = _cbHiddenLines->isChecked();
     _subject.Send(EV::def_ENT_Geometry_EdgeShadingChanged.Create(args));
+}
+
+void ENT_GeometryOutln::Event_VertexScaleChanged(const EV::Event& event) {
+    const EV::Params_ENT_Geometry_VertexScaleChanged& args = EV::def_ENT_Geometry_VertexScaleChanged.GetArgs(event);
+    _sbVertexScale->blockSignals(true);
+    _sbVertexScale->setValue(args.vertexScale);
+    _sbVertexScale->blockSignals(false);
 }
 
 void ENT_GeometryOutln::Event_EdgeScaleChanged(const EV::Event& event) {

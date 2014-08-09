@@ -3,6 +3,10 @@
 #include <Nubuck\renderer\color\color.h>
 #include <Nubuck\events\events.h>
 
+BEGIN_EVENT_DEF(ENT_Geometry_VertexScaleChanged)
+    float vertexScale;
+END_EVENT_DEF
+
 BEGIN_EVENT_DEF(ENT_Geometry_EdgeScaleChanged)
     float edgeScale;
 END_EVENT_DEF

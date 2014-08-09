@@ -56,6 +56,7 @@ private:
     void UpdateRenderMesh();
     void DestroyRenderMesh();
 
+    float       _vertexScale;
     float       _edgeScale;
     R::Color    _edgeColor;
 
@@ -82,6 +83,7 @@ private:
     A::Animation* _anims;
 
 #pragma region EventHandlers
+    void Event_VertexScaleChanged(const EV::Event& event);
     void Event_EdgeScaleChanged(const EV::Event& event);
     void Event_EdgeColorChanged(const EV::Event& event);
     void Event_TransparencyChanged(const EV::Event& event);
@@ -135,9 +137,11 @@ public:
 
     void ApplyTransformation() override;
 
+    float       GetVertexScale() const;
     float       GetEdgeScale() const;
     R::Color    GetEdgeColor() const;
 
+    void SetVertexScale(float vertexScale);
     void SetEdgeScale(float edgeScale);
     void SetEdgeColor(const R::Color& color);
 

@@ -17,7 +17,7 @@ void PointNodes::DestroyMesh() {
     }
 }
 
-void PointNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
+void PointNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) {
     _nodes.clear();
     _inMap.clear();
     _inMap.resize(mesh.max_node_index() + 1);
@@ -28,6 +28,7 @@ void PointNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M:
         rv.pvert    = pv;
         rv.position = fpos[pv->id()];
         rv.color    = mesh.color_of(pv);
+        rv.radius   = scale * mesh.radius_of(pv);
 
         _inMap[pv->id()] = _nodes.size();
         _nodes.push_back(rv);
@@ -35,14 +36,12 @@ void PointNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M:
 
     const unsigned numVerts = _nodes.size();
 
-	const float nodeSize = cvar_r_nodeSize;
-
     _vertices.clear();
     _vertices.resize(numVerts);
 
     for(unsigned i = 0; i < numVerts; ++i) {
         _vertices[i].position   = _nodes[i].position;
-        _vertices[i].normal.z   = nodeSize; // matches billboard nodes layout
+        _vertices[i].normal.z   = _nodes[i].radius; // matches billboard nodes layout
         _vertices[i].color      = _nodes[i].color;
     }
 
@@ -55,15 +54,17 @@ void PointNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M:
     _needsRebuild = true;
 }
 
-void PointNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
+void PointNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) {
     typedef leda::nb::RatPolyMesh::State state_t;
     for(unsigned i = 0; i < _nodes.size(); ++i) {
         leda::node pv = _nodes[i].pvert;
         if(state_t::GEOMETRY_CHANGED == mesh.state_of(pv)) {
             _nodes[i].position = fpos[_nodes[i].pvert->id()];
             _nodes[i].color = mesh.color_of(_nodes[i].pvert);
+            _nodes[i].radius = scale * mesh.radius_of(_nodes[i].pvert);
             _vertices[i].position = _nodes[i].position;
             _vertices[i].color = _nodes[i].color;
+            _vertices[i].normal.z = _nodes[i].radius; // matches billboard nodes layout
 
             const unsigned vertSz = sizeof(Mesh::Vertex);
             const unsigned off = vertSz * (&_vertices[i] - &_vertices[0]);

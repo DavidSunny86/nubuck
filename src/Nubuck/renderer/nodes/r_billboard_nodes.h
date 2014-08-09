@@ -34,11 +34,11 @@ public:
 
     bool IsEmpty() const override {
 		SYS::ScopedLock lock(_mtx);
-		return _nodes.empty(); 
+		return _nodes.empty();
 	}
 
-	void Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) override;
-    void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) override;
+	void Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) override;
+    void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) override;
 
     void SetColor(leda::node pv, const Color& color) override;
 

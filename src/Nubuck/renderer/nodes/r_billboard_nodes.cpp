@@ -22,7 +22,7 @@ BillboardNodes::~BillboardNodes() {
     // DestroyMesh();
 }
 
-void BillboardNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
+void BillboardNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) {
 	SYS::ScopedLock lock(_mtx);
 
     _nodes.clear();
@@ -35,6 +35,7 @@ void BillboardNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vecto
         rv.pvert    = pv;
         rv.position = fpos[pv->id()];
         rv.color    = mesh.color_of(pv);
+        rv.radius   = scale * mesh.radius_of(pv);
 
         _inMap[pv->id()] = _nodes.size();
         _nodes.push_back(rv);
@@ -46,13 +47,12 @@ void BillboardNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vecto
     _billboards.clear();
     _billboards.resize(numBillboards);
 
-    // bbNormals.xy encode texcoords
-	float nodeSize = cvar_r_nodeSize;
+    // bbNormals.xy encode texcoords, bbNormals.z encodes radius
     static const M::Vector3 bbNormals[4] = {
-        M::Vector3(-1.0f, -1.0f, nodeSize),
-        M::Vector3( 1.0f, -1.0f, nodeSize),
-        M::Vector3( 1.0f,  1.0f, nodeSize),
-        M::Vector3(-1.0f,  1.0f, nodeSize)
+        M::Vector3(-1.0f, -1.0f, 0.0f),
+        M::Vector3( 1.0f, -1.0f, 0.0f),
+        M::Vector3( 1.0f,  1.0f, 0.0f),
+        M::Vector3(-1.0f,  1.0f, 0.0f)
     };
 
     for(unsigned i = 0; i < numBillboards; ++i) {
@@ -60,6 +60,7 @@ void BillboardNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vecto
             _billboards[i].verts[k].position = _nodes[i].position;
             _billboards[i].verts[k].color = _nodes[i].color;
             _billboards[i].verts[k].normal = bbNormals[k];
+            _billboards[i].verts[k].normal.z = _nodes[i].radius;
         }
     }
 
@@ -74,16 +75,18 @@ void BillboardNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vecto
     _needsRebuild = true;
 }
 
-void BillboardNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
+void BillboardNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) {
     typedef leda::nb::RatPolyMesh::State state_t;
     for(unsigned i = 0; i < _nodes.size(); ++i) {
         leda::node pv = _nodes[i].pvert;
         if(state_t::GEOMETRY_CHANGED == mesh.state_of(pv)) {
             _nodes[i].position = fpos[_nodes[i].pvert->id()];
             _nodes[i].color = mesh.color_of(_nodes[i].pvert);
+            _nodes[i].radius = scale * mesh.radius_of(_nodes[i].pvert);
             for(unsigned k = 0; k < 4; ++k) {
                 _billboards[i].verts[k].position = _nodes[i].position;
                 _billboards[i].verts[k].color = _nodes[i].color;
+                _billboards[i].verts[k].normal.z = _nodes[i].radius;
             }
 
             const unsigned vertSz = sizeof(Mesh::Vertex);

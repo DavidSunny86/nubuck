@@ -18,14 +18,15 @@ public:
         leda::node  pvert; // corresponding vertex of polymesh
         M::Vector3  position;
         R::Color    color;
+        float       radius;
     };
 public:
     virtual ~Nodes() { }
 
     virtual bool IsEmpty() const = 0;
 
-    virtual void Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) = 0;
-    virtual void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) = 0;
+    virtual void Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) = 0;
+    virtual void Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) = 0;
 
     virtual void SetColor(leda::node pv, const Color& color) = 0;
 

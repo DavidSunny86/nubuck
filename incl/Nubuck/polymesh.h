@@ -22,6 +22,7 @@ public:
     };
 private:
     static const R::Color   defaultVertexColor;
+    static const float      defaultVertexRadius;
     static const R::Color 	defaultEdgeColor;
     static const float      defaultEdgeRadius;
 
@@ -32,6 +33,7 @@ private:
     leda::node_map<float>   _vatt_colorR;
     leda::node_map<float>   _vatt_colorG;
     leda::node_map<float>   _vatt_colorB;
+    leda::node_map<float>   _vatt_radius;
 
     // edge attributes
     leda::edge_map<char>    _eatt_state;
@@ -71,6 +73,7 @@ public:
     edge split(const edge e0, const edge e1);
 
     const VEC3&     position_of(const node v) const;
+    const float     radius_of(const node v) const;
     R::Color        color_of(const node v) const;
 
     const float     radius_of(const edge e) const;
@@ -81,6 +84,7 @@ public:
     R::Color        color_of(const face f) const;
 
     void set_position(const node v, const VEC3& p);
+    void set_radius(const node v, const float radius);
     void set_color(const node v, const R::Color& color);
 
     void set_radius(const edge e, const float radius);
@@ -102,6 +106,9 @@ template<typename VEC3>
 const R::Color PolyMesh<VEC3>::defaultVertexColor = R::Color(0.3f, 0.3f, 0.3f);
 
 template<typename VEC3>
+const float PolyMesh<VEC3>::defaultVertexRadius = 0.02f;
+
+template<typename VEC3>
 const R::Color PolyMesh<VEC3>::defaultEdgeColor = R::Color(0.3f, 0.3f, 0.3f);
 
 template<typename VEC3>
@@ -119,6 +126,7 @@ inline void PolyMesh<VEC3>::InitVertexAttributes() {
     _vatt_colorR.init(*this, defaultVertexColor.r);
     _vatt_colorG.init(*this, defaultVertexColor.g);
     _vatt_colorB.init(*this, defaultVertexColor.b);
+    _vatt_radius.init(*this, defaultVertexRadius);
 }
 
 template<typename VEC3>
@@ -212,6 +220,11 @@ inline const VEC3& PolyMesh<VEC3>::position_of(const node v) const {
 }
 
 template<typename VEC3>
+inline const float PolyMesh<VEC3>::radius_of(const node v) const {
+    return _vatt_radius[v];
+}
+
+template<typename VEC3>
 inline R::Color PolyMesh<VEC3>::color_of(const node v) const {
     return R::Color(_vatt_colorR[v], _vatt_colorG[v], _vatt_colorB[v]);
 }
@@ -249,6 +262,12 @@ inline void PolyMesh<VEC3>::set_position(const node v, const VEC3& p) {
     forall_adj_faces(f, v) _fatt_state[f] = M::Max(_fatt_state[f], static_cast<char>(State::GEOMETRY_CHANGED));
 
     LEDA_ACCESS(VEC3, entry(v)) = p;
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::set_radius(const node v, const float radius) {
+    _vatt_state[v] = M::Max(_vatt_state[v], static_cast<char>(State::GEOMETRY_CHANGED));
+    _vatt_radius[e] = radius;
 }
 
 template<typename VEC3>
