@@ -24,18 +24,6 @@ namespace COM {
 
 } // namespace COM
 
-#define MAX_TOKEN 512
-
-typedef struct ctoken_s {
-	struct ctoken_s* next;
-	char string[MAX_TOKEN];
-	float f;
-	int i;
-} ctoken_t;
-
-int COM_Tokenize(ctoken_t** tokens, const char* string, char term);
-void COM_FreeTokens(ctoken_t* tokens);
-
 namespace COM {
 
 class ItTokenizer {
