@@ -6,7 +6,7 @@ namespace UI {
 
 void Console::OnExec() {
     QByteArray cmd = _ui.edtInput->text().toAscii();
-    COM::CMD::Exec(_textStream, cmd.data());
+    COM::CMD::ExecCommand(_textStream, cmd.data());
     _textStream.flush();
 
     _ui.edtInput->clear();

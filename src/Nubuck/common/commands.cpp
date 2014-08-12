@@ -26,11 +26,11 @@ struct FindNamePred {
     bool operator()(const Command& cmd) const { return name == cmd.name; }
 };
 
-void Register(const std::string& name, const std::string& desc, callback_t callback) {
+void RegisterCommand(const std::string& name, const std::string& desc, callback_t callback) {
     cmds.push_back(Command(name, desc, callback));
 }
 
-void Exec(QTextStream& cout, const char* cmd) {
+void ExecCommand(QTextStream& cout, const char* cmd) {
     COM::ItTokenizer toks(cmd, " \t");
     COM::ItTokenizer::Token tok = toks.NextToken();
     const std::string name = std::string(tok.start, toks.Length(tok));
@@ -42,7 +42,7 @@ void Exec(QTextStream& cout, const char* cmd) {
     }
     tok = toks.NextToken();
     cout << cmd << ": ";
-    it->callback(cout, tok.start); 
+    it->callback(cout, tok.start);
 }
 
 } // namespace CMD

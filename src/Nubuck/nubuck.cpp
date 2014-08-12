@@ -7,6 +7,7 @@
 #include <Nubuck\nubuck.h>
 #include <Nubuck\common\common.h>
 #include <common\config\config.h>
+#include <common\commands.h>
 #include <world\world.h>
 #include <renderer\effects\effect.h>
 #include <renderer\effects\statedesc_gen\statedesc_gen.h>
@@ -121,6 +122,10 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     nubuck.world    = &W::world;
     nubuck.log      = UI::LogWidget::Instance();
     nubuck.ui       = &g_ui.GetMainWindow();
+
+    // register commands
+    COM::CMD::RegisterCommand("lsvars", "list config variables", COM::CMD_ListVariables);
+    COM::CMD::RegisterCommand("set", "set config variable", COM::CMD_SetVariable);
 
     // REMOVEME
 	OP::g_operators.Register(new OP::TranslatePanel, new OP::Translate);
