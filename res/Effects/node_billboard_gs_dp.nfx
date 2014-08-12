@@ -5,7 +5,8 @@ fx NodeBillboardGSDP {
 
         fs = 
         """
-        const bool PERFORM_DEPTH_PEEL = true;
+        const bool  PERFORM_DEPTH_PEEL  = true;
+        const int   SHAPE               = 0;
 
         #include <Shaders\node_billboard_gs.frag>
         """;

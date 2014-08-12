@@ -22,6 +22,7 @@ in VertexData {
 out BillboardData {
     vec3 spinePos_ss;
     vec3 color;
+    vec2 texCoords; // in [-1, 1]
 } outData;
 
 vec3 EyeToScreenSpace(vec4 v) {
@@ -43,20 +44,24 @@ void main() {
     gl_Position = uProjection * vec4(center + vec3(-size, -size, 0.0), 1.0);
     outData.spinePos_ss = spinePos_ss;
     outData.color = inData[0].color;
+    outData.texCoords = vec2(-1.0, -1.0);
     EmitVertex();
 
     gl_Position = uProjection * vec4(center + vec3( size, -size, 0.0), 1.0);
     outData.spinePos_ss = spinePos_ss;
     outData.color = inData[0].color;
+    outData.texCoords = vec2( 1.0, -1.0);
     EmitVertex();
 
     gl_Position = uProjection * vec4(center + vec3(-size,  size, 0.0), 1.0);
     outData.spinePos_ss = spinePos_ss;
     outData.color = inData[0].color;
+    outData.texCoords = vec2(-1.0,  1.0);
     EmitVertex();
 
     gl_Position = uProjection * vec4(center + vec3( size,  size, 0.0), 1.0);
     outData.spinePos_ss = spinePos_ss;
     outData.color = inData[0].color;
+    outData.texCoords = vec2( 1.0,  1.0);
     EmitVertex();
 }
