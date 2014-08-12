@@ -89,6 +89,7 @@ template<> struct ToGLEnum<int>         { enum { ENUM = GL_INT }; };
 
 COM::Config::Variable<float>	cvar_r_nodeSize("r_nodeSize", 0.025f);
 COM::Config::Variable<float>    cvar_r_edgeRadius("r_edgeRadius", 0.1f);
+COM::Config::Variable<int>      cvar_r_smoothEdges("r_smoothEdges", 0);
 COM::Config::Variable<int>      cvar_r_transparencyMode("r_transparencyMode", R::TransparencyMode::BACKFACES_FRONTFACES);
 COM::Config::Variable<int>      cvar_r_numDepthPeels("r_numDepthPeels", 5);
 

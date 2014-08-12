@@ -1,4 +1,4 @@
-fx EdgeLineBillboardGS {
+fx EdgeLineBillboardGSSE {
     sortkey = 10;
 
     pass Pass0 {
@@ -15,7 +15,7 @@ fx EdgeLineBillboardGS {
         """
         const bool PERFORM_DEPTH_PEEL   = false;
         const bool STIPPLE              = false;
-        const bool SMOOTH_EDGES         = false;
+        const bool SMOOTH_EDGES         = true;
 
         #include <Shaders\edge_line_billboard_gs.frag>
         """;

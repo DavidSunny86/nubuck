@@ -2,6 +2,7 @@
 OPTIONS:
 PERFORM_DEPTH_PEEL
 STIPPLE
+SMOOTH_EDGES
 */
 
 layout(std140) uniform UniformsHot {
@@ -23,6 +24,7 @@ uniform sampler2D peelDepth;
 in AxisData {
     vec3    v0;
     vec3    v1;
+    float   s;
     float   t;
     vec3    color;
 } inData;
@@ -63,6 +65,12 @@ void main() {
 
         float s = sin(0.25 * d_ss);
         if(0.0 > s) alpha = 0.0;
+    }
+
+    if(SMOOTH_EDGES) {
+        const float border = 0.9;
+        float dist = abs(2.0 * (inData.s - 0.5));
+        if(border < dist) alpha = 1.0 - (dist - border) / (1.0 - border);
     }
 
     gl_FragColor = vec4(inData.color, alpha);

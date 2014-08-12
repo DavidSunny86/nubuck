@@ -692,6 +692,11 @@ void ENT_Geometry::BuildRenderList() {
             _renderList.meshJobs.push_back(rjob);
 
             rjob.fx = "EdgeLineBillboardGS";
+
+            if(cvar_r_smoothEdges) {
+                rjob.fx = "EdgeLineBillboardGSSE";
+            }
+
             rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_DEPTH_0;
         }
         _renderList.meshJobs.push_back(rjob);

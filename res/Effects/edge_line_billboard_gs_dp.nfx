@@ -7,6 +7,7 @@ fx EdgeLineBillboardGSDP {
         """
         const bool PERFORM_DEPTH_PEEL   = true;
         const bool STIPPLE              = false;
+        const bool SMOOTH_EDGES         = false;
 
         #include <Shaders\edge_line_billboard_gs.frag>
         """;

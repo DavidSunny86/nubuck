@@ -16,6 +16,7 @@ in VertexData {
 out AxisData {
     vec3    v0;
     vec3    v1;
+    float   s;
     float   t;
     vec3    color;
 } outData;
@@ -44,6 +45,7 @@ void main() {
     gl_Position = uProjection * vec4(v0 + M * vec3(-0.5, 0.0, 0.0), 1.0);
     outData.v0 = v0;
     outData.v1 = v1;
+    outData.s = 0.0;
     outData.t = 0.0;
     outData.color = inData[0].color.rgb;
     EmitVertex();
@@ -51,6 +53,7 @@ void main() {
     gl_Position = uProjection * vec4(v0 + M * vec3( 0.5, 0.0, 0.0), 1.0);
     outData.v0 = v0;
     outData.v1 = v1;
+    outData.s = 1.0;
     outData.t = 0.0;
     outData.color = inData[0].color.rgb;
     EmitVertex();
@@ -58,6 +61,7 @@ void main() {
     gl_Position = uProjection * vec4(v0 + M * vec3(-0.5, 1.0, 0.0), 1.0);
     outData.v0 = v0;
     outData.v1 = v1;
+    outData.s = 0.0;
     outData.t = 1.0;
     outData.color = inData[1].color.rgb;
     EmitVertex();
@@ -65,6 +69,7 @@ void main() {
     gl_Position = uProjection * vec4(v0 + M * vec3( 0.5, 1.0, 0.0), 1.0);
     outData.v0 = v0;
     outData.v1 = v1;
+    outData.s = 1.0;
     outData.t = 1.0;
     outData.color = inData[1].color.rgb;
     EmitVertex();

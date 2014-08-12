@@ -28,6 +28,7 @@ struct TransparencyMode {
 
 extern COM::Config::Variable<float>	cvar_r_nodeSize;
 extern COM::Config::Variable<float> cvar_r_edgeRadius;
+extern COM::Config::Variable<int>   cvar_r_smoothEdges;
 extern COM::Config::Variable<int>   cvar_r_transparencyMode;
 extern COM::Config::Variable<int>   cvar_r_numDepthPeels;
 
