@@ -80,7 +80,7 @@ public:
     float RandomFloat(float min, float max) const;
 
     // contains trailing delimiter, eg.
-    // C:\Libraries\LEDA\ 
+    // 'C:\Libraries\LEDA\'
     const std::string& BaseDir(void) const;
 
     const char* GetEnvVar(const std::string& name) const;
