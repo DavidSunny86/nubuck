@@ -309,6 +309,15 @@
     <Filter Include="Public\renderer\color">
       <UniqueIdentifier>{6b790fd9-1337-4dba-bad9-62cf75603351}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Private\renderer\texfont">
+      <UniqueIdentifier>{badac92f-a8fc-4778-8b08-ccc951f8b100}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\world\entities\ent_text">
+      <UniqueIdentifier>{6db051a0-399f-4fba-abd0-0d2a9c08c51a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private\renderer\text">
+      <UniqueIdentifier>{5740581d-9fad-43fb-876d-eece690ef448}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Nubuck\renderer\glew\glew.h">
@@ -778,6 +787,18 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\maxint.h">
       <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\texfont\texfont.h">
+      <Filter>Private\renderer\texfont</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_text\ent_text.h">
+      <Filter>Private\world\entities\ent_text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_text\ent_text_outln.h">
+      <Filter>Private\world\entities\ent_text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\renderer\text\r_text.h">
+      <Filter>Private\renderer\text</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1290,6 +1311,18 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\animation\animator.cpp">
       <Filter>Private\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\texfont\texfont.cpp">
+      <Filter>Private\renderer\texfont</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_text\ent_text.cpp">
+      <Filter>Private\world\entities\ent_text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_text\ent_text_outln.cpp">
+      <Filter>Private\world\entities\ent_text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\renderer\text\r_text.cpp">
+      <Filter>Private\renderer\text</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

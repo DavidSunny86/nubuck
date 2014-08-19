@@ -1,14 +1,19 @@
 #pragma once
 
+#include <string>
+
 #include <Nubuck\math\vector3.h>
+#include <Nubuck\math\matrix4.h>
 #include <Nubuck\math\quaternion.h>
+#include <Nubuck\system\locks\spinlock.h>
 #include <UI\outliner\outliner_fwd.h>
 
 namespace W {
 
 struct EntityType {
     enum Enum {
-        ENT_GEOMETRY = 0
+        ENT_GEOMETRY = 0,
+        ENT_TEXT
     };
 };
 

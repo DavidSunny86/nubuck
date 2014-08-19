@@ -7,6 +7,7 @@
 #include <QAction>
 
 #include <Nubuck\operators\operator_invoker.h>
+#include <world\entities\ent_text\ent_text.h>
 
 #include "op_loop.h"
 
@@ -57,6 +58,8 @@ bool Loop::Invoke() {
 	leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
 	leda::CONVEX_HULL(L, mesh);
 	mesh.compute_faces();
+
+    W::ENT_Text* text = W::world.CreateText();
 
     return true;
 }

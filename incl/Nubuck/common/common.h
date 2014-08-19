@@ -42,6 +42,8 @@ class ItTokenizer {
 private:
     const char* start;
     const char* end;
+
+    const char* name;
 public:
     struct Token {
         const char* start;
@@ -56,12 +58,18 @@ public:
 
     ItTokenizer(const char* string, const char* delim);
 
+    void        SetName(const char* name); // used for error messages
+
     Token       NextToken();
     bool        IsValid(const Token& tok) const;
 
     unsigned    Length(const Token& tok) const;
     unsigned    StartIndex(const Token& tok) const;
     unsigned    EndIndex(const Token& tok) const;
+
+    Token       Expect(const char* name);
+    Token       ExpectInt(int& val);
+    Token       ExpectStr(std::string& val);
 };
 
 } // namespace COM

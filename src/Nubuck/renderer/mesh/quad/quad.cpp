@@ -2,7 +2,11 @@
 
 namespace R {
 
-    Mesh::Desc CreateQuadDesc(float edgeLength) {
+    Mesh::Desc CreateQuadDesc(
+        float edgeLength,
+        const M::Vector2& texCoords_lowerLeft,
+        const M::Vector2& texCoords_upperRight)
+    {
         Mesh::Desc desc;
 
         Mesh::Vertex* v = new Mesh::Vertex[4];
@@ -15,10 +19,10 @@ namespace R {
         v[1].position = M::Vector3( size, -size, 0.0f);
         v[2].position = M::Vector3( size,  size, 0.0f);
         v[3].position = M::Vector3(-size,  size, 0.0f);
-        v[0].texCoords = M::Vector2(0.0f, 0.0f);
-        v[1].texCoords = M::Vector2(1.0f, 0.0f);
-        v[2].texCoords = M::Vector2(1.0f, 1.0f);
-        v[3].texCoords = M::Vector2(0.0f, 1.0f);
+        v[0].texCoords = M::Vector2(texCoords_lowerLeft.x, texCoords_lowerLeft.y);
+        v[1].texCoords = M::Vector2(texCoords_upperRight.x, texCoords_lowerLeft.y);
+        v[2].texCoords = M::Vector2(texCoords_upperRight.x, texCoords_upperRight.y);
+        v[3].texCoords = M::Vector2(texCoords_lowerLeft.x, texCoords_upperRight.y);
         desc.vertices       = v;
         desc.numVertices    = 4;
 
@@ -29,7 +33,7 @@ namespace R {
         desc.numIndices = 6;
 
         desc.primType = GL_TRIANGLES;
-        
+
         return desc;
     }
 
