@@ -30,6 +30,8 @@ class ItTokenizer {
 private:
     const char* start;
     const char* end;
+
+    const char* name;
 public:
     struct Token {
         const char* start;
@@ -44,12 +46,19 @@ public:
 
     ItTokenizer(const char* string, const char* delim);
 
+    void        SetName(const char* name); // used for error messages
+
     Token       NextToken();
     bool        IsValid(const Token& tok) const;
 
     unsigned    Length(const Token& tok) const;
     unsigned    StartIndex(const Token& tok) const;
     unsigned    EndIndex(const Token& tok) const;
+
+    Token       Expect(const char* name);
+    Token       ExpectInt(int& val);
+    Token       ExpectFloat(float& val);
+    Token       ExpectStr(std::string& val);
 };
 
 } // namespace COM
@@ -68,7 +77,7 @@ public:
     float RandomFloat(float min, float max) const;
 
     // contains trailing delimiter, eg.
-    // C:\Libraries\LEDA\ 
+    // 'C:\Libraries\LEDA\'
     const std::string& BaseDir(void) const;
 
     const char* GetEnvVar(const std::string& name) const;

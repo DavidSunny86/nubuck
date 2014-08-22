@@ -49,8 +49,14 @@ R::Texture* AllocTGA(GEN::Pointer<FS::File> file) {
 	file->Read((char*)&header, sizeof(TGAHeader_t));
 
 	if(0 != memcmp(&header.fileSpec, &supportedFileSpec, sizeof(FileSpec_t))) {
-        common.printf("'%s' has invalid tga format. currently only uncompressed 24bit rga, 32bit rgba files are supported\n",
-            file->Name().c_str());
+        common.printf("'%s': ", file->Name().c_str());
+        common.printf("invalid tga format. currently only uncompressed 24bit rga, 32bit rgba files are supported.\n");
+        common.printf("... header.fileSpec.imageId = %d\n", header.fileSpec.imageId);
+        common.printf("... header.fileSpec.colorMapType = %d\n", header.fileSpec.colorMapType);
+        common.printf("... header.fileSpec.imageType = %d\n", header.fileSpec.imageType);
+        common.printf("... header.fileSpec.colorMapStart = %d\n", header.fileSpec.colorMapStart);
+        common.printf("... header.fileSpec.colorMapLength = %d\n", header.fileSpec.colorMapLength);
+        common.printf("... header.fileSpec.colorMapEntrySize = %d\n", header.fileSpec.colorMapEntrySize);
 		throw COM::InvalidFormatException();
 	}
 
@@ -95,6 +101,21 @@ R::Texture* AllocTGA(GEN::Pointer<FS::File> file) {
 	for(int i = 0; i < size; i += bytesPerPixel) {
 		std::swap(pixelData[i], pixelData[i + 2]);
 	}
+
+    if(0 != (32 & header.imageSpec.attributes)) {
+        // the origin is in the upper left hand corner instead of the lower
+        // left hand corner, so we have to flip the image
+        const int stride = bytesPerPixel * header.imageSpec.width;
+        int h = 0, l = header.imageSpec.height - 1;
+        while(h < l) {
+            // swap rows h and l
+            for(int i = 0; i < stride; ++i) {
+                std::swap(pixelData[stride * h + i], pixelData[stride * l + i]);
+            }
+            h++;
+            l--;
+        }
+    }
 
 	int width = header.imageSpec.width;
 	int height = header.imageSpec.height;

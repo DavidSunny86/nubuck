@@ -19,6 +19,7 @@
 #include <operators\operators.h>
 #include <operators\operator_driver.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
+#include <world\entities\ent_text\ent_text.h>
 #include <nubuck_private.h>
 #include "entity.h"
 #include "world_events.h"
@@ -597,11 +598,16 @@ void World::Render(R::RenderList& renderList) {
     SYS::ScopedLock lockEntities(_entitiesMtx);
 
     for(unsigned i = 0; i < _entities.size(); ++i) {
-        if(!_entities[i]->IsDead() && EntityType::ENT_GEOMETRY == _entities[i]->GetType()) {
-            ENT_Geometry& geom = static_cast<ENT_Geometry&>(*_entities[i]);
-            renderList.meshJobs.insert(renderList.meshJobs.end(),
-                geom.GetRenderList().meshJobs.begin(),
-                geom.GetRenderList().meshJobs.end());
+        if(!_entities[i]->IsDead()) {
+            if(EntityType::ENT_GEOMETRY == _entities[i]->GetType()) {
+                ENT_Geometry& geom = static_cast<ENT_Geometry&>(*_entities[i]);
+                renderList.meshJobs.insert(renderList.meshJobs.end(),
+                    geom.GetRenderList().meshJobs.begin(),
+                    geom.GetRenderList().meshJobs.end());
+            } else if(EntityType::ENT_TEXT == _entities[i]->GetType()) {
+                ENT_Text& text = static_cast<ENT_Text&>(*_entities[i]);
+                text.GetRenderJobs(renderList);
+            }
         }
     }
 }
@@ -629,6 +635,25 @@ IGeometry* World::CreateGeometry() {
     Send(EV::def_LinkEntity.Create(args));
 
     return geom;
+}
+
+ENT_Text* World::CreateText() {
+    entIdCntMtx.Lock();
+    unsigned entId = entIdCnt++;
+    entIdCntMtx.Unlock();
+
+    ENT_Text* text = new ENT_Text();
+    text->SetID(entId);
+
+    text->SetPosition(M::Vector3::Zero);
+    text->SetOrientation(M::Quat::Identity());
+    text->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
+
+    EV::Params_LinkEntity args;
+    args.entity = text;
+    Send(EV::def_LinkEntity.Create(args));
+
+    return text;
 }
 
 DWORD World::Thread_Func(void) {

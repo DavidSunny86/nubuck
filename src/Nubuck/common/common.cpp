@@ -29,7 +29,12 @@ ItTokenizer::ItTokenizer(const char* string, const char* delim)
     , delim(delim)
     , start(string)
     , end(string)
+    , name("ItTokenizer")
 { }
+
+void ItTokenizer::SetName(const char* name) {
+    this->name = name;
+}
 
 ItTokenizer::Token ItTokenizer::NextToken() {
     const char* cur = end;
@@ -38,6 +43,150 @@ ItTokenizer::Token ItTokenizer::NextToken() {
     while('\0' != *cur && !IsDelim(delim, *cur)) cur++;
     end = cur;
     return Token(start, end);
+}
+
+ItTokenizer::Token ItTokenizer::Expect(const char* name) {
+    const char* cur = end;
+    while('\0' != *cur && IsDelim(delim, *cur)) cur++;
+    const char *nstart = cur, *nameCur = name;
+    while('\0' != *nameCur) {
+        if(*cur++ != *nameCur++) {
+            char tokBuf[512] = { 0 };
+            strncpy(tokBuf, nstart, cur - nstart);
+            common.printf("ERROR - %s: ", this->name);
+            common.printf("expecting '%s', got '%s'\n",
+                name, tokBuf);
+            Crash();
+        }
+    }
+    start = nstart;
+    end = cur;
+    return Token(start, end);
+}
+
+ItTokenizer::Token ItTokenizer::ExpectInt(int& val) {
+    const char* cur = end;
+    while('\0' != *cur && IsDelim(delim, *cur)) cur++;
+    const char *nstart = cur;
+
+    bool    negative = false;
+    int     num = 0;
+    int     arity = 1;
+
+    if('-' == *cur) {
+        negative = true;
+        cur++;
+    }
+
+    if(!isdigit(*cur)) {
+        char tokBuf[512] = { 0 };
+        strncpy(tokBuf, nstart, 1);
+        common.printf("ERROR - %s: ", this->name);
+        common.printf("expecting INT, got '%s'\n",
+            tokBuf);
+        Crash();
+    }
+
+    while(isdigit(*cur)) {
+        num *= 10;
+        num += *cur - '0';
+        cur++;
+    }
+
+    if(negative) num *= -1;
+
+    val = num;
+
+    start = nstart;
+    end = cur;
+
+    return Token(start, end);
+}
+
+ItTokenizer::Token ItTokenizer::ExpectFloat(float &val) {
+    const char* cur = end;
+    while('\0' != *cur && IsDelim(delim, *cur)) cur++;
+    const char *nstart = cur;
+
+    bool    negative = false;
+    float   num = 0;
+
+    if('-' == *cur) {
+        negative = true;
+        cur++;
+    }
+
+    if(!isdigit(*cur)) {
+        char tokBuf[512] = { 0 };
+        strncpy(tokBuf, nstart, 1);
+        common.printf("ERROR - %s: ", this->name);
+        common.printf("expecting FLOAT, got '%s'\n",
+            tokBuf);
+        Crash();
+    }
+
+    while(isdigit(*cur)) {
+        num *= 10.0f;
+        num += *cur - '0';
+        cur++;
+    }
+
+    if('.' == *cur) {
+        cur++;
+
+        float pow = 0.1f;
+        while(isdigit(*cur)) {
+            num += pow * (*cur - '0');
+            pow /= 10.0f;
+            cur++;
+        }
+    }
+
+    if(negative) num *= -1;
+
+    val = num;
+
+    start = nstart;
+    end = cur;
+
+    return Token(start, end);
+}
+
+// expected string: "content", returned string: content
+ItTokenizer::Token ItTokenizer::ExpectStr(std::string& str) {
+    const char* cur = end;
+    while('\0' != *cur && IsDelim(delim, *cur)) cur++;
+    const char *nstart = cur;
+
+    if('\"' != *cur++) {
+        char tokBuf[512] = { 0 };
+        strncpy(tokBuf, nstart, 1);
+        common.printf("ERROR - %s: ", this->name);
+        common.printf("expecting STRING, got '%s'\n",
+            tokBuf);
+        Crash();
+    }
+
+    while('\0' != *cur) {
+        if('\"' == *cur) {
+            str = std::string(nstart + 1, cur - nstart - 1);
+
+            start = nstart;
+            end = cur + 1;
+            return Token(start, end);
+        }
+        cur++;
+    }
+
+    char tokBuf[512] = { 0 };
+    strncpy(tokBuf, nstart, 512);
+    common.printf("ERROR - %s: ", this->name);
+    common.printf("expecting STRING, got '%s'\n",
+        tokBuf);
+    Crash();
+
+    // unreachable
+    return Token(NULL, NULL);
 }
 
 bool ItTokenizer::IsValid(const Token& tok) const { return tok.end - tok.start; }

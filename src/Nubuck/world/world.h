@@ -25,6 +25,7 @@ namespace W {
     class ENT_Polyhedron;
     class ENT_Mesh;
     class ENT_Geometry;
+    class ENT_Text;
 
     extern SYS::Semaphore g_worldSem;
 
@@ -126,6 +127,7 @@ namespace W {
         // exported to client
         ISelection* GetSelection() override;
         IGeometry* CreateGeometry() override; // thread-safe
+        ENT_Text* CreateText();
 
         // thread interface
         DWORD Thread_Func(void);

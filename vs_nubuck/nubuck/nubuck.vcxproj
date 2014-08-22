@@ -16,7 +16,7 @@
     <ClInclude Include="..\..\incl\Nubuck\animation\animator_inl.h" />
     <ClInclude Include="..\..\incl\Nubuck\animation\move_vertex_anim.h" />
     <ClInclude Include="..\..\incl\Nubuck\common\common.h" />
-    <ClInclude Include="..\..\incl\Nubuck\common\string_hash.h" />
+    <ClInclude Include="..\..\incl\Nubuck\common\string_helper.h" />
     <ClInclude Include="..\..\incl\Nubuck\events\core_events.h" />
     <ClInclude Include="..\..\incl\Nubuck\events\events.h" />
     <ClInclude Include="..\..\incl\Nubuck\generic\pointer.h" />
@@ -90,6 +90,7 @@
     <ClInclude Include="..\..\src\Nubuck\common\config\config.h" />
     <ClInclude Include="..\..\src\Nubuck\common\filehandle.h" />
     <ClInclude Include="..\..\src\Nubuck\common\filesystem\filesystem.h" />
+    <ClInclude Include="..\..\src\Nubuck\common\string_helper.h" />
     <ClInclude Include="..\..\src\Nubuck\common\types.h" />
     <CustomBuild Include="..\..\src\Nubuck\mainloop\mainloop.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
@@ -258,8 +259,10 @@
     <ClInclude Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\shader_preprocessor_local.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\skin\skin.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\skin\skinmgr.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\texfont\texfont.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\textures\texallocs.h" />
     <ClInclude Include="..\..\src\Nubuck\renderer\textures\texture.h" />
+    <ClInclude Include="..\..\src\Nubuck\renderer\text\r_text.h" />
     <ClInclude Include="..\..\src\Nubuck\system\opengl\glwindow\glwindow.h" />
     <ClInclude Include="..\..\src\Nubuck\system\opengl\opengl.h" />
     <ClInclude Include="..\..\src\Nubuck\system\thread\thread.h" />
@@ -382,6 +385,8 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNUBUCK_MT -DPARANOID -DUNICODE -DWIN32 -DQT_DLL -DGLEW_BUILD -DLEDA_DLL -DLEDA_MULTI_THREAD -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DNUBUCK_LIB -DQT_GUI_LIB -D_WINDLL  "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtGui"</Command>
     </CustomBuild>
+    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_text\ent_text.h" />
+    <ClInclude Include="..\..\src\Nubuck\world\entities\ent_text\ent_text_outln.h" />
     <ClInclude Include="..\..\src\Nubuck\world\world_events.h" />
     <ClInclude Include="GeneratedFiles\ui_console.h" />
     <ClInclude Include="GeneratedFiles\ui_operatorpanelheader.h" />
@@ -464,7 +469,7 @@
     <ClCompile Include="..\..\src\Nubuck\common\common.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\config\config.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\filesystem\filesystem.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\common\string_hash.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\common\string_helper.cpp" />
     <ClCompile Include="..\..\src\Nubuck\mainloop\mainloop.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\box.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\is_ray_box.cpp" />
@@ -554,8 +559,10 @@
     <ClCompile Include="..\..\src\Nubuck\renderer\shader\shader_preprocessor\shader_preprocessor.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\skin\skin.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\skin\skinmgr.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\texfont\texfont.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\textures\texture.cpp" />
     <ClCompile Include="..\..\src\Nubuck\renderer\textures\tga_texalloc.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\renderer\text\r_text.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\locks\condvar.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\locks\semaphore.cpp" />
     <ClCompile Include="..\..\src\Nubuck\system\locks\shared_resources.cpp" />
@@ -584,6 +591,8 @@
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_outln.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entities\ent_geometry\ent_geometry_serialize.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_text\ent_text.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\world\entities\ent_text\ent_text_outln.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\entity.cpp" />
     <ClCompile Include="..\..\src\Nubuck\world\world.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_colorbutton.cpp">

@@ -1,0 +1,15 @@
+fx Text {
+    pass Pass0 {
+        state {
+            depth.maskEnabled = GL_FALSE;
+            blend {
+                enabled   = GL_TRUE;
+                srcFactor = GL_SRC_ALPHA;
+                dstFactor = GL_ONE_MINUS_SRC_ALPHA;
+            }
+        }
+
+        vs = "#include <Shaders\text.vert>";
+        fs = "#include <Shaders\text.frag>";
+    }
+}
