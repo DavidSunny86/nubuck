@@ -11,7 +11,6 @@ private:
     UI::Outliner::itemHandle_t _outlinerItem;
 
     R::Text _text;
-    R::Text _sdtext;
 public:
     ENT_Text();
 

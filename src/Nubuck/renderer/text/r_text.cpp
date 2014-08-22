@@ -57,18 +57,11 @@ static float ComputeScale(
     return size / width_ts;
 }
 
-void Text::_Rebuild(
-    const int               numPages,
-    const int               texWidth,
-    const int               texHeight,
-    const float             lineHeight,
-    const std::string&      text,
-    const TF_Char* const    chars)
-{
+void Text::Rebuild(const TexFont& texFont, const std::string& text) {
     DestroyMesh();
 
     _pageMeshes.clear();
-    _pageMeshes.resize(numPages);
+    _pageMeshes.resize(texFont.common.pages);
 
     const Mesh::Index indices[] = { 0, 1, 2, 0, 2, 3 };
 
@@ -85,22 +78,25 @@ void Text::_Rebuild(
         */
     };
 
+    const int texWidth = texFont.common.scaleW;
+    const int texHeight = texFont.common.scaleH;
+
     // scale to normalized texture space
     const float scaleW = 1.0f / texWidth;
     const float scaleH = 1.0f / texHeight;
 
-    const float scale = ComputeScale(texWidth, texHeight, chars, 2.5f); // texture space to world space scale
+    const float scale = ComputeScale(texWidth, texHeight, texFont.chars, 2.5f); // texture space to world space scale
 
     M::Vector2 cursor;
 
-    const float ydiff = scale * scaleH * lineHeight;
+    const float ydiff = scale * scaleH * texFont.common.lineHeight;
 
     for(unsigned cidx = 0; cidx < text.size(); ++cidx) {
         const char c = text[cidx];
 
         if(' ' == c) {
             // let a space be the size of one 'x'
-            cursor.x += scale * scaleW * chars['x'].xadvance;
+            cursor.x += scale * scaleW * texFont.chars['x'].xadvance;
             continue;
         }
 
@@ -110,9 +106,12 @@ void Text::_Rebuild(
             continue;
         }
 
-        const TF_Char& texChar = chars[c];
+        const TF_Char& texChar = texFont.chars[c];
 
         PageMesh& pageMesh = _pageMeshes[texChar.page];
+
+        pageMesh.texFilename = texFont.pages[texChar.page].file;
+        pageMesh.texture = NULL;
 
         M::Vector2 tc_lowerLeft, tc_upperRight;
         ComputeTextureCoordinates(texWidth, texHeight, texChar, tc_lowerLeft, tc_upperRight);
@@ -169,49 +168,19 @@ void Text::_Rebuild(
     }
 }
 
-void Text::Rebuild(const TexFont& texFont, const std::string& text) {
-    const TexFont::Common& texCommon = texFont.GetCommon();
-    _Rebuild(texCommon.pages, texCommon.scaleW, texCommon.scaleH, texCommon.lineHeight, text, texFont.GetChars());
-}
-
-void Text::Rebuild(const SDTexFont& texFont, const std::string& text) {
-    const SDTexFont::Common& texCommon = texFont.GetCommon();
-    _Rebuild(1, texCommon.scaleW, texCommon.scaleH, texCommon.lineHeight, text, texFont.GetChars());
-}
-
-void Text::GetRenderJobs(const TexFont& texFont, RenderList& renderList) const {
+void Text::GetRenderJobs(RenderList& renderList) {
     for(unsigned i = 0; i < _pageMeshes.size(); ++i) {
-        const PageMesh& pageMesh = _pageMeshes[i];
+        PageMesh& pageMesh = _pageMeshes[i];
+
+        if(!pageMesh.texture) {
+            pageMesh.texture = TextureManager::Instance().Get(pageMesh.texFilename).Raw();
+        }
 
         R::MeshJob mjob;
 
         R::Material mat = R::Material::White;
         mat.texBindings[0].samplerName = "font";
-        mat.texBindings[0].texture = texFont.GetPageTexture(i);
-
-        mjob.fx         = "Text";
-        mjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
-        mjob.material   = mat;
-        mjob.primType   = 0;
-        mjob.tfmesh     = pageMesh.tfmesh;
-
-        mjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
-        renderList.meshJobs.push_back(mjob);
-
-        mjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
-        renderList.meshJobs.push_back(mjob);
-    }
-}
-
-void Text::GetRenderJobs(SDTexFont& texFont, RenderList& renderList) const {
-    for(unsigned i = 0; i < _pageMeshes.size(); ++i) {
-        const PageMesh& pageMesh = _pageMeshes[i];
-
-        R::MeshJob mjob;
-
-        R::Material mat = R::Material::White;
-        mat.texBindings[0].samplerName = "font";
-        mat.texBindings[0].texture = texFont.GetPageTexture();
+        mat.texBindings[0].texture = pageMesh.texture;
 
         mjob.fx         = "SDText";
         mjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;

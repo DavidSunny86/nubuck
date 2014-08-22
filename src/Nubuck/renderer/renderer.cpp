@@ -22,7 +22,6 @@
 #include <renderer\framebuffer\framebuffer.h>
 #include <renderer\renderbuffer\renderbuffer.h>
 #include <renderer\textures\texture.h>
-#include <renderer\texfont\texfont.h>
 #include "renderer_local.h"
 #include "renderer.h"
 #include <world\world.h>
@@ -762,8 +761,6 @@ void Renderer::BeginFrame() {
     frame_time.Start();
 
     metrics.frame.numDrawCalls = 0;
-
-    TexFontManager::Instance().LoadTextures();
 
     framebuffer->Bind();
 

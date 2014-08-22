@@ -7,9 +7,7 @@
 
 namespace R {
 
-struct TF_Char;
-class TexFont;
-class SDTexFont;
+struct TexFont;
 struct RenderList;
 
 class Text {
@@ -22,28 +20,19 @@ private:
         meshPtr_t   mesh;
         tfmeshPtr_t tfmesh;
 
+        std::string texFilename;
+        Texture*    texture;
+
         PageMesh() : mesh(NULL), tfmesh(NULL) { }
     };
     std::vector<PageMesh> _pageMeshes;
 
     void DestroyMesh();
-
-    void _Rebuild(
-        const int               numPages,
-        const int               texWidth,
-        const int               texHeight,
-        const float             lineHeight,
-        const std::string&      text,
-        const TF_Char* const    chars);
 public:
     Text();
 
     void Rebuild(const TexFont& texFont, const std::string& text);
-    void GetRenderJobs(const TexFont& texFont, RenderList& renderList) const;
-
-    // HACK
-    void Rebuild(const SDTexFont& texFont, const std::string& text);
-    void GetRenderJobs(SDTexFont& texFont, RenderList& renderList) const;
+    void GetRenderJobs(RenderList& renderList);
 };
 
 } // namespace R

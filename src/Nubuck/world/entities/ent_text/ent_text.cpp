@@ -6,11 +6,7 @@
 #include <world\entities\ent_text\ent_text_outln.h>
 #include <UI\userinterface.h>
 
-COM::Config::Variable<int> cvar_r_textType("textType", 0);
-
 namespace W {
-
-static const char CHAR = 't';
 
 ENT_Text::ENT_Text()
     : _outlinerItem(NULL)
@@ -20,15 +16,10 @@ ENT_Text::ENT_Text()
     _outlinerItem = g_ui.GetOutliner().AddItem("", this);
     g_ui.GetOutliner().SetItemName(_outlinerItem, "Text");
 
-
-    const std::string filename = common.BaseDir() + "Textures\\Fonts\\consolas_32.fnt";
-    R::TexFont& texFont = R::TexFontManager::Instance().GetTexFont(filename);
-
-    const std::string sdfilename = common.BaseDir() + "Textures\\Fonts\\consola.ttf_sdf.txt";
-    R::SDTexFont& sdtexFont = R::TexFontManager::Instance().GetSDTexFont(sdfilename);
+    const std::string filename = common.BaseDir() + "Textures\\Fonts\\consola.ttf_sdf.txt";
+    const R::TexFont& texFont = R::FindTexFont(R::TF_Type::SDFont, filename);
 
     _text.Rebuild(texFont, "Hello World\nHow are you?");
-    _sdtext.Rebuild(sdtexFont, "Hello World\nHow are you?");
 }
 
 UI::OutlinerView* ENT_Text::CreateOutlinerView() {
@@ -36,14 +27,7 @@ UI::OutlinerView* ENT_Text::CreateOutlinerView() {
 }
 
 void ENT_Text::GetRenderJobs(R::RenderList& renderList) {
-    const std::string filename = common.BaseDir() + "Textures\\Fonts\\consolas_32.fnt";
-    R::TexFont& texFont = R::TexFontManager::Instance().GetTexFont(filename);
-
-    const std::string sdfilename = common.BaseDir() + "Textures\\Fonts\\consola.ttf_sdf.txt";
-    R::SDTexFont& sdtexFont = R::TexFontManager::Instance().GetSDTexFont(sdfilename);
-
-    if(0 == cvar_r_textType) _text.GetRenderJobs(texFont, renderList);
-    else _sdtext.GetRenderJobs(sdtexFont, renderList);
+    _text.GetRenderJobs(renderList);
 }
 
 } // namespace W
