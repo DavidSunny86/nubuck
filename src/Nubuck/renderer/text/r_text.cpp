@@ -22,8 +22,9 @@ void Text::DestroyMesh() {
 Text::Text() { }
 
 static void ComputeTextureCoordinates(
-    const TexFont::Common& texCommon,
-    const TexFont::Char& texChar,
+    const int texWidth,
+    const int texHeight,
+    const TF_Char& texChar,
     M::Vector2& lowerLeft,
     M::Vector2& upperRight)
 {
@@ -31,8 +32,8 @@ static void ComputeTextureCoordinates(
     // - origin is upper left hand corner.
     // - xy specify upper left hand corner
 
-    const float scaleW = 1.0f / texCommon.scaleW;
-    const float scaleH = 1.0f / texCommon.scaleH;
+    const float scaleW = 1.0f / texWidth;
+    const float scaleH = 1.0f / texHeight;
 
     lowerLeft.x   = scaleW * texChar.x;
     upperRight.y  = 1.0f - scaleH * texChar.y;
@@ -41,14 +42,33 @@ static void ComputeTextureCoordinates(
     lowerLeft.y   = upperRight.y - scaleH * texChar.height;
 }
 
-void Text::Rebuild(const TexFont& texFont, const std::string& text) {
+static float ComputeScale(
+    const int texWidth,
+    const int texHeight,
+    const TF_Char* const chars,
+    const float size)
+{
+    const TF_Char& texChar = chars['A'];
+
+    M::Vector2 tc_lowerLeft, tc_upperRight;
+    ComputeTextureCoordinates(texWidth, texHeight, texChar, tc_lowerLeft, tc_upperRight);
+
+    const float width_ts = tc_upperRight.x - tc_lowerLeft.x;
+    return size / width_ts;
+}
+
+void Text::_Rebuild(
+    const int               numPages,
+    const int               texWidth,
+    const int               texHeight,
+    const float             lineHeight,
+    const std::string&      text,
+    const TF_Char* const    chars)
+{
     DestroyMesh();
 
-    const TexFont::Info&    texInfo = texFont.GetInfo();
-    const TexFont::Common&  texCommon = texFont.GetCommon();
-
     _pageMeshes.clear();
-    _pageMeshes.resize(texFont.GetCommon().pages);
+    _pageMeshes.resize(numPages);
 
     const Mesh::Index indices[] = { 0, 1, 2, 0, 2, 3 };
 
@@ -66,21 +86,21 @@ void Text::Rebuild(const TexFont& texFont, const std::string& text) {
     };
 
     // scale to normalized texture space
-    const float scaleW = 1.0f / texCommon.scaleW;
-    const float scaleH = 1.0f / texCommon.scaleH;
+    const float scaleW = 1.0f / texWidth;
+    const float scaleH = 1.0f / texHeight;
 
-    const float scale = 2.5f; // texture space to world space scale
+    const float scale = ComputeScale(texWidth, texHeight, chars, 2.5f); // texture space to world space scale
 
     M::Vector2 cursor;
 
-    const float ydiff = scale * scaleH * texCommon.lineHeight;
+    const float ydiff = scale * scaleH * lineHeight;
 
     for(unsigned cidx = 0; cidx < text.size(); ++cidx) {
         const char c = text[cidx];
 
         if(' ' == c) {
             // let a space be the size of one 'x'
-            cursor.x += scale * scaleW * texFont.GetChar('x').xadvance;
+            cursor.x += scale * scaleW * chars['x'].xadvance;
             continue;
         }
 
@@ -90,12 +110,12 @@ void Text::Rebuild(const TexFont& texFont, const std::string& text) {
             continue;
         }
 
-        const TexFont::Char& texChar = texFont.GetChar(c);
+        const TF_Char& texChar = chars[c];
 
         PageMesh& pageMesh = _pageMeshes[texChar.page];
 
         M::Vector2 tc_lowerLeft, tc_upperRight;
-        ComputeTextureCoordinates(texCommon, texChar, tc_lowerLeft, tc_upperRight);
+        ComputeTextureCoordinates(texWidth, texHeight, texChar, tc_lowerLeft, tc_upperRight);
 
         const M::Vector2 size_ts = tc_upperRight - tc_lowerLeft;
 
@@ -149,6 +169,16 @@ void Text::Rebuild(const TexFont& texFont, const std::string& text) {
     }
 }
 
+void Text::Rebuild(const TexFont& texFont, const std::string& text) {
+    const TexFont::Common& texCommon = texFont.GetCommon();
+    _Rebuild(texCommon.pages, texCommon.scaleW, texCommon.scaleH, texCommon.lineHeight, text, texFont.GetChars());
+}
+
+void Text::Rebuild(const SDTexFont& texFont, const std::string& text) {
+    const SDTexFont::Common& texCommon = texFont.GetCommon();
+    _Rebuild(1, texCommon.scaleW, texCommon.scaleH, texCommon.lineHeight, text, texFont.GetChars());
+}
+
 void Text::GetRenderJobs(const TexFont& texFont, RenderList& renderList) const {
     for(unsigned i = 0; i < _pageMeshes.size(); ++i) {
         const PageMesh& pageMesh = _pageMeshes[i];
@@ -160,6 +190,30 @@ void Text::GetRenderJobs(const TexFont& texFont, RenderList& renderList) const {
         mat.texBindings[0].texture = texFont.GetPageTexture(i);
 
         mjob.fx         = "Text";
+        mjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+        mjob.material   = mat;
+        mjob.primType   = 0;
+        mjob.tfmesh     = pageMesh.tfmesh;
+
+        mjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
+        renderList.meshJobs.push_back(mjob);
+
+        mjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
+        renderList.meshJobs.push_back(mjob);
+    }
+}
+
+void Text::GetRenderJobs(SDTexFont& texFont, RenderList& renderList) const {
+    for(unsigned i = 0; i < _pageMeshes.size(); ++i) {
+        const PageMesh& pageMesh = _pageMeshes[i];
+
+        R::MeshJob mjob;
+
+        R::Material mat = R::Material::White;
+        mat.texBindings[0].samplerName = "font";
+        mat.texBindings[0].texture = texFont.GetPageTexture();
+
+        mjob.fx         = "SDText";
         mjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
         mjob.material   = mat;
         mjob.primType   = 0;

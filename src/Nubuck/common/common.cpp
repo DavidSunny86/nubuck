@@ -161,6 +161,55 @@ ItTokenizer::Token ItTokenizer::ExpectInt(int& val) {
     return Token(start, end);
 }
 
+ItTokenizer::Token ItTokenizer::ExpectFloat(float &val) {
+    const char* cur = end;
+    while('\0' != *cur && IsDelim(delim, *cur)) cur++;
+    const char *nstart = cur;
+
+    bool    negative = false;
+    float   num = 0;
+
+    if('-' == *cur) {
+        negative = true;
+        cur++;
+    }
+
+    if(!isdigit(*cur)) {
+        char tokBuf[512] = { 0 };
+        strncpy(tokBuf, nstart, 1);
+        common.printf("ERROR - %s: ", this->name);
+        common.printf("expecting FLOAT, got '%s'\n",
+            tokBuf);
+        Crash();
+    }
+
+    while(isdigit(*cur)) {
+        num *= 10.0f;
+        num += *cur - '0';
+        cur++;
+    }
+
+    if('.' == *cur) {
+        cur++;
+
+        float pow = 0.1f;
+        while(isdigit(*cur)) {
+            num += pow * (*cur - '0');
+            pow /= 10.0f;
+            cur++;
+        }
+    }
+
+    if(negative) num *= -1;
+
+    val = num;
+
+    start = nstart;
+    end = cur;
+
+    return Token(start, end);
+}
+
 // expected string: "content", returned string: content
 ItTokenizer::Token ItTokenizer::ExpectStr(std::string& str) {
     const char* cur = end;

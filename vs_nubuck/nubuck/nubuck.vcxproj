@@ -16,7 +16,7 @@
     <ClInclude Include="..\..\incl\Nubuck\animation\animator_inl.h" />
     <ClInclude Include="..\..\incl\Nubuck\animation\move_vertex_anim.h" />
     <ClInclude Include="..\..\incl\Nubuck\common\common.h" />
-    <ClInclude Include="..\..\incl\Nubuck\common\string_hash.h" />
+    <ClInclude Include="..\..\incl\Nubuck\common\string_helper.h" />
     <ClInclude Include="..\..\incl\Nubuck\events\core_events.h" />
     <ClInclude Include="..\..\incl\Nubuck\events\events.h" />
     <ClInclude Include="..\..\incl\Nubuck\generic\pointer.h" />
@@ -90,6 +90,7 @@
     <ClInclude Include="..\..\src\Nubuck\common\config\config.h" />
     <ClInclude Include="..\..\src\Nubuck\common\filehandle.h" />
     <ClInclude Include="..\..\src\Nubuck\common\filesystem\filesystem.h" />
+    <ClInclude Include="..\..\src\Nubuck\common\string_helper.h" />
     <ClInclude Include="..\..\src\Nubuck\common\types.h" />
     <CustomBuild Include="..\..\src\Nubuck\mainloop\mainloop.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
@@ -468,7 +469,7 @@
     <ClCompile Include="..\..\src\Nubuck\common\common.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\config\config.cpp" />
     <ClCompile Include="..\..\src\Nubuck\common\filesystem\filesystem.cpp" />
-    <ClCompile Include="..\..\src\Nubuck\common\string_hash.cpp" />
+    <ClCompile Include="..\..\src\Nubuck\common\string_helper.cpp" />
     <ClCompile Include="..\..\src\Nubuck\mainloop\mainloop.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\box.cpp" />
     <ClCompile Include="..\..\src\Nubuck\math\is_ray_box.cpp" />

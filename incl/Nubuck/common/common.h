@@ -69,6 +69,7 @@ public:
 
     Token       Expect(const char* name);
     Token       ExpectInt(int& val);
+    Token       ExpectFloat(float& val);
     Token       ExpectStr(std::string& val);
 };
 

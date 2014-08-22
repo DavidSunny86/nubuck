@@ -680,9 +680,6 @@
     <ClInclude Include="..\..\incl\Nubuck\common\common.h">
       <Filter>Public\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\incl\Nubuck\common\string_hash.h">
-      <Filter>Public\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\incl\Nubuck\generic\pointer.h">
       <Filter>Public\generic</Filter>
     </ClInclude>
@@ -799,6 +796,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Nubuck\renderer\text\r_text.h">
       <Filter>Private\renderer\text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\incl\Nubuck\common\string_helper.h">
+      <Filter>Public\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Nubuck\common\string_helper.h">
+      <Filter>Private\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1144,9 +1147,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_operator_invoker.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Nubuck\common\string_hash.cpp">
-      <Filter>Private\common</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\operators\op_loop\op_loop.cpp">
       <Filter>Private\operators\op_loop</Filter>
     </ClCompile>
@@ -1323,6 +1323,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Nubuck\renderer\text\r_text.cpp">
       <Filter>Private\renderer\text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Nubuck\common\string_helper.cpp">
+      <Filter>Private\common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <queue>
 #include <Nubuck\common\common.h>
-#include <Nubuck\common\string_hash.h>
+#include <Nubuck\common\string_helper.h>
 #include <Nubuck\system\locks\spinlock.h>
 #include <Nubuck\system\locks\condvar.h>
 #include <Nubuck\system\locks\semaphore.h>
