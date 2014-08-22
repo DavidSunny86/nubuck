@@ -403,6 +403,18 @@ void SetState(const State& state) {
         curState.stencil.op.back.zpass   = state.stencil.op.back.zpass;
     }
 
+    if(curState.alphaTest.enabled != state.alphaTest.enabled) {
+        SetEnabled(GL_ALPHA_TEST, state.alphaTest.enabled);
+        curState.alphaTest.enabled = state.alphaTest.enabled;
+    }
+    c0 = curState.alphaTest.func    != state.alphaTest.func;
+    c1 = curState.alphaTest.ref     != state.alphaTest.ref;
+    if(c0 || c1) {
+        GL_CALL(glAlphaFunc(state.alphaTest.func, state.alphaTest.ref));
+        curState.alphaTest.func = state.alphaTest.func;
+        curState.alphaTest.ref  = state.alphaTest.ref;
+    }
+
     if(curState.raster.pointSize != state.raster.pointSize) {
         GL_CALL(glPointSize(state.raster.pointSize));
         curState.raster.pointSize = state.raster.pointSize;

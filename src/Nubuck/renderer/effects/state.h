@@ -50,6 +50,12 @@ struct State {
         } op;
     } stencil;
 
+    struct AlphaTest {
+        GLboolean   enabled;
+        GLenum      func;
+        float       ref;
+    } alphaTest;
+
     struct Rasterizing {
         float       pointSize;
         float       lineWidth;

@@ -28,6 +28,10 @@ void SetDefaultState(State& state) {
     state.stencil.op.back.zfail    	= GL_KEEP;
     state.stencil.op.back.zpass    	= GL_KEEP;
 
+    state.alphaTest.enabled         = GL_FALSE;
+    state.alphaTest.func            = GL_ALWAYS;
+    state.alphaTest.ref             = 0.0f;
+
     state.raster.pointSize          = 1.0f;
     state.raster.lineWidth          = 1.0f;
 
