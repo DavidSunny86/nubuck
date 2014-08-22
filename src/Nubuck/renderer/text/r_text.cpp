@@ -91,7 +91,7 @@ void Text::Rebuild(
 
     const float scale = ComputeScale(texWidth, texHeight, texFont.chars, 2.5f); // texture space to world space scale
 
-    M::Vector2 cursor;
+    M::Vector2 cursor = M::Vector2::Zero;
 
     const float ydiff = scale * scaleH * texFont.common.lineHeight;
 
