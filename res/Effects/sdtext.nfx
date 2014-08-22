@@ -1,14 +1,12 @@
 fx SDText {
     pass Pass0 {
-        state {
-            blend {
-                enabled   = GL_TRUE;
-                srcFactor = GL_SRC_ALPHA;
-                dstFactor = GL_ONE_MINUS_SRC_ALPHA;
-            }
+        state.alphaTest {
+            enabled = GL_TRUE;
+            func    = GL_GEQUAL;
+            ref     = 0.5;
         }
 
         vs = "#include <Shaders\text.vert>";
-        fs = "#include <Shaders\sdtext.frag>";
+        fs = "#include <Shaders\text.frag>";
     }
 }

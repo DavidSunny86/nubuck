@@ -31,7 +31,10 @@ private:
 public:
     Text();
 
-    void Rebuild(const TexFont& texFont, const std::string& text);
+    void Rebuild(
+        const TexFont& texFont,
+        const std::string& text,
+        const Color& color = Color::Black);
     void GetRenderJobs(RenderList& renderList);
 };
 

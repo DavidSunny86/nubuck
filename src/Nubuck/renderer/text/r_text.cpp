@@ -57,7 +57,11 @@ static float ComputeScale(
     return size / width_ts;
 }
 
-void Text::Rebuild(const TexFont& texFont, const std::string& text) {
+void Text::Rebuild(
+    const TexFont& texFont,
+    const std::string& text,
+    const Color& color) 
+{
     DestroyMesh();
 
     _pageMeshes.clear();
@@ -138,7 +142,7 @@ void Text::Rebuild(const TexFont& texFont, const std::string& text) {
             vert.texCoords = texCoords[i];
 
             vert.normal = M::Vector3(0.0f, 0.0f, 1.0f);
-            vert.color = Color::White;
+            vert.color = color;
 
             pageMesh.vertices.push_back(vert);
         }
