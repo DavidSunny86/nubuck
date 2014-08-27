@@ -9,15 +9,55 @@
 #include <operators\operators.h>
 #include <renderer\metrics\metrics.h>
 #include <renderer\effects\effectmgr.h>
+#include <renderer\mesh\quad\quad.h>
+#include <renderer\mesh\meshmgr.h>
 #include "renderview.h"
 
 #include <operators\operators.h> // !!!
 
 namespace UI {
 
+    // top-down gradient
+    void RenderView::BuildBackgroundGradient() {
+        if(_bgGradient.mesh) {
+            R::meshMgr.Destroy(_bgGradient.mesh);
+            _bgGradient.mesh = NULL;
+        }
+        if(_bgGradient.tfmesh) {
+            R::meshMgr.Destroy(_bgGradient.tfmesh);
+            _bgGradient.tfmesh = NULL;
+        }
+
+        R::Mesh::Desc meshDesc = R::CreateQuadDesc(2.0f);
+        R::Color c0 = _renderer.GetBackgroundColor();
+        R::Color c1 = R::Lerp(c0, R::Color::Black, 0.6f);
+        meshDesc.vertices[0].color = c1;
+        meshDesc.vertices[1].color = c1;
+        meshDesc.vertices[2].color = c0;
+        meshDesc.vertices[3].color = c0;
+
+        _bgGradient.mesh = R::meshMgr.Create(meshDesc);
+        _bgGradient.tfmesh = R::meshMgr.Create(_bgGradient.mesh);
+
+        R::meshMgr.GetMesh(_bgGradient.tfmesh).SetTransform(M::Mat4::Identity());
+    }
+
+    void RenderView::RenderBackgroundGradient(R::RenderList& renderList) {
+        R::MeshJob mjob;
+        mjob.fx         = "UnlitTP";
+        mjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+        mjob.tfmesh     = _bgGradient.tfmesh;
+        mjob.material   = R::Material::White;
+        mjob.primType   = 0;
+
+        renderList.meshJobs.push_back(mjob);
+    }
+
     void RenderView::initializeGL(void) {
         _renderer.Init();
         _debugText.Init(GetRenderingContext().GetDeviceContext());
+
+        BuildBackgroundGradient();
     }
 
     void RenderView::resizeGL(int width, int height) {
@@ -127,18 +167,35 @@ namespace UI {
         if(!qevent->isAutoRepeat()) W::world.Send(EV::def_Key.Create(args));
     }
 
+    void RenderView::OnSetBackgroundColor(float r, float g, float b) {
+        _bgColor = R::Color(r, g, b);
+        _renderer.SetBackgroundColor(_bgColor);
+        BuildBackgroundGradient();
+    }
+
     void RenderView::OnSetBackgroundColor(const R::Color& color) {
-        _renderer.SetBackgroundColor(color);
+        OnSetBackgroundColor(color.r, color.g, color.b);
     }
 
     void RenderView::OnSetBackgroundColor(const QColor& color) {
-        _renderer.SetBackgroundColor(R::Color(color.redF(), color.greenF(), color.blueF()));
+        OnSetBackgroundColor(color.redF(), color.greenF(), color.blueF());
     }
+
+    void RenderView::OnShowBackgroundGradient(bool show) {
+        _bgGradient.show = show;
+    }
+
+    void RenderView::OnShowBackgroundGradient(int show) {
+        OnShowBackgroundGradient(0 != show);
+    }
+
+    R::Color RenderView::defaultBackgroundColor = R::Color::FromBytes(154, 206, 235); // cornflower blue (crayola)
 
     RenderView::RenderView(QWidget* parent)
         : glWidget_t(parent)
         , _fpsLabel(NULL)
         , _time(0.0f)
+        , _bgColor(defaultBackgroundColor)
     {
         setFocusPolicy(Qt::StrongFocus);
         setMouseTracking(true);
@@ -150,6 +207,14 @@ namespace UI {
 
     const R::Renderer& RenderView::GetRenderer() const {
         return _renderer;
+    }
+
+    const R::Color& RenderView::GetBackgroundColor() const {
+        return _bgColor;
+    }
+
+    bool RenderView::IsBackgroundGradient() const {
+        return _bgGradient.show;
     }
 
     void RenderView::Render() {
@@ -165,6 +230,7 @@ namespace UI {
         _rtimer.Start();
 
         _renderList.Clear();
+        if(_bgGradient.show) RenderBackgroundGradient(_renderList);
         W::world.Render(_renderList);
         OP::g_operators.GetMeshJobs(_renderList.meshJobs);
 

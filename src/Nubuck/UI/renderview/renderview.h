@@ -22,6 +22,20 @@ namespace UI {
         float       _time;
         SYS::Timer  _rtimer;
 
+        R::Color _bgColor;
+
+        struct Gradient {
+            R::meshPtr_t    mesh;
+            R::tfmeshPtr_t  tfmesh;
+
+            bool            show;
+
+            Gradient() : mesh(NULL), tfmesh(NULL), show(true) { }
+        } _bgGradient; // background gradient
+
+        void BuildBackgroundGradient();
+        void RenderBackgroundGradient(R::RenderList& renderList);
+
         R::Renderer     _renderer;
         R::RenderList   _renderList;
         R::DebugText    _debugText;
@@ -40,9 +54,14 @@ namespace UI {
         void keyPressEvent(QKeyEvent* event) override;
         void keyReleaseEvent(QKeyEvent* event) override;
     public slots:
+        void OnSetBackgroundColor(float r, float g, float b);
         void OnSetBackgroundColor(const R::Color& color);
         void OnSetBackgroundColor(const QColor& color);
+        void OnShowBackgroundGradient(bool show);
+        void OnShowBackgroundGradient(int show); // hide if show = 0
     public:
+        static R::Color defaultBackgroundColor;
+
         typedef GLWidget glWidget_t;
 
         enum {
@@ -54,6 +73,9 @@ namespace UI {
         ~RenderView(void);
 
         const R::Renderer& GetRenderer() const;
+
+        const R::Color& GetBackgroundColor() const;
+        bool            IsBackgroundGradient() const;
 
         void Render();
 

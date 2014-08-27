@@ -14,7 +14,7 @@ namespace R {
         Color(float r, float g, float b, float a = 1.0f);
 
 		static Color RandomSolidColor(void);
-        static Color FromBytes(char r, char g, char b);
+        static Color FromBytes(unsigned char r, unsigned char g, unsigned char b);
 
         static Color White;
 		static Color Black;

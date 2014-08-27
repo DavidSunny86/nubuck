@@ -1,0 +1,21 @@
+// only vertex colors,
+// vertices already transformed and projected
+fx UnlitTP {
+  pass Pass0 {
+    state.depth.maskEnabled = GL_FALSE;
+
+    // vs = "#include <Shaders\mesh_tp.vert>";
+    vs = "#include <Shaders\mesh_tp.vert>";
+
+    fs = 
+    """
+    const bool LIGHTING_ENABLED             = false;
+    const bool LIGHTING_TWOSIDED_ENABLED    = false;
+    const bool PREMULT_ALPHA                = false;
+    const bool PERFORM_DEPTH_TEST           = false;
+    const bool PERFORM_DEPTH_PEEL           = false;
+
+    #include <Shaders\mesh.frag>
+    """;
+  }
+}

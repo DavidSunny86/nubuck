@@ -17,7 +17,7 @@ namespace R {
         return Color(RandomIn01(), RandomIn01(), RandomIn01());
     }
 
-    Color Color::FromBytes(char r, char g, char b) {
+    Color Color::FromBytes(unsigned char r, unsigned char g, unsigned char b) {
         const float f = 1.0f / 255.0f;
         return Color(f * r, f * g, f * b);
     }
@@ -31,8 +31,8 @@ namespace R {
 
     Color BlendAddRGB(const Color& lhp, const Color& rhp) {
         return Color(
-            M::Min(1.0f, lhp.r + rhp.r), 
-            M::Min(1.0f, lhp.g + rhp.g), 
+            M::Min(1.0f, lhp.r + rhp.r),
+            M::Min(1.0f, lhp.g + rhp.g),
             M::Min(1.0f, lhp.b + rhp.b));
     }
 

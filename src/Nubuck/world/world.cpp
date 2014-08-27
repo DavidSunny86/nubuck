@@ -588,7 +588,6 @@ void World::Render(R::RenderList& renderList) {
     renderList.projWeight = _camArcball.GetProjectionWeight();
     renderList.zoom = _camArcball.GetZoom();
     renderList.worldMat = _camArcball.GetWorldToEyeMatrix();
-    renderList.meshJobs.clear();
 
     if(g_showRenderViewControls) {
         Grid_GetRenderJobs(renderList.meshJobs);

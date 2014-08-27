@@ -183,7 +183,7 @@ namespace UI {
 
         addDockWidget(Qt::LeftDockWidgetArea, &g_ui.GetOperatorPanel());
 
-        _renderConfig = new RenderConfig(this);
+        _renderConfig = new RenderConfig(_renderView, this);
         _renderConfig->setFloating(true);
         _renderConfig->hide();
     }

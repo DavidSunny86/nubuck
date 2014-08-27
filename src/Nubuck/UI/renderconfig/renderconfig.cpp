@@ -1,10 +1,13 @@
 #include <Nubuck\math\math.h>
 #include <renderer\renderer.h>
+#include <UI\renderview\renderview.h>
+#include <UI\mainwindow\mainwindow.h>
+#include <UI\userinterface.h>
 #include "renderconfig.h"
 
 namespace UI {
 
-void RenderConfig::OnNodeSizeChanged(double value) { 
+void RenderConfig::OnNodeSizeChanged(double value) {
     float diff = (float)_ui.sbNodeSize->value() - cvar_r_nodeSize;
     if(0.0f != diff) {
         cvar_r_nodeSize = cvar_r_nodeSize + diff;
@@ -39,12 +42,18 @@ void RenderConfig::OnNumDepthPeelsChanged(int value) {
     }
 }
 
-RenderConfig::RenderConfig(QWidget* parent) : QDockWidget(parent) {
+RenderConfig::RenderConfig(RenderView* renderView, QWidget* parent) : QDockWidget(parent) {
     _ui.setupUi(this);
 
     _ui.sbNodeSize->setValue(cvar_r_nodeSize);
     _ui.sbEdgeRadius->setValue(cvar_r_edgeRadius);
     _ui.sbNumDepthPeels->setValue(cvar_r_numDepthPeels);
+
+    R::Color bgColor = renderView->GetBackgroundColor();
+    _ui.btnBgColor->SetColor(bgColor.r, bgColor.g, bgColor.b);
+    _ui.cbGradient->setChecked(renderView->IsBackgroundGradient());
+    connect(_ui.btnBgColor, SIGNAL(SigColorChanged(float, float, float)), renderView, SLOT(OnSetBackgroundColor(float, float, float)));
+    connect(_ui.cbGradient, SIGNAL(stateChanged(int)), renderView, SLOT(OnShowBackgroundGradient(int)));
 }
 
 } // namespace UI

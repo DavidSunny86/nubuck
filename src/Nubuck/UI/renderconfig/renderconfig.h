@@ -5,6 +5,9 @@
 
 namespace UI {
 
+class ColorButton;
+class RenderView;
+
 class RenderConfig : public QDockWidget {
     Q_OBJECT
 private:
@@ -15,7 +18,7 @@ public slots:
     void OnTransparencyModeChanged(int index);
     void OnNumDepthPeelsChanged(int value);
 public:
-    RenderConfig(QWidget* parent = NULL);
+    RenderConfig(RenderView* renderView, QWidget* parent = NULL);
 };
 
 } // namespace UI
