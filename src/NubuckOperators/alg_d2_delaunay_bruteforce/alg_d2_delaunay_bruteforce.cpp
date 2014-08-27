@@ -61,6 +61,9 @@ D2_Delaunay_BruteForce_Panel::D2_Delaunay_BruteForce_Panel() {
 }
 
 void D2_Delaunay_BruteForce_Panel::Invoke() {
+    _btnToggleParaboloid->setChecked(false);
+    _btnToggleConvexHull->setChecked(false);
+
     _sldConvexHullScale->blockSignals(true);
     _sldConvexHullScale->setValue(1000);
     _sldConvexHullScale->blockSignals(false);
