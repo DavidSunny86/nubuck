@@ -29,7 +29,7 @@ namespace UI {
         }
 
         R::Mesh::Desc meshDesc = R::CreateQuadDesc(2.0f);
-        R::Color c0 = _renderer.GetBackgroundColor();
+        R::Color c0 = _bgColor;
         R::Color c1 = R::Lerp(c0, R::Color::Black, 0.6f);
         meshDesc.vertices[0].color = c1;
         meshDesc.vertices[1].color = c1;
@@ -169,7 +169,7 @@ namespace UI {
 
     void RenderView::OnSetBackgroundColor(float r, float g, float b) {
         _bgColor = R::Color(r, g, b);
-        _renderer.SetBackgroundColor(_bgColor);
+        _renderer.SetClearColor(_bgColor);
         BuildBackgroundGradient();
     }
 

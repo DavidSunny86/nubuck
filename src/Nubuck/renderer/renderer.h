@@ -56,6 +56,7 @@ struct DirectionalLight {
 };
 
 struct RenderList {
+    Color                       clearColor;
     float                       projWeight;
     float                       zoom;
     M::Matrix4                  worldMat;
@@ -104,7 +105,7 @@ private:
 
     std::vector<MeshJob> _renderLayers[Layers::NUM_LAYERS];
 
-    Color _bgColor;
+    Color _clearColor;
 
     void Render(
         const RenderList& renderList,
@@ -118,8 +119,8 @@ public:
 
     void Init(void); // requires gl context
 
-    const Color&    GetBackgroundColor() const;
-    void            SetBackgroundColor(const Color& color);
+    const Color&    GetClearColor() const;
+    void            SetClearColor(const Color& color);
 
     void Resize(int width, int height);
     void FinishResize();
