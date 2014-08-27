@@ -35,7 +35,6 @@
     <addaction name="actShowConsole"/>
     <addaction name="separator"/>
     <addaction name="actToggleRenderViewControls"/>
-    <addaction name="actChooseBackgroundColor"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -181,22 +180,6 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>actChooseBackgroundColor</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>OnChooseBackgroundColor()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>299</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>OnRandomPoints()</slot>
@@ -205,6 +188,5 @@
   <slot>OnLoadOperatorPlugin()</slot>
   <slot>OnShowConsole()</slot>
   <slot>OnToggleRenderViewControls()</slot>
-  <slot>OnChooseBackgroundColor()</slot>
  </slots>
 </ui>

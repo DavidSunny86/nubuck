@@ -88,13 +88,6 @@ namespace UI {
         qApp->exit();
     }
 
-    void MainWindow::OnChooseBackgroundColor() {
-        R::Color oldColor = _renderView->GetRenderer().GetBackgroundColor();
-        QColorDialog colorDialog;
-        connect(&colorDialog, SIGNAL(currentColorChanged(const QColor&)), _renderView, SLOT(OnSetBackgroundColor(const QColor&)));
-        if(QDialog::Rejected == colorDialog.exec()) _renderView->OnSetBackgroundColor(oldColor);
-    }
-
     void MainWindow::OnToggleRenderViewControls() {
         ToggleRenderViewControls();
     }

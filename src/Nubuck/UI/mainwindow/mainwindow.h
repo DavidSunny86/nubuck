@@ -46,7 +46,6 @@ namespace UI {
     protected:
         void closeEvent(QCloseEvent*) override;
     public slots:
-        void OnChooseBackgroundColor();
         void OnToggleRenderViewControls();
         void OnShowConsole();
 	    void OnRandomPoints(void);
