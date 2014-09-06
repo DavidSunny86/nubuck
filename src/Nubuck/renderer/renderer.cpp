@@ -92,6 +92,7 @@ COM::Config::Variable<float>    cvar_r_edgeRadius("r_edgeRadius", 0.1f);
 COM::Config::Variable<int>      cvar_r_smoothEdges("r_smoothEdges", 0);
 COM::Config::Variable<int>      cvar_r_transparencyMode("r_transparencyMode", R::TransparencyMode::BACKFACES_FRONTFACES);
 COM::Config::Variable<int>      cvar_r_numDepthPeels("r_numDepthPeels", 5);
+COM::Config::Variable<int>      cvar_r_forceState("r_forceState", 0);
 
 namespace R {
 
@@ -342,34 +343,35 @@ void SetEnabled(GLenum state, GLboolean enabled) {
 }
 
 void SetState(const State& state) {
+    const bool force = 0 != cvar_r_forceState;
     bool c0, c1, c2, c3;
 
-    if(curState.culling.hw.enabled != state.culling.hw.enabled) {
+    if(force || curState.culling.hw.enabled != state.culling.hw.enabled) {
         SetEnabled(GL_CULL_FACE, state.culling.hw.enabled);
         curState.culling.hw.enabled = state.culling.hw.enabled;
     }
-    if(curState.culling.hw.enabled && curState.culling.hw.cullFace != state.culling.hw.cullFace) {
+    if(force || curState.culling.hw.enabled && curState.culling.hw.cullFace != state.culling.hw.cullFace) {
         GL_CALL(glCullFace(state.culling.hw.cullFace));
         curState.culling.hw.cullFace = state.culling.hw.cullFace;
     }
     curState.culling.sw = state.culling.sw;
 
-    if(curState.blend.enabled != state.blend.enabled) {
+    if(force || curState.blend.enabled != state.blend.enabled) {
         SetEnabled(GL_BLEND, state.blend.enabled);
         curState.blend.enabled = state.blend.enabled;
     }
-    if(curState.blend.srcFactor != state.blend.srcFactor || curState.blend.dstFactor != state.blend.dstFactor) {
+    if(force || curState.blend.srcFactor != state.blend.srcFactor || curState.blend.dstFactor != state.blend.dstFactor) {
         glBlendFunc(state.blend.srcFactor, state.blend.dstFactor);
         curState.blend.srcFactor = state.blend.srcFactor;
         curState.blend.dstFactor = state.blend.dstFactor;
     }
 
     // SetEnabled(GL_DEPTH_TEST, state.depth.enabled);
-    if(curState.depth.maskEnabled != state.depth.maskEnabled) {
+    if(force || curState.depth.maskEnabled != state.depth.maskEnabled) {
         GL_CALL(glDepthMask(state.depth.maskEnabled));
         curState.depth.maskEnabled = state.depth.maskEnabled;
     }
-    if(curState.depth.func != state.depth.func) {
+    if(force || curState.depth.func != state.depth.func) {
         GL_CALL(glDepthFunc(state.depth.func));
         curState.depth.func = state.depth.func;
     }
@@ -378,7 +380,7 @@ void SetState(const State& state) {
     c0 = curState.stencil.func.func != state.stencil.func.func;
     c1 = curState.stencil.func.ref  != state.stencil.func.ref;
     c2 = curState.stencil.func.mask != state.stencil.func.mask;
-    if(c0 || c1 || c2) {
+    if(force || c0 || c1 || c2) {
         GL_CALL(glStencilFunc(state.stencil.func.func, state.stencil.func.ref, state.stencil.func.mask));
         curState.stencil.func.func  = state.stencil.func.func;
         curState.stencil.func.ref   = state.stencil.func.ref;
@@ -387,7 +389,7 @@ void SetState(const State& state) {
     c0 = curState.stencil.op.front.fail   != state.stencil.op.front.fail;
     c1 = curState.stencil.op.front.zfail  != state.stencil.op.front.zfail;
     c2 = curState.stencil.op.front.zpass  != state.stencil.op.front.zpass;
-    if(c0 || c1 || c2) {
+    if(force || c0 || c1 || c2) {
         GL_CALL(glStencilOpSeparate(GL_FRONT, state.stencil.op.front.fail, state.stencil.op.front.zfail, state.stencil.op.front.zpass));
         curState.stencil.op.front.fail    = state.stencil.op.front.fail;
         curState.stencil.op.front.zfail   = state.stencil.op.front.zfail;
@@ -396,43 +398,43 @@ void SetState(const State& state) {
     c0 = curState.stencil.op.back.fail   != state.stencil.op.back.fail;
     c1 = curState.stencil.op.back.zfail  != state.stencil.op.back.zfail;
     c2 = curState.stencil.op.back.zpass  != state.stencil.op.back.zpass;
-    if(c0 || c1 || c2) {
+    if(force || c0 || c1 || c2) {
         GL_CALL(glStencilOpSeparate(GL_BACK, state.stencil.op.back.fail, state.stencil.op.back.zfail, state.stencil.op.back.zpass));
         curState.stencil.op.back.fail    = state.stencil.op.back.fail;
         curState.stencil.op.back.zfail   = state.stencil.op.back.zfail;
         curState.stencil.op.back.zpass   = state.stencil.op.back.zpass;
     }
 
-    if(curState.alphaTest.enabled != state.alphaTest.enabled) {
+    if(force || curState.alphaTest.enabled != state.alphaTest.enabled) {
         SetEnabled(GL_ALPHA_TEST, state.alphaTest.enabled);
         curState.alphaTest.enabled = state.alphaTest.enabled;
     }
     c0 = curState.alphaTest.func    != state.alphaTest.func;
     c1 = curState.alphaTest.ref     != state.alphaTest.ref;
-    if(c0 || c1) {
+    if(force || c0 || c1) {
         GL_CALL(glAlphaFunc(state.alphaTest.func, state.alphaTest.ref));
         curState.alphaTest.func = state.alphaTest.func;
         curState.alphaTest.ref  = state.alphaTest.ref;
     }
 
-    if(curState.raster.pointSize != state.raster.pointSize) {
+    if(force || curState.raster.pointSize != state.raster.pointSize) {
         GL_CALL(glPointSize(state.raster.pointSize));
         curState.raster.pointSize = state.raster.pointSize;
     }
 
-    if(curState.raster.lineWidth != state.raster.lineWidth) {
+    if(force || curState.raster.lineWidth != state.raster.lineWidth) {
         GL_CALL(glLineWidth(state.raster.lineWidth));
         curState.raster.lineWidth = state.raster.lineWidth;
     }
 
-    if(curState.raster.lineStipple.enabled != state.raster.lineStipple.enabled) {
+    if(force || curState.raster.lineStipple.enabled != state.raster.lineStipple.enabled) {
         SetEnabled(GL_LINE_STIPPLE, state.raster.lineStipple.enabled);
         curState.raster.lineStipple.enabled = state.raster.lineStipple.enabled;
     }
 
     c0 = curState.raster.lineStipple.factor != state.raster.lineStipple.factor;
     c1 = curState.raster.lineStipple.pattern != state.raster.lineStipple.pattern;
-    if(c0 || c1) {
+    if(force || c0 || c1) {
         GL_CALL(glLineStipple(state.raster.lineStipple.factor, state.raster.lineStipple.pattern));
         curState.raster.lineStipple.factor = state.raster.lineStipple.factor;
         curState.raster.lineStipple.pattern = state.raster.lineStipple.pattern;
@@ -442,7 +444,7 @@ void SetState(const State& state) {
     c1 = curState.color.maskEnabled.green != state.color.maskEnabled.green;
     c2 = curState.color.maskEnabled.blue != state.color.maskEnabled.blue;
     c3 = curState.color.maskEnabled.alpha != state.color.maskEnabled.alpha;
-    if(c0 || c1 || c2 || c3) {
+    if(force || c0 || c1 || c2 || c3) {
         GL_CALL(glColorMask(state.color.maskEnabled.red, state.color.maskEnabled.green, state.color.maskEnabled.blue, state.color.maskEnabled.alpha));
         curState.color.maskEnabled = state.color.maskEnabled;
     }
@@ -897,6 +899,8 @@ void Renderer::Render(RenderList& renderList) {
         dp_fb[2]->Bind();
         Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glPopAttrib();
+
         // use effect with premult alpha
         for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_0].size(); ++i) {
             MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_0][i];
@@ -934,7 +938,13 @@ void Renderer::Render(RenderList& renderList) {
             unsigned other  = 1 - self;
 
             dp_fb[1 + self]->Bind();
+
+            glPushAttrib(GL_COLOR_BUFFER_BIT);
+            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
             Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            glPopAttrib();
 
             Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N]);
 
@@ -989,8 +999,6 @@ void Renderer::Render(RenderList& renderList) {
         // draw compositing buffer
         framebuffer->Bind();
         DrawFullscreenQuad(*fb_comp.cb);
-
-        glPopAttrib();
     }
 
     if(!_renderLayers[Layers::GEOMETRY_0_DEPTH_ONLY].empty()) {
