@@ -852,7 +852,12 @@ void Renderer::Render(RenderList& renderList) {
 
     const float zoom = 0.45f * renderList.zoom; // arbitrary scaling factor, looks okay i guess
     M::Matrix4 perspective  = M::Mat4::Perspective(45.0f, _aspect, 0.1f, 100.0f);
-    M::Matrix4 ortho        = M::Mat4::Ortho(-zoom * _aspect, zoom * _aspect, -zoom, zoom, 0.1f, 100.0f);
+
+    // NOTE: choose sufficiently large negative value for near clipping plane. using the same value
+    // as for the perspective proj. matrix causes artifacts that look like z-fighting.
+    // i have absolutely no idea why.
+    M::Matrix4 ortho        = M::Mat4::Ortho(-zoom * _aspect, zoom * _aspect, -zoom, zoom, -100.0f, 100.0f);
+
     M::Matrix4 projection   = Lerp(perspective, ortho, renderList.projWeight);
     M::Matrix4 worldToEye   = renderList.worldMat;
 
