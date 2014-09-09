@@ -607,7 +607,6 @@ void ENT_Geometry::BuildRenderList() {
         R::MeshJob rjob;
 
         R::Material mat = R::Material::White;
-        mat.isTransparent = _isTransparent;
 
         rjob.material   = mat;
         rjob.tfmesh     = _tfmesh;

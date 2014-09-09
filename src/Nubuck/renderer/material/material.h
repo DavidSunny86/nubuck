@@ -1,29 +1,51 @@
 #pragma once
 
 #include <Nubuck\renderer\color\color.h>
-#include <renderer\textures\texture.h>
 
 namespace R {
 
-    struct Material {
-        struct TexBinding {
-            Texture*    texture;
-            const char* samplerName;
+class Program;
+class Texture;
 
-            TexBinding() : texture(NULL), samplerName(NULL) { }
-
-            bool IsValid() const { return NULL != texture && NULL != samplerName; }
-        };
-        enum { NUM_TEX_BINDINGS = 3 };
-
-        bool        isTransparent;
-        Color       diffuseColor;
-        TexBinding  texBindings[NUM_TEX_BINDINGS];
-
-		static Material White;
-
-        Material() : isTransparent(false) { }
-        Material(const Color& diffuseColor) : diffuseColor(diffuseColor) { }
+class Material {
+private:
+    enum {
+        // first three texture units are used by renderer
+        MATERIAL_BASE_TEXUNIT = 3
     };
+
+    struct UniformType {
+        enum Enum {
+            TEXTURE = 0
+        };
+    };
+
+    struct UniformBinding {
+        const char*         name;
+        UniformType::Enum   type; 
+        union Variant {
+            Texture* v_tex;
+        } variant;
+
+        UniformBinding() : name(0) { }
+
+        bool IsValid() const { return 0 != name; }
+    };
+    enum { NUM_UNIFORM_BINDINGS = 3 };
+
+    Color           diffuseColor;
+    UniformBinding  uniformBindings[NUM_UNIFORM_BINDINGS];
+    int             _numBindings;
+public:
+    static void Bind(Program& prog, const Material& mat);
+
+    static Material White;
+
+    Material();
+    Material(const Color& diffuseColor) : diffuseColor(diffuseColor) { }
+
+    void SetUniformBinding(const char* name, Texture* val);
+    void ClearUniformBinding(const char* name);
+};
 
 } // namespace R

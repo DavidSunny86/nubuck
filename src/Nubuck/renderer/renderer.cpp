@@ -450,6 +450,44 @@ void SetState(const State& state) {
     }
 }
 
+static const int NUM_PIPELINE_TEX_BINDINGS = 3;
+
+struct TexBinding {
+    const char* name;
+    Texture*    texture;
+
+    bool IsValid() const { return 0 != name; }
+
+    TexBinding() : name(0) { }
+} pipelineTexBindings[NUM_PIPELINE_TEX_BINDINGS];
+
+static void SetPipelineTextureBinding(const int texUnit, const char* name, Texture* texture) {
+    assert(0 <= texUnit && texUnit < NUM_PIPELINE_TEX_BINDINGS);
+    TexBinding& tb = pipelineTexBindings[texUnit];
+    tb.name     = name;
+    tb.texture  = texture;
+}
+
+static void BindPipelineTextures(Program& prog) {
+    for(int i = 0; i < NUM_PIPELINE_TEX_BINDINGS; ++i) {
+        const TexBinding& tb = pipelineTexBindings[i];
+        if(tb.IsValid()) {
+            GLint loc = glGetUniformLocation(prog.GetID(), tb.name);
+            if(0 <= loc) {
+                prog.SetUniform(tb.name, i);
+                tb.texture->Bind(i);
+            }
+        }
+    }
+}
+
+static void ClearPipelineTextureBindings() {
+    for(int i = 0; i < NUM_PIPELINE_TEX_BINDINGS; ++i) {
+        pipelineTexBindings[i].name     = 0;
+        pipelineTexBindings[i].texture  = 0;
+    }
+}
+
 Renderer::Renderer(void) : _time(0.0f), _screenshotRequested(false), _clearColor(Color::Black) {
 }
 
@@ -676,25 +714,8 @@ static void DrawFrame(
             Uniforms_BindBuffers();
             SetState(desc.state);
 
-            for(int texIdx = 0; texIdx < Material::NUM_TEX_BINDINGS; ++texIdx) {
-                if(cur->material.texBindings[texIdx].IsValid()) {
-                    const Material::TexBinding& tex = cur->material.texBindings[texIdx];
-
-                    // REMOVEME
-                    /*
-                    assert(
-                        !strcmp("depthTex", tex.samplerName) ||
-                        !strcmp("solidDepth", tex.samplerName) ||
-                        !strcmp("peelDepth", tex.samplerName));
-                    */
-
-                    GLint loc = glGetUniformLocation(prog.GetID(), tex.samplerName);
-                    if(0 <= loc) {
-                        prog.SetUniform(tex.samplerName, texIdx);
-                        tex.texture->Bind(texIdx);
-                    }
-                }
-            }
+            BindPipelineTextures(prog);
+            Material::Bind(prog, cur->material);
 
             next = DrawMeshList(prog, desc.state, desc.type, desc.flags, modelView, geomSortMode, cur);
 
@@ -869,19 +890,11 @@ void Renderer::Render(RenderList& renderList) {
     if(!_renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].empty()) {
         fb_useDepth.fb->Bind();
 
-        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
-            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
-            mjob.material.texBindings[0].texture = depthbuffer.Raw();
-            mjob.material.texBindings[0].samplerName = "solidDepth";
-        }
+        SetPipelineTextureBinding(0, "solidDepth", depthbuffer.Raw());
 
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0]);
 
-        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
-            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
-            mjob.material.texBindings[0].texture = NULL;
-            mjob.material.texBindings[0].samplerName = "";
-        }
+        ClearPipelineTextureBindings();
 
         framebuffer->Bind();
     }
@@ -907,11 +920,8 @@ void Renderer::Render(RenderList& renderList) {
         glPopAttrib();
 
         // use effect with premult alpha
-        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_0].size(); ++i) {
-            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_0][i];
-            mjob.material.texBindings[1].samplerName = "solidDepth";
-            mjob.material.texBindings[1].texture = depthbuffer.Raw();
-        }
+        SetPipelineTextureBinding(1, "solidDepth", depthbuffer.Raw());
+
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_0]);
 
         // composite first peel
@@ -926,15 +936,8 @@ void Renderer::Render(RenderList& renderList) {
         glPopAttrib();
 
         // set depth texture for first peeling pass
-        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N].size(); ++i) {
-            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N][i];
-            mjob.material.texBindings[0].texture      = dp_db[1].Raw();
-            mjob.material.texBindings[0].samplerName  = "depthTex";
-
-            // remains unchanged throughout peeling
-            mjob.material.texBindings[1].texture        = depthbuffer.Raw();
-            mjob.material.texBindings[1].samplerName    = "solidDepth";
-        }
+        SetPipelineTextureBinding(0, "depthTex", dp_db[1].Raw());
+        SetPipelineTextureBinding(1, "solidDepth", depthbuffer.Raw());
 
         assert(0 < cvar_r_numDepthPeels);
         unsigned numDepthPeels = static_cast<unsigned>(cvar_r_numDepthPeels) - 1;
@@ -955,18 +958,10 @@ void Renderer::Render(RenderList& renderList) {
 
             // render use-depth pass, with dp enabled
             if(!_renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH].empty()) {
-                for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH].size(); ++i) {
-                    MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH][i];
+                SetPipelineTextureBinding(0, "depthTex", dp_db[other].Raw());
+                SetPipelineTextureBinding(1, "solidDepth", depthbuffer.Raw());
+                SetPipelineTextureBinding(2, "peelDepth", dp_db[self].Raw());
 
-                    mjob.material.texBindings[0].samplerName = "depthTex";
-                    mjob.material.texBindings[0].texture = dp_db[other].Raw();
-
-                    mjob.material.texBindings[1].samplerName = "solidDepth";
-                    mjob.material.texBindings[1].texture = depthbuffer.Raw();
-
-                    mjob.material.texBindings[2].samplerName = "peelDepth";
-                    mjob.material.texBindings[2].texture = dp_db[self].Raw();
-                }
                 dp_fb[0]->Bind();
                 Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH]);
             }
@@ -983,10 +978,7 @@ void Renderer::Render(RenderList& renderList) {
             glPopAttrib();
 
             // set depth texture for next peeling pass
-            for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N].size(); ++i) {
-                MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N][i];
-                mjob.material.texBindings[0].texture = dp_db[self].Raw();
-            }
+            SetPipelineTextureBinding(0, "depthTex", dp_db[self].Raw());
 
         } // passes
 
@@ -1014,19 +1006,11 @@ void Renderer::Render(RenderList& renderList) {
     if(!_renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].empty()) {
         fb_useDepth.fb->Bind();
 
-        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
-            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
-            mjob.material.texBindings[0].texture = depthbuffer.Raw();
-            mjob.material.texBindings[0].samplerName = "solidDepth";
-        }
+        SetPipelineTextureBinding(0, "solidDepth", depthbuffer.Raw());
 
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0]);
 
-        for(unsigned i = 0; i < _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size(); ++i) {
-            MeshJob& mjob = _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0][i];
-            mjob.material.texBindings[0].texture = NULL;
-            mjob.material.texBindings[0].samplerName = "";
-        }
+        ClearPipelineTextureBindings();
 
         framebuffer->Bind();
     }

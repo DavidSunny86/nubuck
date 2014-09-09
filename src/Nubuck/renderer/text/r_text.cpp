@@ -183,8 +183,7 @@ void Text::GetRenderJobs(RenderList& renderList) {
         R::MeshJob mjob;
 
         R::Material mat = R::Material::White;
-        mat.texBindings[0].samplerName = "font";
-        mat.texBindings[0].texture = pageMesh.texture;
+        mat.SetUniformBinding("font", pageMesh.texture);
 
         mjob.fx         = "SDText";
         mjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
