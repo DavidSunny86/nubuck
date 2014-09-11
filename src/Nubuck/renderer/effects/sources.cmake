@@ -1,0 +1,14 @@
+recurse()
+add_sources(
+    default_effects.cpp
+    effect.cpp
+    effect.h
+    effectmgr.cpp
+    effectmgr.h
+    pass.cpp
+    pass.h
+    state.cpp
+    state.h
+    statedesc.cpp
+    statedesc.h
+)

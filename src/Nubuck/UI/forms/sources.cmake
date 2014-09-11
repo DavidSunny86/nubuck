@@ -1,0 +1,13 @@
+recurse()
+add_sources(
+    algorithm.ui
+    console.ui
+    logwidget.ui
+    mainwindow.ui
+    op_delaunay3d.ui
+    op_loadobj.ui
+    operatorpanelheader.ui
+    randompoints.ui
+    renderconfig.ui
+    rendermetrics.ui
+)

@@ -1,0 +1,11 @@
+recurse()
+add_sources(
+    operator.cpp
+    operator_driver.cpp
+    operator_driver.h
+    operator_events.h
+    operator_modules.cpp
+    operators.cpp
+    operators.h
+    standard_algorithm.cpp
+)

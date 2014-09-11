@@ -1,0 +1,9 @@
+recurse()
+add_sources(
+    block_signals.h
+    plaintextdevice.cpp
+    plaintextdevice.h
+    userinterface.cpp
+    userinterface.h
+    window_events.h
+)

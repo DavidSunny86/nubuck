@@ -1,0 +1,22 @@
+recurse()
+add_sources(
+    alg_flipclip.cpp
+    flipclip.cpp
+    flipclip.h
+    globals.cpp
+    globals.h
+    phase_clip.cpp
+    phase_clip.h
+    phase_flip.cpp
+    phase_flip.h
+    phase_init.cpp
+    phase_init.h
+    phase_simplify.cpp
+    phase_simplify.h
+    phase_stitch.cpp
+    phase_stitch.h
+    phase_strip.cpp
+    phase_strip.h
+)
+
+add_operator(${operatorName})

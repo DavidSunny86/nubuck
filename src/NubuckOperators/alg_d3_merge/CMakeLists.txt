@@ -1,0 +1,22 @@
+recurse()
+add_sources(
+    alg_d3_merge.cpp
+    hull_xy_graham.cpp
+    mantle.cpp
+    mantle.h
+    phase0.cpp
+    phase0.h
+    phase1_level0.cpp
+    phase1_level0.h
+    phase1_level1.cpp
+    phase1_level1.h
+    phase2.cpp
+    phase2.h
+    phase3.cpp
+    phase3.h
+    shared.cpp
+    shared.h
+    supp_xy.cpp
+)
+
+add_operator(${operatorName})

@@ -1,0 +1,9 @@
+recurse()
+add_sources(
+    r_billboard_nodes.cpp
+    r_billboard_nodes.h
+    r_nodes.cpp
+    r_nodes.h
+    r_point_nodes.cpp
+    r_point_nodes.h
+)

@@ -1,0 +1,13 @@
+recurse()
+add_sources(
+    d3_graph.h
+    d3_graph_inl.h
+    d3_point.cpp
+    d3_point.h
+    d3_point_inl.h
+    lmath.h
+    lmath_inl.h
+    matrix3.h
+    to_float_vec.h
+    vector_traits.h
+)

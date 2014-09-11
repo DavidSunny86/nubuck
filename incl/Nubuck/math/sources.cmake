@@ -1,0 +1,26 @@
+recurse()
+add_sources(
+    box.h
+    intersections.h
+    line2.h
+    line3.h
+    line_mem_inl.h
+    math.h
+    math_inl.h
+    matrix3.h
+    matrix4.h
+    plane.h
+    quaternion.h
+    quaternion_mem_inl.h
+    quaternion_op_inl.h
+    ray.h
+    sphere.h
+    transform.h
+    vector2.h
+    vector2_mem_inl.h
+    vector2_op_inl.h
+    vector3.h
+    vector3_mem_inl.h
+    vector3_op_inl.h
+    view_frustrum.h
+)

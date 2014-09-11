@@ -1,0 +1,9 @@
+recurse()
+add_sources(
+    entity.cpp
+    entity.h
+    world.cpp
+    world.h
+    world_events.h
+    world_inl.h
+)

@@ -1,0 +1,13 @@
+recurse()
+add_sources(
+    mesh.cpp
+    mesh.h
+    meshmgr.cpp
+    meshmgr.h
+    meshmgr_fwd.h
+    meshmgr_inl.h
+    staticbuffer.cpp
+    staticbuffer.h
+    tfmesh.cpp
+    tfmesh.h
+)
