@@ -82,13 +82,12 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     common.Init(argc, argv);
     R::CreateDefaultEffects();
 
+    bool useStylesheet = true;
+
     unsigned i = 0;
     while(i < argc) {
-        if(!strcmp("--stylesheet", argv[i])) {
-            std::string stylesheet = common.BaseDir() + argv[i + 1];
-            common.printf("INFO - reading stylesheet: %s\n", stylesheet.c_str());
-            QString styleSheet(QString::fromStdString(ReadFile(stylesheet.c_str())));
-            app.setStyleSheet(styleSheet);
+        if(!strcmp("--no-stylesheet", argv[i])) {
+            useStylesheet = false;
         }
         if(!strcmp("--genstatedesc", argv[i])) {
             common.printf("INFO - generating statedesc.\n");
@@ -99,6 +98,20 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
             }
         }
         i++;
+    }
+
+    // read stylesheet
+    if(useStylesheet) {
+        std::string stylesheetFilename = common.BaseDir() + "nubuck.stylesheet";
+        common.printf("INFO - reading stylesheet: %s\n", stylesheetFilename.c_str());
+        const std::string stylesheet = ReadFile(stylesheetFilename.c_str());
+        if(stylesheet.empty()) {
+            common.printf("ERROR - unable to read stylesheet %s\n", stylesheetFilename.c_str());
+            Crash();
+        } else {
+            QString styleSheet(QString::fromStdString(stylesheet));
+            app.setStyleSheet(styleSheet);
+        }
     }
 
     common.printf("INFO - Nubuck compiled with Qt version '%s'\n", QT_VERSION_STR);
