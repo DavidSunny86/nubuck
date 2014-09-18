@@ -64,7 +64,7 @@ QGroupBox::title {
     subcontrol-position: top left;
 }
 
-QAbstractButton, QAbstractSpinBox, QComboBox {
+QAbstractButton, QAbstractSpinBox, QComboBox, QFrame#nbw_spinBox {
     border-color:   #1E1E1E;
     border-style:   solid;
     border-width:   2px;
@@ -80,6 +80,55 @@ QAbstractButton, QAbstractSpinBox, QComboBox {
         x2: 0, y2: 1,
         stop: 0 #5E5E5E,
         stop: 1 #2E2E2E
+    );
+}
+
+QLineEdit#nbw_spinBox_lineEdit {
+    color:          #000000;
+
+    padding-left:   0;
+    padding-right:  0;
+    padding-top:    1ex;
+    padding-bottom: 1ex;
+
+    border:         none;
+    border-color:   rgba(0, 0, 0, 0);
+    background:     rgba(0, 0, 0, 0);
+}
+
+QFrame#nbw_spinBox_controls {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+QFrame#nbw_spinBox_controls[dragging="true"] {
+    color: #000000;
+}
+
+QFrame#nbw_spinBox_progress {
+    border-color:   rgba(0, 0, 0, 0);
+    border-style:   solid;
+    border-width:   4px;
+    border-radius:  6;
+
+    padding-top:    1ex;
+    padding-bottom: 1ex;
+    padding-left:   2ex;
+    padding-right:  2ex;
+
+    background-color: QLinearGradient(
+        x1: 0, y1: 0,
+        x2: 0, y2: 1,
+        stop: 0 #008F00,
+        stop: 1 #2E2E2E
+    );
+}
+
+QFrame#nbw_spinBox_progress[dragging="true"] {
+    background-color: QLinearGradient(
+        x1: 0, y1: 0,
+        x2: 0, y2: 1,
+        stop: 0 #00FF00,
+        stop: 1 #008F00
     );
 }
 
@@ -130,9 +179,22 @@ QLineEdit {
     );
 }
 
-QAbstractButton:hover, QAbstractSpinBox:hover, QLineEdit:hover, QComboBox:hover {
+QAbstractButton:hover, QAbstractSpinBox:hover, QLineEdit:hover, QComboBox:hover,
+QFrame#nbw_spinBox:hover
+{
     border-color: #00FF00;
     border-width: 2;
+}
+
+QFrame#nbw_spinBox[dragging="true"] {
+    color: #000000;
+
+    background-color: QLinearGradient(
+        x1: 0, y1: 0,
+        x2: 0, y2: 1,
+        stop: 0 #8E8E8E,
+        stop: 1 #5E5E5E
+    );
 }
 
 QAbstractButton:checked {

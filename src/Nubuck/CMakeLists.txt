@@ -163,7 +163,7 @@ add_definitions(-DUNICODE)
 
 # TARGET nubuck
 add_library(nubuck SHARED ${nubuckSources} ${nubuckHeaders} ${nubuckHeaders_ui} ${nubuckQtRes})
-target_link_libraries(nubuck leda opengl32 glu32 Qt4::QtGui Qt4::QtOpenGL)
+target_link_libraries(nubuck leda opengl32 glu32 Qt4::QtGui Qt4::QtOpenGL Qt4::QtSvg)
 set_target_properties(nubuck PROPERTIES 
     COMPILE_DEFINITIONS "NUBUCK_LIB;NUBUCK_MT;PARANOID;GLEW_BUILD")
 
