@@ -1,6 +1,7 @@
 #include <QVBoxLayout>
 #include <QSpacerItem>
 #include <QLabel>
+#include <UI\nbw_spinbox\nbw_spinbox.h>
 #include "simple_panel.h"
 
 namespace UI {
@@ -29,12 +30,14 @@ QComboBox* SimplePanel::AddComboBox(const QString& str, const std::vector<QStrin
     return comboBox;
 }
 
-QSpinBox* SimplePanel::AddSpinBox(const QString& str, int min, int max) {
+NBW_SpinBox* SimplePanel::AddSpinBox(const QString& str, int min, int max) {
     int r = _grid->rowCount();
-    QSpinBox* spinBox = new QSpinBox();
-    spinBox->setRange(min, max);
-    _grid->addWidget(new QLabel(str), r, 0);
-    _grid->addWidget(spinBox, r, 1);
+    NBW_SpinBox* spinBox = new NBW_SpinBox();
+    spinBox->setTypeMask(NBW_SpinBox::TypeFlags::INTEGER);
+    spinBox->setMinimum(min);
+    spinBox->setMaximum(max);
+    spinBox->setText(str + ": ");
+    _grid->addWidget(spinBox, r, 0, 1, 2);
     return spinBox;
 }
 

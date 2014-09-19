@@ -9,6 +9,8 @@
 
 #include <Nubuck\operators\operator.h>
 
+class NBW_SpinBox;
+
 namespace UI {
 
 class SimplePanel : public OP::OperatorPanel {
@@ -19,7 +21,7 @@ public:
 
     void            AddLabel(const QString& str);
     QComboBox*      AddComboBox(const QString& str, const std::vector<QString>& items);
-    QSpinBox*   	AddSpinBox(const QString& str, int min, int max);
+    NBW_SpinBox*   	AddSpinBox(const QString& str, int min, int max);
     QPushButton*    AddPushButton(const QString& str);
     QCheckBox*      AddCheckBox(const QString& str);
 

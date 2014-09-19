@@ -19,19 +19,22 @@ BEGIN_EVENT_DEF(OP_RandomPoints_Update)
     bool    save;
 END_EVENT_DEF
 
+class NBW_SpinBox;
+
 namespace OP {
 namespace GEN {
 
 class RandomPointsPanel : public UI::SimplePanel {
     Q_OBJECT
 private:
-    QComboBox*  _cbDomain;
-    QSpinBox*   _sbSize;
-    QSpinBox*   _sbRadius;
-    QCheckBox*  _cbSave;
+    QComboBox*      _cbDomain;
+    NBW_SpinBox*    _sbSize;
+    NBW_SpinBox*    _sbRadius;
+    QCheckBox*      _cbSave;
 
     void _OnArgsChanged();
 public slots:
+    void OnArgsChanged(leda::rational);
     void OnArgsChanged(int);
     void OnArgsChanged(bool);
 public:

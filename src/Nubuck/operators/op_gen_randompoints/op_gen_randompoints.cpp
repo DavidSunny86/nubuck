@@ -1,3 +1,4 @@
+#include <UI\nbw_spinbox\nbw_spinbox.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include "op_gen_randompoints.h"
 
@@ -9,10 +10,14 @@ namespace GEN {
 void RandomPointsPanel::_OnArgsChanged() {
     EV::Params_OP_RandomPoints_Update args;
     args.domain = _cbDomain->currentIndex();
-    args.size   = _sbSize->value();
-    args.radius = _sbRadius->value();
+    args.size   = _sbSize->value().numerator().to_long();
+    args.radius = _sbRadius->value().numerator().to_long();
     args.save   = _cbSave->isChecked();
     g_operators.InvokeAction(EV::def_OP_RandomPoints_Update.Create(args));
+}
+
+void RandomPointsPanel::OnArgsChanged(leda::rational) {
+    _OnArgsChanged();
 }
 
 void RandomPointsPanel::OnArgsChanged(int) {
@@ -43,11 +48,11 @@ RandomPointsPanel::RandomPointsPanel(QWidget* parent) : SimplePanel(parent) {
 
     _sbRadius = AddSpinBox("radius", 1, 1000);
     _sbRadius->setValue(radius);
-    connect(_sbRadius, SIGNAL(valueChanged(int)), this, SLOT(OnArgsChanged(int)));
+    connect(_sbRadius, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnArgsChanged(leda::rational)));
 
     _sbSize = AddSpinBox("size", 1, 100000);
     _sbSize->setValue(size);
-    connect(_sbSize, SIGNAL(valueChanged(int)), this, SLOT(OnArgsChanged(int)));
+    connect(_sbSize, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnArgsChanged(leda::rational)));
 
     AddVerticalSpace(20);
 
