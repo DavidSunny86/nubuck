@@ -7,8 +7,7 @@
 #include "ui_op_delaunay3d.h"
 
 BEGIN_EVENT_DEF(OP_Delaunay3D_SetScale)
-    int value;
-    int max;
+    double value;
 END_EVENT_DEF
 
 namespace OP {
@@ -18,7 +17,7 @@ class Delaunay3DPanel : public OperatorPanel {
 private:
     Ui::Delaunay3D _ui;
 private slots:
-    void OnScaleChanged(int value);
+    void OnScaleChanged(leda::rational value);
 public:
     Delaunay3DPanel(QWidget* parent = NULL);
 

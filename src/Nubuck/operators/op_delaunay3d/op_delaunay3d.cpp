@@ -13,20 +13,28 @@
 
 namespace OP {
 
-void Delaunay3DPanel::OnScaleChanged(int value) {
+void Delaunay3DPanel::OnScaleChanged(leda::rational value) {
     EV::Params_OP_Delaunay3D_SetScale args;
-    args.value = value;
-    args.max = _ui.sldScale->maximum();
+    args.value = value.to_double();
     SendToOperator(EV::def_OP_Delaunay3D_SetScale.Create(args));
 }
 
 Delaunay3DPanel::Delaunay3DPanel(QWidget* parent) : OperatorPanel(parent) {
     _ui.setupUi(this);
+
+    _ui.sbScale->setObjectName("nbw_spinBox"); // important for stylesheet.
+    _ui.sbScale->showProgressBar(true);
+    _ui.sbScale->setMinimum(0.0);
+    _ui.sbScale->setMaximum(1.0);
+    _ui.sbScale->setSingleStep(0.025);
+    _ui.sbScale->setValue(0.0);
+
+    connect(_ui.sbScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnScaleChanged(leda::rational)));
 }
 
 void Delaunay3DPanel::Invoke() {
-    UI::BlockSignals block(_ui.sldScale);
-    _ui.sldScale->setValue(0);
+    UI::BlockSignals block(_ui.sbScale);
+    _ui.sbScale->setValue(0);
 }
 
 namespace {
@@ -51,7 +59,7 @@ void Delaunay3D::Event_SetScale(const EV::Event& event) {
     for(unsigned j = 0; j < _simplices.size(); ++j) {
         Simplex& simplex = _simplices[j];
 
-        leda::rational scale = 1 + 5 * leda::rational(args.value, args.max);
+        leda::rational scale = 1 + 5 * args.value;
         leda::rat_vector center = scale * simplex.center;
 
         leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();

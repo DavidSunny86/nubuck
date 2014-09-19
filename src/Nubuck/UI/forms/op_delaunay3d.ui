@@ -14,14 +14,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>explosion scale:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
+   <item row="1" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -34,43 +27,24 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0">
-    <widget class="QSlider" name="sldScale">
-     <property name="minimum">
-      <number>0</number>
-     </property>
-     <property name="maximum">
-      <number>100</number>
-     </property>
-     <property name="singleStep">
-      <number>1</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+   <item row="0" column="0">
+    <widget class="NBW_SpinBox" name="sbScale">
+     <property name="text">
+      <string>explosion scale: </string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>NBW_SpinBox</class>
+   <extends>QFrame</extends>
+   <header>UI/nbw_spinbox/nbw_spinbox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>sldScale</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>Delaunay3D</receiver>
-   <slot>OnScaleChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>240</x>
-     <y>18</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>199</x>
-     <y>149</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>OnScaleChanged(int)</slot>
  </slots>
