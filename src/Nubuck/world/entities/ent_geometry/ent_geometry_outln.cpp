@@ -4,6 +4,7 @@
 #include <QSlider>
 #include <QVBoxLayout>
 
+#include <UI\nbw_spinbox\nbw_spinbox.h>
 #include <UI\colorbutton\colorbutton.h>
 #include <UI\block_signals.h>
 #include "ent_geometry_outln.h"
@@ -11,15 +12,15 @@
 
 namespace W {
 
-void ENT_GeometryOutln::OnVertexScaleChanged(double value) {
+void ENT_GeometryOutln::OnVertexScaleChanged(leda::rational value) {
     EV::Params_ENT_Geometry_VertexScaleChanged args;
-    args.vertexScale = (float)value;
+    args.vertexScale = value.to_float();
     _subject.Send(EV::def_ENT_Geometry_VertexScaleChanged.Create(args));
 }
 
-void ENT_GeometryOutln::OnEdgeScaleChanged(double value) {
+void ENT_GeometryOutln::OnEdgeScaleChanged(leda::rational value) {
 	EV::Params_ENT_Geometry_EdgeScaleChanged args;
-	args.edgeScale = (float)value;
+    args.edgeScale = value.to_float();
 	_subject.Send(EV::def_ENT_Geometry_EdgeScaleChanged.Create(args));
 }
 
@@ -29,9 +30,9 @@ void ENT_GeometryOutln::OnEdgeColorChanged(float r, float g, float b) {
 	_subject.Send(EV::def_ENT_Geometry_EdgeColorChanged.Create(args));
 }
 
-void ENT_GeometryOutln::OnTransparencyChanged(int value) {
+void ENT_GeometryOutln::OnTransparencyChanged(leda::rational value) {
     EV::Params_ENT_Geometry_TransparencyChanged args;
-    args.transparency = (float)value / _sldHullAlpha->maximum();
+    args.transparency = value.to_float();
     _subject.Send(EV::def_ENT_Geometry_TransparencyChanged.Create(args));
 }
 
@@ -65,15 +66,15 @@ ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) 
 void ENT_GeometryOutln::InitOutline() {
 	QGridLayout* layout = new QGridLayout();
 
-    QLabel* lblVertexScale = new QLabel("vertex scale:");
-    _sbVertexScale = new QDoubleSpinBox;
+    _sbVertexScale = new NBW_SpinBox;
+    _sbVertexScale->setText("vertex scale: ");
     _sbVertexScale->setMinimum(0.05f);
     _sbVertexScale->setMaximum(5.00f);
     _sbVertexScale->setSingleStep(0.1f);
 	_sbVertexScale->setValue(_subject.GetVertexScale());
 
-    QLabel* lblEdgeRadius = new QLabel("edge scale:");
-    _sbEdgeScale = new QDoubleSpinBox;
+    _sbEdgeScale = new NBW_SpinBox;
+    _sbEdgeScale->setText("edge scale: ");
     _sbEdgeScale->setMinimum(0.05f);
     _sbEdgeScale->setMaximum(5.00f);
     _sbEdgeScale->setSingleStep(0.1f);
@@ -93,12 +94,13 @@ void ENT_GeometryOutln::InitOutline() {
 
     _cbHiddenLines = new QCheckBox("show hidden lines");
 
-    QLabel* lblHullAlpha = new QLabel("hull alpha:");
-    _sldHullAlpha = new QSlider(Qt::Horizontal);
-    _sldHullAlpha->setTracking(true);
-    _sldHullAlpha->setMinimum(0);
-    _sldHullAlpha->setMaximum(100);
-    _sldHullAlpha->setValue(100);
+    _sbHullAlpha = new NBW_SpinBox;
+    _sbHullAlpha->showProgressBar(true);
+    _sbHullAlpha->setText("hull alpha: ");
+    _sbHullAlpha->setMinimum(0.0);
+    _sbHullAlpha->setMaximum(1.0);
+    _sbHullAlpha->setSingleStep(0.025);
+    _sbHullAlpha->setValue(1.0);
 
     QLabel* lblRenderMode = new QLabel("rendermode: ");
     _btnRenderVertices = new QPushButton(QIcon(":/ui/Images/vertices.png"), "");
@@ -115,11 +117,9 @@ void ENT_GeometryOutln::InitOutline() {
     hboxLayout->addWidget(_btnRenderEdges);
     hboxLayout->addWidget(_btnRenderFaces);
 
-    layout->addWidget(lblVertexScale, 0, 0, 1, 1);
-    layout->addWidget(_sbVertexScale, 0, 1, 1, 1);
+    layout->addWidget(_sbVertexScale, 0, 0, 1, 2);
 
-    layout->addWidget(lblEdgeRadius, 1, 0, 1, 1);
-    layout->addWidget(_sbEdgeScale, 1, 1, 1, 1);
+    layout->addWidget(_sbEdgeScale, 1, 0, 1, 2);
 
     layout->addWidget(lblEdgeColor, 2, 0, 1, 1);
     layout->addWidget(_btnEdgeColor, 2, 1, 1, 1);
@@ -129,20 +129,19 @@ void ENT_GeometryOutln::InitOutline() {
 
     layout->addWidget(_cbHiddenLines, 4, 0, 1, 2);
 
-    layout->addWidget(lblHullAlpha, 5, 0, 1, 1);
-    layout->addWidget(_sldHullAlpha, 5, 1, 1, 1);
+    layout->addWidget(_sbHullAlpha, 5, 0, 1, 2);
 
     layout->addWidget(lblRenderMode, 6, 0, 1, 1);
     layout->addLayout(hboxLayout, 6, 1, 1, 1);
 
 	setLayout(layout);
 
-    QObject::connect(_sbVertexScale, SIGNAL(valueChanged(double)), this, SLOT(OnVertexScaleChanged(double)));
-    QObject::connect(_sbEdgeScale, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeScaleChanged(double)));
+    QObject::connect(_sbVertexScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnVertexScaleChanged(leda::rational)));
+    QObject::connect(_sbEdgeScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnEdgeScaleChanged(leda::rational)));
     QObject::connect(_btnEdgeColor, SIGNAL(SigColorChanged(float, float, float)), this, SLOT(OnEdgeColorChanged(float, float, float)));
     QObject::connect(_cbEdgeShading, SIGNAL(currentIndexChanged(int)), this, SLOT(OnEdgeShadingChanged(int)));
     QObject::connect(_cbHiddenLines, SIGNAL(stateChanged(int)), this, SLOT(OnHiddenLinesChanged(int)));
-    QObject::connect(_sldHullAlpha, SIGNAL(valueChanged(int)), this, SLOT(OnTransparencyChanged(int)));
+    QObject::connect(_sbHullAlpha, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnTransparencyChanged(leda::rational)));
 
     QObject::connect(_btnRenderVertices, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
     QObject::connect(_btnRenderEdges, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
