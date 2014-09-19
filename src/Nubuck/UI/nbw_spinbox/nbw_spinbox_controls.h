@@ -15,6 +15,8 @@ private:
     QRectF _arrowRegions[2];
     QRectF _textRegion;
 
+    QString         _text;
+
     leda::rational  _rval;
     leda::rational 	_singleStep;
     leda::rational  _min;
@@ -52,12 +54,16 @@ signals:
 public:
     NBW_SpinBoxControls(QWidget* parent = 0);
 
+    const QString& text() const;
+
     leda::rational GetValue() const;
 
     leda::rational minimum() const;
     leda::rational maximum() const;
 
     void setTypeMask(int mask);
+
+    void setText(const QString& text);
 
     void setMinimum(const leda::rational val);
     void setMaximum(const leda::rational val);

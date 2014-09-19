@@ -1,6 +1,5 @@
 #include <assert.h>
-
-#include <Nubuck\common\common.h>
+#include <stdio.h>
 
 #include <QVBoxLayout>
 #include <QResizeEvent>
@@ -31,7 +30,7 @@ static bool ParseRational(const char* str, leda::rational& rval, int& typeFlag) 
     // ignore leading whitespace
     while('\0' != *ptr && isspace(*ptr)) ptr++;
 
-    enum { 
+    enum {
         TYPE_INTEGER    = NBW_SpinBox::TypeFlags::INTEGER,
         TYPE_RATIONAL   = NBW_SpinBox::TypeFlags::RATIONAL,
         TYPE_DOUBLE     = NBW_SpinBox::TypeFlags::DOUBLE
@@ -50,8 +49,8 @@ static bool ParseRational(const char* str, leda::rational& rval, int& typeFlag) 
         if(1 == state) {
             if('-' == c) {
                 if(isNumNeg) {
-                    common.printf("ERROR - ParseRational, state = %d\n", state);
-                    common.printf("... expected DIGIT, got '%c'\n", c);
+                    printf("ERROR - ParseRational, state = %d\n", state);
+                    printf("... expected DIGIT, got '%c'\n", c);
                     nextState = 0;
                 } else {
                     isNumNeg = true;
@@ -64,8 +63,8 @@ static bool ParseRational(const char* str, leda::rational& rval, int& typeFlag) 
                 num = c - '0';
                 nextState = 4;
             } else {
-                common.printf("ERROR - ParseRational, state = %d\n", state);
-                common.printf("... expected '-' or DIGIT, got '%c'\n", c);
+                printf("ERROR - ParseRational, state = %d\n", state);
+                printf("... expected '-' or DIGIT, got '%c'\n", c);
                 nextState = 0;
             }
         }
@@ -77,8 +76,8 @@ static bool ParseRational(const char* str, leda::rational& rval, int& typeFlag) 
             } else if(isspace(c)) {
                 nextState = 5;
             } else {
-                common.printf("ERROR - ParseRational, state = %d\n", state);
-                common.printf("... expected '.' or SPACE, got '%c'\n", c);
+                printf("ERROR - ParseRational, state = %d\n", state);
+                printf("... expected '.' or SPACE, got '%c'\n", c);
                 nextState = 0;
             }
         }
@@ -90,8 +89,8 @@ static bool ParseRational(const char* str, leda::rational& rval, int& typeFlag) 
             } else if(isspace(c)) {
                 nextState = 9;
             } else {
-                common.printf("ERROR - ParseRational, state = %d\n", state);
-                common.printf("... expected DIGIT or SPACE, got '%c'\n", c);
+                printf("ERROR - ParseRational, state = %d\n", state);
+                printf("... expected DIGIT or SPACE, got '%c'\n", c);
                 nextState = 0;
             }
         }
@@ -106,8 +105,8 @@ static bool ParseRational(const char* str, leda::rational& rval, int& typeFlag) 
             } else if(isspace(c)) {
                 nextState = 5;
             } else {
-                common.printf("ERROR - ParseRational, state = %d\n", state);
-                common.printf("... expected DIGIT, '.' or SPACE, got '%c'\n", c);
+                printf("ERROR - ParseRational, state = %d\n", state);
+                printf("... expected DIGIT, '.' or SPACE, got '%c'\n", c);
                 nextState = 0;
             }
         }
@@ -118,8 +117,8 @@ static bool ParseRational(const char* str, leda::rational& rval, int& typeFlag) 
                 nextState = 6;
             }
             else if(!isspace(c)) {
-                common.printf("ERROR - ParseRational, state = %d\n", state);
-                common.printf("... expected '/' or SPACE, got '%c'\n", c);
+                printf("ERROR - ParseRational, state = %d\n", state);
+                printf("... expected '/' or SPACE, got '%c'\n", c);
                 nextState = 0;
             }
         }
@@ -132,8 +131,8 @@ static bool ParseRational(const char* str, leda::rational& rval, int& typeFlag) 
                 denom = c - '0';
                 nextState = 8;
             } else if(!isspace(c)) {
-                common.printf("ERROR - ParseRational, state = %d\n", state);
-                common.printf("... expected '-', DIGIT > 0 or SPACE got '%c'\n", c);
+                printf("ERROR - ParseRational, state = %d\n", state);
+                printf("... expected '-', DIGIT > 0 or SPACE got '%c'\n", c);
                 nextState = 0;
             }
         }
@@ -143,8 +142,8 @@ static bool ParseRational(const char* str, leda::rational& rval, int& typeFlag) 
                 denom = c - '0';
                 nextState = 8;
             } else {
-                common.printf("ERROR - ParseRational, state = %d\n", state);
-                common.printf("... expected DIGIT > 0, got '%c'\n", c);
+                printf("ERROR - ParseRational, state = %d\n", state);
+                printf("... expected DIGIT > 0, got '%c'\n", c);
                 nextState = 0;
             }
         }
@@ -156,16 +155,16 @@ static bool ParseRational(const char* str, leda::rational& rval, int& typeFlag) 
             } else if(isspace(c)) {
                 nextState = 9;
             }else {
-                common.printf("ERROR - ParseRational, state = %d\n", state);
-                common.printf("... expected DIGIT, got '%c'\n", c);
+                printf("ERROR - ParseRational, state = %d\n", state);
+                printf("... expected DIGIT, got '%c'\n", c);
                 nextState = 0;
             }
         }
 
         if(9 == state) {
             if(!isspace(c)) {
-                common.printf("ERROR - ParseRational, state = %d\n", state);
-                common.printf("... expected SPACE, got '%c'\n", c);
+                printf("ERROR - ParseRational, state = %d\n", state);
+                printf("... expected SPACE, got '%c'\n", c);
                 nextState = 0;
             }
         }
@@ -201,7 +200,7 @@ static bool ParseRational(const char* str, leda::rational& rval, int& typeFlag) 
 void NBW_SpinBoxControls::SetValue(const leda::rational rval) {
     leda::rational clamped = leda::max(_min, leda::min(_max, rval));
     if(clamped != _rval) {
-        _rval = clamped; 
+        _rval = clamped;
         emit SigValueChanged();
     }
 }
@@ -258,6 +257,11 @@ static float Length(const QPointF& p) {
     return sqrtf(p.x() * p.x() + p.y() * p.y());
 }
 
+static int Abs(int val) {
+    if(0 > val) return -val;
+    else return val;
+}
+
 static int Sign(int val) {
     if(0 < val) return 1;
     else if(0 > val) return -1;
@@ -272,7 +276,7 @@ void NBW_SpinBoxControls::mouseMoveEvent(QMouseEvent* event) {
 
         int dist = 50;
 
-        int accu = M::Abs(_distAccu.x());
+        int accu = Abs(_distAccu.x());
         int sign = Sign(_distAccu.x());
         while(dist < accu) {
             leda::rational rval = rval1 + sign * _singleStep;
@@ -281,7 +285,7 @@ void NBW_SpinBoxControls::mouseMoveEvent(QMouseEvent* event) {
         }
         _distAccu.setX(sign * accu);
 
-        accu = M::Abs(_distAccu.y());
+        accu = Abs(_distAccu.y());
         sign = Sign(_distAccu.y());
         while(dist < accu) {
             leda::rational rval = rval1 - sign * _singleStep; // invert y-axis
@@ -368,8 +372,6 @@ void NBW_SpinBoxControls::paintEvent(QPaintEvent*) {
     painter.restore();
 
     if(STATE_NORMAL == _state || STATE_DRAGGING == _state) {
-        const QString& _text = "Radius: ";
-
         const QString& text = _text + QString("%1").arg(_rval.to_double());
 
         painter.drawText(_textRegion, Qt::AlignCenter, text);
@@ -378,6 +380,7 @@ void NBW_SpinBoxControls::paintEvent(QPaintEvent*) {
 
 NBW_SpinBoxControls::NBW_SpinBoxControls(QWidget* parent)
     : QFrame(parent)
+    , _text("value: ")
     , _rval(0)
     , _singleStep(1)
     , _min(0)
@@ -396,6 +399,10 @@ NBW_SpinBoxControls::NBW_SpinBoxControls(QWidget* parent)
     connect(_lineEdit, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 }
 
+const QString& NBW_SpinBoxControls::text() const {
+    return _text;
+}
+
 leda::rational NBW_SpinBoxControls::GetValue() const {
     return _rval;
 }
@@ -410,6 +417,11 @@ leda::rational NBW_SpinBoxControls::maximum() const {
 
 void NBW_SpinBoxControls::setTypeMask(int mask) {
     _typeMask = mask;
+}
+
+void NBW_SpinBoxControls::setText(const QString& text) {
+    _text = text;
+    update();
 }
 
 void NBW_SpinBoxControls::setMinimum(const leda::rational val) {
@@ -497,7 +509,7 @@ NBW_SpinBox::NBW_SpinBox(QWidget* parent)
     }
 }
 
-void NBW_SpinBox::ShowProgressBar(bool show) {
+void NBW_SpinBox::showProgressBar(bool show) {
     _showProgress = show;
     _progress->setVisible(show);
 }
@@ -508,10 +520,15 @@ QSize NBW_SpinBox::sizeHint() const {
 }
 
 // just forward these to controls
+const QString& NBW_SpinBox::text() const { return _controls->text(); }
+
 leda::rational NBW_SpinBox::minimum() const { return _controls->minimum(); }
 leda::rational NBW_SpinBox::maximum() const { return _controls->maximum(); }
+leda::rational NBW_SpinBox::value() const { return _controls->GetValue(); }
 
 void NBW_SpinBox::setTypeMask(int mask) { _controls->setTypeMask(mask); }
+
+void NBW_SpinBox::setText(const QString& text) { _controls->setText(text); }
 
 void NBW_SpinBox::setMinimum(const leda::rational val) { _controls->setMinimum(val); }
 void NBW_SpinBox::setMaximum(const leda::rational val) { _controls->setMaximum(val); }
