@@ -484,7 +484,7 @@ void ENT_Geometry::OnDestroy() {
 	_nodeRenderer->DestroyRenderMesh();
 	_edgeRenderer->DestroyRenderMesh();
     DestroyRenderMesh();
-	_renderMode &= ~(RenderMode::EDGES | RenderMode::NODES); // !!!
+	_renderMode &= ~(Nubuck::RenderMode::EDGES | Nubuck::RenderMode::NODES); // !!!
 
     g_ui.GetOutliner().DeleteItem(_outlinerItem);
     _outlinerItem = NULL;
@@ -601,7 +601,7 @@ void ENT_Geometry::BuildRenderList() {
 
     const int transparencyMode = cvar_r_transparencyMode;
 
-    if(RenderMode::FACES & _renderMode && NULL != _mesh) {
+    if(Nubuck::RenderMode::FACES & _renderMode && NULL != _mesh) {
         R::meshMgr.GetMesh(_tfmesh).SetTransform(GetObjectToWorldMatrix());
 
         R::MeshJob rjob;
@@ -643,7 +643,7 @@ void ENT_Geometry::BuildRenderList() {
         }
     }
 
-    if(RenderMode::NODES & _renderMode && !_nodeRenderer->IsEmpty()) {
+    if(Nubuck::RenderMode::NODES & _renderMode && !_nodeRenderer->IsEmpty()) {
 	    _nodeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _nodeRenderer->GetRenderJob();
         rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
@@ -668,7 +668,7 @@ void ENT_Geometry::BuildRenderList() {
         _renderList.meshJobs.push_back(rjob);
     }
 
-    if(RenderMode::EDGES & _renderMode && !_edgeRenderer->IsEmpty()) {
+    if(Nubuck::RenderMode::EDGES & _renderMode && !_edgeRenderer->IsEmpty()) {
 		_edgeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _edgeRenderer->GetRenderJob();
         rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;

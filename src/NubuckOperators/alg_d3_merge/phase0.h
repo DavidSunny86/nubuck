@@ -4,7 +4,7 @@
 #include "shared.h"
 
 struct Phase0 : OP::ALG::Phase {
-    IGeometry* CreateHighlightedEdgeGeometry(const point_t& p0, const point_t& p1);
+    nb::geometry CreateHighlightedEdgeGeometry(const point_t& p0, const point_t& p1);
 
     void            Enter() override;
 

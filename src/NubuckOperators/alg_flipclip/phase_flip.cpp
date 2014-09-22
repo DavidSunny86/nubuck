@@ -7,9 +7,9 @@
 Phase_Flip::Phase_Flip(Globals& g) : _g(g) { }
 
 void Phase_Flip::Enter() {
-    _g.nb.log->printf("entering phase 'flip'\n");
+    nubuck().log_printf("entering phase 'flip'\n");
 
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
 
     // gather red edges
     _S.clear();
@@ -25,7 +25,7 @@ void Phase_Flip::Enter() {
 Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
     typedef leda::d3_rat_point point_t;
 
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
 
     while(!_S.empty()) {
         _fp.e = _S.pop();
@@ -116,12 +116,12 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
         ApplyEdgeColors(mesh);
     }
 
-    _g.nb.log->printf("number of flips: %d\n", _numFlips);
+    nubuck().log_printf("number of flips: %d\n", _numFlips);
     return StepRet::DONE;
 }
 
 Phase_Flip::StepRet::Enum Phase_Flip::StepPerformFlip() {
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
 
     const leda::node v0 = leda::source(_fp.e1);
     const leda::node v2 = leda::source(_fp.e3);

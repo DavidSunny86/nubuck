@@ -11,8 +11,6 @@ public:
 };
 
 class MergeVertices : public Operator {
-private:
-    Nubuck _nb;
 public:
     void Register(const Nubuck& nb, Invoker& invoker) override;
     bool Invoke() override;

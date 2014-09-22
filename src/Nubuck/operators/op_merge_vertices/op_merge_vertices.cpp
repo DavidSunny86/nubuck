@@ -7,9 +7,7 @@
 namespace OP {
 
 void MergeVertices::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-
-    QAction* action = _nb.ui->GetVertexMenu()->addAction("Merge");
+    QAction* action = nubuck().vertex_menu()->addAction("Merge");
     action->setShortcut(QKeySequence("M"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
@@ -63,15 +61,14 @@ static leda::node merge_vertices(leda::nb::RatPolyMesh& mesh, leda::node v0, led
 }
 
 bool MergeVertices::Invoke() {
-    ISelection* sel = _nb.world->GetSelection();
-    if(sel->GetList().empty()) {
+    if(nubuck().selected_geometry().empty()) {
         std::cout << "MergeVertices: empty selection" << std::endl;
         return false;
     }
 
-    _nb.ui->SetOperatorName("Merge");
+    nubuck().set_operator_name("Merge");
 
-    W::ENT_Geometry* geom = (W::ENT_Geometry*)sel->GetList().front();
+    W::ENT_Geometry* geom = (W::ENT_Geometry*)nubuck().selected_geometry().front();
     std::vector<leda::node> verts = geom->GetVertexSelection();
     if(2 != verts.size()) {
         std::cout << "MergeVertices: number of selected vertices != 2" << std::endl;
@@ -85,7 +82,7 @@ bool MergeVertices::Invoke() {
     leda::list<leda::edge> r;
     std::cout << "|r| = " << r.size() << std::endl;
     mesh.compute_faces();
-    sel->SelectVertex(ISelection::SELECT_NEW, geom, vert);
+    nubuck().select_vertex(Nubuck::SELECT_MODE_NEW, geom, vert);
 
     return true;
 }

@@ -102,7 +102,7 @@ void World::Selection::SignalChange() {
     g_ui.GetOutliner().Send(ev);
 }
 
-void World::Selection::Set(IGeometry* geom) {
+void World::Selection::Set(ENT_Geometry* geom) {
     SYS::ScopedLock lock(_mtx);
 	for(unsigned i = 0; i < geomList.size(); ++i) {
         ENT_Geometry* geom = (ENT_Geometry*)geomList[i];
@@ -116,7 +116,7 @@ void World::Selection::Set(IGeometry* geom) {
     SignalChange();
 }
 
-void World::Selection::Add(IGeometry* geom) {
+void World::Selection::Add(ENT_Geometry* geom) {
     SYS::ScopedLock lock(_mtx);
     bool sel = 0;
 	for(unsigned i = 0; !sel && i < geomList.size(); ++i)
@@ -146,15 +146,15 @@ M::Vector3 World::Selection::GetGlobalCenter() {
     return center;
 }
 
-std::vector<IGeometry*> World::Selection::GetList() const {
+std::vector<ENT_Geometry*> World::Selection::GetList() const {
     SYS::ScopedLock lock(_mtx);
     return geomList;
 }
 
-void World::Selection::SelectVertex(SelectMode mode, IGeometry* geom, leda::node vert) {
+void World::Selection::SelectVertex(Nubuck::SelectMode mode, ENT_Geometry* geom, leda::node vert) {
     SYS::ScopedLock lock(_mtx);
     W::ENT_Geometry* ent = (W::ENT_Geometry*)geom;
-    if(SELECT_NEW == mode) ent->ClearVertexSelection();
+    if(Nubuck::SELECT_MODE_NEW == mode) ent->ClearVertexSelection();
     ent->Select(vert);
     SignalChange();
 }
@@ -326,7 +326,7 @@ void World::Event_RebuildAll(const EV::Event& event) {
 void World::Event_EditModeChanged(const EV::Event& event) {
     const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
 
-    std::vector<IGeometry*> geomSel = _selection.GetList();
+    std::vector<ENT_Geometry*> geomSel = _selection.GetList();
     if(!geomSel.empty()) {
         ENT_Geometry* ent = (ENT_Geometry*)geomSel.front();
         ent->SetEditMode(editMode_t::Enum(args.editMode));
@@ -449,7 +449,7 @@ void World::BoundingBox::Transform() {
 
 void World::BBoxes_BuildFromSelection() {
     _bboxes.clear();
-    std::vector<IGeometry*> geomList = _selection.GetList();
+    std::vector<ENT_Geometry*> geomList = _selection.GetList();
     for(unsigned i = 0; i < geomList.size(); ++i) {
         _bboxes.push_back(GEN::MakePtr(new BoundingBox((const ENT_Geometry*)geomList[i])));
     }
@@ -611,11 +611,11 @@ void World::Render(R::RenderList& renderList) {
     }
 }
 
-ISelection* World::GetSelection() {
+World::Selection* World::GetSelection() {
     return &_selection;
 }
 
-IGeometry* World::CreateGeometry() {
+ENT_Geometry* World::CreateGeometry() {
     entIdCntMtx.Lock();
     unsigned entId = entIdCnt++;
     entIdCntMtx.Unlock();

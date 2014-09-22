@@ -16,7 +16,19 @@ private:
 public:
     typedef float (*heightFunc_t)(float x, float y);
 
-    Plane(const IWorld::PlaneDesc& desc);
+    struct PlaneDesc {
+        struct Sample2 { float x, y; };
+        typedef float (*heightFunc_t)(float x, float y);
+
+        heightFunc_t    heightFunc;
+        bool            flip;
+        float           size;
+        int             subdiv;
+        Sample2*        addSamples;
+        unsigned        numAddSamples;
+    };
+
+    Plane(const PlaneDesc& desc);
 
     Mesh::Desc GetDesc(void);
 };

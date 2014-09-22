@@ -35,28 +35,28 @@ namespace W {
         void*       inf;
     };
 
-    class World : public IWorld, public SYS::Thread, public EV::EventHandler<> {
+    class World : public SYS::Thread, public EV::EventHandler<> {
     private:
         DECL_HANDLE_EVENTS(World)
 
-        class Selection : public ISelection {
+        class Selection {
         private:
             mutable SYS::SpinLock _mtx;
 
-            std::vector<IGeometry*> geomList;
+            std::vector<ENT_Geometry*> geomList;
             M::Vector3              center; // in world space
 
             void ComputeCenter();
             void SignalChange();
         public:
-            void Set(IGeometry* geom) override;
-            void Add(IGeometry* geom) override;
-            void Clear() override;
+            void Set(ENT_Geometry* geom);
+            void Add(ENT_Geometry* geom);
+            void Clear();
 
-            M::Vector3 GetGlobalCenter() override;
-            std::vector<IGeometry*> GetList() const override;
+            M::Vector3 GetGlobalCenter();
+            std::vector<ENT_Geometry*> GetList() const;
 
-            void SelectVertex(SelectMode mode, IGeometry* geom, leda::node vert) override;
+            void SelectVertex(Nubuck::SelectMode mode, ENT_Geometry* geom, leda::node vert);
         } _selection;
 
         std::vector<GEN::Pointer<Entity> > _entities;
@@ -125,8 +125,8 @@ namespace W {
         void Render(R::RenderList& renderList);
 
         // exported to client
-        ISelection* GetSelection() override;
-        IGeometry* CreateGeometry() override; // thread-safe
+        Selection* GetSelection();
+        ENT_Geometry* CreateGeometry(); // thread-safe
         ENT_Text* CreateText();
 
         // thread interface

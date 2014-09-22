@@ -8,7 +8,7 @@ static bool IsValidGridPos(int i, int j, int N) {
 }
 
 // the planes faces the positive z axis. set flip=true to face the negative z axis.
-Plane::Plane(const IWorld::PlaneDesc& desc)
+Plane::Plane(const PlaneDesc& desc)
 {
     int regN = 1 + (1 << desc.subdiv);
 

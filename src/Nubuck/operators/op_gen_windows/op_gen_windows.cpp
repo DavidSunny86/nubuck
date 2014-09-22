@@ -13,17 +13,16 @@ namespace OP {
 namespace GEN {
 
 void Windows::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-    QAction* action = _nb.ui->GetSceneMenu()->addAction("Create Windows Scene");
+    QAction* action = nubuck().scene_menu()->addAction("Create Windows Scene");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool Windows::Invoke() {
     typedef leda::d3_rat_point point3_t;
 
-    _nb.ui->SetOperatorName("Windows Scene");
+    nubuck().set_operator_name("Windows Scene");
 
-    const int renderMode = IGeometry::RenderMode::FACES;
+    const int renderMode = Nubuck::RenderMode::FACES;
     const point3_t p[3] = {
         point3_t(-1, -1, 0),
         point3_t( 1, -1, 0),
@@ -35,15 +34,15 @@ bool Windows::Invoke() {
         R::Color(0.0f, 0.0f, 1.0f)
     };
     char nameBuffer[16];
-    IGeometry* geoms[3];
+    nb::geometry geoms[3];
     const float dist = 0.25f;
     for(int i = 0; i < 3; ++i) {
-        IGeometry* geom = _nb.world->CreateGeometry();
+        nb::geometry geom = nubuck().create_geometry();
         sprintf(nameBuffer, "Window %d", i);
-        geom->SetName(nameBuffer);
-        geom->SetRenderMode(renderMode);
-        geom->SetPosition(M::Vector3(0.0f, 0.0f, -dist + dist * i));
-        leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+        nubuck().set_geometry_name(geom, nameBuffer);
+        nubuck().set_geometry_render_mode(geom, renderMode);
+        nubuck().set_geometry_position(geom, M::Vector3(0.0f, 0.0f, -dist + dist * i));
+        leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
         mesh.make_triangle(p[0], p[1], p[2]);
         mesh.set_color(mesh.first_face(), c[i]);
         geoms[i] = geom;

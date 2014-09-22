@@ -191,8 +191,6 @@ void Translate::SetCursorPosition(const M::Vector3& pos) {
 }
 
 void Translate::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-
     /*
     no need for explicit invokation
     QAction* action = _nb.ui->GetSceneMenu()->addAction("Translate");
@@ -211,7 +209,7 @@ static M::Vector3 Axis(int i) {
 }
 
 bool Translate::Invoke() {
-    _nb.ui->SetOperatorName("Translate");
+    nubuck().set_operator_name("Translate");
     return true;
 }
 
@@ -283,13 +281,13 @@ static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
     return leda::d3_rat_point(x, y, z);
 }
 
-static M::Vector3 FindCursorPosition(ISelection* sel) {
+static M::Vector3 FindCursorPosition() {
     const W::editMode_t::Enum editMode = W::world.GetEditMode().GetMode();
 
-    if(W::editMode_t::OBJECTS == editMode) return sel->GetGlobalCenter();
+    if(W::editMode_t::OBJECTS == editMode) return g_nubuck.global_center_of_selection();
 
     if(W::editMode_t::VERTICES == editMode) {
-        W::ENT_Geometry* geom = (W::ENT_Geometry*)sel->GetList().front();
+        W::ENT_Geometry* geom = (W::ENT_Geometry*)g_nubuck.selected_geometry().front();
         std::vector<leda::node> verts = geom->GetVertexSelection();
         M::Vector3 pos = M::Vector3::Zero;
         M::Matrix4 objToWorld = geom->GetObjectToWorldMatrix();
@@ -311,10 +309,9 @@ Translate::UpdateCursor
 ====================
 */
 void Translate::UpdateCursor() {
-    ISelection* sel = W::world.GetSelection();
-	if(sel->GetList().empty()) HideCursor();
+    if(g_nubuck.selected_geometry().empty()) HideCursor();
     else {
-        SetCursorPosition(FindCursorPosition(sel));
+        SetCursorPosition(FindCursorPosition());
         ShowCursor();
     }
 }
@@ -340,7 +337,7 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
         assert(is);
         _dragOrig = inf.where;
 
-        const std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
+        const std::vector<nb::geometry>& geomList = nubuck().selected_geometry();
 
         _center = M::Vector3::Zero;
 
@@ -394,10 +391,10 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
                         nidx = i;
                 }
 
-                ISelection::SelectMode selectMode = ISelection::SELECT_ADD;
-                if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = ISelection::SELECT_NEW;
-                W::world.GetSelection()->SelectVertex(selectMode, geom, hits[nidx].vert);
-                SetCursorPosition(FindCursorPosition(W::world.GetSelection()));
+                Nubuck::SelectMode selectMode = Nubuck::SELECT_MODE_ADD;
+                if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = Nubuck::SELECT_MODE_NEW;
+                nubuck().select_vertex(selectMode, geom, hits[nidx].vert);
+                SetCursorPosition(FindCursorPosition());
             }
         }
     }
@@ -435,11 +432,11 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
         pos.vec[_dragAxis] = _oldCursorPos.vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
         SetCursorPosition(pos);
 
-        std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
+        std::vector<nb::geometry>& geomList = nubuck().selected_geometry();
 
         if(W::editMode_t::OBJECTS == _editMode) {
             for(unsigned i = 0; i < geomList.size(); ++i) {
-                IGeometry* geom = geomList[i];
+                nb::geometry geom = geomList[i];
                 M::Vector3 pos = _oldGeomPos[i];
                 pos.vec[_dragAxis] = _oldGeomPos[i].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
                 geom->SetPosition(pos);
@@ -474,11 +471,11 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
 
         float scale = M::Length(p - _oldCursorPos) / base;
 
-        std::vector<IGeometry*>& geomList = W::world.GetSelection()->GetList();
+        std::vector<nb::geometry>& geomList = nubuck().selected_geometry();
 
         if(W::editMode_t::OBJECTS == _editMode) {
             for(unsigned i = 0; i < geomList.size(); ++i) {
-                IGeometry* geom = geomList[i];
+                nb::geometry geom = geomList[i];
                 leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
                 leda::node v;
                 forall_nodes(v, mesh) {

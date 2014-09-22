@@ -19,7 +19,7 @@
 
 namespace W {
 
-class ENT_Geometry : public IGeometry, public Entity, public EV::EventHandler<> {
+class ENT_Geometry : public Entity, public EV::EventHandler<> {
 private:
     leda::nb::RatPolyMesh _ratPolyMesh;
 
@@ -59,6 +59,8 @@ private:
     float       _vertexScale;
     float       _edgeScale;
     R::Color    _edgeColor;
+
+    typedef Nubuck::ShadingMode ShadingMode;
 
     bool                _isSolid; // detectable by raycast
     bool                _isHidden;
@@ -115,27 +117,27 @@ public:
 
     bool IsSolid() const { return _isSolid; }
 
-    void SetSolid(bool solid) override;
+    void SetSolid(bool solid);
 
     void SetTransparency(float transparency);
 
     bool IsMeshCompiled() const;
     void CompileMesh();
 
-    const std::string& GetName() const override { return Entity::GetName(); }
+    const std::string& GetName() const { return Entity::GetName(); }
 
-    void SetName(const std::string& name) override;
+    void SetName(const std::string& name);
 
-	void Destroy() override { Entity::Destroy(); }
-    void OnDestroy() override;
+	void Destroy() { Entity::Destroy(); }
+    void OnDestroy();
 
-    UI::OutlinerView* CreateOutlinerView() override;
+    UI::OutlinerView* CreateOutlinerView();
 
-    leda::nb::RatPolyMesh&          GetRatPolyMesh() override;
+    leda::nb::RatPolyMesh&          GetRatPolyMesh();
     const leda::nb::RatPolyMesh&    GetRatPolyMesh() const;
     void Rebuild();
 
-    void ApplyTransformation() override;
+    void ApplyTransformation();
 
     float       GetVertexScale() const;
     float       GetEdgeScale() const;
@@ -150,19 +152,19 @@ public:
 
     const M::Box& GetBoundingBox() const;
 
-    M::Vector3 GetPosition() const override;
+    M::Vector3 GetPosition() const;
 
-    void SetPosition(const M::Vector3& position) override;
-    void SetScale(const M::Vector3& scale) override;
+    void SetPosition(const M::Vector3& position);
+    void SetScale(const M::Vector3& scale);
 
-    void HideOutline() override;
+    void HideOutline();
 
-    void Show() override;
-    void Hide() override;
+    void Show();
+    void Hide();
 
-    void SetRenderMode(int flags) override;
-    void SetRenderLayer(unsigned layer) override;
-    void SetShadingMode(ShadingMode::Enum mode) override;
+    void SetRenderMode(int flags);
+    void SetRenderLayer(unsigned layer);
+    void SetShadingMode(ShadingMode::Enum mode);
 
     int GetRenderMode() const { return _renderMode; }
 
@@ -175,7 +177,7 @@ public:
     void AttachAnimation(A::Animation* animation);
 };
 
-void SaveGeometryToFile(const std::string& filename, IGeometry* geom);
-void LoadGeometryFromFile(const std::string& filename, IGeometry* geom);
+void SaveGeometryToFile(const std::string& filename, ENT_Geometry* geom);
+void LoadGeometryFromFile(const std::string& filename, ENT_Geometry* geom);
 
 } // namespace W

@@ -25,8 +25,6 @@ public:
 
 class LoadGeom : public Operator {
 private:
-    Nubuck _nb;
-
     void Event_Load(const EV::Event& event);
 public:
     LoadGeom();

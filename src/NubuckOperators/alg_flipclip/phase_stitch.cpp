@@ -28,12 +28,12 @@ inline bool equal_xy(const leda::d3_rat_point& lhp, const leda::d3_rat_point& rh
 Phase_Stitch::Phase_Stitch(Globals& g) : _g(g) { }
 
 void Phase_Stitch::Enter() {
-    _g.nb.log->printf("entering phase 'stitch'\n");
+    nubuck().log_printf("entering phase 'stitch'\n");
 
     if(RunMode::RUN == GetRunConf().mode && _g.haltBeforeStitching) {
         // previous phase might have not computed faces in run mode
         for(int side = 0; side < 2; ++side) {
-            leda::nb::RatPolyMesh& mesh = _g.geom[side]->GetRatPolyMesh();
+            leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[side]);
             mesh.compute_faces();
             ApplyEdgeColors(mesh);
             if(_g.hullEdges[side]) mesh.set_visible(mesh.face_of(_g.hullEdges[side]), false);
@@ -42,12 +42,12 @@ void Phase_Stitch::Enter() {
 }
 
 Phase_Stitch::StepRet::Enum Phase_Stitch::Step() {
-    leda::nb::RatPolyMesh& mesh = _g.geom[Side::FRONT]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[Side::FRONT]);
 
-    mesh.join(_g.geom[Side::BACK]->GetRatPolyMesh());
+    mesh.join(nubuck().poly_mesh(_g.geom[Side::BACK]));
 
-    _g.geom[Side::BACK]->Destroy();
-    _g.geom[Side::FRONT]->SetName("Stitched Hull");
+    nubuck().destroy_geometry(_g.geom[Side::BACK]);
+    nubuck().set_geometry_name(_g.geom[Side::FRONT], "Stitched Hull");
 
     int numHullVerts = 0;
     leda::edge e = _g.hullEdges[Side::FRONT];

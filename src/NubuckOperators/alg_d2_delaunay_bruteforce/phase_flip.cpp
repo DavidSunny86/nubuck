@@ -39,9 +39,9 @@ bool Phase_Flip::Quadrilateral::IsNull() const {
 }
 
 void Phase_Flip::Enter() {
-    _g.nb.log->printf("entering phase 'flip'\n");
+    nubuck().log_printf("entering phase 'flip'\n");
 
-    leda::nb::RatPolyMesh& mesh = _g.delaunay->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.delaunay);
 
     leda::edge e;
     forall_edges(e, mesh) {
@@ -62,7 +62,7 @@ void ApplyEdgeColor(leda::nb::RatPolyMesh& mesh, leda::edge e) {
 Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
     typedef leda::rat_point point2_t;
 
-    leda::nb::RatPolyMesh& mesh = _g.delaunay->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.delaunay);
 
     // reset colors of previous flip
     if(!_q.IsNull()) {
@@ -74,7 +74,7 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
         ApplyEdgeColor(mesh, _q.e4);
 
         // color chull mesh
-        leda::nb::RatPolyMesh& chullMesh = _g.chull->GetRatPolyMesh();
+        leda::nb::RatPolyMesh& chullMesh = nubuck().poly_mesh(_g.chull);
         chullMesh.set_color(_g.emap[_q.e ], mesh.color_of(_q.e ));
         chullMesh.set_color(_g.emap[_q.r ], mesh.color_of(_q.r ));
         chullMesh.set_color(_g.emap[_q.e1], mesh.color_of(_q.e1));
@@ -100,9 +100,9 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
 
         if(isStrictlyConvex && inCircle) {
             const leda::circle Cf(C.to_circle());
-            _g.circle->SetPosition(_g.delaunay->GetPosition() + M::Vector3(Cf.center().xcoord(), Cf.center().ycoord(), 0.0f));
-            _g.circle->SetScale(static_cast<float>(Cf.radius()) * M::Vector3(1.0f, 1.0f, 1.0f));
-            _g.circle->Show();
+            nubuck().set_geometry_position(_g.circle, nubuck().geometry_position(_g.delaunay) + M::Vector3(Cf.center().xcoord(), Cf.center().ycoord(), 0.0f));
+            nubuck().set_geometry_scale(_g.circle, static_cast<float>(Cf.radius()) * M::Vector3(1.0f, 1.0f, 1.0f));
+            nubuck().show_geometry(_g.circle);
 
             // color delaunay mesh
             mesh.set_color(q.e1, R::Color::Yellow);
@@ -111,7 +111,7 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
             mesh.set_color(q.e4, R::Color::Yellow);
 
             // color chull mesh
-            leda::nb::RatPolyMesh& chullMesh = _g.chull->GetRatPolyMesh();
+            leda::nb::RatPolyMesh& chullMesh = nubuck().poly_mesh(_g.chull);
             chullMesh.set_color(_g.emap[q.e1], R::Color::Yellow);
             chullMesh.set_color(_g.emap[q.e2], R::Color::Yellow);
             chullMesh.set_color(_g.emap[q.e3], R::Color::Yellow);
@@ -125,14 +125,14 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
         }
     }
 
-    _g.circle->Hide();
+    nubuck().hide_geometry(_g.circle);
 
     return StepRet::DONE;
 }
 
 Phase_Flip::StepRet::Enum Phase_Flip::StepPerformFlip() {
-    leda::nb::RatPolyMesh& mesh = _g.delaunay->GetRatPolyMesh();
-    leda::nb::RatPolyMesh& chullMesh = _g.chull->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.delaunay);
+    leda::nb::RatPolyMesh& chullMesh = nubuck().poly_mesh(_g.chull);
 
     // flip delaunay edge
     mesh.move_edge(_q.e, _q.e2, leda::source(_q.e4));
@@ -152,9 +152,9 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepPerformFlip() {
     const leda::rat_circle C(_q.p0, _q.p1, _q.p2);
 
     const leda::circle Cf(C.to_circle());
-    _g.circle->SetPosition(_g.delaunay->GetPosition() + M::Vector3(Cf.center().xcoord(), Cf.center().ycoord(), 0.0f));
-    _g.circle->SetScale(static_cast<float>(Cf.radius()) * M::Vector3(1.0f, 1.0f, 1.0f));
-    _g.circle->Show();
+    nubuck().set_geometry_position(_g.circle, nubuck().geometry_position(_g.delaunay) + M::Vector3(Cf.center().xcoord(), Cf.center().ycoord(), 0.0f));
+    nubuck().set_geometry_scale(_g.circle, static_cast<float>(Cf.radius()) * M::Vector3(1.0f, 1.0f, 1.0f));
+    nubuck().show_geometry(_g.circle);
 
     // force rebuild
     mesh.compute_faces();

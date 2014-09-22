@@ -49,9 +49,9 @@ Phase_Clip::Phase_Clip(Globals& g, bool forceFlips)
 { }
 
 void Phase_Clip::Enter() {
-    _g.nb.log->printf("entering phase 'clip'\n");
+    nubuck().log_printf("entering phase 'clip'\n");
 
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
 
     _L.clear();
     _rdeg.init(mesh, 0);
@@ -71,7 +71,7 @@ void Phase_Clip::Enter() {
 }
 
 Phase_Clip::StepRet::Enum Phase_Clip::StepSearch() {
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
 
     while(!_L.empty()) {
         _clipV = _L.pop();
@@ -99,12 +99,12 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepSearch() {
         ApplyEdgeColors(mesh);
     }
 
-    _g.nb.log->printf("number of clips: %d\n", _numClips);
+    nubuck().log_printf("number of clips: %d\n", _numClips);
     return StepRet::DONE;
 }
 
 Phase_Clip::StepRet::Enum Phase_Clip::StepPerformClip() {
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
 
     leda::edge e;
     forall_out_edges(e, _clipV) {

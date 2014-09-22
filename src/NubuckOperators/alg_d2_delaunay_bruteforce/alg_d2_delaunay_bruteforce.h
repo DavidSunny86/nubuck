@@ -45,7 +45,7 @@ private:
     void Event_SetConvexHullScale(const EV::Event& event);
 protected:
     const char*     GetName() const override;
-    OP::ALG::Phase* Init(const Nubuck& nb) override;
+    OP::ALG::Phase* Init() override;
 public:
     D2_Delaunay_BruteForce();
 };

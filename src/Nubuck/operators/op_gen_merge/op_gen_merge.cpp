@@ -15,14 +15,12 @@ namespace GEN {
 MergePanel::MergePanel(QWidget* parent) : OperatorPanel(parent) { }
 
 void Merge::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-
-    QAction* action = _nb.ui->GetSceneMenu()->addAction("Create Merge Scene");
+    QAction* action = nubuck().scene_menu()->addAction("Create Merge Scene");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool Merge::Invoke() {
-    _nb.ui->SetOperatorName("Create Merge Scene");
+    nubuck().set_operator_name("Create Merge Scene");
 
     leda::list_item it;
 
@@ -37,24 +35,23 @@ bool Merge::Invoke() {
     }
 
     const int renderAll = 
-        IGeometry::RenderMode::NODES |
-        IGeometry::RenderMode::EDGES |
-        IGeometry::RenderMode::FACES;
+        Nubuck::RenderMode::NODES |
+        Nubuck::RenderMode::EDGES |
+        Nubuck::RenderMode::FACES;
 
-    IGeometry* geom0 = _nb.world->CreateGeometry();
-    geom0->SetRenderMode(renderAll);
-    leda::CONVEX_HULL(L0, geom0->GetRatPolyMesh());
-    geom0->GetRatPolyMesh().compute_faces();
+    nb::geometry geom0 = nubuck().create_geometry();
+    nubuck().set_geometry_render_mode(geom0, renderAll);
+    leda::CONVEX_HULL(L0, nubuck().poly_mesh(geom0));
+    nubuck().poly_mesh(geom0).compute_faces();
 
-    IGeometry* geom1 = _nb.world->CreateGeometry();
-    geom1->SetRenderMode(renderAll);
-    leda::CONVEX_HULL(L1, geom1->GetRatPolyMesh());
-    geom1->GetRatPolyMesh().compute_faces();
+    nb::geometry geom1 = nubuck().create_geometry();
+    nubuck().set_geometry_render_mode(geom1, renderAll);
+    leda::CONVEX_HULL(L1, nubuck().poly_mesh(geom1));
+    nubuck().poly_mesh(geom1).compute_faces();
     
-    ISelection* sel = _nb.world->GetSelection();
-    sel->Clear();
-    sel->Add(geom0);
-    sel->Add(geom1);
+    nubuck().clear_selection();
+    nubuck().select_geometry(Nubuck::SELECT_MODE_ADD, geom0);
+    nubuck().select_geometry(Nubuck::SELECT_MODE_ADD, geom1);
 
     return true;
 }

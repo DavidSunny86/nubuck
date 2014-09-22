@@ -52,17 +52,17 @@ static leda::nb::RatPolyMesh preload;
 void LoadOBJ::Event_Load(const EV::Event& event) {
 	const EV::Params_OP_LoadOBJ_Load& args = EV::def_OP_LoadOBJ_Load.GetArgs(event);
 
-	_nb.world->GetSelection()->Clear();
+	nubuck().clear_selection();
 	if(_geom) _geom->Destroy();
 
-	_geom = (W::ENT_Geometry*)_nb.world->CreateGeometry();
-	_geom->SetRenderMode(IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES);
+    _geom = (W::ENT_Geometry*)nubuck().create_geometry();
+	_geom->SetRenderMode(Nubuck::RenderMode::NODES | Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES);
 	leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
 	mesh.FromObj(args.filename->toAscii());
 
-	_nb.world->GetSelection()->Set(_geom);
+    nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, _geom);
 
-    _nb.log->printf("loaded object: |V| = %d, |E| = %d, |F| = %d\n",
+    nubuck().log_printf("loaded object: |V| = %d, |E| = %d, |F| = %d\n",
         mesh.number_of_nodes(), mesh.number_of_edges(), mesh.number_of_faces());
 
 	delete args.filename;
@@ -78,14 +78,14 @@ void LoadOBJ::Event_LoadScene(const EV::Event& event) {
 
     mesh0.join(mesh1);
 
-    const int renderAll = IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES;
-    W::ENT_Geometry* geom = (W::ENT_Geometry*)_nb.world->CreateGeometry();
+    const int renderAll = Nubuck::RenderMode::NODES | Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES;
+    W::ENT_Geometry* geom = (W::ENT_Geometry*)nubuck().create_geometry();
     geom->SetRenderMode(renderAll);
     geom->GetRatPolyMesh() = mesh0;
 
-    _nb.world->GetSelection()->Set(geom);
+    nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, geom);
 
-    _nb.log->printf("LoadOBJ: loading scene finished\n");
+    nubuck().log_printf("LoadOBJ: loading scene finished\n");
 }
 
 LoadOBJ::LoadOBJ() : _geom(NULL) {
@@ -94,13 +94,11 @@ LoadOBJ::LoadOBJ() : _geom(NULL) {
 }
 
 void LoadOBJ::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-
-    _nb.log->printf("LoadOBJ: preloading mesh\n");
+    nubuck().log_printf("LoadOBJ: preloading mesh\n");
     std::string filename = common.BaseDir() + "Meshes\\laurana_hp.obj";
     preload.FromObj(filename.c_str());
 
-    QAction* action = _nb.ui->GetSceneMenu()->addAction("Load .obj file");
+    QAction* action = nubuck().scene_menu()->addAction("Load .obj file");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 

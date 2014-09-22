@@ -39,7 +39,7 @@ private:
 protected:
     const char* GetName() const;
 
-    OP::ALG::Phase* Init(const Nubuck& nb);
+    OP::ALG::Phase* Init();
 public:
     FlipClip();
 };

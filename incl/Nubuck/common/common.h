@@ -63,7 +63,7 @@ public:
 
 } // namespace COM
 
-class Common : public ICommon {
+class Common {
 private:
     FILE* _logfile;
 
@@ -82,7 +82,7 @@ public:
 
     const char* GetEnvVar(const std::string& name) const;
 
-    void printf(const char* format, ...) override;
+    void printf(const char* format, ...);
 };
 
 NUBUCK_API void COM_printf(const char* format, ...);

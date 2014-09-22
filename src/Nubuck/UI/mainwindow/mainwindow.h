@@ -14,7 +14,7 @@ namespace UI {
     class Console;
     class RenderView;
 
-	class MainWindow : public QMainWindow, public IMainWindow {
+	class MainWindow : public QMainWindow {
         Q_OBJECT
 	private:
 		Ui::MainWindow  _ui;
@@ -60,13 +60,13 @@ namespace UI {
 
         RenderView* GetRenderView() { return _renderView; }
 
-        QMenu* GetSceneMenu() override      { return _opMenus[MENU_SCENE]->menu; }
-        QMenu* GetObjectMenu() override     { return _opMenus[MENU_OBJECT]->menu; }
-        QMenu* GetAlgorithmMenu() override  { return _opMenus[MENU_ALGORITHMS]->menu; }
-        QMenu* GetVertexMenu() override     { return _opMenus[MENU_VERTEX]->menu; }
+        QMenu* GetSceneMenu()      { return _opMenus[MENU_SCENE]->menu; }
+        QMenu* GetObjectMenu()     { return _opMenus[MENU_OBJECT]->menu; }
+        QMenu* GetAlgorithmMenu()  { return _opMenus[MENU_ALGORITHMS]->menu; }
+        QMenu* GetVertexMenu()     { return _opMenus[MENU_VERTEX]->menu; }
 
-        void SetOperatorName(const char* name) override;
-        void SetOperatorPanel(QWidget* widget) override;
+        void SetOperatorName(const char* name);
+        void SetOperatorPanel(QWidget* widget);
 	};
 
 } // namespace UI

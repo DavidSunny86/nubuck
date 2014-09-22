@@ -135,11 +135,11 @@ struct CompareVertexPositionsDescending : leda::leda_cmp_base<leda::node> {
 };
 
 void Phase_Init::Enter() {
-    _g.nb.log->printf("entering phase 'init'\n");
+    nubuck().log_printf("entering phase 'init'\n");
 }
 
 Phase_Init::StepRet::Enum Phase_Init::Step() {
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
 
     if(Side::FRONT == _g.side) {
         leda::list<leda::node>& L = _g.L[Side::FRONT];

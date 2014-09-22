@@ -36,7 +36,6 @@ public:
 
 class LoadOBJ : public Operator {
 private:
-    Nubuck              _nb;
 	W::ENT_Geometry*    _geom;
 
     void Event_Load(const EV::Event& event);

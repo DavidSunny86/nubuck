@@ -41,7 +41,133 @@ void ToggleRenderViewControls() {
     g_showRenderViewControls = !g_showRenderViewControls;
 }
 
-Nubuck nubuck;
+void NubuckImpl::log_printf(const char* format, ...) {
+    static char buffer[2048];
+
+    memset(buffer, 0, sizeof(buffer));
+    va_list args;
+    va_start(args, format);
+    vsprintf(buffer, format, args);
+    va_end(args);
+
+    UI::logWidget().printf(format);
+}
+
+QMenu* NubuckImpl::scene_menu() {
+    return g_ui.GetMainWindow().GetSceneMenu();
+}
+
+QMenu* NubuckImpl::object_menu() {
+    return g_ui.GetMainWindow().GetObjectMenu();
+}
+
+QMenu* NubuckImpl::algorithm_menu() {
+    return g_ui.GetMainWindow().GetAlgorithmMenu();
+}
+
+QMenu* NubuckImpl::vertex_menu() {
+    return g_ui.GetMainWindow().GetVertexMenu();
+}
+
+void NubuckImpl::set_operator_name(const char* name) {
+    return g_ui.GetMainWindow().SetOperatorName(name);
+}
+
+void NubuckImpl::set_operator_panel(QWidget* panel) {
+    return g_ui.GetMainWindow().SetOperatorPanel(panel);
+}
+
+nb::geometry NubuckImpl::create_geometry() {
+    return W::world.CreateGeometry();
+}
+
+void NubuckImpl::destroy_geometry(const nb::geometry obj) {
+    obj->Destroy();
+}
+
+void NubuckImpl::clear_selection() {
+    W::world.GetSelection()->Clear();
+}
+
+void NubuckImpl::select_geometry(SelectMode mode, const nb::geometry obj) {
+    if(SELECT_MODE_ADD == mode) {
+        W::world.GetSelection()->Add(obj);
+    } else {
+        W::world.GetSelection()->Set(obj);
+    }
+}
+
+void NubuckImpl::select_vertex(SelectMode mode, const nb::geometry obj, const leda::node vert) {
+    W::world.GetSelection()->SelectVertex(mode, obj, vert);
+}
+
+std::vector<nb::geometry> NubuckImpl::selected_geometry() {
+    return W::world.GetSelection()->GetList();
+}
+
+M::Vector3 NubuckImpl::global_center_of_selection() {
+    return W::world.GetSelection()->GetGlobalCenter();
+}
+
+const std::string& NubuckImpl::geometry_name(const nb::geometry obj) {
+    return obj->GetName();
+}
+
+M::Vector3 NubuckImpl::geometry_position(const nb::geometry obj) {
+    return obj->GetPosition();
+}
+
+leda::nb::RatPolyMesh& NubuckImpl::poly_mesh(const nb::geometry obj) {
+    return obj->GetRatPolyMesh();
+}
+
+void NubuckImpl::set_geometry_name(const nb::geometry obj, const std::string& name) {
+    obj->SetName(name);
+}
+
+void NubuckImpl::apply_geometry_transformation(const nb::geometry obj) {
+    obj->ApplyTransformation();
+}
+
+void NubuckImpl::set_geometry_position(const nb::geometry obj, const M::Vector3& position) {
+    obj->SetPosition(position);
+}
+
+void NubuckImpl::set_geometry_scale(const nb::geometry obj, const M::Vector3& scale) {
+    obj->SetScale(scale);
+}
+
+void NubuckImpl::hide_geometry_outline(const nb::geometry obj) {
+    obj->HideOutline();
+}
+
+void NubuckImpl::hide_geometry(const nb::geometry obj) {
+    obj->Hide();
+}
+
+void NubuckImpl::show_geometry(const nb::geometry obj) {
+    obj->Show();
+}
+
+void NubuckImpl::set_geometry_solid(const nb::geometry obj, bool solid) {
+    obj->SetSolid(solid);
+}
+
+void NubuckImpl::set_geometry_render_mode(const nb::geometry obj, int flags) {
+    obj->SetRenderMode(flags);
+}
+
+void NubuckImpl::set_geometry_render_layer(const nb::geometry obj, unsigned layer) {
+    obj->SetRenderLayer(layer);
+}
+
+void NubuckImpl::set_geometry_shading_mode(const nb::geometry obj, ShadingMode::Enum mode) {
+    obj->SetShadingMode(mode);
+}
+
+NubuckImpl g_nubuck;
+
+Nubuck& nubuck() { return g_nubuck; }
 
 namespace {
 
@@ -125,16 +251,7 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
     MainLoop mainLoop;
     mainLoop.Enter();
 
-    nubuck.common   = &common;
-    nubuck.world    = &W::world;
-    nubuck.log      = UI::LogWidget::Instance();
-
     ALG::gs_algorithm.SetAlloc(algAlloc);
-
-    nubuck.common   = &common;
-    nubuck.world    = &W::world;
-    nubuck.log      = UI::LogWidget::Instance();
-    nubuck.ui       = &g_ui.GetMainWindow();
 
     // register commands
     COM::CMD::RegisterCommand("lsvars", "list config variables", COM::CMD_ListVariables);

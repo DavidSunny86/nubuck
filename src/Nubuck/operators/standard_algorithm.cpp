@@ -101,15 +101,14 @@ StandardAlgorithm::StandardAlgorithm() {
 }
 
 void StandardAlgorithm::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-    QAction* action = nb.ui->GetAlgorithmMenu()->addAction(GetName());
+    QAction* action = nubuck().algorithm_menu()->addAction(GetName());
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool StandardAlgorithm::Invoke() {
-    _nb.ui->SetOperatorName(GetName());
+    nubuck().set_operator_name(GetName());
 
-    Phase* phase = Init(_nb);
+    Phase* phase = Init();
     if(phase) {
 	    SetPhase(GEN::MakePtr(phase));
         return true;

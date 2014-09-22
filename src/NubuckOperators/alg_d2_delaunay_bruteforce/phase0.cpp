@@ -211,14 +211,14 @@ void CreateGrid(
 }
 
 void Phase0::Enter() {
-    _g.nb.log->printf("entering phase 'init'\n");
+    nubuck().log_printf("entering phase 'init'\n");
 
     const int renderMode =
-        IGeometry::RenderMode::NODES |
-        IGeometry::RenderMode::EDGES;
-    _g.delaunay->SetRenderMode(renderMode);
+        Nubuck::RenderMode::NODES |
+        Nubuck::RenderMode::EDGES;
+    nubuck().set_geometry_render_mode(_g.delaunay, renderMode);
 
-    leda::nb::RatPolyMesh& mesh = _g.delaunay->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.delaunay);
 
     leda::list<leda::node> L = mesh.all_nodes();
 
@@ -244,16 +244,16 @@ void Phase0::Enter() {
 
     // copy mesh
     const int renderAll =
-        IGeometry::RenderMode::NODES |
-        IGeometry::RenderMode::EDGES |
-        IGeometry::RenderMode::FACES;
-    _g.chull = _g.nb.world->CreateGeometry();
-    _g.chull->SetName("Convex Hull");
-    _g.chull->SetRenderMode(renderAll);
-    _g.chull->SetPosition(_g.chull->GetPosition() + M::Vector3(0.0f, 0.0f, 2.0f));
-    _g.chull->Hide();
+        Nubuck::RenderMode::NODES |
+        Nubuck::RenderMode::EDGES |
+        Nubuck::RenderMode::FACES;
+    _g.chull = nubuck().create_geometry();
+    nubuck().set_geometry_name(_g.chull, "Convex Hull");
+    nubuck().set_geometry_render_mode(_g.chull, renderAll);
+    nubuck().set_geometry_position(_g.chull, nubuck().geometry_position(_g.chull) + M::Vector3(0.0f, 0.0f, 2.0f));
+    nubuck().hide_geometry(_g.chull);
 
-    leda::nb::RatPolyMesh& chullMesh = _g.chull->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& chullMesh = nubuck().poly_mesh(_g.chull);
 
     Copy_MapAB(mesh, chullMesh, _g.vmap, _g.emap);
 
@@ -264,13 +264,13 @@ void Phase0::Enter() {
     }
 
     // paraboloid mesh
-    _g.paraboloid = _g.nb.world->CreateGeometry();
-    _g.paraboloid->SetRenderMode(IGeometry::RenderMode::FACES);
-    _g.paraboloid->SetName("Paraboloid");
-    _g.paraboloid->SetPosition(_g.paraboloid->GetPosition() + M::Vector3(0.0f, 0.0f, 2.0f));
-    _g.paraboloid->Hide();
+    _g.paraboloid = nubuck().create_geometry();
+    nubuck().set_geometry_render_mode(_g.paraboloid, Nubuck::RenderMode::FACES);
+    nubuck().set_geometry_name(_g.paraboloid, "Paraboloid");
+    nubuck().set_geometry_position(_g.paraboloid, nubuck().geometry_position(_g.paraboloid) + M::Vector3(0.0f, 0.0f, 2.0f));
+    nubuck().hide_geometry(_g.paraboloid);
 
-    leda::nb::RatPolyMesh& parabMesh = _g.paraboloid->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& parabMesh = nubuck().poly_mesh(_g.paraboloid);
 
     CreateGrid(parabMesh, 6, maxSize);
 

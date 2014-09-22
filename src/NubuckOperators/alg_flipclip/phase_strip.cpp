@@ -45,9 +45,9 @@ void StripTetrahedrons(leda::nb::RatPolyMesh& mesh, leda::node v) {
 Phase_Strip::Phase_Strip(Globals& g) : _g(g) { }
 
 void Phase_Strip::Enter() {
-    _g.nb.log->printf("entering phase 'strip'\n");
+    nubuck().log_printf("entering phase 'strip'\n");
 
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
 
     _L.clear();
     leda::node v;
@@ -72,7 +72,7 @@ void Phase_Strip::Enter() {
 }
 
 Phase_Strip::StepRet::Enum Phase_Strip::StepSearch() {
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
 
     if(_L.empty()) {
         if(RunMode::NEXT == GetRunConf().mode) {
@@ -82,7 +82,7 @@ Phase_Strip::StepRet::Enum Phase_Strip::StepSearch() {
             ApplyEdgeColors(mesh);
         }
 
-        _g.nb.log->printf("number of strips: %d\n", _numStrips);
+        nubuck().log_printf("number of strips: %d\n", _numStrips);
         return StepRet::DONE;
     }
 
@@ -105,7 +105,7 @@ Phase_Strip::StepRet::Enum Phase_Strip::StepSearch() {
 Phase_Strip::StepRet::Enum Phase_Strip::StepPerformStrip() {
     leda::node v = _L.pop_front();
 
-    leda::nb::RatPolyMesh& mesh = _g.geom[_g.side]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
 
     StripTetrahedrons(mesh, v);
     _numStrips++;

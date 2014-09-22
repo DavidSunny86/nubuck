@@ -29,7 +29,7 @@ void Operators::UpdateOperatorPanel() {
     }
     assert(panel);
     g_ui.GetOperatorPanel().Clear();
-    nubuck.ui->SetOperatorPanel(panel);
+    g_nubuck.set_operator_panel(panel);
 }
 
 void Operators::Event_Push(const EV::Event& event) {
@@ -126,7 +126,7 @@ unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module)
     connect(invoker, SIGNAL(SigInvokeOperator(unsigned)), this, SLOT(OnInvokeOperator(unsigned)));
 
     op->SetPanel(panel);
-    op->Register(nubuck, *invoker);
+    op->Register(g_nubuck, *invoker);
 
     OperatorDesc desc;
     desc.id = id;

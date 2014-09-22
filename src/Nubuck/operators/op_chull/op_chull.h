@@ -15,8 +15,6 @@ public:
 class ConvexHull : public Operator {
 private:
     typedef leda::d3_rat_point point3_t;
-
-    Nubuck _nb;
 public:
     void Register(const Nubuck& nb, Invoker& invoker) override;
     bool Invoke() override;

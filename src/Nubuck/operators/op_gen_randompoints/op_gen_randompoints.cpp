@@ -188,7 +188,7 @@ void RandomPoints::UpdateCloud(Domain::Enum domain, int size, int radius) {
     forall_items(it, L) {
         mesh.set_position(mesh.new_node(), L[it]);
     }
-    _nb.world->GetSelection()->Set(_cloud);
+    nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, _cloud);
 }
 
 void RandomPoints::Event_Update(const EV::Event& event) {
@@ -243,33 +243,31 @@ RandomPoints::RandomPoints()
 }
 
 void RandomPoints::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-
-    QMenu* sceneMenu = _nb.ui->GetSceneMenu();
+    QMenu* sceneMenu = nubuck().scene_menu();
     QAction* action = sceneMenu->addAction("Random Points");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool RandomPoints::Invoke() {
-    _nb.ui->SetOperatorName("Random Points");
+    nubuck().set_operator_name("Random Points");
 
-    _hull = _nb.world->CreateGeometry();
-    _hull->SetSolid(false);
-    _hull->HideOutline();
-    _hull->SetRenderMode(IGeometry::RenderMode::FACES);
-    _cloud = _nb.world->CreateGeometry();
-    _cloud->SetName("point cloud");
-    _cloud->SetRenderMode(IGeometry::RenderMode::NODES);
+    _hull = nubuck().create_geometry();
+    nubuck().set_geometry_solid(_hull, false);
+    nubuck().hide_geometry_outline(_hull);
+    nubuck().set_geometry_render_mode(_hull, Nubuck::RenderMode::FACES);
+    _cloud = nubuck().create_geometry();
+    nubuck().set_geometry_name(_cloud, "point cloud");
+    nubuck().set_geometry_render_mode(_cloud, Nubuck::RenderMode::NODES);
 
-    _cloudCopy = _nb.world->CreateGeometry();
-    _cloudCopy->SetName("point cloud");
-    _cloudCopy->HideOutline();
+    _cloudCopy = nubuck().create_geometry();
+    nubuck().set_geometry_name(_cloudCopy, "point cloud");
+    nubuck().hide_geometry_outline(_cloudCopy);
 
     UpdateHull(_lastDomain, _lastRadius);
     UpdateCloud(Domain::Enum(_lastDomain), _lastSize, _lastRadius);
     _cloudCopy->GetRatPolyMesh() = _cloud->GetRatPolyMesh();
 
-    _nb.world->GetSelection()->Set(_cloud);
+    nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, _cloud);
 
     return true;
 }

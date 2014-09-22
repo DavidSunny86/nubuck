@@ -51,7 +51,6 @@ public:
 
 class NUBUCK_API StandardAlgorithm : public Operator {
 private:
-    Nubuck              _nb;
     GEN::Pointer<Phase> _phase;
     Phase::RunConf      _runConf;
 
@@ -62,7 +61,7 @@ private:
     void Event_Run(const EV::Event& event);
 protected:
     virtual const char* GetName() const = 0;
-    virtual Phase*      Init(const Nubuck& nb) = 0; // return false to decline invocation
+    virtual Phase*      Init() = 0; // return false to decline invocation
 public:
     StandardAlgorithm();
 

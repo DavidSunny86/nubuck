@@ -26,9 +26,7 @@ public:
 
 class SaveGeom : public Operator {
 private:
-    Nubuck _nb;
-
-    IGeometry* _geom;
+    nb::geometry _geom;
 
     void Event_Save(const EV::Event& event);
 public:

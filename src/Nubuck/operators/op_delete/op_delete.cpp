@@ -6,21 +6,19 @@
 namespace OP {
 
 void Delete::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-
-    QAction* action = _nb.ui->GetObjectMenu()->addAction("Delete");
+    QAction* action = nubuck().object_menu()->addAction("Delete");
     action->setShortcut(QKeySequence("D"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool Delete::Invoke() {
-    _nb.ui->SetOperatorName("Delete");
+    nubuck().set_operator_name("Delete");
 
-    std::vector<IGeometry*> geomList = W::world.GetSelection()->GetList();
+    std::vector<nb::geometry> geomList = nubuck().selected_geometry();
     for(unsigned i = 0; i < geomList.size(); ++i) {
-        geomList[i]->Destroy();
+        nubuck().destroy_geometry(geomList[i]);
     }
-	W::world.GetSelection()->Clear();
+    nubuck().clear_selection();
 
     return true;
 }

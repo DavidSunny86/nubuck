@@ -46,8 +46,8 @@ void FlipClip::Event_DistanceChanged(const EV::Event& event) {
 
     float hdist = 0.5f * args.dist;
 
-    _g.geom[Side::FRONT]->SetPosition(M::Vector3(0.0f, 0.0f, hdist));
-    _g.geom[Side::BACK]->SetPosition(M::Vector3(0.0f, 0.0f, -hdist));
+    nubuck().set_geometry_position(_g.geom[Side::FRONT], M::Vector3(0.0f, 0.0f, hdist));
+    nubuck().set_geometry_position(_g.geom[Side::BACK], M::Vector3(0.0f, 0.0f, -hdist));
 }
 
 void FlipClip::Event_RunConfChanged(const EV::Event& event) {
@@ -57,37 +57,34 @@ void FlipClip::Event_RunConfChanged(const EV::Event& event) {
 
 const char* FlipClip::GetName() const { return "Flip & Clip"; }
 
-OP::ALG::Phase* FlipClip::Init(const Nubuck& nb) {
-    _g.nb = nb;
-
+OP::ALG::Phase* FlipClip::Init() {
     // choose first selected geometry as input
-    ISelection* sel = _g.nb.world->GetSelection();
-    std::vector<IGeometry*> geomSel = sel->GetList();
+    std::vector<nb::geometry> geomSel = nubuck().selected_geometry();
     if(geomSel.empty()) {
-        _g.nb.log->printf("ERROR - no input object selected.\n");
+        nubuck().log_printf("ERROR - no input object selected.\n");
         return NULL;
     }
     _g.geom[Side::FRONT] = geomSel[0];
 
-    const unsigned renderAll = IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES;
-    _g.geom[Side::FRONT]->SetRenderMode(renderAll);
-    _g.geom[Side::FRONT]->SetName("Front Hull");
+    const unsigned renderAll = Nubuck::RenderMode::NODES | Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES;
+    nubuck().set_geometry_render_mode(_g.geom[Side::FRONT], renderAll);
+    nubuck().set_geometry_name(_g.geom[Side::FRONT], "Front Hull");
 
-    leda::nb::RatPolyMesh& frontMesh = _g.geom[Side::FRONT]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& frontMesh = nubuck().poly_mesh(_g.geom[Side::FRONT]);
 
     if(0 < frontMesh.number_of_edges()) {
-        _g.nb.log->printf("deleting edges and faces of input mesh.\n");
+        nubuck().log_printf("deleting edges and faces of input mesh.\n");
         frontMesh.del_all_edges();
         frontMesh.del_all_faces(); // this is necessary!
     }
 
     _g.L[Side::FRONT] = frontMesh.all_nodes();
 
-    _g.geom[Side::BACK] = _g.nb.world->CreateGeometry();
-    _g.geom[Side::BACK]->SetRenderMode(renderAll);
-    _g.geom[Side::BACK]->SetName("Back Hull");
+    _g.geom[Side::BACK] = nubuck().create_geometry();
+    nubuck().set_geometry_render_mode(_g.geom[Side::BACK], renderAll);
+    nubuck().set_geometry_name(_g.geom[Side::BACK], "Back Hull");
 
-    leda::nb::RatPolyMesh& backMesh = _g.geom[Side::BACK]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& backMesh = nubuck().poly_mesh(_g.geom[Side::BACK]);
     backMesh = frontMesh;
 
     _g.L[Side::BACK] = backMesh.all_nodes();

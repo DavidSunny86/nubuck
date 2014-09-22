@@ -43,14 +43,14 @@ void LoadGeom::Event_Load(const EV::Event& event) {
     const EV::Params_OP_LoadGeom_Load& args = EV::def_OP_LoadGeom_Load.GetArgs(event);
     const std::string& filename(*args.filename);
 
-    IGeometry* geom = _nb.world->CreateGeometry();
+    nb::geometry geom = nubuck().create_geometry();
     const int renderAll =
-        IGeometry::RenderMode::NODES |
-        IGeometry::RenderMode::EDGES |
-        IGeometry::RenderMode::FACES;
-    geom->SetRenderMode(renderAll);
+        Nubuck::RenderMode::NODES |
+        Nubuck::RenderMode::EDGES |
+        Nubuck::RenderMode::FACES;
+    nubuck().set_geometry_render_mode(geom, renderAll);
     W::LoadGeometryFromFile(filename, geom);
-    geom->GetRatPolyMesh().compute_faces();
+    nubuck().poly_mesh(geom).compute_faces();
 
     delete args.filename;
 }
@@ -60,14 +60,12 @@ LoadGeom::LoadGeom() {
 }
 
 void LoadGeom::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-
-    QAction* action = _nb.ui->GetSceneMenu()->addAction("Load .geom file");
+    QAction* action = nubuck().scene_menu()->addAction("Load .geom file");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool LoadGeom::Invoke() {
-    _nb.ui->SetOperatorName("Load (.geom)");
+    nubuck().set_operator_name("Load (.geom)");
     return true;
 }
 

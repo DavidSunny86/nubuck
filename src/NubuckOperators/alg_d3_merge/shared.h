@@ -63,22 +63,20 @@ enum Color {
 };
 
 struct Globals {
-    Nubuck nb;
-
 	leda::edge_map<Color>       edgeColors;
     leda::node_map<Color>       nodeColors;
     leda::node_map<leda::edge>  purpleEdges;
 
     leda::edge activeEdge;
 
-    IGeometry* geom0;
-    IGeometry* geom1;
-    IGeometry* geom; // union of geom0, geom1
+    nb::geometry geom0;
+    nb::geometry geom1;
+    nb::geometry geom; // union of geom0, geom1
 
-    IGeometry* geom_suppEdge;
-    IGeometry* geom_activeEdge0;
-    IGeometry* geom_activeEdge1;
-    IGeometry* geom_activeEdge;
+    nb::geometry geom_suppEdge;
+    nb::geometry geom_activeEdge0;
+    nb::geometry geom_activeEdge1;
+    nb::geometry geom_activeEdge;
 
 	GEN::Pointer<Mantle> mantle;
 
@@ -94,7 +92,7 @@ struct Globals {
 
 extern Globals g;
 
-inline mesh_t& GetG() { return g.geom->GetRatPolyMesh(); }
+inline mesh_t& GetG() { return nubuck().poly_mesh(g.geom); }
 
 void InitPhases();
 void UpdateActiveEdge();

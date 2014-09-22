@@ -46,7 +46,7 @@ namespace ALG {
     }
 
     DWORD Driver::Thread_Func(void) {
-        SetPhase(GEN::MakePtr(_algorithm->Init(nubuck, _G)));
+        SetPhase(GEN::MakePtr(_algorithm->Init(g_nubuck, _G)));
 
         while(true) {
             _cmdsSem.Wait();

@@ -14,17 +14,48 @@
 class QMenu;
 class QWidget;
 
-struct ICommon {
-    virtual ~ICommon(void) { }
+namespace W {
 
-    virtual void printf(const char* format, ...) = 0;
-};
+class ENT_Geometry;
 
-struct IGeometry {
-    virtual void Destroy() = 0;
+} // namespace W
 
-    virtual leda::nb::RatPolyMesh& GetRatPolyMesh() = 0;
+namespace nb {
 
+typedef W::ENT_Geometry* geometry;
+
+} // namespace nb
+
+struct Nubuck {
+    // logfile
+    virtual void log_printf(const char* format, ...) = 0;
+
+    // user interface
+    virtual QMenu*  scene_menu() = 0;
+    virtual QMenu*  object_menu() = 0;
+    virtual QMenu*  algorithm_menu() = 0;
+    virtual QMenu*  vertex_menu() = 0;
+    virtual void    set_operator_name(const char* name) = 0;
+    virtual void    set_operator_panel(QWidget* panel) = 0;
+
+    // world
+    virtual nb::geometry    create_geometry() = 0;
+    virtual void            destroy_geometry(const nb::geometry obj) = 0;
+
+    // selection
+    enum SelectMode {
+        SELECT_MODE_NEW,
+        SELECT_MODE_ADD
+    };
+
+    virtual void                    clear_selection() = 0;
+    virtual void                	select_geometry(SelectMode mode, const nb::geometry obj) = 0;
+    virtual void                	select_vertex(SelectMode, const nb::geometry obj, const leda::node vert) = 0;
+
+    virtual std::vector<nb::geometry>   selected_geometry() = 0;
+    virtual M::Vector3                  global_center_of_selection() = 0;
+
+    // geometry
     struct RenderMode {
         enum Flags {
             FACES    = (1 << 0),
@@ -44,99 +75,30 @@ struct IGeometry {
         };
     };
 
-    virtual const std::string& GetName() const = 0;
+    virtual const std::string&  geometry_name(const nb::geometry obj) = 0;
+    virtual M::Vector3          geometry_position(const nb::geometry obj) = 0;
 
-    virtual M::Vector3 GetPosition() const = 0;
+    virtual leda::nb::RatPolyMesh& poly_mesh(const nb::geometry obj) = 0;
 
-    virtual void SetName(const std::string& name) = 0;
+    virtual void                set_geometry_name(const nb::geometry obj, const std::string& name) = 0;
 
-    virtual void ApplyTransformation() = 0;
+    virtual void                apply_geometry_transformation(const nb::geometry obj) = 0;
 
-    virtual void SetPosition(const M::Vector3& position) = 0;
-    virtual void SetScale(const M::Vector3& scale) = 0;
+    virtual void                set_geometry_position(const nb::geometry obj, const M::Vector3& position) = 0;
+    virtual void                set_geometry_scale(const nb::geometry obj, const M::Vector3& scale) = 0;
 
-    virtual void HideOutline() = 0;
+    virtual void                hide_geometry_outline(const nb::geometry obj) = 0;
 
-    virtual void Hide() = 0;
-    virtual void Show() = 0;
+    virtual void                hide_geometry(const nb::geometry obj) = 0;
+    virtual void                show_geometry(const nb::geometry obj) = 0;
 
-    virtual void SetSolid(bool solid) = 0;
-    virtual void SetRenderMode(int flags) = 0;
-    virtual void SetRenderLayer(unsigned layer) = 0;
-    virtual void SetShadingMode(ShadingMode::Enum mode) = 0;
+    virtual void                set_geometry_solid(const nb::geometry obj, bool solid) = 0;
+    virtual void                set_geometry_render_mode(const nb::geometry obj, int flags) = 0;
+    virtual void                set_geometry_render_layer(const nb::geometry obj, unsigned layer) = 0;
+    virtual void                set_geometry_shading_mode(const nb::geometry obj, ShadingMode::Enum mode) = 0;
 };
 
-struct ISelection {
-    enum SelectMode {
-        SELECT_NEW = 0,
-        SELECT_ADD
-    };
-
-    virtual ~ISelection() { }
-
-    virtual void Set(IGeometry* geom) = 0;
-    virtual void Add(IGeometry* geom) = 0;
-    virtual void Clear() = 0;
-
-    virtual M::Vector3 GetGlobalCenter() = 0;
-    virtual std::vector<IGeometry*> GetList() const = 0;
-
-    virtual void SelectVertex(SelectMode mode, IGeometry* geom, leda::node vert) = 0;
-};
-
-struct IWorld {
-    struct PlaneDesc {
-        struct Sample2 { float x, y; };
-        typedef float (*heightFunc_t)(float x, float y);
-
-        heightFunc_t    heightFunc;
-        bool            flip;
-        float           size;
-        int             subdiv;
-        Sample2*        addSamples;
-        unsigned        numAddSamples;
-    };
-
-    struct SphereDesc {
-        int     numSubdiv;
-        bool    smooth;
-    };
-
-    struct CylinderDesc {
-        float       radius;
-        float   	height;
-        unsigned    numSlices;
-        bool        caps;
-    };
-
-    virtual ISelection* GetSelection() = 0;
-
-    virtual IGeometry* CreateGeometry() = 0;
-};
-
-struct ILog {
-    virtual ~ILog(void) { }
-
-    virtual void printf(const char* format, ...) = 0;
-};
-
-struct IMainWindow {
-    virtual ~IMainWindow() { }
-
-    virtual QMenu* GetSceneMenu() = 0;
-    virtual QMenu* GetObjectMenu() = 0;
-    virtual QMenu* GetAlgorithmMenu() = 0;
-    virtual QMenu* GetVertexMenu() = 0;
-    virtual void SetOperatorName(const char* name) = 0;
-    virtual void SetOperatorPanel(QWidget* panel) = 0;
-};
-
-struct Nubuck {
-    ICommon*        common;
-    IWorld*     	world;
-    ILog*           log;
-    IMainWindow*    ui;
-};
+NUBUCK_API Nubuck& nubuck();
 
 struct IPhase {
     enum StepRet {

@@ -10,17 +10,15 @@
 namespace OP {
 
 void Join::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-
-    QAction* action = _nb.ui->GetObjectMenu()->addAction("Join");
+    QAction* action = nubuck().object_menu()->addAction("Join");
     action->setShortcut(QKeySequence("J"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool Join::Invoke() {
-    _nb.ui->SetOperatorName("Join");
+    nubuck().set_operator_name("Join");
 
-	std::vector<IGeometry*> geomList = W::world.GetSelection()->GetList();
+    std::vector<nb::geometry> geomList = nubuck().selected_geometry();
     if(geomList.size() < 2) return true; // nothing to join
 
     W::ENT_Geometry* geom0 = (W::ENT_Geometry*)geomList[0];
@@ -34,7 +32,7 @@ bool Join::Invoke() {
         geom->Destroy();
     }
 
-	_nb.world->GetSelection()->Set(geom0);
+    nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, geom0);
 
     printf(">>>>>>>>>> OP::Join finished\n");
 

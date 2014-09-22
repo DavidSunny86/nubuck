@@ -38,7 +38,7 @@ private:
 public:
     Phase_Flip(Globals& g)
         : _g(g)
-        , _S(g.delaunay->GetRatPolyMesh())
+        , _S(nubuck().poly_mesh(g.delaunay))
         , _stepMode(StepMode::SEARCH)
     { }
 

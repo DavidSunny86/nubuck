@@ -14,7 +14,7 @@ MoveVertexAnimation::MoveVertexAnimation()
     , _time(0.0f)
 { }
 
-void MoveVertexAnimation::Init(IGeometry* subject, leda::node vert, const point3_t& position, float duration) {
+void MoveVertexAnimation::Init(const nb::geometry subject, leda::node vert, const point3_t& position, float duration) {
     _subject = subject;
     _vert = vert;
     _duration = duration;
@@ -42,7 +42,7 @@ void MoveVertexAnimation::DoMove(float secsPassed) {
     geom->Rebuild();
 }
 
-NUBUCK_API void SetVertexPosition(IGeometry* subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration) {
+NUBUCK_API void SetVertexPosition(const nb::geometry subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration) {
     MoveVertexAnimation anim;
     anim.Init(subject, vertex, position, duration);
     anim.PlayFor(duration);

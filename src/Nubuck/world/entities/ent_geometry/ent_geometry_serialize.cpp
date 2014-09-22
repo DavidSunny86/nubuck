@@ -31,7 +31,7 @@ std::string ReadString(std::ifstream& file) {
 
 namespace W {
 
-void SaveGeometryToFile(const std::string& filename, IGeometry* geom)
+void SaveGeometryToFile(const std::string& filename, ENT_Geometry* geom)
 {
     std::ofstream file(filename.c_str());
     WriteString(file, geom->GetName());
@@ -40,7 +40,7 @@ void SaveGeometryToFile(const std::string& filename, IGeometry* geom)
     file.close();
 }
 
-void LoadGeometryFromFile(const std::string& filename, IGeometry* geom)
+void LoadGeometryFromFile(const std::string& filename, ENT_Geometry* geom)
 {
     std::ifstream file(filename.c_str());
     geom->SetName(ReadString(file));

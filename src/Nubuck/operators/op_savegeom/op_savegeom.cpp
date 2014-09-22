@@ -58,19 +58,16 @@ SaveGeom::SaveGeom() {
 }
 
 void SaveGeom::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-
-    QAction* action = _nb.ui->GetObjectMenu()->addAction("Save as .geom file");
+    QAction* action = nubuck().object_menu()->addAction("Save as .geom file");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool SaveGeom::Invoke() {
-    _nb.ui->SetOperatorName("Save (.geom)");
+    nubuck().set_operator_name("Save (.geom)");
 
-    ISelection* sel = _nb.world->GetSelection();
-    std::vector<IGeometry*> geomSel = sel->GetList();
+    std::vector<nb::geometry> geomSel = nubuck().selected_geometry();
     if(geomSel.empty()) {
-        _nb.log->printf("no geometry selected.\n");
+        nubuck().log_printf("no geometry selected.\n");
         return false;
     }
 

@@ -4,9 +4,8 @@
 #include <LEDA\geo\d3_rat_point.h>
 
 #include <Nubuck\nubuck_api.h>
+#include <Nubuck\nubuck.h>
 #include <Nubuck\animation\animation.h>
-
-struct IGeometry;
 
 namespace A {
 
@@ -14,7 +13,7 @@ class NUBUCK_API MoveVertexAnimation : public Animation {
 private:
     typedef leda::d3_rat_point point3_t;
 
-    IGeometry* _subject;
+    W::ENT_Geometry* _subject;
 
     leda::node  _vert;
     point3_t    _p0, _p1;
@@ -26,11 +25,11 @@ protected:
 public:
     MoveVertexAnimation();
 
-    void Init(IGeometry* subject, leda::node vertex, const point3_t& position, float duration);
+    void Init(const nb::geometry subject, leda::node vertex, const point3_t& position, float duration);
 };
 
 // supplementary convenience function
 
-NUBUCK_API void SetVertexPosition(IGeometry* subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration);
+NUBUCK_API void SetVertexPosition(const nb::geometry subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration);
 
 } // namespace A

@@ -63,9 +63,9 @@ void DeleteLooseNodes(leda::nb::RatPolyMesh& G) {
 Phase_Simplify::Phase_Simplify(Globals& g) : _g(g) { }
 
 void Phase_Simplify::Enter() {
-    _g.nb.log->printf("entering phase 'simplify'\n");
+    nubuck().log_printf("entering phase 'simplify'\n");
 
-    leda::nb::RatPolyMesh& mesh = _g.geom[Side::FRONT]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[Side::FRONT]);
 
     _deg.init(mesh, 0);
     leda::node v;
@@ -93,9 +93,9 @@ void Phase_Simplify::Enter() {
 }
 
 Phase_Simplify::StepRet::Enum Phase_Simplify::Step() {
-    leda::nb::RatPolyMesh& mesh = _g.geom[Side::FRONT]->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[Side::FRONT]);
 
-    _g.nb.log->printf("removing %d collinear edges.\n", _L.size());
+    nubuck().log_printf("removing %d collinear edges.\n", _L.size());
 
     leda::node v, w;
     leda::edge r, e;
@@ -112,15 +112,15 @@ Phase_Simplify::StepRet::Enum Phase_Simplify::Step() {
 
     mesh.compute_faces();
 
-    _g.nb.log->printf("CHECK_HULL: ... ");
+    nubuck().log_printf("CHECK_HULL: ... ");
     bool isConvex = leda::CHECK_HULL(mesh);
-    _g.nb.log->printf(isConvex ? "true" : "false");
-    _g.nb.log->printf("\n");
+    nubuck().log_printf(isConvex ? "true" : "false");
+    nubuck().log_printf("\n");
 
-    _g.nb.log->printf("convex hull:\n");
-    _g.nb.log->printf("... |V| = %d\n", mesh.number_of_nodes());
-    _g.nb.log->printf("... |E| = %d\n", mesh.number_of_edges());
-    _g.nb.log->printf("... |F| = %d\n", mesh.number_of_faces());
+    nubuck().log_printf("convex hull:\n");
+    nubuck().log_printf("... |V| = %d\n", mesh.number_of_nodes());
+    nubuck().log_printf("... |E| = %d\n", mesh.number_of_edges());
+    nubuck().log_printf("... |F| = %d\n", mesh.number_of_faces());
 
     return StepRet::DONE;
 }

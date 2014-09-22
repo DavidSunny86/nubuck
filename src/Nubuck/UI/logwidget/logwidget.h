@@ -10,7 +10,7 @@
 
 namespace UI {
 
-    class LogWidget : public QWidget, public ILog {
+    class LogWidget : public QWidget {
         Q_OBJECT
     private:
         Ui::LogWidget   _ui;
@@ -34,7 +34,7 @@ namespace UI {
 
         void sys_printf(const char* format, ...);
 
-        void printf(const char* format, ...) override;
+        void printf(const char* format, ...);
     };
 
 } // namespace UI

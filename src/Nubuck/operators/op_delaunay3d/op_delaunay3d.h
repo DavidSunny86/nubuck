@@ -31,10 +31,8 @@ private:
         leda::rat_vector    localPos[4];
         leda::rat_vector    center;
     };
-    IGeometry*              geom;
+    nb::geometry              geom;
     std::vector<Simplex> _simplices;
-
-    Nubuck  _nb;
 
     void Event_SetScale(const EV::Event& event);
 public:

@@ -62,7 +62,7 @@ void Delaunay3D::Event_SetScale(const EV::Event& event) {
         leda::rational scale = 1 + 5 * args.value;
         leda::rat_vector center = scale * simplex.center;
 
-        leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+        leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
         for(int i = 0; i < 4; ++i) {
             // NOTE: carrying out this addition with rat_vectors yields NaNs when converted to float.
             // i have absolutely NO IDEA why. maybe corrupted leda install?
@@ -77,9 +77,7 @@ Delaunay3D::Delaunay3D() {
 }
 
 void Delaunay3D::Register(const Nubuck& nb, Invoker& invoker) {
-    _nb = nb;
-
-    QAction* action = _nb.ui->GetObjectMenu()->addAction("Delaunay 3D");
+    QAction* action = nubuck().object_menu()->addAction("Delaunay 3D");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
@@ -106,17 +104,17 @@ bool Delaunay3D::Invoke() {
 
     _simplices.clear();
 
-    std::vector<IGeometry*> geomSel = _nb.world->GetSelection()->GetList();
+    std::vector<nb::geometry> geomSel = nubuck().selected_geometry();
     if(geomSel.empty()) {
-        _nb.log->printf("no geometry selected.\n");
+        nubuck().log_printf("no geometry selected.\n");
         return false;
     }
 
-    _nb.ui->SetOperatorName("Delaunay 3D");
+    nubuck().set_operator_name("Delaunay 3D");
 
-    IGeometry* cloud = geomSel.front();
+    nb::geometry cloud = geomSel.front();
 
-    leda::nb::RatPolyMesh& cloudMesh = cloud->GetRatPolyMesh();
+    leda::nb::RatPolyMesh& cloudMesh = nubuck().poly_mesh(cloud);
     leda::list<point3_t> L;
     leda::node v;
     forall_nodes(v, cloudMesh) L.push_back(cloudMesh.position_of(v));
@@ -128,9 +126,9 @@ bool Delaunay3D::Invoke() {
     leda::fork::D3_DELAUNAY(L, S);
     std::cout << "DONE" << std::endl;
 
-    geom = _nb.world->CreateGeometry();
-    geom->SetRenderMode(IGeometry::RenderMode::NODES | IGeometry::RenderMode::EDGES | IGeometry::RenderMode::FACES);
-    leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+    geom = nubuck().create_geometry();
+    nubuck().set_geometry_render_mode(geom, Nubuck::RenderMode::NODES | Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES);
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
 
     std::cout << "Delaunay3D: creating simplex geometries ... " << std::flush;
     leda::list_item it;
@@ -156,8 +154,8 @@ bool Delaunay3D::Invoke() {
     mesh.make_map();
     mesh.compute_faces();
 
-    cloud->Destroy();
-    _nb.world->GetSelection()->Clear();
+    nubuck().destroy_geometry(cloud);
+    nubuck().clear_selection();
 
     std::cout << "DONE" << std::endl;
 

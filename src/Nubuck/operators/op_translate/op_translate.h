@@ -39,8 +39,6 @@ private:
         };
     };
 
-    Nubuck _nb;
-
     TransformMode::Enum _mode;
 
     R::meshPtr_t    _axisMesh;

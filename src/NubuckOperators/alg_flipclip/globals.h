@@ -20,10 +20,9 @@ struct Side {
 
 // encapsulates data shared among all phases
 struct Globals {
-    Nubuck                  nb;
     leda::list<leda::node>  L[2];
     Side::Enum              side;
-    IGeometry*              geom[2];
+    nb::geometry            geom[2];
     leda::edge              hullEdges[2];
     leda::node              stitchVerts[2];
 

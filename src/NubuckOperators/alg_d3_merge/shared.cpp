@@ -17,11 +17,11 @@ void InitPhases() {
 void UpdateActiveEdge() {
     const mesh_t& G = GetG();
 	if(!g.geom_activeEdge) {
-		g.geom_activeEdge = g.nb.world->CreateGeometry();
-        g.geom_activeEdge->SetName("active edge");
-		g.geom_activeEdge->SetRenderMode(IGeometry::RenderMode::EDGES);
+        g.geom_activeEdge = nubuck().create_geometry();
+        nubuck().set_geometry_name(g.geom_activeEdge, "active edge");
+        nubuck().set_geometry_render_mode(g.geom_activeEdge, Nubuck::RenderMode::EDGES);
 	}
-	mesh_t& mesh = g.geom_activeEdge->GetRatPolyMesh();
+    mesh_t& mesh = nubuck().poly_mesh(g.geom_activeEdge);
 	mesh.clear();
     leda::node v0 = mesh.new_node(), v1 = mesh.new_node();
 	mesh.set_position(v0, G.position_of(G.source(g.activeEdge)));
