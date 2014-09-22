@@ -27,12 +27,13 @@ static bool IsOperatorFilename(const std::basic_string<TCHAR>& filename) {
 
 void LoadOperators(void) {
     const std::string baseDir = common.BaseDir();
-    std::basic_string<TCHAR> filename = std::basic_string<TCHAR>(baseDir.begin(), baseDir.end())  + TEXT("Operators\\*");
+    const std::basic_string<TCHAR> basePath = std::basic_string<TCHAR>(baseDir.begin(), baseDir.end())  + TEXT("Operators\\");
+    std::basic_string<TCHAR> searchPath = basePath + TEXT("*");
     WIN32_FIND_DATA ffd;
-    HANDLE ff = FindFirstFile(filename.c_str(), &ffd);
+    HANDLE ff = FindFirstFile(searchPath.c_str(), &ffd);
     if(INVALID_HANDLE_VALUE == ff) {
         if(ERROR_FILE_NOT_FOUND == GetLastError()) {
-            common.printf("WARNING - directory %s does not exist.\n", filename.c_str());
+            common.printf("WARNING - directory %s does not exist.\n", searchPath.c_str());
         } else {
             common.printf("ERROR - LoadOperators: FindFirstFile failed.\n");
             Crash();
@@ -42,7 +43,8 @@ void LoadOperators(void) {
         if(IsOperatorFilename(ffd.cFileName)) {
             std_tcout << TEXT("found operator ") << ffd.cFileName << std::endl;
 
-            HMODULE lib = LoadLibrary(ffd.cFileName);
+            const std::basic_string<TCHAR> filename = basePath + ffd.cFileName;
+            HMODULE lib = LoadLibrary(filename.c_str());
             if(!lib) {
                 std_tcout << TEXT("ERROR: unable to load ") << ffd.cFileName << std::endl;
 			}
