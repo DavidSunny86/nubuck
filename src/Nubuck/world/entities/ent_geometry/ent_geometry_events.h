@@ -24,7 +24,7 @@ BEGIN_EVENT_DEF(ENT_Geometry_RenderModeChanged)
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(ENT_Geometry_EdgeShadingChanged)
-    Nubuck::ShadingMode::Enum    shadingMode;
-    bool                            showHiddenLines;
+    int     shadingMode; // in Nubuck::ShadingMode
+    bool    showHiddenLines;
 END_EVENT_DEF
 

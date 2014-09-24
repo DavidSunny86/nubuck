@@ -199,7 +199,7 @@ void ENT_Geometry::Event_RenderModeChanged(const EV::Event& event) {
 void ENT_Geometry::Event_EdgeShadingChanged(const EV::Event& event) {
     const EV::Params_ENT_Geometry_EdgeShadingChanged& args = EV::def_ENT_Geometry_EdgeShadingChanged.GetArgs(event);
     _stylizedHiddenLines = args.showHiddenLines;
-    SetShadingMode(args.shadingMode);
+    SetShadingMode(Nubuck::ShadingMode::Enum(args.shadingMode));
 }
 
 ENT_Geometry::ENT_Geometry()

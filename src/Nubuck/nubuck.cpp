@@ -103,7 +103,8 @@ void NubuckImpl::select_geometry(SelectMode mode, const nb::geometry obj) {
 }
 
 void NubuckImpl::select_vertex(SelectMode mode, const nb::geometry obj, const leda::node vert) {
-    W::world.GetSelection()->SelectVertex(mode, obj, vert);
+    if(SELECT_MODE_NEW == mode) W::world.GetSelection()->SelectVertex_New(obj, vert);
+    else W::world.GetSelection()->SelectVertex_Add(obj, vert);
 }
 
 std::vector<nb::geometry> NubuckImpl::selected_geometry() {

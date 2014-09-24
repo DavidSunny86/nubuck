@@ -151,10 +151,17 @@ std::vector<ENT_Geometry*> World::Selection::GetList() const {
     return geomList;
 }
 
-void World::Selection::SelectVertex(Nubuck::SelectMode mode, ENT_Geometry* geom, leda::node vert) {
+void World::Selection::SelectVertex_New(ENT_Geometry* geom, leda::node vert) {
     SYS::ScopedLock lock(_mtx);
     W::ENT_Geometry* ent = (W::ENT_Geometry*)geom;
-    if(Nubuck::SELECT_MODE_NEW == mode) ent->ClearVertexSelection();
+    ent->ClearVertexSelection();
+    ent->Select(vert);
+    SignalChange();
+}
+
+void World::Selection::SelectVertex_Add(ENT_Geometry* geom, leda::node vert) {
+    SYS::ScopedLock lock(_mtx);
+    W::ENT_Geometry* ent = (W::ENT_Geometry*)geom;
     ent->Select(vert);
     SignalChange();
 }

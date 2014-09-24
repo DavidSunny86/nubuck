@@ -5,7 +5,6 @@
 #include <vector>
 #include <queue>
 
-#include <Nubuck\nubuck.h>
 #include <Nubuck\generic\pointer.h>
 #include <system\timer\timer.h>
 #include <system\thread\thread.h>
@@ -56,7 +55,8 @@ namespace W {
             M::Vector3 GetGlobalCenter();
             std::vector<ENT_Geometry*> GetList() const;
 
-            void SelectVertex(Nubuck::SelectMode mode, ENT_Geometry* geom, leda::node vert);
+            void SelectVertex_New(ENT_Geometry* geom, leda::node vert);
+            void SelectVertex_Add(ENT_Geometry* geom, leda::node vert);
         } _selection;
 
         std::vector<GEN::Pointer<Entity> > _entities;
