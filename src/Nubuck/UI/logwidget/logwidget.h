@@ -4,7 +4,6 @@
 #include <vector>
 
 #include <QWidget>
-#include <Nubuck\nubuck.h>
 #include <Nubuck\system\locks\spinlock.h>
 #include "ui_logwidget.h"
 
