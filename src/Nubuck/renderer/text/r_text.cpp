@@ -19,7 +19,11 @@ void Text::DestroyMesh() {
     }
 }
 
-Text::Text() { }
+Text::Text() : _size(M::Vector2::Zero) { }
+
+const M::Vector2& Text::GetSize() const {
+    return _size;
+}
 
 static void ComputeTextureCoordinates(
     const int texWidth,
@@ -145,6 +149,9 @@ void Text::Rebuild(
             vert.color = color;
 
             pageMesh.vertices.push_back(vert);
+
+            _size.x = M::Max(_size.x, vert.position.x);
+            _size.y = M::Max(_size.y, -vert.position.y);
         }
 
         cursor.x += scale * scaleW * texChar.xadvance;
@@ -172,9 +179,11 @@ void Text::Rebuild(
     }
 }
 
-void Text::GetRenderJobs(RenderList& renderList) {
+void Text::GetRenderJobs(const M::Matrix4& transform, RenderList& renderList) {
     for(unsigned i = 0; i < _pageMeshes.size(); ++i) {
         PageMesh& pageMesh = _pageMeshes[i];
+
+        meshMgr.GetMesh(pageMesh.tfmesh).SetTransform(transform);
 
         if(!pageMesh.texture) {
             pageMesh.texture = TextureManager::Instance().Get(pageMesh.texFilename).Raw();

@@ -14,15 +14,23 @@
 class QMenu;
 class QWidget;
 
+namespace M {
+
+struct Vector2;
+
+} // namespace M
+
 namespace W {
 
 class ENT_Geometry;
+class ENT_Text;
 
 } // namespace W
 
 namespace nb {
 
-typedef W::ENT_Geometry* geometry;
+typedef W::ENT_Geometry*    geometry;
+typedef W::ENT_Text*        text;
 
 } // namespace nb
 
@@ -41,6 +49,7 @@ struct Nubuck {
     // world
     virtual nb::geometry    create_geometry() = 0;
     virtual void            destroy_geometry(const nb::geometry obj) = 0;
+    virtual nb::text        create_text() = 0;
 
     // selection
     enum SelectMode {
@@ -96,6 +105,12 @@ struct Nubuck {
     virtual void                set_geometry_render_mode(const nb::geometry obj, int flags) = 0;
     virtual void                set_geometry_render_layer(const nb::geometry obj, unsigned layer) = 0;
     virtual void                set_geometry_shading_mode(const nb::geometry obj, ShadingMode::Enum mode) = 0;
+
+    // text
+    virtual const M::Vector2&   text_content_size(const nb::text obj) const = 0;
+
+    virtual void                set_text_position(const nb::text obj, const M::Vector3& pos) = 0;
+    virtual void                set_text_content(const nb::text obj, const std::string& content) = 0;
 };
 
 NUBUCK_API Nubuck& nubuck();

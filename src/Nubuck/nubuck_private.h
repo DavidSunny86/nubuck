@@ -21,6 +21,7 @@ struct NubuckImpl : Nubuck {
     // world
     nb::geometry    create_geometry();
     void            destroy_geometry(const nb::geometry obj);
+    nb::text        create_text();
 
     void                    clear_selection();
     void                	select_geometry(SelectMode mode, const nb::geometry obj);
@@ -51,6 +52,12 @@ struct NubuckImpl : Nubuck {
     void                set_geometry_render_mode(const nb::geometry obj, int flags);
     void                set_geometry_render_layer(const nb::geometry obj, unsigned layer);
     void                set_geometry_shading_mode(const nb::geometry obj, ShadingMode::Enum mode);
+
+    // text
+    const M::Vector2&   text_content_size(const nb::text obj) const;
+
+    void                set_text_position(const nb::text obj, const M::Vector3& position);
+    void                set_text_content(const nb::text obj, const std::string& content);
 };
 
 extern NubuckImpl g_nubuck;

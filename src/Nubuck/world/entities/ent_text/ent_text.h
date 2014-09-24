@@ -6,6 +6,7 @@
 
 namespace W {
 
+// NOTE on terminology: the displayed text is also called 'content'
 class ENT_Text : public Entity {
 private:
     UI::Outliner::itemHandle_t _outlinerItem;
@@ -15,6 +16,10 @@ public:
     ENT_Text();
 
     UI::OutlinerView* CreateOutlinerView() override;
+
+    const M::Vector2& GetContentSize() const;
+
+    void SetContent(const std::string& content);
 
     void GetRenderJobs(R::RenderList& renderList);
 };

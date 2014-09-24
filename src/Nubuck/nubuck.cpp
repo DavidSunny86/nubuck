@@ -9,6 +9,7 @@
 #include <common\config\config.h>
 #include <common\commands.h>
 #include <world\world.h>
+#include <world\entities\ent_text\ent_text.h>
 #include <renderer\effects\effect.h>
 #include <renderer\effects\statedesc_gen\statedesc_gen.h>
 #include <algdriver\algdriver.h>
@@ -83,6 +84,10 @@ nb::geometry NubuckImpl::create_geometry() {
 
 void NubuckImpl::destroy_geometry(const nb::geometry obj) {
     obj->Destroy();
+}
+
+nb::text NubuckImpl::create_text() {
+    return W::world.CreateText();
 }
 
 void NubuckImpl::clear_selection() {
@@ -163,6 +168,18 @@ void NubuckImpl::set_geometry_render_layer(const nb::geometry obj, unsigned laye
 
 void NubuckImpl::set_geometry_shading_mode(const nb::geometry obj, ShadingMode::Enum mode) {
     obj->SetShadingMode(mode);
+}
+
+const M::Vector2& NubuckImpl::text_content_size(const nb::text obj) const {
+    return obj->GetContentSize();
+}
+
+void NubuckImpl::set_text_position(const nb::text obj, const M::Vector3& position) {
+    obj->SetPosition(position);
+}
+
+void NubuckImpl::set_text_content(const nb::text obj, const std::string& content) {
+    obj->SetContent(content);
 }
 
 NubuckImpl g_nubuck;

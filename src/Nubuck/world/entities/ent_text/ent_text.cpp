@@ -26,8 +26,19 @@ UI::OutlinerView* ENT_Text::CreateOutlinerView() {
     return new ENT_TextOutln();
 }
 
+const M::Vector2& ENT_Text::GetContentSize() const {
+    return _text.GetSize();
+}
+
+void ENT_Text::SetContent(const std::string& content) {
+    const std::string filename = common.BaseDir() + "Textures\\Fonts\\consola.ttf_sdf.txt";
+    const R::TexFont& texFont = R::FindTexFont(R::TF_Type::SDFont, filename);
+
+    _text.Rebuild(texFont, content);
+}
+
 void ENT_Text::GetRenderJobs(R::RenderList& renderList) {
-    _text.GetRenderJobs(renderList);
+    _text.GetRenderJobs(GetObjectToWorldMatrix(), renderList);
 }
 
 } // namespace W

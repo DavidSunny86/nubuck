@@ -27,15 +27,19 @@ private:
     };
     std::vector<PageMesh> _pageMeshes;
 
+    M::Vector2 _size; // computed size of oob
+
     void DestroyMesh();
 public:
     Text();
+
+    const M::Vector2& GetSize() const;
 
     void Rebuild(
         const TexFont& texFont,
         const std::string& text,
         const Color& color = Color::Black);
-    void GetRenderJobs(RenderList& renderList);
+    void GetRenderJobs(const M::Matrix4& transform, RenderList& renderList);
 };
 
 } // namespace R
