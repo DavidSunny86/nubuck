@@ -2,6 +2,9 @@
 
 #include <vector>
 
+#include <LEDA\graph\graph.h>
+
+#include <Nubuck\polymesh_fwd.h>
 #include <Nubuck\renderer\color\color.h>
 #include <Nubuck\math\vector3.h>
 #include <Nubuck\math\matrix4.h>

@@ -5,6 +5,7 @@
 
 #include <LEDA\geo\d3_hull.h>
 
+#include <Nubuck\nubuck.h>
 #include <Nubuck\polymesh.h>
 #include <Nubuck\operators\operator_invoker.h>
 #include <operators\op_gen_merge\op_gen_merge.h>

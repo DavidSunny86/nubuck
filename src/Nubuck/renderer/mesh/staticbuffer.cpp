@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <renderer\metrics\metrics.h>
 #include "../glcall.h"
 #include "staticbuffer.h"

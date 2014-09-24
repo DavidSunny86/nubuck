@@ -1,8 +1,11 @@
+#include <iostream>
+
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QAction>
 #include <QMenu>
 
+#include <Nubuck\nubuck.h>
 #include <Nubuck\operators\operator_invoker.h>
 #include <Nubuck\operators\standard_algorithm.h>
 #include <operators\operators.h>

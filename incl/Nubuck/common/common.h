@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string>
 
-#include <Nubuck\nubuck.h>
+#include <Nubuck\nubuck_api.h>
 
 #define COM_assert(expr) \
     do { \

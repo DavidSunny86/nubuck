@@ -1,3 +1,5 @@
+#include <maxint.h>
+
 #include <QLabel>
 #include <QPushButton>
 #include <QDoubleSpinBox>

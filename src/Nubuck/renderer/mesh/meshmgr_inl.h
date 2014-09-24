@@ -1,5 +1,7 @@
 #pragma once
 
+#include <assert.h>
+
 #include <Nubuck\system\locks\scoped_lock.h>
 #include "meshmgr.h"
 

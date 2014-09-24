@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <Nubuck\common\common.h>
 #include <renderer\effects\statedesc.h>
 #include "nfx_local.h"
