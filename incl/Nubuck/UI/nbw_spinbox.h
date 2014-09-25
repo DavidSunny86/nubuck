@@ -1,13 +1,18 @@
 #pragma once
 
+// when specifiying QDESIGNER_WIDGET_EXPORT and NUBUCK_API (or Q_DECL_EXPORT) for
+// the same class, no moc file is generated for that class by automoc.
+
 #ifdef NUBUCK_BUILD_DESIGNER_PLUGIN
 #include <QDesignerExportWidget>
+#define NUBUCK_WIDGET QDESIGNER_WIDGET_EXPORT
 #else
-#define QDESIGNER_WIDGET_EXPORT /* ... */
+#define NUBUCK_WIDGET NUBUCK_API
 #endif
 
 #include <QFrame>
 #include <LEDA\numbers\rational.h>
+#include <Nubuck\nubuck_api.h>
 
 class NBW_SpinBoxControls;
 
@@ -17,7 +22,7 @@ class NBW_SpinBoxControls;
 // derive custom widgets from QFrame to make the stylesheet work.
 // method proposed in http://stackoverflow.com/questions/7276330/qt-stylesheet-for-custom-widget
 // doesn't work when custom widget defines Q_OBJECT
-class QDESIGNER_WIDGET_EXPORT NBW_SpinBox : public QFrame {
+class NUBUCK_WIDGET NBW_SpinBox : public QFrame {
     Q_OBJECT
 
     Q_PROPERTY(QString text READ text WRITE setText)

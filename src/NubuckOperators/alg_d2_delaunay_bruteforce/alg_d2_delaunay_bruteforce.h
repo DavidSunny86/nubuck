@@ -7,6 +7,8 @@
 #include <Nubuck\operators\standard_algorithm.h>
 #include "globals.h"
 
+class NBW_SpinBox;
+
 BEGIN_EVENT_DEF_CS(ToggleParaboloid)
 END_EVENT_DEF_CS
 
@@ -20,13 +22,13 @@ END_EVENT_DEF_CS
 class D2_Delaunay_BruteForce_Panel : public OP::ALG::StandardAlgorithmPanel {
     Q_OBJECT
 private:
-    QCheckBox*  _btnToggleParaboloid;
-    QCheckBox*  _btnToggleConvexHull;
-    QSlider*    _sldConvexHullScale;
+    QCheckBox*      _btnToggleParaboloid;
+    QCheckBox*  	_btnToggleConvexHull;
+    NBW_SpinBox*    _sbConvexHullScale;
 private slots:
     void OnToggleParaboloid();
     void OnToggleConvexHull();
-    void OnConvexHullScaleChanged(int value);
+    void OnConvexHullScaleChanged(leda::rational value);
 public:
     D2_Delaunay_BruteForce_Panel();
 

@@ -4,6 +4,7 @@
 
 #include <LEDA\geo\d3_hull.h>
 #include <Nubuck\polymesh.h>
+#include <Nubuck\UI\nbw_spinbox.h>
 #include "alg_d2_delaunay_bruteforce.h"
 #include "phase0.h"
 
@@ -19,8 +20,8 @@ void D2_Delaunay_BruteForce_Panel::OnToggleConvexHull() {
     OP::SendToOperator(def_ToggleConvexHull.Create(Params_ToggleConvexHull()));
 }
 
-void D2_Delaunay_BruteForce_Panel::OnConvexHullScaleChanged(int) {
-    float scale = static_cast<float>(_sldConvexHullScale->value()) / _sldConvexHullScale->maximum();
+void D2_Delaunay_BruteForce_Panel::OnConvexHullScaleChanged(leda::rational) {
+    float scale = _sbConvexHullScale->value().to_float() / _sbConvexHullScale->maximum().to_float();
 
     Params_SetConvexHullScale args;
     args.scale = scale;
@@ -42,14 +43,16 @@ D2_Delaunay_BruteForce_Panel::D2_Delaunay_BruteForce_Panel() {
 
     row0->addWidget(_btnToggleConvexHull);
 
-    _sldConvexHullScale = new QSlider(Qt::Horizontal);
-    _sldConvexHullScale->setMaximum(1000);
-    _sldConvexHullScale->setMinimum(1);
-    _sldConvexHullScale->setValue(1000);
-    connect(_sldConvexHullScale, SIGNAL(valueChanged(int)), this, SLOT(OnConvexHullScaleChanged(int)));
+    _sbConvexHullScale = new NBW_SpinBox;
+    _sbConvexHullScale->setText("z-scale: ");
+    _sbConvexHullScale->showProgressBar(true);
+    _sbConvexHullScale->setMaximum(1000);
+    _sbConvexHullScale->setMinimum(1);
+    _sbConvexHullScale->setValue(1000);
+    _sbConvexHullScale->setSingleStep(10);
+    connect(_sbConvexHullScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnConvexHullScaleChanged(leda::rational)));
 
-    row1->addWidget(new QLabel("z-scale:"));
-    row1->addWidget(_sldConvexHullScale);
+    row1->addWidget(_sbConvexHullScale);
 
     vboxLayout->addLayout(row0);
     vboxLayout->addLayout(row1);
@@ -64,9 +67,9 @@ void D2_Delaunay_BruteForce_Panel::Invoke() {
     _btnToggleParaboloid->setChecked(false);
     _btnToggleConvexHull->setChecked(false);
 
-    _sldConvexHullScale->blockSignals(true);
-    _sldConvexHullScale->setValue(1000);
-    _sldConvexHullScale->blockSignals(false);
+    _sbConvexHullScale->blockSignals(true);
+    _sbConvexHullScale->setValue(1000);
+    _sbConvexHullScale->blockSignals(false);
 }
 
 // ================================================================================
