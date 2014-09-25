@@ -71,6 +71,8 @@ void Text::Rebuild(
     _pageMeshes.clear();
     _pageMeshes.resize(texFont.common.pages);
 
+    _size = M::Vector2::Zero;
+
     const Mesh::Index indices[] = { 0, 1, 2, 0, 2, 3 };
 
     const M::Vector3 pos[] = {
