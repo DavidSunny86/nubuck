@@ -1,5 +1,5 @@
 #include <QtPlugin>
-#include <UI\nbw_spinbox\nbw_spinbox.h>
+#include <Nubuck\UI\nbw_spinbox.h>
 #include "nbw_spinbox_plugin.h"
 
 NBW_SpinBoxPlugin::NBW_SpinBoxPlugin(QObject* parent)
@@ -25,7 +25,7 @@ QString NBW_SpinBoxPlugin::group() const {
 }
 
 QString NBW_SpinBoxPlugin::includeFile() const {
-    return "UI/nbw_spinbox/nbw_spinbox.h";
+    return "Nubuck/UI/nbw_spinbox.h";
 }
 
 QString NBW_SpinBoxPlugin::name() const {

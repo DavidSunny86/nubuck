@@ -1,5 +1,5 @@
 #include <maxint.h>
-#include <UI\nbw_spinbox\nbw_spinbox.h>
+#include <Nubuck\UI\nbw_spinbox.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include "op_gen_randompoints.h"
 

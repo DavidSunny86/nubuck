@@ -6,7 +6,7 @@
 #include <QSlider>
 #include <QVBoxLayout>
 
-#include <UI\nbw_spinbox\nbw_spinbox.h>
+#include <Nubuck\UI\nbw_spinbox.h>
 #include <UI\colorbutton\colorbutton.h>
 #include <UI\block_signals.h>
 #include "ent_geometry_outln.h"

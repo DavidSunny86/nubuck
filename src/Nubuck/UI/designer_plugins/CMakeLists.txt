@@ -22,7 +22,10 @@ add_definitions(-DLEDA_DLL -DLEDA_MULTI_THREAD)
 add_definitions(-DUNICODE)
 
 set(nubuckSources "nbw_spinbox_plugin.cpp;../nbw_spinbox/nbw_spinbox.cpp")
-set(nubuckHeaders "nbw_spinbox_plugin.h;../nbw_spinbox/nbw_spinbox.h;../nbw_spinbox/nbw_spinbox_controls.h")
+set(nubuckHeaders 
+    "nbw_spinbox_plugin.h"
+    "${leda_dir}/incl/Nubuck/UI/nbw_spinbox.h"
+    "../nbw_spinbox/nbw_spinbox_controls.h")
 set(nubuckForms "")
 set(nubuckHeaders_ui "")
 

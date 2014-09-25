@@ -22,7 +22,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>0</height>
       </size>
      </property>
     </spacer>
@@ -40,7 +40,7 @@
   <customwidget>
    <class>NBW_SpinBox</class>
    <extends>QFrame</extends>
-   <header>UI/nbw_spinbox/nbw_spinbox.h</header>
+   <header>Nubuck/UI/nbw_spinbox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

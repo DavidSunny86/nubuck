@@ -9,8 +9,8 @@
 #include <QPushButton>
 #include <QStyle>
 
+#include <Nubuck\UI\nbw_spinbox.h>
 #include "nbw_spinbox_controls.h"
-#include "nbw_spinbox.h"
 
 const float NBW_SpinBoxControls::s_padding = 5.0f;
 const QSizeF NBW_SpinBoxControls::s_arrowSize(20.0f, 20.0f);

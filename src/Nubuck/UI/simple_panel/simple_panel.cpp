@@ -1,7 +1,7 @@
 #include <QVBoxLayout>
 #include <QSpacerItem>
 #include <QLabel>
-#include <UI\nbw_spinbox\nbw_spinbox.h>
+#include <Nubuck\UI\nbw_spinbox.h>
 #include "simple_panel.h"
 
 namespace UI {
