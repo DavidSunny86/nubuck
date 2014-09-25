@@ -187,9 +187,9 @@ bool JoeConfigs::Invoke() {
     SetScale(config, 2);
 
     nb::text text = nubuck().create_text();
-    std::cout << "content size = " << nubuck().text_content_size(text) << std::endl;
-    nubuck().set_text_content(text, "config 1a");
-    M::Vector3 pos = M::Vector3(-0.5f * nubuck().text_content_size(text).x, 0.0f, 0.0f);
+    nubuck().set_text_content_scale(text, 'A', 1.0f);
+    nubuck().set_text_content(text, "1a");
+    M::Vector3 pos = M::Vector3(-0.5f * nubuck().text_content_size(text).x, -1.0f, -1.0f);
     nubuck().set_text_position(text, pos);
 
     return true;

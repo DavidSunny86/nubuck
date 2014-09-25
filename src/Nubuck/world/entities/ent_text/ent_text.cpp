@@ -8,18 +8,25 @@
 
 namespace W {
 
+void ENT_Text::Rebuild() {
+    const std::string filename = common.BaseDir() + "Textures\\Fonts\\consola.ttf_sdf.txt";
+    const R::TexFont& texFont = R::FindTexFont(R::TF_Type::SDFont, filename);
+
+    _text.Rebuild(texFont, _content, _refChar, _refCharSize);
+}
+
 ENT_Text::ENT_Text()
     : _outlinerItem(NULL)
+    , _content("Hello, World!\nHow are you?")
+    , _refChar('A')
+    , _refCharSize(2.5f)
 {
     SetType(EntityType::ENT_TEXT);
 
     _outlinerItem = g_ui.GetOutliner().AddItem("", this);
     g_ui.GetOutliner().SetItemName(_outlinerItem, "Text");
 
-    const std::string filename = common.BaseDir() + "Textures\\Fonts\\consola.ttf_sdf.txt";
-    const R::TexFont& texFont = R::FindTexFont(R::TF_Type::SDFont, filename);
-
-    _text.Rebuild(texFont, "Hello World\nHow are you?");
+    Rebuild();
 }
 
 UI::OutlinerView* ENT_Text::CreateOutlinerView() {
@@ -31,10 +38,14 @@ const M::Vector2& ENT_Text::GetContentSize() const {
 }
 
 void ENT_Text::SetContent(const std::string& content) {
-    const std::string filename = common.BaseDir() + "Textures\\Fonts\\consola.ttf_sdf.txt";
-    const R::TexFont& texFont = R::FindTexFont(R::TF_Type::SDFont, filename);
+    _content = content;
+    Rebuild();
+}
 
-    _text.Rebuild(texFont, content);
+void ENT_Text::SetContentScale(const char refChar, const float refCharSize) {
+    _refChar = refChar;
+    _refCharSize = refCharSize;
+    Rebuild();
 }
 
 void ENT_Text::GetRenderJobs(R::RenderList& renderList) {

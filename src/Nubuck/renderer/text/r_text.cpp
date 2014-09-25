@@ -50,20 +50,23 @@ static float ComputeScale(
     const int texWidth,
     const int texHeight,
     const TF_Char* const chars,
-    const float size)
+    const char refChar,
+    const float refCharSize)
 {
-    const TF_Char& texChar = chars['A'];
+    const TF_Char& texChar = chars[refChar];
 
     M::Vector2 tc_lowerLeft, tc_upperRight;
     ComputeTextureCoordinates(texWidth, texHeight, texChar, tc_lowerLeft, tc_upperRight);
 
     const float width_ts = tc_upperRight.x - tc_lowerLeft.x;
-    return size / width_ts;
+    return refCharSize / width_ts;
 }
 
 void Text::Rebuild(
     const TexFont& texFont,
     const std::string& text,
+    const char refChar,
+    const float refCharSize,
     const Color& color) 
 {
     DestroyMesh();
@@ -95,7 +98,7 @@ void Text::Rebuild(
     const float scaleW = 1.0f / texWidth;
     const float scaleH = 1.0f / texHeight;
 
-    const float scale = ComputeScale(texWidth, texHeight, texFont.chars, 2.5f); // texture space to world space scale
+    const float scale = ComputeScale(texWidth, texHeight, texFont.chars, refChar, refCharSize); // texture space to world space scale
 
     M::Vector2 cursor = M::Vector2::Zero;
 

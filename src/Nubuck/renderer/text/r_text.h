@@ -38,6 +38,8 @@ public:
     void Rebuild(
         const TexFont& texFont,
         const std::string& text,
+        const char refChar = 'A',
+        const float refCharSize = 2.5f,
         const Color& color = Color::Black);
     void GetRenderJobs(const M::Matrix4& transform, RenderList& renderList);
 };

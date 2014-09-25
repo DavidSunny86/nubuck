@@ -183,6 +183,10 @@ void NubuckImpl::set_text_content(const nb::text obj, const std::string& content
     obj->SetContent(content);
 }
 
+void NubuckImpl::set_text_content_scale(const nb::text obj, const char refChar, const float refCharSize) {
+    obj->SetContentScale(refChar, refCharSize);
+}
+
 NubuckImpl g_nubuck;
 
 Nubuck& nubuck() { return g_nubuck; }

@@ -111,6 +111,7 @@ struct Nubuck {
 
     virtual void                set_text_position(const nb::text obj, const M::Vector3& pos) = 0;
     virtual void                set_text_content(const nb::text obj, const std::string& content) = 0;
+    virtual void                set_text_content_scale(const nb::text obj, const char refChar, const float refCharSize) = 0;
 };
 
 NUBUCK_API Nubuck& nubuck();
