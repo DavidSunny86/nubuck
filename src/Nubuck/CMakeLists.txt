@@ -166,6 +166,8 @@ add_library(nubuck SHARED ${nubuckSources} ${nubuckHeaders} ${nubuckHeaders_ui} 
 target_link_libraries(nubuck leda opengl32 glu32 Qt4::QtGui Qt4::QtOpenGL Qt4::QtSvg)
 set_target_properties(nubuck PROPERTIES 
     COMPILE_DEFINITIONS "NUBUCK_LIB;NUBUCK_MT;PARANOID;GLEW_BUILD")
+set_target_properties(nubuck PROPERTIES
+    COMPILE_FLAGS "/MP /Gm-") # multi-processor compilation is generally a good idea
 
 # copy .dll to leda_dir
 add_custom_command(TARGET nubuck POST_BUILD
