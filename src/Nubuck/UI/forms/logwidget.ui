@@ -14,13 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="2">
-    <widget class="QTextBrowser" name="textBrowser">
-     <property name="lineWrapMode">
-      <enum>QTextEdit::NoWrap</enum>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="0">
     <widget class="QCheckBox" name="cbEnable">
      <property name="text">
@@ -38,26 +31,13 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QPlainTextEdit" name="textBrowser"/>
+   </item>
   </layout>
  </widget>
  <resources/>
  <connections>
-  <connection>
-   <sender>btnClear</sender>
-   <signal>clicked()</signal>
-   <receiver>textBrowser</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>296</x>
-     <y>279</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>199</x>
-     <y>135</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>cbEnable</sender>
    <signal>toggled(bool)</signal>
@@ -71,6 +51,22 @@
     <hint type="destinationlabel">
      <x>199</x>
      <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClear</sender>
+   <signal>clicked()</signal>
+   <receiver>textBrowser</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>296</x>
+     <y>279</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>

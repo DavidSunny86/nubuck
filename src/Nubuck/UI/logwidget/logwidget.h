@@ -15,10 +15,17 @@ namespace UI {
         Ui::LogWidget   _ui;
         bool            _enabled;
 
-        std::vector<std::string>    _buffer;
-        SYS::SpinLock               _bufferMtx;
+        QBrush          _defaultFgBrush;
+
+        std::vector<char>   _buffer;
+        char*               _bufferCur;
+        SYS::SpinLock       _bufferMtx;
+
+        unsigned            _blockCnt;
 
         LogWidget(QWidget* parent = NULL);
+
+        void printf(int blockType, const char* format, va_list args);
     private slots:
         void OnSetEnabled(bool enable);
     public:
