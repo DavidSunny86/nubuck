@@ -15,7 +15,8 @@ BEGIN_EVENT_DEF(Mouse)
         BUTTON_MIDDLE   = 4     // == Qt::MiddleButton
     };
     enum Modifier {
-        MODIFIER_SHIFT = 0x02000000 // == Qt::ShiftModifier
+        MODIFIER_SHIFT  = 0x02000000, // == Qt::ShiftModifier
+        MODIFIER_CTRL   = 0x04000000  // == Qt::ControlModifier
     };
     int type, button, mods, delta, x, y;
     int* ret;
