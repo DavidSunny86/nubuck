@@ -1,12 +1,86 @@
 #include <QAction>
 #include <QMenu>
+#include <QVBoxLayout>
+#include <QSignalMapper>
 
 #include <LEDA\geo\d3_hull.h>
 #include <Nubuck\nubuck.h>
+#include <Nubuck\UI\nbw_spinbox.h>
 #include <Nubuck\polymesh.h>
 #include <Nubuck\operators\operator.h>
 #include <Nubuck\operators\operator_invoker.h>
-#include <Nubuck\operators\standard_algorithm.h>
+
+enum JoeConfig {
+    CONF_1A = 0,
+    CONF_1B,
+    CONF_2,
+    CONF_3A,
+    CONF_3B,
+    CONF_4,
+    CONF_5,
+
+    NUM_CONFIGS
+};
+
+BEGIN_EVENT_DEF_CS(SetConfigScale)
+    int     config;
+    double  scale;
+END_EVENT_DEF_CS
+
+class NBW_SpinBox;
+
+class JoeConfigsPanel : public OP::OperatorPanel {
+    Q_OBJECT
+private:
+    NBW_SpinBox* _sbScales[NUM_CONFIGS];
+
+    QSignalMapper _sigMap;
+private slots:
+    void OnConfigScaleChanged(int which);
+public:
+    JoeConfigsPanel();
+};
+
+void JoeConfigsPanel::OnConfigScaleChanged(int which) {
+    Params_SetConfigScale args;
+    args.config = which;
+    args.scale = _sbScales[which]->value().to_double();
+    OP::SendToOperator(def_SetConfigScale.Create(args));
+}
+
+JoeConfigsPanel::JoeConfigsPanel() {
+    QString texts[] = {
+        "1a: ",
+        "1b: ",
+        "2: ",
+        "3a: ",
+        "3b: ",
+        "4: ",
+        "5: "
+    };
+    
+    QVBoxLayout* layout = new QVBoxLayout;
+
+    for(int i = 0; i < NUM_CONFIGS; ++i) {
+        NBW_SpinBox* sb = new NBW_SpinBox;
+        sb->setText(texts[i]);
+        sb->showProgressBar(true);
+        sb->setMinimum(1.0);
+        sb->setMaximum(5.0);
+        sb->setSingleStep(0.05);
+
+        // NOTE: it's okay for the slot to discard arguments
+        connect(sb, SIGNAL(SigValueChanged(leda::rational)), &_sigMap, SLOT(map()));
+        _sigMap.setMapping(sb, i);
+        layout->addWidget(sb);
+
+        _sbScales[i] = sb;
+    }
+
+    setLayout(layout);
+
+    connect(&_sigMap, SIGNAL(mapped(int)), this, SLOT(OnConfigScaleChanged(int)));
+}
 
 struct Config {
     nb::geometry    geom;
@@ -23,27 +97,41 @@ struct Simplex {
 class JoeConfigs : public OP::Operator {
 private:
     enum {
-        // total number of configurations. 
-        // config1a and config1b are counted as two configurations
-        NUM_CONFIGS     = 3,
-
         // total number of simplices in all configurations
-        NUM_SIMPLICES   = 9  
-    };
-
-    enum {
-        CONF_1A
+        NUM_SIMPLICES   = 18  
     };
 
     Config  _configs[NUM_CONFIGS];
     Simplex _simplices[NUM_SIMPLICES];
 
     void SetScale(Config& config, const leda::rational scale);
+
+    // construction
+    int                         _cs_simp_cnt;
+    int                         _cs_config;
+    const leda::d3_rat_point*   _cs_positions;
+
+    void BeginSimplices(const int config, const leda::d3_rat_point* positions);
+    void AddSimplex(int i0, int i1, int i2, int i3);
+    void EndSimplices();
+
+    void Event_SetConfigScale(const EV::Event& event);
 public:
+    JoeConfigs();
+
     void Register(const Nubuck& nb, OP::Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }
 };
+
+void JoeConfigs::Event_SetConfigScale(const EV::Event& event) {
+    const Params_SetConfigScale& args = def_SetConfigScale.GetArgs(event);
+    SetScale(_configs[args.config], args.scale);
+}
+
+JoeConfigs::JoeConfigs() : _cs_simp_cnt(0) {
+    AddEventHandler(def_SetConfigScale, this, &JoeConfigs::Event_SetConfigScale);
+}
 
 namespace {
 
@@ -154,22 +242,39 @@ std::ostream& operator<<(std::ostream& stream, const M::Vector2& v) {
     return stream;
 }
 
+void JoeConfigs::BeginSimplices(const int config, const leda::d3_rat_point* positions) {
+    _cs_config = config;
+    _cs_positions = positions;
+
+    _configs[_cs_config].simp_first = _cs_simp_cnt;
+}
+
+void JoeConfigs::EndSimplices() {
+    _configs[_cs_config].simp_last = _cs_simp_cnt;
+}
+
+void JoeConfigs::AddSimplex(int i0, int i1, int i2, int i3) {
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_configs[_cs_config].geom);
+    ::AddSimplex(
+        _cs_positions[i0],
+        _cs_positions[i1],
+        _cs_positions[i2],
+        _cs_positions[i3],
+        mesh,
+        _simplices[_cs_simp_cnt++]);
+}
+
 bool JoeConfigs::Invoke() {
+    nubuck().set_operator_name("Joe's Configurations");
+
     const int renderAll =
         Nubuck::RenderMode::NODES |
         Nubuck::RenderMode::EDGES |
         Nubuck::RenderMode::FACES;
 
-    Config& config = _configs[CONF_1A];
-
-    config.geom = nubuck().create_geometry();
-    nubuck().set_geometry_render_mode(config.geom, renderAll);
-
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(config.geom);
-
     enum { VA = 0, VB, VC, VD, VE };
 
-    const leda::d3_rat_point positions[] = {
+    const leda::d3_rat_point vertPos1[] = {
         leda::d3_rat_point(-1,  0, -1), // a
         leda::d3_rat_point( 0,  0,  1), // b
         leda::d3_rat_point( 1,  0, -1), // c
@@ -177,28 +282,129 @@ bool JoeConfigs::Invoke() {
         leda::d3_rat_point( 0, -1,  0)  // e
     };
 
-    int simp_cnt = 0;
+    const leda::rational r(1, 2);
+    const leda::d3_rat_point vertPos2[] = {
+        leda::d3_rat_point( 0,  0,  0), // a
+        leda::d3_rat_point( 0,  r,  0), // b
+        leda::d3_rat_point( 0, -r,  1), // c
+        leda::d3_rat_point(-1, -r, -1), // d
+        leda::d3_rat_point( 1, -r, -1)  // e
+    };
 
-    config.simp_first = 0;
-    AddSimplex(positions[VA], positions[VB], positions[VC], positions[VD], mesh, _simplices[simp_cnt++]);
-    AddSimplex(positions[VA], positions[VB], positions[VC], positions[VE], mesh, _simplices[simp_cnt++]);
-    config.simp_last = simp_cnt;
+    const leda::d3_rat_point vertPos3[] = {
+        leda::d3_rat_point( 0, -r, -1), // a
+        leda::d3_rat_point( 0, -r,  1), // b
+        leda::d3_rat_point( 0,  r,  0), // c
+        leda::d3_rat_point(-1, -r,  0), // d
+        leda::d3_rat_point( 1, -r,  0)  // e
+    };
 
-    SetScale(config, 2);
+    const leda::d3_rat_point vertPos4[] = {
+        leda::d3_rat_point( 0, -r, -1), // a
+        leda::d3_rat_point( 0, -r,  1), // b
+        leda::d3_rat_point( 0,  r,  0), // c
+        leda::d3_rat_point(-1, -r, -1), // d
+        leda::d3_rat_point( 1, -r, -1)  // e
+    };
 
-    nb::text text = nubuck().create_text();
-    nubuck().set_text_content_scale(text, 'A', 1.0f);
-    nubuck().set_text_content(text, "1a");
-    M::Vector3 pos = M::Vector3(-0.5f * nubuck().text_content_size(text).x, -1.0f, -1.0f);
-    nubuck().set_text_position(text, pos);
+    const leda::d3_rat_point vertPos5[] = {
+        leda::d3_rat_point( 0, -r,  0), // a
+        leda::d3_rat_point( 0, -r,  1), // b
+        leda::d3_rat_point( 0,  r,  0), // c
+        leda::d3_rat_point(-1, -r, -1), // d
+        leda::d3_rat_point( 1, -r, -1)  // e
+    };
+
+    const M::Vector3 configPos[] = {
+        M::Vector3(-4.0f,  2.0f, 0.0f), // 1a
+        M::Vector3( 0.0f,  2.0f, 0.0f), // 1b
+        M::Vector3( 4.0f,  2.0f, 0.0f), // 2
+        M::Vector3(-6.0f, -2.0f, 0.0f), // 3a
+        M::Vector3(-2.0f, -2.0f, 0.0f), // 3b
+        M::Vector3( 2.0f, -2.0f, 0.0f), // 4
+        M::Vector3( 6.0f, -2.0f, 0.0f)  // 5
+    };
+
+    const std::string configNames[] = {
+        "1a",
+        "1b",
+        "2",
+        "3a",
+        "3b",
+        "4",
+        "5"
+    };
+
+    for(int i = 0; i < NUM_CONFIGS; ++i) {
+        Config& config = _configs[i];
+
+        config.geom = nubuck().create_geometry();
+        nubuck().set_geometry_name(config.geom, std::string("Config ") + configNames[i]);
+        nubuck().set_geometry_render_mode(config.geom, renderAll);
+        nubuck().set_geometry_position(config.geom, configPos[i]);
+
+        nb::text text = nubuck().create_text();
+        nubuck().set_text_content_scale(text, 'A', 1.0f);
+        nubuck().set_text_content(text, configNames[i]);
+        M::Vector3 pos = configPos[i] + M::Vector3(-0.5f * nubuck().text_content_size(text).x, -1.0f, -1.0f);
+        nubuck().set_text_position(text, pos);
+    }
+
+    // configuration 1a
+    BeginSimplices(CONF_1A, vertPos1);
+    AddSimplex(VA, VB, VC, VD);
+    AddSimplex(VA, VB, VC, VE);
+    EndSimplices();
+
+    // configuration 1b
+    BeginSimplices(CONF_1B, vertPos1);
+    AddSimplex(VA, VB, VD, VE);
+    AddSimplex(VA, VC, VD, VE);
+    AddSimplex(VB, VC, VD, VE);
+    EndSimplices();
+
+    // configuration 2
+    BeginSimplices(CONF_2, vertPos2);
+    AddSimplex(VA, VB, VC, VD);
+    AddSimplex(VA, VB, VC, VE);
+    AddSimplex(VA, VB, VD, VE);
+    AddSimplex(VA, VC, VD, VE);
+    EndSimplices();
+
+    // configuration 3a
+    BeginSimplices(CONF_3A, vertPos3);
+    AddSimplex(VA, VB, VC, VD);
+    AddSimplex(VA, VB, VC, VE);
+    EndSimplices();
+
+    // configuration 3b
+    BeginSimplices(CONF_3B, vertPos3);
+    AddSimplex(VA, VC, VD, VE);
+    AddSimplex(VB, VC, VD, VE);
+    EndSimplices();
+
+    // configuration 4
+    BeginSimplices(CONF_4, vertPos4);
+    AddSimplex(VA, VB, VC, VD);
+    AddSimplex(VA, VB, VC, VE);
+    EndSimplices();
+
+    // configuration 5
+    BeginSimplices(CONF_5, vertPos5);
+    AddSimplex(VA, VB, VC, VD);
+    AddSimplex(VA, VB, VC, VE);
+    AddSimplex(VA, VC, VD, VE);
+    EndSimplices();
 
     return true;
 }
 
 NUBUCK_OPERATOR OP::OperatorPanel* CreateOperatorPanel() {
-    return new OP::ALG::StandardAlgorithmPanel;
+    return new JoeConfigsPanel;
 }
 
 NUBUCK_OPERATOR OP::Operator* CreateOperator() {
     return new JoeConfigs;
 }
+
+#include "alg_joe_configs.moc"
