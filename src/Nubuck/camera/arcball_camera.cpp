@@ -41,7 +41,7 @@ VectorInXYPlaneFromMousePos
 ====================
 */
 M::Vector3 VectorInXYPlaneFromMousePos(
-    float halfWidth, float halfHeight, 
+    float halfWidth, float halfHeight,
     int mouseX, int mouseY, float dist)
 {
     // hardcoded values
@@ -190,9 +190,10 @@ void ArcballCamera::StartZooming(int mouseX, int mouseY) {
 
 bool ArcballCamera::Zoom(int mouseX, int mouseY) {
     const float scale = 0.8f;
+    const float minZoom = 0.1f;
     if(_zooming) {
         float zoom = scale  * (_y0 - mouseY);
-        _zoom = _lastZoom - zoom;
+        _zoom = M::Max(minZoom, _lastZoom - zoom);
     }
     return _zooming;
 }
