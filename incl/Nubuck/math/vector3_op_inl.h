@@ -43,4 +43,8 @@ namespace M {
 					   lhp.x * rhp.y - lhp.y * rhp.x);
 	}
 
+    M_INLINE Vector3 Lerp(const Vector3& v0, const Vector3& v1, float t) {
+        return (1.0f - t) * v0 + t * v1;
+    }
+
 } // namespace M

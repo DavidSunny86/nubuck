@@ -42,9 +42,12 @@ namespace M {
 	Vector3	Negate(const Vector3& vec);
 	float	Dot(const Vector3& lhp, const Vector3& rhp);
 	Vector3	Cross(const Vector3& lhp, const Vector3& rhp);
+    Vector3 Lerp(const Vector3& v0, const Vector3& v1, float t);
 	Vector3	Normalize(const Vector3& vector);
 	float	Length(const Vector3& vector);
+	float	SquaredLength(const Vector3& vector);
 	float	Distance(const Vector3& lhp, const Vector3& rhp);
+    float   SquaredDistance(const Vector3& lhp, const Vector3& rhp);
 	bool	LinearlyDependent(const Vector3& u, const Vector3& v);
     void    Orthogonalize(Vector3& v0, Vector3& v1, Vector3& v2);
 

@@ -11,8 +11,16 @@ namespace M {
 		return sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
 	}
 
+	float SquaredLength(const Vector3& vector) {
+		return vector.x * vector.x + vector.y * vector.y + vector.z * vector.z;
+	}
+
 	float Distance(const Vector3& lhp, const Vector3& rhp) {
 		return M::Length(rhp - lhp);
+	}
+
+	float SquaredDistance(const Vector3& lhp, const Vector3& rhp) {
+        return SquaredLength(rhp - lhp);
 	}
 
 	bool LinearlyDependent(const Vector3& u, const Vector3& v) {
