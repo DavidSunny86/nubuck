@@ -8,7 +8,7 @@ class ArcballCamera {
 public:
     struct Projection {
         enum Enum {
-            PERSPECTIVE = 0, 
+            PERSPECTIVE = 0,
             ORTHOGRAPHIC,
             NUM_PROJECTIONS
         };
@@ -42,6 +42,15 @@ private:
 
         OrientAnim() : active(false) { }
     } _orientAnim;
+
+    // animation state of translation
+    struct TransAnim {
+        M::Vector3  v0, v1;
+        float       dur, t;
+        bool        active;
+
+        TransAnim() : active(false) { }
+    } _transAnim;
 
     // animation state of projection weight
     struct ProjWeightAnim {
@@ -80,6 +89,7 @@ public:
     void ZoomOut();
 
     void RotateTo(const M::Quaternion& orient, float dur);
+    void TranslateTo(const M::Vector3& pos, float dur);
     void SetProjection(Projection::Enum proj, float dur);
     void ToggleProjection(float dur);
 

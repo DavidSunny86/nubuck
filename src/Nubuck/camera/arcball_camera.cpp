@@ -215,6 +215,19 @@ void ArcballCamera::RotateTo(const M::Quaternion& orient, float dur) {
     }
 }
 
+void ArcballCamera::TranslateTo(const M::Vector3& pos, float dur) {
+    TransAnim& anim = _transAnim;
+
+    // don't reset duration when target doesn't change
+    if(!anim.active || !M::AlmostEqual(0.0f, M::SquaredDistance(pos, anim.v1))) {
+        anim.dur    = dur;
+        anim.t      = 0.0f;
+        anim.v0     = _target;
+        anim.v1     = pos;
+        anim.active = true;
+    }
+}
+
 void ArcballCamera::SetProjection(Projection::Enum proj, float dur) {
     ProjWeightAnim& anim = _projWeightAnim;
 
@@ -251,6 +264,21 @@ bool ArcballCamera::FrameUpdate(float secsPassed) {
         anim.t += secsPassed;
         if(anim.dur <= anim.t) {
             _orient = anim.v1;
+            anim.active = false;
+        }
+
+        cameraChanged = true;
+    }
+
+    if(_transAnim.active) {
+        TransAnim& anim = _transAnim;
+
+        float l = anim.t / anim.dur;
+        _target = M::Lerp(anim.v0, anim.v1, l);
+
+        anim.t += secsPassed;
+        if(anim.dur <= anim.t) {
+            _target = anim.v1;
             anim.active = false;
         }
 

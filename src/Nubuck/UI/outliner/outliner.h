@@ -21,7 +21,7 @@
 
 namespace UI {
 
-struct OutlinerView : public QWidget, public EV::EventHandler<> { 
+struct OutlinerView : public QWidget, public EV::EventHandler<> {
     virtual ~OutlinerView() { }
     DECL_HANDLE_EVENTS(OutlinerView);
 };
@@ -54,6 +54,18 @@ public:
     void setChecked(bool checked) {
         _idx = 1 ? checked : 0;
         setIcon(*_icons[_idx]);
+    }
+};
+
+struct FocusCameraButton : public QToolButton {
+private:
+    W::Entity* _entity;
+protected:
+    void mousePressEvent(QMouseEvent* event);
+public:
+    FocusCameraButton(W::Entity* entity) : _entity(entity){
+        setIcon(QIcon(":/ui/Images/focus_camera.svg"));
+        setObjectName("selectObject");
     }
 };
 
@@ -93,7 +105,7 @@ private:
         W::Entity*          entity; // used to create view
         OutlinerView*       view;
 
-        LinkedItem() 
+        LinkedItem()
             : prev(NULL)
             , next(NULL)
             , isVisible(false)

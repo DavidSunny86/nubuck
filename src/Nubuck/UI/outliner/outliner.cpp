@@ -21,6 +21,15 @@ void SelectEntityButton::mousePressEvent(QMouseEvent* event) {
     }
 }
 
+void FocusCameraButton::mousePressEvent(QMouseEvent* event) {
+    if(_entity) {
+        ArcballCamera& camera = W::world.GetCamera();
+        const M::Vector3& target = _entity->GetPosition(); // TODO: use center of bbox instead
+        const float transitionDur = 0.25f; // same as rotation
+        camera.TranslateTo(target, transitionDur);
+    }
+}
+
 void NameEntityButton::mousePressEvent(QMouseEvent*) {
     bool ok;
     QString oldName = QString::fromStdString(_entity->GetName());
@@ -36,6 +45,7 @@ void Outliner::Event_CreateView(const EV::Event& event) {
 
     // build header widget
     item->header.selection = new SelectEntityButton(item->entity);
+    FocusCameraButton* focusButton = new FocusCameraButton(item->entity);
 
     item->header.name = new NameEntityButton(item->entity, QString("Polyhedron %1").arg(0));
     item->header.name->setObjectName("objectName");
@@ -45,6 +55,7 @@ void Outliner::Event_CreateView(const EV::Event& event) {
     QHBoxLayout* headerLayout = new QHBoxLayout;
     headerLayout->setContentsMargins(11, 0, 0, 0); // tightly packed
     headerLayout->addWidget(item->header.selection);
+    headerLayout->addWidget(focusButton);
     headerLayout->addWidget(item->header.name);
     QWidget* headerWidget = new QWidget;
     headerWidget->setObjectName("outlinerHeader");

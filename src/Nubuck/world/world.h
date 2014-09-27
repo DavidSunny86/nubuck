@@ -114,6 +114,8 @@ namespace W {
         const EditMode& GetEditMode() const { return _editMode; }
         EditMode&       GetEditMode() { return _editMode; };
 
+        ArcballCamera&  GetCamera() { return _camArcball; }
+
         M::Matrix4 GetCameraMatrix() const { return _camArcball.GetWorldToEyeMatrix(); }
         M::Matrix4 GetModelView() const { return _camArcball.GetWorldToEyeMatrix(); }
 
