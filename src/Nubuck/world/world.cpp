@@ -88,11 +88,10 @@ World world;
 
 void World::Selection::ComputeCenter() {
     center = M::Vector3::Zero;
-    for(unsigned i = 0; i < geomList.size(); ++i) {
-        ENT_Geometry* geom = (ENT_Geometry*)geomList[i];
-        center += geom->GetGlobalCenter();
+    for(unsigned i = 0; i < list.size(); ++i) {
+        center += list[i]->GetGlobalCenter();
     }
-    center /= geomList.size();
+    center /= list.size();
 }
 
 void World::Selection::SignalChange() {
@@ -102,29 +101,26 @@ void World::Selection::SignalChange() {
     g_ui.GetOutliner().Send(ev);
 }
 
-void World::Selection::Set(ENT_Geometry* geom) {
+void World::Selection::Set(Entity* ent) {
     SYS::ScopedLock lock(_mtx);
-	for(unsigned i = 0; i < geomList.size(); ++i) {
-        ENT_Geometry* geom = (ENT_Geometry*)geomList[i];
-		geom->Deselect();
+	for(unsigned i = 0; i < list.size(); ++i) {
+        list[i]->Deselect();
 	}
-    geomList.clear();
-    ENT_Geometry* ent = (ENT_Geometry*)geom;
+    list.clear();
     ent->Select();
-    geomList.push_back(geom);
+    list.push_back(ent);
     ComputeCenter();
     SignalChange();
 }
 
-void World::Selection::Add(ENT_Geometry* geom) {
+void World::Selection::Add(Entity* ent) {
     SYS::ScopedLock lock(_mtx);
     bool sel = 0;
-	for(unsigned i = 0; !sel && i < geomList.size(); ++i)
-        if(geomList[i] == geom) sel = true;
+	for(unsigned i = 0; !sel && i < list.size(); ++i)
+        if(list[i] == ent) sel = true;
     if(!sel) {
-        ENT_Geometry* ent = (ENT_Geometry*)geom;
-		ent->Select();
-		geomList.push_back(geom);
+        ent->Select();
+        list.push_back(ent);
         ComputeCenter();
         SignalChange();
 	}
@@ -132,11 +128,10 @@ void World::Selection::Add(ENT_Geometry* geom) {
 
 void World::Selection::Clear() {
     SYS::ScopedLock lock(_mtx);
-	for(unsigned i = 0; i < geomList.size(); ++i) {
-        ENT_Geometry* geom = (ENT_Geometry*)geomList[i];
-		geom->Deselect();
+	for(unsigned i = 0; i < list.size(); ++i) {
+		list[i]->Deselect();
 	}
-    geomList.clear();
+    list.clear();
     SignalChange();
 }
 
@@ -146,9 +141,29 @@ M::Vector3 World::Selection::GetGlobalCenter() {
     return center;
 }
 
-std::vector<ENT_Geometry*> World::Selection::GetList() const {
+template<typename TYPE>
+void GetFilteredList(const EntityType::Enum type, const std::vector<Entity*>& list, std::vector<TYPE*>& filtered) {
+    filtered.clear();
+    for(unsigned i = 0; i < list.size(); ++i) {
+        const Entity* ent = list[i];
+        if(type == ent->GetType()) {
+            filtered.push_back((TYPE*)ent); // ugly but safe downcast
+        }
+    }
+}
+
+std::vector<ENT_Geometry*> World::Selection::GetGeometryList() const {
     SYS::ScopedLock lock(_mtx);
-    return geomList;
+    std::vector<ENT_Geometry*> filtered;
+    GetFilteredList(EntityType::ENT_GEOMETRY, list, filtered);
+    return filtered;
+}
+
+std::vector<ENT_Text*> World::Selection::GetTextList() const {
+    SYS::ScopedLock lock(_mtx);
+    std::vector<ENT_Text*> filtered;
+    GetFilteredList(EntityType::ENT_TEXT, list, filtered);
+    return filtered;
 }
 
 void World::Selection::SelectVertex_New(ENT_Geometry* geom, leda::node vert) {
@@ -336,7 +351,7 @@ void World::Event_RebuildAll(const EV::Event& event) {
 void World::Event_EditModeChanged(const EV::Event& event) {
     const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
 
-    std::vector<ENT_Geometry*> geomSel = _selection.GetList();
+    std::vector<ENT_Geometry*> geomSel = _selection.GetGeometryList();
     if(!geomSel.empty()) {
         ENT_Geometry* ent = (ENT_Geometry*)geomSel.front();
         ent->SetEditMode(editMode_t::Enum(args.editMode));
@@ -459,7 +474,7 @@ void World::BoundingBox::Transform() {
 
 void World::BBoxes_BuildFromSelection() {
     _bboxes.clear();
-    std::vector<ENT_Geometry*> geomList = _selection.GetList();
+    std::vector<ENT_Geometry*> geomList = _selection.GetGeometryList();
     for(unsigned i = 0; i < geomList.size(); ++i) {
         _bboxes.push_back(GEN::MakePtr(new BoundingBox((const ENT_Geometry*)geomList[i])));
     }

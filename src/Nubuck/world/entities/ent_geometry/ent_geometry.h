@@ -73,8 +73,6 @@ private:
     float               _transparency;
     bool                _isTransparent;
 
-    M::Box              _bbox;      // untransformed bounding box
-
     void ComputeCenter();
     void ComputeBoundingBox();
 
@@ -146,11 +144,6 @@ public:
     void SetVertexScale(float vertexScale);
     void SetEdgeScale(float edgeScale);
     void SetEdgeColor(const R::Color& color);
-
-    M::Vector3 GetLocalCenter() const;
-    M::Vector3 GetGlobalCenter();
-
-    const M::Box& GetBoundingBox() const;
 
     M::Vector3 GetPosition() const;
 

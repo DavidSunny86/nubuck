@@ -42,18 +42,19 @@ namespace W {
         private:
             mutable SYS::SpinLock _mtx;
 
-            std::vector<ENT_Geometry*> geomList;
+            std::vector<Entity*>    list;
             M::Vector3              center; // in world space
 
             void ComputeCenter();
             void SignalChange();
         public:
-            void Set(ENT_Geometry* geom);
-            void Add(ENT_Geometry* geom);
+            void Set(Entity* ent);
+            void Add(Entity* ent);
             void Clear();
 
-            M::Vector3 GetGlobalCenter();
-            std::vector<ENT_Geometry*> GetList() const;
+            M::Vector3                  GetGlobalCenter();
+            std::vector<ENT_Geometry*>  GetGeometryList() const;
+            std::vector<ENT_Text*>      GetTextList() const;
 
             void SelectVertex_New(ENT_Geometry* geom, leda::node vert);
             void SelectVertex_Add(ENT_Geometry* geom, leda::node vert);

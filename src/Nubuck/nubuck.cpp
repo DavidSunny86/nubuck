@@ -108,7 +108,7 @@ void NubuckImpl::select_vertex(SelectMode mode, const nb::geometry obj, const le
 }
 
 std::vector<nb::geometry> NubuckImpl::selected_geometry() {
-    return W::world.GetSelection()->GetList();
+    return W::world.GetSelection()->GetGeometryList();
 }
 
 M::Vector3 NubuckImpl::global_center_of_selection() {

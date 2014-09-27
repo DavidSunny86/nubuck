@@ -151,17 +151,19 @@ void ENT_Geometry::DestroyRenderMesh() {
 }
 
 void ENT_Geometry::ComputeBoundingBox() {
-    _bbox.min = _bbox.max = _fpos[_ratPolyMesh.first_node()->id()];
+    M::Box bbox;
+    bbox.min = bbox.max = _fpos[_ratPolyMesh.first_node()->id()];
     leda::node v;
     forall_nodes(v, _ratPolyMesh) {
         M::Vector3 p = _fpos[v->id()];
-        _bbox.min.x = M::Min(_bbox.min.x, p.x);
-        _bbox.min.y = M::Min(_bbox.min.y, p.y);
-        _bbox.min.z = M::Min(_bbox.min.z, p.z);
-        _bbox.max.x = M::Max(_bbox.max.x, p.x);
-        _bbox.max.y = M::Max(_bbox.max.y, p.y);
-        _bbox.max.z = M::Max(_bbox.max.z, p.z);
+        bbox.min.x = M::Min(bbox.min.x, p.x);
+        bbox.min.y = M::Min(bbox.min.y, p.y);
+        bbox.min.z = M::Min(bbox.min.z, p.z);
+        bbox.max.x = M::Max(bbox.max.x, p.x);
+        bbox.max.y = M::Max(bbox.max.y, p.y);
+        bbox.max.z = M::Max(bbox.max.z, p.z);
     }
+    SetBoundingBox(bbox);
 }
 
 void ENT_Geometry::Event_VertexScaleChanged(const EV::Event& event) {
@@ -429,22 +431,6 @@ void ENT_Geometry::SetEdgeColor(const R::Color& color) {
     EV::Params_ENT_Geometry_EdgeColorChanged args = { _edgeColor };
     EV::Event event = EV::def_ENT_Geometry_EdgeColorChanged.Create(args);
     g_ui.GetOutliner().SendToView(_outlinerItem, event);
-}
-
-M::Vector3 ENT_Geometry::GetLocalCenter() const {
-	SYS::ScopedLock lock(_mtx);
-    return _bbox.min + 0.5f * (_bbox.max - _bbox.min);
-}
-
-M::Vector3 ENT_Geometry::GetGlobalCenter() {
-	SYS::ScopedLock lock(_mtx);
-    M::Vector3 localCenter = GetLocalCenter();
-    return M::Transform(GetObjectToWorldMatrix(), localCenter);
-}
-
-const M::Box& ENT_Geometry::GetBoundingBox() const {
-	SYS::ScopedLock lock(_mtx);
-	return _bbox;
 }
 
 M::Vector3 ENT_Geometry::GetPosition() const {

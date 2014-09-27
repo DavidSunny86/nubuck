@@ -27,6 +27,10 @@ ENT_Text::ENT_Text()
     g_ui.GetOutliner().SetItemName(_outlinerItem, "Text");
 
     Rebuild();
+
+    // TODO
+    M::Box bbox = M::Box::FromCenterSize(M::Vector3::Zero, M::Vector3(10.0f, 10.0f, 10.0f));
+    SetBoundingBox(bbox);
 }
 
 UI::OutlinerView* ENT_Text::CreateOutlinerView() {

@@ -197,7 +197,7 @@ void Translate::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
     */
 
-    if(!W::world.GetSelection()->GetList().empty()) HideCursor();
+    if(!nubuck().selected_geometry().empty()) HideCursor();
 }
 
 static M::Vector3 Axis(int i) {
@@ -328,7 +328,7 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
 
     _editMode = W::world.GetEditMode().GetMode();
 
-    if(!W::world.GetSelection()->GetList().empty() && TraceCursor(ray, axis, &inf)) {
+    if(!nubuck().selected_geometry().empty() && TraceCursor(ray, axis, &inf)) {
         M::Vector3 eyeZ = EyeZ(W::world.GetModelView());
         M::Vector3 vAxis = Axis(axis);
         _dragAxis = axis;
@@ -380,8 +380,8 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
             }
         }
 
-        if(W::editMode_t::VERTICES == _editMode && !W::world.GetSelection()->GetList().empty()) {
-            W::ENT_Geometry* geom = (W::ENT_Geometry*)W::world.GetSelection()->GetList().front();
+        if(W::editMode_t::VERTICES == _editMode && !nubuck().selected_geometry().empty()) {
+            W::ENT_Geometry* geom = (W::ENT_Geometry*)nubuck().selected_geometry().front();
             std::vector<W::ENT_Geometry::VertexHit> hits;
             if(geom->TraceVertices(ray, 0.2f, hits)) {
                 // find nearest hit

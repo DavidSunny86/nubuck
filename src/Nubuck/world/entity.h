@@ -5,6 +5,7 @@
 #include <Nubuck\math\vector3.h>
 #include <Nubuck\math\matrix4.h>
 #include <Nubuck\math\quaternion.h>
+#include <Nubuck\math\box.h>
 #include <Nubuck\system\locks\spinlock.h>
 #include <UI\outliner\outliner_fwd.h>
 
@@ -38,6 +39,10 @@ private:
     M::Vector3          _position;
     M::Quaternion       _orientation;
     M::Vector3          _scale;
+
+    M::Box              _bbox;
+protected:
+    void SetBoundingBox(const M::Box& bbox);
 public:
     Entity();
     virtual ~Entity() { }
@@ -62,7 +67,12 @@ public:
     M::Quaternion       GetOrientation() const;
     M::Vector3          GetScale() const;
 
+    const M::Box&       GetBoundingBox() const;
+
     M::Matrix4          GetObjectToWorldMatrix() const;
+
+    M::Vector3          GetLocalCenter() const;
+    M::Vector3          GetGlobalCenter() const;
 
     void                SetPosition(const M::Vector3& position);
     void                SetOrientation(const M::Quaternion& orientation);
