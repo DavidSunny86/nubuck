@@ -3,6 +3,7 @@
 namespace {
 
 const float zoomStep = 2.0f;
+const float minZoom = 0.1f;
 
 M::Vector3 Transform(const M::Quaternion& q, const M::Vector3& v) {
     // TODO: use q*vq instead
@@ -123,11 +124,11 @@ void ArcballCamera::ResetRotation() {
 }
 
 void ArcballCamera::ZoomIn() {
-    _zoom -= zoomStep;
+    _zoom = M::Max(minZoom, _zoom - zoomStep);
 }
 
 void ArcballCamera::ZoomOut() {
-    _zoom += zoomStep;
+    _zoom = M::Max(minZoom, _zoom + zoomStep);
 }
 
 void ArcballCamera::SetScreenSize(int width, int height) {
@@ -190,7 +191,6 @@ void ArcballCamera::StartZooming(int mouseX, int mouseY) {
 
 bool ArcballCamera::Zoom(int mouseX, int mouseY) {
     const float scale = 0.8f;
-    const float minZoom = 0.1f;
     if(_zooming) {
         float zoom = scale  * (_y0 - mouseY);
         _zoom = M::Max(minZoom, _lastZoom - zoom);
