@@ -86,12 +86,36 @@ World world;
 
 // Selection impl ---
 
-void World::Selection::ComputeCenter() {
-    center = M::Vector3::Zero;
-    for(unsigned i = 0; i < list.size(); ++i) {
-        center += list[i]->GetGlobalCenter();
+void World::Selection::_Clear() {
+    Entity *next, *ent = head;
+    while(ent) {
+        ent->Deselect();
+        next = ent->selectionLink.next;
+        ent->selectionLink.SetNull();
+        ent = next;
     }
-    center /= list.size();
+    head = NULL;
+}
+
+void World::Selection::_Select(Entity* ent) {
+    ent->selectionLink.prev = NULL;
+    ent->selectionLink.next = head;
+    if(head) head->selectionLink.prev = ent;
+    head = ent;
+
+    ent->Select();
+}
+
+void World::Selection::ComputeCenter() {
+    int size = 0;
+    center = M::Vector3::Zero;
+    const Entity* ent = head;
+    while(ent) {
+        center += ent->GetGlobalCenter();
+        ent = ent->selectionLink.next;
+        size++;
+    }
+    center /= size;
 }
 
 void World::Selection::SignalChange() {
@@ -103,35 +127,25 @@ void World::Selection::SignalChange() {
 
 void World::Selection::Set(Entity* ent) {
     SYS::ScopedLock lock(_mtx);
-	for(unsigned i = 0; i < list.size(); ++i) {
-        list[i]->Deselect();
-	}
-    list.clear();
-    ent->Select();
-    list.push_back(ent);
+    _Clear();
+    _Select(ent);
     ComputeCenter();
     SignalChange();
 }
 
 void World::Selection::Add(Entity* ent) {
+    if(ent->IsSelected()) return;
+
     SYS::ScopedLock lock(_mtx);
-    bool sel = 0;
-	for(unsigned i = 0; !sel && i < list.size(); ++i)
-        if(list[i] == ent) sel = true;
-    if(!sel) {
-        ent->Select();
-        list.push_back(ent);
-        ComputeCenter();
-        SignalChange();
-	}
+    _Select(ent);
+    ComputeCenter();
+    SignalChange();
 }
 
 void World::Selection::Clear() {
     SYS::ScopedLock lock(_mtx);
-	for(unsigned i = 0; i < list.size(); ++i) {
-		list[i]->Deselect();
-	}
-    list.clear();
+    _Clear();
+    ComputeCenter(); // essentially sets center to 0
     SignalChange();
 }
 
@@ -142,27 +156,28 @@ M::Vector3 World::Selection::GetGlobalCenter() {
 }
 
 template<typename TYPE>
-void GetFilteredList(const EntityType::Enum type, const std::vector<Entity*>& list, std::vector<TYPE*>& filtered) {
+void GetFilteredList(const EntityType::Enum type, const Entity* head, std::vector<TYPE*>& filtered) {
     filtered.clear();
-    for(unsigned i = 0; i < list.size(); ++i) {
-        const Entity* ent = list[i];
+    const Entity* ent = head;
+    while(ent) {
         if(type == ent->GetType()) {
             filtered.push_back((TYPE*)ent); // ugly but safe downcast
         }
+        ent = ent->selectionLink.next;
     }
 }
 
 std::vector<ENT_Geometry*> World::Selection::GetGeometryList() const {
     SYS::ScopedLock lock(_mtx);
     std::vector<ENT_Geometry*> filtered;
-    GetFilteredList(EntityType::ENT_GEOMETRY, list, filtered);
+    GetFilteredList(EntityType::ENT_GEOMETRY, head, filtered);
     return filtered;
 }
 
 std::vector<ENT_Text*> World::Selection::GetTextList() const {
     SYS::ScopedLock lock(_mtx);
     std::vector<ENT_Text*> filtered;
-    GetFilteredList(EntityType::ENT_TEXT, list, filtered);
+    GetFilteredList(EntityType::ENT_TEXT, head, filtered);
     return filtered;
 }
 
@@ -457,9 +472,9 @@ void World::BoundingBox::Destroy() {
     }
 }
 
-World::BoundingBox::BoundingBox(const ENT_Geometry* geom) : geom(geom) {
+World::BoundingBox::BoundingBox(const Entity* entity) : entity(entity) {
     const M::Vector3 vf = 0.5f * M::Vector3(1.0f, 1.0f, 1.0f);
-    M::Box bbox = geom->GetBoundingBox();
+    M::Box bbox = entity->GetBoundingBox();
     bbox.min -= vf;
     bbox.max += vf;
     WireframeBox meshDesc(bbox);
@@ -469,14 +484,15 @@ World::BoundingBox::BoundingBox(const ENT_Geometry* geom) : geom(geom) {
 }
 
 void World::BoundingBox::Transform() {
-    R::meshMgr.GetMesh(tfmesh).SetTransform(geom->GetObjectToWorldMatrix());
+    R::meshMgr.GetMesh(tfmesh).SetTransform(entity->GetObjectToWorldMatrix());
 }
 
 void World::BBoxes_BuildFromSelection() {
     _bboxes.clear();
-    std::vector<ENT_Geometry*> geomList = _selection.GetGeometryList();
-    for(unsigned i = 0; i < geomList.size(); ++i) {
-        _bboxes.push_back(GEN::MakePtr(new BoundingBox((const ENT_Geometry*)geomList[i])));
+    Entity* ent = _selection.Head();
+    while(ent) {
+        _bboxes.push_back(GEN::MakePtr(new BoundingBox(ent)));
+        ent = ent->selectionLink.next;
     }
 }
 
@@ -534,19 +550,34 @@ static M::Vector3 GetCenterPosition(const M::Box& box) {
     return 0.5f * (box.max - box.min) + box.min;
 }
 
-bool World::Trace(const M::Ray& ray, ENT_Geometry** ret) {
+bool World::Trace(const M::Ray& ray, Entity** ret, entityFilter_t filter) {
     SYS::ScopedLock lockEntities(_entitiesMtx);
     for(unsigned i = 0; i < _entities.size(); ++i) {
         GEN::Pointer<Entity> entity = _entities[i];
-        if(!entity->IsDead() && EntityType::ENT_GEOMETRY == entity->GetType()) {
-            ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
-            M::Box bbox = geom.GetBoundingBox();
-            SetCenterPosition(bbox, M::Transform(geom.GetObjectToWorldMatrix(), GetCenterPosition(bbox)));
-            if(geom.IsSolid() && M::IS::Intersects(ray, bbox)) {
-                *ret = &geom;
+        if(!entity->IsDead() && filter(*entity)) {
+            M::Box bbox = entity->GetBoundingBox();
+            SetCenterPosition(bbox, M::Transform(entity->GetObjectToWorldMatrix(), GetCenterPosition(bbox)));
+            if(entity->IsSolid() && M::IS::Intersects(ray, bbox)) {
+                *ret = entity.Raw();
                 return true;
             }
         }
+    }
+    return false;
+}
+
+static bool Filter_AcceptAll(const Entity&) { return true; }
+static bool Filter_IsGeometry(const Entity& ent) { return EntityType::ENT_GEOMETRY == ent.GetType(); }
+
+bool World::TraceEntity(const M::Ray& ray, Entity** ret) {
+    return Trace(ray, ret, Filter_AcceptAll);
+}
+
+bool World::TraceGeometry(const M::Ray& ray, ENT_Geometry** ret) {
+    Entity* hit = NULL;
+    if(Trace(ray, &hit, Filter_IsGeometry)) {
+        *ret = static_cast<ENT_Geometry*>(hit); // ugly but safe downcast
+        return true;
     }
     return false;
 }
@@ -636,10 +667,6 @@ void World::Render(R::RenderList& renderList) {
     }
 }
 
-World::Selection* World::GetSelection() {
-    return &_selection;
-}
-
 ENT_Geometry* World::CreateGeometry() {
     entIdCntMtx.Lock();
     unsigned entId = entIdCnt++;
@@ -678,6 +705,47 @@ ENT_Text* World::CreateText() {
     Send(EV::def_LinkEntity.Create(args));
 
     return text;
+}
+
+void World::ClearSelection() {
+    SYS::ScopedLock lockEntities(_entitiesMtx);
+    _selection.Clear();
+}
+
+void World::Select_New(Entity* ent) {
+    _selection.Set(ent);
+}
+
+void World::Select_Add(Entity* ent) {
+    _selection.Add(ent);
+}
+
+void World::SelectVertex_New(ENT_Geometry* geom, const leda::node vert) {
+    SYS::ScopedLock lockEntities(_entitiesMtx);
+    _selection.SelectVertex_New(geom, vert);
+}
+
+void World::SelectVertex_Add(ENT_Geometry* geom, const leda::node vert) {
+    SYS::ScopedLock lockEntities(_entitiesMtx);
+    _selection.SelectVertex_Add(geom, vert);
+}
+
+std::vector<ENT_Geometry*> World::SelectedGeometry() {
+    SYS::ScopedLock lockEntities(_entitiesMtx);
+    return _selection.GetGeometryList();
+}
+
+M::Vector3 World::GlobalCenterOfSelection() {
+    SYS::ScopedLock lockEntities(_entitiesMtx);
+    return _selection.GetGlobalCenter();
+}
+
+Entity* World::FirstSelectedEntity() {
+    return _selection.Head();
+}
+
+Entity* World::NextSelectedEntity(Entity* ent) {
+    return ent->selectionLink.next;
 }
 
 DWORD World::Thread_Func(void) {

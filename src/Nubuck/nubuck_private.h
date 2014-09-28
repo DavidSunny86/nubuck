@@ -25,14 +25,30 @@ struct NubuckImpl : Nubuck {
 
     void                    clear_selection();
     void                	select_geometry(SelectMode mode, const nb::geometry obj);
+    void                    select(SelectMode mode, const nb::entity obj);
     void                	select_vertex(SelectMode, const nb::geometry obj, const leda::node vert);
 
     std::vector<nb::geometry>   selected_geometry();
     M::Vector3                  global_center_of_selection();
 
+    // entities
+    M::Vector3              position(nb::entity obj);
+
+    nb::EntityType::Enum    type_of(nb::entity obj);
+    nb::geometry            to_geometry(nb::entity obj);
+    nb::text                to_text(nb::entity obj);
+
+    nb::entity              first_selected_entity();
+    nb::entity              next_selected_entity(nb::entity obj);
+
+    void                    set_position(nb::entity obj, const M::Vector3& pos);
+
     // geometry
     const std::string&  geometry_name(const nb::geometry obj);
     M::Vector3          geometry_position(const nb::geometry obj);
+
+    nb::geometry        first_selected_geometry();
+    nb::geometry        next_selected_geometry(nb::geometry obj);
 
     leda::nb::RatPolyMesh& poly_mesh(const nb::geometry obj);
 

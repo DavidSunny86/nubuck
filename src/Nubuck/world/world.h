@@ -38,16 +38,24 @@ namespace W {
     private:
         DECL_HANDLE_EVENTS(World)
 
+        // NOTE: selection is managed by operators ONLY
         class Selection {
         private:
             mutable SYS::SpinLock _mtx;
 
-            std::vector<Entity*>    list;
-            M::Vector3              center; // in world space
+            Entity*     head;
+            M::Vector3  center; // in world space
+
+            void _Clear();
+            void _Select(Entity* ent);
 
             void ComputeCenter();
             void SignalChange();
         public:
+            Selection() : head(NULL) { }
+
+            Entity* Head() { return head; }
+
             void Set(Entity* ent);
             void Add(Entity* ent);
             void Clear();
@@ -80,14 +88,14 @@ namespace W {
         void Grid_GetRenderJobs(std::vector<R::MeshJob>& rjobs);
 
         struct BoundingBox {
-            const ENT_Geometry*     geom;
-            R::meshPtr_t            mesh;
-            R::tfmeshPtr_t          tfmesh;
+            const Entity*   entity;
+            R::meshPtr_t    mesh;
+            R::tfmeshPtr_t  tfmesh;
 
             void Destroy();
 
-            BoundingBox() : geom(NULL), mesh(NULL), tfmesh(NULL) { }
-            BoundingBox(const ENT_Geometry* geom);
+            BoundingBox() : entity(NULL), mesh(NULL), tfmesh(NULL) { }
+            BoundingBox(const Entity* entity);
             ~BoundingBox() { Destroy(); }
             void Transform();
         };
@@ -96,6 +104,10 @@ namespace W {
         void                        BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs);
 
         EditMode _editMode;
+
+        typedef bool (*entityFilter_t)(const Entity& ent);
+
+        bool    Trace(const M::Ray& ray, Entity** ent, entityFilter_t filter);
 
 #pragma region EventHandlers
         void Event_Apocalypse(const EV::Event& event);
@@ -121,16 +133,30 @@ namespace W {
         M::Matrix4 GetModelView() const { return _camArcball.GetWorldToEyeMatrix(); }
 
         M::Ray  PickingRay(const M::Vector2& mouseCoords);
-        bool    Trace(const M::Ray& ray, ENT_Geometry** geom);
+        bool    TraceEntity(const M::Ray& ray, Entity** ret);
+        bool    TraceGeometry(const M::Ray& ray, ENT_Geometry** ret);
 
         void RebuildAll();
         void Update(void);
         void Render(R::RenderList& renderList);
 
         // exported to client
-        Selection* GetSelection();
         ENT_Geometry* CreateGeometry(); // thread-safe
         ENT_Text* CreateText();
+
+        // selection, exported to client
+        // MUST be called from inside operator
+        void                        ClearSelection();
+        void 						Select_New(Entity* ent);
+        void 						Select_Add(Entity* ent);
+        void 						SelectVertex_New(ENT_Geometry* geom, const leda::node vert);
+        void 						SelectVertex_Add(ENT_Geometry* geom, const leda::node vert);
+
+        std::vector<ENT_Geometry*>  SelectedGeometry();
+        M::Vector3                  GlobalCenterOfSelection();
+
+        Entity*                     FirstSelectedEntity();
+        Entity*                     NextSelectedEntity(Entity* ent);
 
         // thread interface
         DWORD Thread_Func(void);

@@ -23,7 +23,8 @@ private:
     struct Tags {
         enum Enum {
             IS_DEAD     = (1 << 0),
-            IS_SELECTED = (1 << 1)
+            IS_SELECTED = (1 << 1),
+            IS_SOLID    = (1 << 2) // detectable by raycast
 		};
 	};
 
@@ -44,12 +45,22 @@ private:
 protected:
     void SetBoundingBox(const M::Box& bbox);
 public:
+    struct DListLink {
+        Entity *prev, *next;
+
+        DListLink() : prev(NULL), next(NULL) { }
+        void SetNull() { prev = next = NULL; }
+    } selectionLink; // managed by World::Selection
+
     Entity();
     virtual ~Entity() { }
 
     void Select();
     void Deselect();
     bool IsSelected() const;
+
+    void SetSolid(bool solid);
+    bool IsSolid() const;
 
     bool IsDead() const;
 

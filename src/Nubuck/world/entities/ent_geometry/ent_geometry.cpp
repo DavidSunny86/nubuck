@@ -210,7 +210,6 @@ ENT_Geometry::ENT_Geometry()
     , _mesh(NULL)
     , _tfmesh(NULL)
     , _meshCompiled(true)
-    , _isSolid(true)
     , _isHidden(false)
     , _renderMode(0)
     , _renderLayer(0)
@@ -289,10 +288,6 @@ void ENT_Geometry::ClearVertexSelection() {
 
 UI::OutlinerView* ENT_Geometry::CreateOutlinerView() {
     return new ENT_GeometryOutln(*this);
-}
-
-void ENT_Geometry::SetSolid(bool solid) {
-    _isSolid = solid;
 }
 
 void ENT_Geometry::SetTransparency(float transparency) {

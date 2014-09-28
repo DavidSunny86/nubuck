@@ -197,7 +197,7 @@ void Translate::Register(const Nubuck& nb, Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
     */
 
-    if(!nubuck().selected_geometry().empty()) HideCursor();
+    if(!nubuck().first_selected_entity()) HideCursor();
 }
 
 static M::Vector3 Axis(int i) {
@@ -287,12 +287,12 @@ static M::Vector3 FindCursorPosition() {
     if(W::editMode_t::OBJECTS == editMode) return g_nubuck.global_center_of_selection();
 
     if(W::editMode_t::VERTICES == editMode) {
-        W::ENT_Geometry* geom = (W::ENT_Geometry*)g_nubuck.selected_geometry().front();
+        nb::geometry geom = nubuck().first_selected_geometry();
         std::vector<leda::node> verts = geom->GetVertexSelection();
         M::Vector3 pos = M::Vector3::Zero;
         M::Matrix4 objToWorld = geom->GetObjectToWorldMatrix();
         for(unsigned i = 0; i < verts.size(); ++i) {
-            pos += M::Transform(objToWorld, ToVector(geom->GetRatPolyMesh().position_of(verts[i])));
+            pos += M::Transform(objToWorld, ToVector(nubuck().poly_mesh(geom).position_of(verts[i])));
         }
         float d = 1.0f / verts.size();
         return d * pos;
@@ -309,7 +309,7 @@ Translate::UpdateCursor
 ====================
 */
 void Translate::UpdateCursor() {
-    if(g_nubuck.selected_geometry().empty()) HideCursor();
+    if(!nubuck().first_selected_entity()) HideCursor();
     else {
         SetCursorPosition(FindCursorPosition());
         ShowCursor();
@@ -328,7 +328,7 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
 
     _editMode = W::world.GetEditMode().GetMode();
 
-    if(!nubuck().selected_geometry().empty() && TraceCursor(ray, axis, &inf)) {
+    if(nubuck().first_selected_entity() && TraceCursor(ray, axis, &inf)) {
         M::Vector3 eyeZ = EyeZ(W::world.GetModelView());
         M::Vector3 vAxis = Axis(axis);
         _dragAxis = axis;
@@ -337,51 +337,62 @@ bool Translate::OnMouseDown(const MouseEvent& event) {
         assert(is);
         _dragOrig = inf.where;
 
-        const std::vector<nb::geometry>& geomList = nubuck().selected_geometry();
+        unsigned selectionSize = 0;
+        nb::entity ent = nubuck().first_selected_entity();
+        while(ent) {
+            selectionSize++;
+            ent = nubuck().next_selected_entity(ent);
+        }
 
         _center = M::Vector3::Zero;
 
         // save entity positions
         if(W::editMode_t::OBJECTS == _editMode) {
-            _oldGeomPos.resize(geomList.size());
-            for(unsigned i = 0; i < _oldGeomPos.size(); ++i) {
-                _oldGeomPos[i] = ((const W::ENT_Geometry*)geomList[i])->GetPosition();
-                _center += _oldGeomPos[i];
+            _oldEntityPos.resize(selectionSize);
+            unsigned i = 0;
+            nb::entity ent = nubuck().first_selected_entity();
+            while(ent) {
+                _oldEntityPos[i] = nubuck().position(ent);
+                _center += _oldEntityPos[i];
+                i++;
+                ent = nubuck().next_selected_entity(ent);
             }
-            _center /= _oldGeomPos.size();
+            _center /= _oldEntityPos.size();
         }
 
         // save vertex positions
-        const W::ENT_Geometry* geom = (const W::ENT_Geometry*)geomList[0];
-        const leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
-        _oldVertPos.init(mesh);
-        leda::node v;
-        forall_nodes(v, mesh) {
-            const M::Vector3 pos = ToVector(mesh.position_of(v));
-            _oldVertPos[v] = pos;
-        }
+        nb::geometry geom = nubuck().first_selected_geometry();
+        if(geom) {
+            const leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
+            _oldVertPos.init(mesh);
+            leda::node v;
+            forall_nodes(v, mesh) {
+                const M::Vector3 pos = ToVector(mesh.position_of(v));
+                _oldVertPos[v] = pos;
+            }
 
-        if(W::editMode_t::VERTICES == _editMode) {
-            std::vector<leda::node> verts = geom->GetVertexSelection();
-            for(unsigned i = 0; i < verts.size(); ++i)
-                _center += _oldVertPos[verts[i]];
-            _center /= verts.size();
-        }
+            if(W::editMode_t::VERTICES == _editMode) {
+                std::vector<leda::node> verts = geom->GetVertexSelection();
+                for(unsigned i = 0; i < verts.size(); ++i)
+                    _center += _oldVertPos[verts[i]];
+                _center /= verts.size();
+            }
+        } // if(geom)
 
         _oldCursorPos = _cursorPos;
         _dragging = true;
-    } else {
+    } else { // cursor not hit
         if(W::editMode_t::OBJECTS == _editMode) {
-            W::ENT_Geometry* geom;
-            if(W::world.Trace(ray, &geom)) {
-                if(MouseEvent::MODIFIER_SHIFT & event.mods) W::world.GetSelection()->Add(geom);
-                else W::world.GetSelection()->Set(geom);
+            nb::entity ent = NULL;
+            if(W::world.TraceEntity(ray, &ent)) {
+                if(MouseEvent::MODIFIER_SHIFT & event.mods) nubuck().select(Nubuck::SELECT_MODE_ADD, ent);
+                else nubuck().select(Nubuck::SELECT_MODE_NEW, ent);
                 return true;
             }
         }
 
-        if(W::editMode_t::VERTICES == _editMode && !nubuck().selected_geometry().empty()) {
-            W::ENT_Geometry* geom = (W::ENT_Geometry*)nubuck().selected_geometry().front();
+        if(W::editMode_t::VERTICES == _editMode && nubuck().first_selected_geometry()) {
+            W::ENT_Geometry* geom = nubuck().first_selected_geometry();
             std::vector<W::ENT_Geometry::VertexHit> hits;
             if(geom->TraceVertices(ray, 0.2f, hits)) {
                 // find nearest hit
@@ -432,20 +443,21 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
         pos.vec[_dragAxis] = _oldCursorPos.vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
         SetCursorPosition(pos);
 
-        std::vector<nb::geometry>& geomList = nubuck().selected_geometry();
-
         if(W::editMode_t::OBJECTS == _editMode) {
-            for(unsigned i = 0; i < geomList.size(); ++i) {
-                nb::geometry geom = geomList[i];
-                M::Vector3 pos = _oldGeomPos[i];
-                pos.vec[_dragAxis] = _oldGeomPos[i].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
-                geom->SetPosition(pos);
+            unsigned i = 0;
+            nb::entity ent = nubuck().first_selected_entity();
+            while(ent) {
+                M::Vector3 pos = _oldEntityPos[i];
+                pos.vec[_dragAxis] = _oldEntityPos[i].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
+                nubuck().set_position(ent, pos);
+                i++;
+                ent = nubuck().next_selected_entity(ent);
             }
         }
 
         if(W::editMode_t::VERTICES == _editMode) {
-            W::ENT_Geometry* geom = (W::ENT_Geometry*)geomList[0];
-            leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+            nb::geometry geom = nubuck().first_selected_geometry();
+            leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
 
             std::vector<leda::node> verts = geom->GetVertexSelection();
             assert(!verts.empty());
@@ -471,12 +483,11 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
 
         float scale = M::Length(p - _oldCursorPos) / base;
 
-        std::vector<nb::geometry>& geomList = nubuck().selected_geometry();
-
         if(W::editMode_t::OBJECTS == _editMode) {
-            for(unsigned i = 0; i < geomList.size(); ++i) {
-                nb::geometry geom = geomList[i];
-                leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+            // TODO: this is broken, does not work for multiple selected geometry objects
+            nb::geometry geom = nubuck().first_selected_geometry();
+            if(geom) {
+                leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
                 leda::node v;
                 forall_nodes(v, mesh) {
                     M::Vector3 pos = _oldVertPos[v];
@@ -487,8 +498,8 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
         }
 
         if(W::editMode_t::VERTICES == _editMode) {
-            W::ENT_Geometry* geom = (W::ENT_Geometry*)geomList[0];
-            leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+            nb::geometry geom = nubuck().first_selected_geometry();
+            leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
 
             std::vector<leda::node> verts = geom->GetVertexSelection();
             assert(!verts.empty());

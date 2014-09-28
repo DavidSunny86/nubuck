@@ -91,28 +91,60 @@ nb::text NubuckImpl::create_text() {
 }
 
 void NubuckImpl::clear_selection() {
-    W::world.GetSelection()->Clear();
+    W::world.ClearSelection();
 }
 
 void NubuckImpl::select_geometry(SelectMode mode, const nb::geometry obj) {
-    if(SELECT_MODE_ADD == mode) {
-        W::world.GetSelection()->Add(obj);
-    } else {
-        W::world.GetSelection()->Set(obj);
-    }
+    if(SELECT_MODE_NEW == mode) W::world.Select_New(obj);
+    else W::world.Select_Add(obj);
+}
+
+void NubuckImpl::select(SelectMode mode, const nb::entity obj) {
+    if(SELECT_MODE_NEW == mode) W::world.Select_New(obj);
+    else W::world.Select_Add(obj);
 }
 
 void NubuckImpl::select_vertex(SelectMode mode, const nb::geometry obj, const leda::node vert) {
-    if(SELECT_MODE_NEW == mode) W::world.GetSelection()->SelectVertex_New(obj, vert);
-    else W::world.GetSelection()->SelectVertex_Add(obj, vert);
+    if(SELECT_MODE_NEW == mode) W::world.SelectVertex_New(obj, vert);
+    else W::world.SelectVertex_Add(obj, vert);
 }
 
 std::vector<nb::geometry> NubuckImpl::selected_geometry() {
-    return W::world.GetSelection()->GetGeometryList();
+    return W::world.SelectedGeometry();
 }
 
 M::Vector3 NubuckImpl::global_center_of_selection() {
-    return W::world.GetSelection()->GetGlobalCenter();
+    return W::world.GlobalCenterOfSelection();
+}
+
+M::Vector3 NubuckImpl::position(nb::entity obj) {
+    return obj->GetPosition();
+}
+
+nb::EntityType::Enum NubuckImpl::type_of(nb::entity obj) {
+    return nb::EntityType::Enum(obj->GetType()); // types are compatible
+}
+
+nb::geometry NubuckImpl::to_geometry(nb::entity obj) {
+    assert(W::EntityType::ENT_GEOMETRY == obj->GetType());
+    return static_cast<W::ENT_Geometry*>(obj); // ugly but safe downcast
+}
+
+nb::text NubuckImpl::to_text(nb::entity obj) {
+    assert(W::EntityType::ENT_TEXT == obj->GetType());
+    return static_cast<W::ENT_Text*>(obj); // ugly but safe downcast
+}
+
+nb::entity NubuckImpl::first_selected_entity() {
+    return W::world.FirstSelectedEntity();
+}
+
+nb::entity NubuckImpl::next_selected_entity(nb::entity obj) {
+    return W::world.NextSelectedEntity(obj);
+}
+
+void NubuckImpl::set_position(nb::entity obj, const M::Vector3& pos) {
+    obj->SetPosition(pos);
 }
 
 const std::string& NubuckImpl::geometry_name(const nb::geometry obj) {
@@ -121,6 +153,28 @@ const std::string& NubuckImpl::geometry_name(const nb::geometry obj) {
 
 M::Vector3 NubuckImpl::geometry_position(const nb::geometry obj) {
     return obj->GetPosition();
+}
+
+nb::geometry NubuckImpl::first_selected_geometry() {
+    W::Entity* ent = W::world.FirstSelectedEntity();
+    while(ent) {
+        if(W::EntityType::ENT_GEOMETRY == ent->GetType()) {
+            return static_cast<W::ENT_Geometry*>(ent); // ugly but safe downcast
+        }
+        ent = ent->selectionLink.next;
+    }
+    return NULL;
+}
+
+nb::geometry NubuckImpl::next_selected_geometry(nb::geometry obj) {
+    W::Entity* ent = obj->selectionLink.next;
+    while(ent) {
+        if(W::EntityType::ENT_GEOMETRY == ent->GetType()) {
+            return static_cast<W::ENT_Geometry*>(ent); // ugly but safe downcast
+        }
+        ent = ent->selectionLink.next;
+    }
+    return NULL;
 }
 
 leda::nb::RatPolyMesh& NubuckImpl::poly_mesh(const nb::geometry obj) {

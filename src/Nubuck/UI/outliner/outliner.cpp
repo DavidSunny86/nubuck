@@ -11,12 +11,11 @@
 namespace UI {
 
 void SelectEntityButton::mousePressEvent(QMouseEvent* event) {
-    if(_entity && W::EntityType::ENT_GEOMETRY == _entity->GetType()) {
-        W::ENT_Geometry* geom = (W::ENT_Geometry*)_entity;
+    if(_entity) {
         if(Qt::ShiftModifier & event->modifiers()) {
-            W::world.GetSelection()->Add(geom);
+            W::world.Select_Add(_entity);
         } else {
-            W::world.GetSelection()->Set(geom);
+            W::world.Select_New(_entity);
         }
     }
 }
@@ -103,11 +102,7 @@ void Outliner::Event_Delete(const EV::Event& event) {
 void Outliner::Event_SelectionChanged(const EV::Event&) {
     LinkedItem* it = _items;
     while(it) {
-        bool isSelected = false;
-        if(W::EntityType::ENT_GEOMETRY == it->entity->GetType()) {
-            W::ENT_Geometry* geom = (W::ENT_Geometry*)it->entity;
-            isSelected = geom->IsSelected();
-        }
+        bool isSelected = it->entity->IsSelected();
         if(it->header.selection) it->header.selection->setChecked(isSelected);
         it = it->next;
     }

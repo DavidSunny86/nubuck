@@ -62,7 +62,6 @@ private:
 
     typedef Nubuck::ShadingMode ShadingMode;
 
-    bool                _isSolid; // detectable by raycast
     bool                _isHidden;
     int                 _renderMode;
     unsigned            _renderLayer;
@@ -112,10 +111,6 @@ public:
     void                    ClearVertexSelection();
 
     std::vector<leda::node> GetVertexSelection() const;
-
-    bool IsSolid() const { return _isSolid; }
-
-    void SetSolid(bool solid);
 
     void SetTransparency(float transparency);
 

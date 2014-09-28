@@ -22,6 +22,7 @@ struct Vector2;
 
 namespace W {
 
+class Entity;
 class ENT_Geometry;
 class ENT_Text;
 
@@ -29,8 +30,16 @@ class ENT_Text;
 
 namespace nb {
 
+typedef W::Entity*          entity;
 typedef W::ENT_Geometry*    geometry;
 typedef W::ENT_Text*        text;
+
+struct EntityType {
+    enum Enum {
+        GEOMETRY = 0,
+        TEXT
+    };
+};
 
 } // namespace nb
 
@@ -59,10 +68,23 @@ struct Nubuck {
 
     virtual void                    clear_selection() = 0;
     virtual void                	select_geometry(SelectMode mode, const nb::geometry obj) = 0;
+    virtual void                    select(SelectMode mode, const nb::entity obj) = 0;
     virtual void                	select_vertex(SelectMode, const nb::geometry obj, const leda::node vert) = 0;
 
     virtual std::vector<nb::geometry>   selected_geometry() = 0;
     virtual M::Vector3                  global_center_of_selection() = 0;
+
+    // entities
+    virtual M::Vector3              position(nb::entity obj) = 0;
+
+    virtual nb::EntityType::Enum    type_of(nb::entity obj) = 0;
+    virtual nb::geometry            to_geometry(nb::entity obj) = 0;
+    virtual nb::text                to_text(nb::entity obj) = 0;
+
+    virtual nb::entity              first_selected_entity() = 0;
+    virtual nb::entity              next_selected_entity(nb::entity obj) = 0;
+
+    virtual void                    set_position(nb::entity obj, const M::Vector3& pos) = 0;
 
     // geometry
     struct RenderMode {
@@ -86,6 +108,9 @@ struct Nubuck {
 
     virtual const std::string&  geometry_name(const nb::geometry obj) = 0;
     virtual M::Vector3          geometry_position(const nb::geometry obj) = 0;
+
+    virtual nb::geometry        first_selected_geometry() = 0;
+    virtual nb::geometry        next_selected_geometry(nb::geometry obj) = 0;
 
     virtual leda::nb::RatPolyMesh& poly_mesh(const nb::geometry obj) = 0;
 

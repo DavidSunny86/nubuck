@@ -16,7 +16,7 @@
 #include <LEDA\geo\d3_hull.h>
 
 // forward decls
-namespace M { namespace IS { struct Info; } } 
+namespace M { namespace IS { struct Info; } }
 
 namespace OP {
 
@@ -73,7 +73,7 @@ private:
 
     M::Vector3                      _cursorPos; // use cursorPos as readonly and SetCursorPosition() for writes
     M::Vector3              		_oldCursorPos;
-    std::vector<M::Vector3> 		_oldGeomPos;
+    std::vector<M::Vector3> 		_oldEntityPos;
     leda::node_array<M::Vector3>    _oldVertPos;
     M::Vector3                      _center;
     W::editMode_t::Enum             _editMode;

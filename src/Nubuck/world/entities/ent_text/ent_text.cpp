@@ -13,6 +13,13 @@ void ENT_Text::Rebuild() {
     const R::TexFont& texFont = R::FindTexFont(R::TF_Type::SDFont, filename);
 
     _text.Rebuild(texFont, _content, _refChar, _refCharSize);
+
+    // recompute bbox
+    const M::Vector2 contentSize = GetContentSize();
+    const M::Vector3 size = M::Vector3(contentSize.x, contentSize.y, 0.1f);
+    const M::Vector3 center = 0.5f * M::Vector3(contentSize.x, -contentSize.y, 0.0f);
+    M::Box bbox = M::Box::FromCenterSize(center, size);
+    SetBoundingBox(bbox);
 }
 
 ENT_Text::ENT_Text()
@@ -27,10 +34,6 @@ ENT_Text::ENT_Text()
     g_ui.GetOutliner().SetItemName(_outlinerItem, "Text");
 
     Rebuild();
-
-    // TODO
-    M::Box bbox = M::Box::FromCenterSize(M::Vector3::Zero, M::Vector3(10.0f, 10.0f, 10.0f));
-    SetBoundingBox(bbox);
 }
 
 UI::OutlinerView* ENT_Text::CreateOutlinerView() {

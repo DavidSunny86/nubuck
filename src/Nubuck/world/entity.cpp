@@ -11,7 +11,7 @@ void Entity::SetBoundingBox(const M::Box& bbox) {
 }
 
 Entity::Entity()
-    : _tags(0)
+    : _tags(Tags::IS_SOLID)
     , _position(M::Vector3::Zero)
     , _orientation(M::Quat::Identity())
     , _scale(1.0f, 1.0f, 1.0f)
@@ -29,6 +29,16 @@ void Entity::Deselect() {
 
 bool Entity::IsSelected() const {
 	return _tags & Tags::IS_SELECTED;
+}
+
+void Entity::SetSolid(bool solid) {
+    SYS::ScopedLock lock(_mtx);
+    if(solid) _tags |= Tags::IS_SOLID;
+    else _tags &= ~Tags::IS_SOLID;
+}
+
+bool Entity::IsSolid() const {
+    return _tags & Tags::IS_SOLID;
 }
 
 bool Entity::IsDead() const {
