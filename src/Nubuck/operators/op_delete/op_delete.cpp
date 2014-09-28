@@ -15,11 +15,18 @@ void Delete::Register(const Nubuck& nb, Invoker& invoker) {
 bool Delete::Invoke() {
     nubuck().set_operator_name("Delete");
 
-    std::vector<nb::geometry> geomList = nubuck().selected_geometry();
-    for(unsigned i = 0; i < geomList.size(); ++i) {
-        nubuck().destroy_geometry(geomList[i]);
+    std::vector<nb::entity> del;
+    nb::entity ent = nubuck().first_selected_entity();
+    while(ent) {
+        del.push_back(ent);
+        ent = nubuck().next_selected_entity(ent);
     }
+
     nubuck().clear_selection();
+
+    for(unsigned i = 0; i < del.size(); ++i) {
+        nubuck().destroy(del[i]);
+    }
 
     return true;
 }

@@ -59,4 +59,9 @@ void ENT_Text::GetRenderJobs(R::RenderList& renderList) {
     _text.GetRenderJobs(GetObjectToWorldMatrix(), renderList);
 }
 
+void ENT_Text::OnDestroy() {
+    g_ui.GetOutliner().DeleteItem(_outlinerItem);
+    _outlinerItem = NULL;
+}
+
 } // namespace W

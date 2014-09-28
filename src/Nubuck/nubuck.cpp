@@ -78,6 +78,10 @@ void NubuckImpl::set_operator_panel(QWidget* panel) {
     return g_ui.GetMainWindow().SetOperatorPanel(panel);
 }
 
+void NubuckImpl::destroy(const nb::entity obj) {
+    obj->Destroy();
+}
+
 nb::geometry NubuckImpl::create_geometry() {
     return W::world.CreateGeometry();
 }

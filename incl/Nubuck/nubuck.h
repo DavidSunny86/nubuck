@@ -56,6 +56,7 @@ struct Nubuck {
     virtual void    set_operator_panel(QWidget* panel) = 0;
 
     // world
+    virtual void            destroy(const nb::entity obj) = 0;
     virtual nb::geometry    create_geometry() = 0;
     virtual void            destroy_geometry(const nb::geometry obj) = 0;
     virtual nb::text        create_text() = 0;

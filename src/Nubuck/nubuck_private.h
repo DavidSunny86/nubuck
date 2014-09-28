@@ -19,6 +19,7 @@ struct NubuckImpl : Nubuck {
     void    set_operator_panel(QWidget* panel);
 
     // world
+    void            destroy(const nb::entity obj);
     nb::geometry    create_geometry();
     void            destroy_geometry(const nb::geometry obj);
     nb::text        create_text();

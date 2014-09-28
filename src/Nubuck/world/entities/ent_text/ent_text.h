@@ -30,6 +30,8 @@ public:
     void SetContentScale(const char refChar, const float refCharSize);
 
     void GetRenderJobs(R::RenderList& renderList);
+
+    void OnDestroy() override;
 };
 
 } // namespace W
