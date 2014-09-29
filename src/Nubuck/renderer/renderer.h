@@ -126,10 +126,13 @@ public:
     void FinishResize();
 
     void BeginFrame();
+    void Render(const M::Matrix4& perspective, const M::Matrix4& ortho, RenderList& renderList);
     void Render(RenderList& renderList);
-    void EndFrame();
+    void EndFrame(bool present = true);
 
     void Screenshot() { _screenshotRequested = true; }
+
+    void LargeScreenshot(const int imgWidth, const int imgHeight, RenderList& renderList);
 };
 
 } // namespace R

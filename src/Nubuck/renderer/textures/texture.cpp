@@ -87,6 +87,13 @@ namespace R {
         delete[] pixels;
     }
 
+    void Texture::WritePixels_BGR(COM::byte_t* pixels) {
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+        Bind(0);
+        GL_CALL(glGetTexImage(GL_TEXTURE_2D, 0, GL_BGR, GL_UNSIGNED_BYTE, pixels));
+    }
+
 	/* TextureManager Impl */
 
 	std::string ToLower(const std::string& str) {

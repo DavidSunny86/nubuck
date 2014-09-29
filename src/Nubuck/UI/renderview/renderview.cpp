@@ -143,6 +143,12 @@ namespace UI {
             return;
         }
 
+        // large screenshot
+        if(Qt::Key_F11 == qevent->key() && !qevent->isAutoRepeat()) {
+            _largeScreenshotRequested = true;
+            return;
+        }
+
         if(Qt::Key_Tab == qevent->key() && !qevent->isAutoRepeat()) {
             W::world.GetEditMode().CycleModes();
             return;
@@ -199,6 +205,8 @@ namespace UI {
     {
         setFocusPolicy(Qt::StrongFocus);
         setMouseTracking(true);
+
+        _largeScreenshotRequested = false;
     }
 
     RenderView::~RenderView(void) {
@@ -233,6 +241,11 @@ namespace UI {
         if(_bgGradient.show) RenderBackgroundGradient(_renderList);
         W::world.Render(_renderList);
         OP::g_operators.GetMeshJobs(_renderList.meshJobs);
+
+        if(_largeScreenshotRequested) {
+            _renderer.LargeScreenshot(10000, 10000, _renderList);
+            _largeScreenshotRequested = false;
+        }
 
         _renderer.BeginFrame();
         _renderer.Render(_renderList);

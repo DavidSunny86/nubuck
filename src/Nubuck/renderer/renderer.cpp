@@ -5,6 +5,7 @@
 
 #include <Nubuck\common\common.h>
 #include <common\config\config.h>
+#include <common\filehandle.h>
 #include <Nubuck\math\matrix3.h>
 #include <Nubuck\math\matrix4.h>
 #include <renderer\glew\glew.h>
@@ -25,6 +26,9 @@
 #include "renderer_local.h"
 #include "renderer.h"
 #include <world\world.h>
+
+// defined in tga_texalloc.cpp
+void WriteTGAHeader(unsigned short width, unsigned short height, FILE* file);
 
 namespace {
 
@@ -806,19 +810,21 @@ void Renderer::BeginFrame() {
     Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void Renderer::EndFrame() {
+void Renderer::EndFrame(bool present) {
     BindWindowSystemFramebuffer();
 
-    glViewport(0, 0, _width, _height);
+    if(present) {
+        glViewport(0, 0, _width, _height);
 
-    float ds = 0.5f * vpMargin / (_width + vpMargin);
-    float dt = 0.5f * vpMargin / (_height + vpMargin);
+        float ds = 0.5f * vpMargin / (_width + vpMargin);
+        float dt = 0.5f * vpMargin / (_height + vpMargin);
 
-    QuadTexCoords texCoords;
-    texCoords.ll = M::Vector2(ds, dt);
-    texCoords.ur = M::Vector2(1.0f - ds, 1.0f - dt);
+        QuadTexCoords texCoords;
+        texCoords.ll = M::Vector2(ds, dt);
+        texCoords.ur = M::Vector2(1.0f - ds, 1.0f - dt);
 
-    DrawFullscreenQuad(*colorbuffer, texCoords);
+        DrawFullscreenQuad(*colorbuffer, texCoords);
+    }
 
     meshMgr.R_Update();
 
@@ -863,21 +869,13 @@ M::Matrix4 Lerp(const M::Matrix4& lhp, const M::Matrix4& rhp, float t) {
 
 } // unnamed namespace
 
-void Renderer::Render(RenderList& renderList) {
+void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, RenderList& renderList) {
     for(unsigned i = 0; i < Layers::NUM_LAYERS; ++i) _renderLayers[i].clear();
 
     for(unsigned i = 0; i < renderList.meshJobs.size(); ++i) {
         MeshJob& rjob = renderList.meshJobs[i];
         _renderLayers[rjob.layer].push_back(rjob);
     }
-
-    const float zoom = 0.45f * renderList.zoom; // arbitrary scaling factor, looks okay i guess
-    M::Matrix4 perspective  = M::Mat4::Perspective(45.0f, _aspect, 0.1f, 100.0f);
-
-    // NOTE: choose sufficiently large negative value for near clipping plane. using the same value
-    // as for the perspective proj. matrix causes artifacts that look like z-fighting.
-    // i have absolutely no idea why.
-    M::Matrix4 ortho        = M::Mat4::Ortho(-zoom * _aspect, zoom * _aspect, -zoom, zoom, -100.0f, 100.0f);
 
     M::Matrix4 projection   = Lerp(perspective, ortho, renderList.projWeight);
     M::Matrix4 worldToEye   = renderList.worldMat;
@@ -1025,6 +1023,109 @@ void Renderer::Render(RenderList& renderList) {
         Clear(GL_DEPTH_BUFFER_BIT);
         Render(renderList, perspective, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_1]);
     }
+}
+
+void Renderer::Render(RenderList& renderList) {
+    const float zoom = 0.45f * renderList.zoom; // arbitrary scaling factor, looks okay i guess
+    M::Matrix4 perspective  = M::Mat4::Perspective(45.0f, _aspect, 0.1f, 100.0f);
+
+    // NOTE: choose sufficiently large negative value for near clipping plane. using the same value
+    // as for the perspective proj. matrix causes artifacts that look like z-fighting.
+    // i have absolutely no idea why.
+    M::Matrix4 ortho        = M::Mat4::Ortho(-zoom * _aspect, zoom * _aspect, -zoom, zoom, -100.0f, 100.0f);
+
+    Render(perspective, ortho, renderList);
+}
+
+// returns ceil(a / b), see
+static int CeilDiv(const int a, const int b) {
+    int div = a / b;
+    if(a % b) div++;
+    return div;
+}
+
+void Renderer::LargeScreenshot(const int imgWidth, const int imgHeight, RenderList& renderList) {
+    // tile image that has a margin with tiles that have margin. then crop the image.
+    // that's the easiest way to work around seams.
+
+    const int m_imgWidth = imgWidth + vpMargin;
+    const int m_imgHeight = imgHeight + vpMargin;
+
+    // tile dimension = framebuffer dimension
+    const int tileWidth = _width + vpMargin;
+    const int tileHeight = _height + vpMargin;
+
+    const int numTilesX = CeilDiv(m_imgWidth, tileWidth);
+    const int numTilesY = CeilDiv(m_imgHeight, tileHeight);
+
+    COM::FileHandle file(fopen("screenshot_large.tga", "wb"));
+    if(0 == file.Handle()) {
+        COM_printf("ERROR - Renderer::LargeScreenshot(): unable to open file\n");
+        Crash();
+    }
+    WriteTGAHeader(m_imgWidth, m_imgHeight, file.Handle());
+
+    COM::byte_t* rowPixels = new COM::byte_t[3 * m_imgWidth * tileHeight];
+    COM::byte_t* pixels = new COM::byte_t[3 * tileWidth * tileHeight];
+
+    // hardcoded values
+    const float p_fovy = 45.0f;
+    const float p_near = 0.1f;
+    const float p_far = 100.0f;
+
+    // computing frustum paramters
+    float p_top = p_near * tanf(0.5f * M::Deg2Rad(p_fovy));
+    float p_bottom = -p_top;
+    float p_right = _aspect * p_top;
+    float p_left = -p_right;
+
+    float p_dx = (p_right - p_left) / numTilesX;
+    float p_dy = (p_top - p_bottom) / numTilesY;
+
+    float left = p_left;
+    float right = left + p_dx;
+
+    float bottom = p_bottom;
+    float top = bottom + p_dy;
+
+    for(int j = 0; j < numTilesY; ++j) {
+        left = p_left;
+        right = left + p_dx;
+
+        for(int i = 0; i < numTilesX; ++i) {
+            BeginFrame();
+            M::Matrix4 perspective = M::Mat4::Frustrum(left, right, bottom, top, p_near, p_far);
+            Render(perspective, M::Mat4::Identity(), renderList);
+            EndFrame(false);
+
+            colorbuffer->WritePixels_BGR(pixels);
+
+            for(int x = 0; x < tileWidth; ++x) {
+                for(int y = 0; y < tileHeight; ++y) {
+                    unsigned c = 3 * m_imgWidth * (y) + 3 * (tileWidth * i + x);
+
+                    if(tileWidth * i + x >= m_imgWidth || tileHeight * j + y >= m_imgHeight) continue;
+
+                    rowPixels[c + 0] = pixels[3 * colorbuffer->Width() * (y) + 3 * (x) + 0];
+                    rowPixels[c + 1] = pixels[3 * colorbuffer->Width() * (y) + 3 * (x) + 1];
+                    rowPixels[c + 2] = pixels[3 * colorbuffer->Width() * (y) + 3 * (x) + 2];
+                }
+            }
+
+            left += p_dx;
+            right += p_dx;
+        }
+
+        fwrite(rowPixels, 3 * m_imgWidth * tileHeight, 1, file.Handle());
+
+        bottom += p_dy;
+        top += p_dy;
+    }
+
+    delete[] pixels;
+    delete[] rowPixels;
+
+    std::cout << "large screenshot DONE!" << std::endl;
 }
 
 } // namespace R

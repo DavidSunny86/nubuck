@@ -34,6 +34,7 @@ namespace R {
 		int Height(void) const { return _height; }
 
         void WriteTGA(const std::string& filename);
+        void WritePixels_BGR(COM::byte_t* pixels); // make sure buffer is large enough
 	};
 
 	typedef Texture* (*texAlloc_t)(GEN::Pointer<FS::File> file);

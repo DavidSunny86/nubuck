@@ -39,6 +39,8 @@ namespace UI {
         R::Renderer     _renderer;
         R::RenderList   _renderList;
         R::DebugText    _debugText;
+
+        bool _largeScreenshotRequested;
     protected:
         void initializeGL(void) override;
         void resizeGL(int width, int height) override;

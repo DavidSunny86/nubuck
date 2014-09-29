@@ -126,6 +126,19 @@ R::Texture* AllocTGA(GEN::Pointer<FS::File> file) {
 	return texture;
 }
 
+void WriteTGAHeader(tgaWord_t width, tgaWord_t height, FILE* file) {
+    TGAHeader_t header;
+
+    memcpy(&header.fileSpec, &supportedFileSpec, sizeof(FileSpec_t));
+    memset(&header.imageSpec, 0, sizeof(ImageSpec_t));
+
+    header.imageSpec.width          = width;
+    header.imageSpec.height         = height;
+    header.imageSpec.bitsPerPixel   = 24;
+
+    fwrite(&header, sizeof(TGAHeader_t), 1, file);
+}
+
 void WriteTGA_BGR(
     const std::string& filename,
     tgaWord_t width,
@@ -138,16 +151,7 @@ void WriteTGA_BGR(
         return;
     }
 
-    TGAHeader_t header;
-
-    memcpy(&header.fileSpec, &supportedFileSpec, sizeof(FileSpec_t));
-    memset(&header.imageSpec, 0, sizeof(ImageSpec_t));
-
-    header.imageSpec.width          = width;
-    header.imageSpec.height         = height;
-    header.imageSpec.bitsPerPixel   = 24;
-
-    fwrite(&header, sizeof(TGAHeader_t), 1, file.Handle());
+    WriteTGAHeader(width, height, file.Handle());
 
     unsigned sz = width * height * 3;
     fwrite(pixelData, sz, 1, file.Handle());
