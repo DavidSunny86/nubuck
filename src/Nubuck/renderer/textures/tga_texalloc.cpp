@@ -132,7 +132,7 @@ void WriteTGA_BGR(
     tgaWord_t height,
     COM::byte_t* pixelData)
 {
-    COM::FileHandle file(fopen(filename.c_str(), "w"));
+    COM::FileHandle file(fopen(filename.c_str(), "wb"));
     if(NULL == file.Handle()) {
         common.printf("ERROR - WriteTGA_BGR: unable to open file '%s'\n", filename.c_str());
         return;
