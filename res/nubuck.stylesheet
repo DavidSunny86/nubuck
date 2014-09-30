@@ -206,6 +206,10 @@ QAbstractButton:checked {
     );
 }
 
+QAbstractButton:disabled {
+    background-color:   rgba(0, 0, 0, 0);
+}
+
 QCheckBox::indicator {
     width:  13px;
     height: 13px;
