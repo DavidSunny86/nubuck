@@ -1,0 +1,11 @@
+fx GenericNormals {
+  pass Normals {
+    state {
+      depth.func        = GL_LEQUAL;
+      raster.lineWidth  = 2.0;
+    }
+    vs = "#include <Shaders\normals.vert>";
+    fs = "#include <Shaders\normals.frag>";
+    gs = "#include <Shaders\normals.geom>";
+  }
+}

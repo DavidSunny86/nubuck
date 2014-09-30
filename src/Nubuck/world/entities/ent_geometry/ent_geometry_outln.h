@@ -30,6 +30,9 @@ private:
     QComboBox*          _cbEdgeShading;
     QCheckBox*          _cbHiddenLines;
 
+    QCheckBox*          _cbWireframe;
+    QCheckBox*          _cbNormals;
+
     void InitOutline();
 
     void SendEdgeShading();

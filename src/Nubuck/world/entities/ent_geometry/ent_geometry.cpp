@@ -195,7 +195,9 @@ void ENT_Geometry::Event_TransparencyChanged(const EV::Event& event) {
 void ENT_Geometry::Event_RenderModeChanged(const EV::Event& event) {
     const EV::Params_ENT_Geometry_RenderModeChanged& args = EV::def_ENT_Geometry_RenderModeChanged.GetArgs(event);
     std::cout << "RECEIVED!" << std::endl;
-    SetRenderMode(args.renderMode);
+    if(_renderMode != args.renderMode) SetRenderMode(args.renderMode);
+    _showWireframe = args.showWireframe;
+    _showNormals = args.showNormals;
 }
 
 void ENT_Geometry::Event_EdgeShadingChanged(const EV::Event& event) {
@@ -215,6 +217,8 @@ ENT_Geometry::ENT_Geometry()
     , _renderLayer(0)
     , _shadingMode(ShadingMode::NICE)
     , _stylizedHiddenLines(false)
+    , _showWireframe(false)
+    , _showNormals(false)
     , _transparency(1.0f)
     , _isTransparent(false)
     , _anims(NULL)
@@ -592,6 +596,18 @@ void ENT_Geometry::BuildRenderList() {
         rjob.material   = mat;
         rjob.tfmesh     = _tfmesh;
         rjob.primType   = 0;
+
+        if(_showWireframe) {
+            rjob.fx = "GenericWireframe";
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+            _renderList.meshJobs.push_back(rjob);
+        }
+
+        if(_showNormals) {
+            rjob.fx = "GenericNormals";
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+            _renderList.meshJobs.push_back(rjob);
+        }
 
         if(_isTransparent) {
             rjob.fx     = "DepthOnly";

@@ -45,6 +45,12 @@ void ENT_GeometryOutln::OnRenderModeChanged(bool) {
     if(_btnRenderEdges->isChecked()) renderMode |= Nubuck::RenderMode::EDGES;
     if(_btnRenderFaces->isChecked()) renderMode |= Nubuck::RenderMode::FACES;
     args.renderMode = renderMode;
+    args.showWireframe = _cbWireframe->isChecked();
+    args.showNormals = _cbNormals->isChecked();
+
+    _cbWireframe->setEnabled(_btnRenderFaces->isChecked());
+    _cbNormals->setEnabled(_btnRenderFaces->isChecked());
+
     _subject.Send(EV::def_ENT_Geometry_RenderModeChanged.Create(args));
 }
 
@@ -119,6 +125,11 @@ void ENT_GeometryOutln::InitOutline() {
     hboxLayout->addWidget(_btnRenderEdges);
     hboxLayout->addWidget(_btnRenderFaces);
 
+    _cbWireframe = new QCheckBox("Wireframe");
+    _cbWireframe->setEnabled(_subject.GetRenderMode() & Nubuck::RenderMode::FACES);
+    _cbNormals = new QCheckBox("Normals");
+    _cbWireframe->setEnabled(_subject.GetRenderMode() & Nubuck::RenderMode::FACES);
+
     layout->addWidget(_sbVertexScale, 0, 0, 1, 2);
 
     layout->addWidget(_sbEdgeScale, 1, 0, 1, 2);
@@ -136,6 +147,9 @@ void ENT_GeometryOutln::InitOutline() {
     layout->addWidget(lblRenderMode, 6, 0, 1, 1);
     layout->addLayout(hboxLayout, 6, 1, 1, 1);
 
+    layout->addWidget(_cbWireframe, 7, 0, 1, 1);
+    layout->addWidget(_cbNormals, 7, 1, 1, 1);
+
 	setLayout(layout);
 
     QObject::connect(_sbVertexScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnVertexScaleChanged(leda::rational)));
@@ -148,6 +162,9 @@ void ENT_GeometryOutln::InitOutline() {
     QObject::connect(_btnRenderVertices, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
     QObject::connect(_btnRenderEdges, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
     QObject::connect(_btnRenderFaces, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
+
+    QObject::connect(_cbWireframe, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
+    QObject::connect(_cbNormals, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
 }
 
 void ENT_GeometryOutln::SendEdgeShading() {

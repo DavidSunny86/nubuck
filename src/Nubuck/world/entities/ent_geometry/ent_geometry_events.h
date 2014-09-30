@@ -20,7 +20,9 @@ BEGIN_EVENT_DEF(ENT_Geometry_TransparencyChanged)
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(ENT_Geometry_RenderModeChanged)
-    int renderMode;
+    int     renderMode;
+    bool    showWireframe;
+    bool    showNormals;
 END_EVENT_DEF
 
 BEGIN_EVENT_DEF(ENT_Geometry_EdgeShadingChanged)
