@@ -25,7 +25,9 @@ void Animator::Move(float secsPassed) {
         }
         anim = anim->animatorLink.next;
     }
+}
 
+void Animator::EndFrame() {
     if(_isIdle) _cvar.Signal();
 }
 

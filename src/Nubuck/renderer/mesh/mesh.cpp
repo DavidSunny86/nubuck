@@ -178,6 +178,7 @@ void Mesh::Invalidate(Mesh::Vertex* const vertices) {
 
 void Mesh::Invalidate(Mesh::Vertex* const vertices, unsigned off, unsigned size) {
     SYS::ScopedLock lock(_mtx);
+    COM_assert(off + size <= sizeof(Vertex) * _vertices.size());
     memcpy(reinterpret_cast<char*>(&_vertices[0]) + off, reinterpret_cast<char*>(vertices) + off, size);
     if(GB_INVALID_HANDLE == _gbHandle) _invalidate = true;
     else GB_Invalidate(_gbHandle, off, size);

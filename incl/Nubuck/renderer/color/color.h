@@ -31,7 +31,7 @@ namespace R {
     Color BlendMulRGB(const Color& lhp, const Color& rhp);
     Color BlendMulRGBA(const Color& lhp, const Color& rhp);
 
-    Color Lerp(const Color& source, const Color& target, float l);
+    NUBUCK_API Color Lerp(const Color& source, const Color& target, float l);
 
     Color4ub ColorTo4ub(const Color& col4f);
     Color3ub ColorTo3ub(const Color& col4f);

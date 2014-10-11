@@ -6,6 +6,7 @@
 
 #include <Nubuck\nubuck.h>
 #include <Nubuck\common\common.h>
+#include <Nubuck\animation\animator.h>
 #include <common\config\config.h>
 #include <common\commands.h>
 #include <world\world.h>
@@ -243,6 +244,10 @@ void NubuckImpl::set_text_content(const nb::text obj, const std::string& content
 
 void NubuckImpl::set_text_content_scale(const nb::text obj, const char refChar, const float refCharSize) {
     obj->SetContentScale(refChar, refCharSize);
+}
+
+void NubuckImpl::wait_for_animations() {
+    OP::WaitForAnimations();
 }
 
 NubuckImpl g_nubuck;

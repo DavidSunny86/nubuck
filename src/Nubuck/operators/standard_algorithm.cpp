@@ -68,6 +68,7 @@ bool Phase::IsWall() const { return false; }
 
 void StandardAlgorithm::SetPhase(const GEN::Pointer<Phase>& phase) {
 	if(_phase.IsValid()) {
+        _phase->Leave();
     }
     _phase = phase;
 	COM_assert(_phase.IsValid());

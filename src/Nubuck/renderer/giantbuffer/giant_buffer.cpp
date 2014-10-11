@@ -284,7 +284,7 @@ static void Resize(unsigned size) {
 
 static void ResizeBuffer() {
     if(giantBufferLSize > giantBufferPSize) {
-        if(0 != giantBufferId) DeleteGiantBuffer(); 
+        if(0 != giantBufferId) DeleteGiantBuffer();
         AllocateGiantBuffer(giantBufferLSize);
     }
 }
@@ -405,6 +405,9 @@ void GB_Invalidate(gbHandle_t handle) {
 void GB_Invalidate(gbHandle_t handle, unsigned off, unsigned size) {
     COM_assert(GB_INVALID_HANDLE != handle);
     GB_MemItem& memItem = memItems[handle];
+    if(off + size > sizeof(Mesh::Vertex) * memItem.numVertices) {
+        __debugbreak();
+    }
     COM_assert(off + size <= sizeof(Mesh::Vertex) * memItem.numVertices);
     GB_BufSeg* bufSeg = memItem.bufSeg;
     if(bufSeg) InsertPatchCmd(&bufSeg->cmds, off, size);

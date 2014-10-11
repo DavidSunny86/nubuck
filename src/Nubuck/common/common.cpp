@@ -299,5 +299,6 @@ void COM_printf(const char* format, ...) {
 }
 
 void Crash(void) {
+    __debugbreak();
     exit(-1);
 }

@@ -40,6 +40,7 @@ public:
     const RunConf&  GetRunConf() const { return *_runConf; }
 
     virtual void Enter() { }
+    virtual void Leave() { }
 
     struct StepRet { enum Enum { DONE = 0, CONTINUE }; };
 

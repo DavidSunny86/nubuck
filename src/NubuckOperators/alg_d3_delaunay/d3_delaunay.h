@@ -133,6 +133,10 @@ public:
      assert(0 && "FindLinkVertex: other simplex is not a neighbour");
      return 0;
  }
+
+ Simplex *rel_prev, *rel_next;
+ int adj;
+ bool in_rel;
  // -- cj
 private:
  bool HULL_TR;
@@ -303,7 +307,7 @@ be neighbours, if they have 3 vertices together, or if they have 2 vertices toge
 
      void AddSimplex(Simplex& simplex, GRAPH<d3_rat_point, int>& mesh); // member for accessibilty reasons
      void compute_mesh();
-     void set_scale();
+     void set_scale(leda::rational scale);
      // -- cj
 
   void reset_flip_counters();

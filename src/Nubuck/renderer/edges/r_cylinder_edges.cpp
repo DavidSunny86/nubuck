@@ -141,6 +141,9 @@ void CylinderEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<
     for(unsigned i = 0; i < _edges.size(); ++i) {
         FatEdge& edge = _edges[i];
         int state = M::Max(mesh.state_of(edge.pe), M::Max(mesh.state_of(edge.v0), mesh.state_of(edge.v1)));
+        if(state_t::TOPOLOGY_CHANGED <= state) {
+            printf("halt!\n");
+        }
         COM_assert(state_t::TOPOLOGY_CHANGED > state);
         if(state_t::GEOMETRY_CHANGED == state) {
             edge.p0 = fpos[edge.v0->id()];
@@ -153,6 +156,8 @@ void CylinderEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<
                 const unsigned numVertices = 8;
                 unsigned off = i * sizeof(Mesh::Vertex) * numVertices;
                 unsigned size = sizeof(Mesh::Vertex) * numVertices;
+
+                COM_assert(!_needsRebuild);
                 meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoxVertices[0], off, size);
             }
         }

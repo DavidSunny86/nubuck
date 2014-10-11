@@ -28,7 +28,7 @@ void MoveVertexAnimation::Init(const nb::geometry subject, leda::node vert, cons
     geom->AttachAnimation(this);
 }
 
-void MoveVertexAnimation::DoMove(float secsPassed) {
+bool MoveVertexAnimation::DoMove(float secsPassed) {
     float l = _time / _duration;
 
     leda::nb::RatPolyMesh& mesh = _subject->GetRatPolyMesh();
@@ -40,6 +40,8 @@ void MoveVertexAnimation::DoMove(float secsPassed) {
 
     W::ENT_Geometry* geom = (W::ENT_Geometry*)_subject;
     geom->Rebuild();
+
+    return _duration <= _time;
 }
 
 NUBUCK_API void SetVertexPosition(const nb::geometry subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration) {

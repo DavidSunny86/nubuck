@@ -635,6 +635,18 @@ void World::Update(void) {
 
     if(OP::g_operators.GetDriver().IsBlocked() || OP::g_operators.IsDriverIdle()) {
         A::g_animator.Move(_secsPassed);
+
+        // RebuildAll
+        for(unsigned i = 0; i < _entities.size(); ++i) {
+            GEN::Pointer<Entity>& entity = _entities[i];
+            if(EntityType::ENT_GEOMETRY == entity->GetType()) {
+                ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
+                geom.Rebuild();
+            }
+        }
+
+        // make sure operator is signaled after entities have been rebuilt
+        A::g_animator.EndFrame();
     }
 }
 

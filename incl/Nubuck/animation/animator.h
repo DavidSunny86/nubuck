@@ -24,6 +24,7 @@ public:
     bool IsIdle() const { return _isIdle; }
 
     void Move(float secsPassed);
+    void EndFrame();
 
     void Filter(const EV::Event& event);
 

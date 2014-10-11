@@ -111,6 +111,10 @@ d3_rat_point intersect(rat_vector n1,rat_vector n2,rat_vector n3,
   abddia=false;
   acddia=false;
   bcddia=false;
+
+  // cj --
+  in_rel = false;
+  // -- cj
  }
 
  Simplex::Simplex(sc_vertex Ap,sc_vertex Bp,sc_vertex Cp,sc_vertex Dp)
@@ -135,6 +139,10 @@ d3_rat_point intersect(rat_vector n1,rat_vector n2,rat_vector n3,
   abddia=false;
   acddia=false;
   bcddia=false;
+
+  // cj --
+  in_rel = false;
+  // -- cj
  }
 
  Simplex::Simplex(const Simplex& S)
@@ -155,6 +163,10 @@ d3_rat_point intersect(rat_vector n1,rat_vector n2,rat_vector n3,
   abddia=S.abddia;
   acddia=S.acddia;
   bcddia=S.bcddia;
+
+  // cj --
+  in_rel = false;
+  // -- cj
  }
 
  void Simplex::init(sc_simplex s1,sc_simplex s2,sc_simplex s3,sc_simplex s4)
@@ -1532,7 +1544,6 @@ void d3_simpl_complex::AddSimplex(Simplex& simplex, GRAPH<d3_rat_point, int>& me
       mesh.compute_faces();
   }
 
-
 namespace {
 
 M::Vector3 ToVector(const leda::d3_rat_point& p) {
@@ -1546,14 +1557,12 @@ leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
 
 } // unnamed namespace
 
-void d3_simpl_complex::set_scale() {
+void d3_simpl_complex::set_scale(leda::rational scale) {
     GRAPH<d3_rat_point, int>& mesh = GetMesh();
-
-    leda::rational scale(1, 1); // !!!
 
     sc_simplex S;
     forall(S, Sil) {
-        if(!S->HULL_TR) {
+        if(!S->HULL_TR && S->meshInf.isValid) {
             Simplex::MeshInf& meshInf = S->meshInf;
             leda::rat_vector center = scale * meshInf.center;
 

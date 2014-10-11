@@ -92,7 +92,10 @@ void BillboardNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector
             const unsigned vertSz = sizeof(Mesh::Vertex);
             const unsigned off = vertSz * (&_billboards[i].verts[0] - &_billboards[0].verts[0]);
             const unsigned size = 4 * vertSz;
-            if(_mesh) meshMgr.GetMesh(_mesh).Invalidate(&_billboards[0].verts[0], off, size);
+            if(_mesh) {
+                COM_assert(!_needsRebuild);
+                meshMgr.GetMesh(_mesh).Invalidate(&_billboards[0].verts[0], off, size);
+            }
         }
     }
 }

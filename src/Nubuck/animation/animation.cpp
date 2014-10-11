@@ -1,3 +1,4 @@
+#include <nubuck_private.h>
 #include <Nubuck\animation\animation.h>
 #include <Nubuck\animation\animator.h>
 
@@ -8,6 +9,7 @@ namespace A {
 
 Animation::Animation()
     : _isDone(true) // animation starts paused
+    , _isMoveDone(false)
 {
     g_animator.LinkAnimation(this);
 }
@@ -19,7 +21,13 @@ Animation::~Animation() {
 bool Animation::IsDone() const { return _isDone; }
 
 void Animation::Move(float secsPassed) {
-    DoMove(secsPassed);
+    if(!_isMoveDone) {
+        _isMoveDone = DoMove(secsPassed);
+
+        if(AnimMode::PLAY_UNTIL_DONE == _mode && _isMoveDone) {
+            _isDone = true;
+        }
+    }
 
     _time += secsPassed;
 
@@ -48,6 +56,12 @@ void Animation::PlayUntil(eventFilter_t eventFilter) {
     _time = 0.0f;
     _eventFilter = eventFilter;
     _mode = AnimMode::PLAY_UNTIL_EVENT;
+    _isDone = false;
+}
+
+void Animation::PlayUntilIsDone() {
+    _time = 0.0f;
+    _mode = AnimMode::PLAY_UNTIL_DONE;
     _isDone = false;
 }
 

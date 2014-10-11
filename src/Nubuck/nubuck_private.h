@@ -76,6 +76,9 @@ struct NubuckImpl : Nubuck {
     void                set_text_position(const nb::text obj, const M::Vector3& position);
     void                set_text_content(const nb::text obj, const std::string& content);
     void                set_text_content_scale(const nb::text obj, const char refChar, const float refCharSize);
+
+    // animation
+    void wait_for_animations();
 };
 
 extern NubuckImpl g_nubuck;

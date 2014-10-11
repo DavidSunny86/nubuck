@@ -21,18 +21,20 @@ private:
     struct AnimMode {
         enum Enum {
             PLAY_FOR_DURATION = 0,
-            PLAY_UNTIL_EVENT
+            PLAY_UNTIL_EVENT,
+            PLAY_UNTIL_DONE
         };
     };
 
     AnimMode::Enum  _mode;
     bool            _isDone;
+    bool            _isMoveDone;
 
     float           _time;
     float           _duration;
     eventFilter_t   _eventFilter;
 protected:
-    virtual void DoMove(float secsPassed) = 0;
+    virtual bool DoMove(float secsPassed) = 0;
 public:
     Animation();
     virtual ~Animation();
@@ -44,7 +46,7 @@ public:
 
     void PlayFor(float duration);
     void PlayUntil(eventFilter_t filter);
-    void PlayUntilIsDone() { }
+    void PlayUntilIsDone();
 };
 
 // stock event filters
