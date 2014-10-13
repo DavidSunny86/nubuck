@@ -47,6 +47,10 @@ void BillboardNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vecto
     _billboards.clear();
     _billboards.resize(numBillboards);
 
+    if(_mesh) DestroyMesh();
+
+    if(_nodes.empty()) return;
+
     // bbNormals.xy encode texcoords, bbNormals.z encodes radius
     static const M::Vector3 bbNormals[4] = {
         M::Vector3(-1.0f, -1.0f, 0.0f),
@@ -65,7 +69,7 @@ void BillboardNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vecto
     }
 
     _billboardIndices.clear();
-    _billboardIndices.reserve(numBillboardIndices);
+    _billboardIndices.reserve(numBillboardIndices); // can't reserve capacity of 0
     for(unsigned i = 0; i < 4 * numBillboards; ++i) {
         if(0 < i && 0 == i % 4) _billboardIndices.push_back(Mesh::RESTART_INDEX);
         _billboardIndices.push_back(i);
@@ -73,26 +77,19 @@ void BillboardNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vecto
     assert(numBillboardIndices == _billboardIndices.size());
 
     // rebuild mesh
-    if(_mesh) DestroyMesh();
+    M::Matrix4 lastTransform = M::Mat4::Identity();
+    if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
 
-    if(!_nodes.empty()) {
-        unsigned numBillboards = _nodes.size();
-        unsigned numBillboardIndices = 5 * numBillboards - 1;
+    Mesh::Desc meshDesc;
+    meshDesc.vertices = &_billboards[0].verts[0];
+    meshDesc.numVertices = 4 * numBillboards;
+    meshDesc.indices = &_billboardIndices[0];
+    meshDesc.numIndices = numBillboardIndices;
+    meshDesc.primType = GL_TRIANGLE_FAN;
 
-        M::Matrix4 lastTransform = M::Mat4::Identity();
-        if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
-
-        Mesh::Desc meshDesc;
-        meshDesc.vertices = &_billboards[0].verts[0];
-        meshDesc.numVertices = 4 * numBillboards;
-        meshDesc.indices = &_billboardIndices[0];
-        meshDesc.numIndices = numBillboardIndices;
-        meshDesc.primType = GL_TRIANGLE_FAN;
-
-        _mesh = meshMgr.Create(meshDesc);
-        _tfmesh = meshMgr.Create(_mesh);
-        meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
-    }
+    _mesh = meshMgr.Create(meshDesc);
+    _tfmesh = meshMgr.Create(_mesh);
+    meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
 }
 
 void BillboardNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) {
@@ -120,6 +117,8 @@ void BillboardNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector
 }
 
 void BillboardNodes::SetColor(leda::node pv, const Color& color) {
+    COM_assert(!_nodes.empty());
+
     const unsigned ridx = _inMap[pv->id()];
 
     _nodes[ridx].color = color;
