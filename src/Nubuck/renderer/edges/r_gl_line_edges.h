@@ -14,8 +14,6 @@ private:
     Mesh::Desc                  _meshDesc;
     meshPtr_t                   _mesh;
     tfmeshPtr_t                 _tfmesh;
-    bool                        _needsRebuild;
-    bool                        _isInvalid;
 
     void DestroyMesh();
 public:

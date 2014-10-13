@@ -99,8 +99,6 @@ void CylinderEdges::Rebuild(const std::vector<Edge>& edges) {
 	for(unsigned i = 0; i < edges.size(); ++i)
 		_edges.push_back(FatEdge(edges[i]));
 
-    _needsRebuild = true;
-
     // RemoveDegeneratedEdges(_edges);
     if(_edges.empty()) return;
 
@@ -126,13 +124,24 @@ void CylinderEdges::Rebuild(const std::vector<Edge>& edges) {
     _edgeBBoxVertices.resize(numVerticesPerEdge * _edges.size());
     for(unsigned i = 0; i < _edges.size(); ++i)
         RebuildVertices(i, M::Mat4::Identity());
-    _isInvalid = true;
 
+    // rebuild mesh
     _meshDesc.vertices = &_edgeBBoxVertices[0];
     _meshDesc.numVertices = _edgeBBoxVertices.size();
     _meshDesc.indices = &_edgeBBoxIndices[0];
     _meshDesc.numIndices = _edgeBBoxIndices.size();
     _meshDesc.primType = GL_TRIANGLE_STRIP;
+
+    if(_mesh) DestroyMesh();
+
+    if(!_edges.empty()) {
+        M::Matrix4 lastTransform = M::Mat4::Identity();
+        if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
+
+        _mesh = meshMgr.Create(_meshDesc);
+        _tfmesh = meshMgr.Create(_mesh);
+        meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
+    }
 }
 
 void CylinderEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
@@ -141,9 +150,6 @@ void CylinderEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<
     for(unsigned i = 0; i < _edges.size(); ++i) {
         FatEdge& edge = _edges[i];
         int state = M::Max(mesh.state_of(edge.pe), M::Max(mesh.state_of(edge.v0), mesh.state_of(edge.v1)));
-        if(state_t::TOPOLOGY_CHANGED <= state) {
-            printf("halt!\n");
-        }
         COM_assert(state_t::TOPOLOGY_CHANGED > state);
         if(state_t::GEOMETRY_CHANGED == state) {
             edge.p0 = fpos[edge.v0->id()];
@@ -157,7 +163,6 @@ void CylinderEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<
                 unsigned off = i * sizeof(Mesh::Vertex) * numVertices;
                 unsigned size = sizeof(Mesh::Vertex) * numVertices;
 
-                COM_assert(!_needsRebuild);
                 meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoxVertices[0], off, size);
             }
         }
@@ -173,25 +178,7 @@ void CylinderEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4&)
 void CylinderEdges::BuildRenderMesh() {
 	SYS::ScopedLock lock(_mtx);
 
-    M::Matrix4 lastTransform = M::Mat4::Identity();
-    if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
-
-    if(_needsRebuild) {
-        if(_mesh) DestroyMesh();
-
-		if(!_edges.empty()) {
-            _mesh = meshMgr.Create(_meshDesc);
-            _tfmesh = meshMgr.Create(_mesh);
-            meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
-		}
-
-        _needsRebuild = false;
-	}
-
-    if(_isInvalid && _mesh) {
-        meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoxVertices[0]);
-        _isInvalid = false;
-	}
+    // nothing to do here
 }
 
 void CylinderEdges::DestroyRenderMesh() {

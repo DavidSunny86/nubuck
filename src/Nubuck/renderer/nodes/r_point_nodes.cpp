@@ -51,7 +51,26 @@ void PointNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vector<M:
         _indices[i] = i;
     }
 
-    _needsRebuild = true;
+    // rebuild mesh
+    if(_mesh) DestroyMesh();
+
+    if(!_nodes.empty()) {
+        M::Matrix4 lastTransform = M::Mat4::Identity();
+        if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
+
+        const unsigned numVerts = _vertices.size();
+
+        Mesh::Desc meshDesc;
+        meshDesc.vertices = &_vertices[0];
+        meshDesc.numVertices = numVerts;
+        meshDesc.indices = &_indices[0];
+        meshDesc.numIndices = numVerts;
+        meshDesc.primType = GL_POINTS;
+
+        _mesh = meshMgr.Create(meshDesc);
+        _tfmesh = meshMgr.Create(_mesh);
+        meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
+    }
 }
 
 void PointNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) {
@@ -77,7 +96,7 @@ void PointNodes::SetColor(leda::node pv, const Color& color) {
     const unsigned ridx = _inMap[pv->id()];
     _vertices[ridx].color = _nodes[ridx].color = color;
 
-    if(!_needsRebuild && _mesh) {
+    if(_mesh) {
         const unsigned vertSz = sizeof(Mesh::Vertex);
         const unsigned off = vertSz * (&_vertices[ridx] - &_vertices[0]);
 
@@ -90,34 +109,7 @@ void PointNodes::Transform(const M::Matrix4& objToWorld) {
 }
 
 void PointNodes::BuildRenderMesh() {
-    if(_isInvalid && _mesh) {
-        meshMgr.GetMesh(_mesh).Invalidate(&_vertices[0]);
-        _isInvalid = false;
-    }
-
-    M::Matrix4 lastTransform = M::Mat4::Identity();
-    if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
-
-    if(_needsRebuild && !_nodes.empty()) {
-        if(_mesh) DestroyMesh();
-
-        if(!_nodes.empty()) {
-            const unsigned numVerts = _vertices.size();
-
-            Mesh::Desc meshDesc;
-            meshDesc.vertices = &_vertices[0];
-            meshDesc.numVertices = numVerts;
-            meshDesc.indices = &_indices[0];
-            meshDesc.numIndices = numVerts;
-            meshDesc.primType = GL_POINTS;
-
-            _mesh = meshMgr.Create(meshDesc);
-            _tfmesh = meshMgr.Create(_mesh);
-            meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
-        }
-
-        _needsRebuild = false;
-    }
+    // nothing to do here
 }
 
 void PointNodes::DestroyRenderMesh() {

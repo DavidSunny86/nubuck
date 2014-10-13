@@ -26,7 +26,6 @@ void LineEdges::Rebuild(const std::vector<Edge>& edges) {
 	SYS::ScopedLock lock(_mtx);
 
     _edges = edges;
-    _needsRebuild = true;
 
     RemoveDegeneratedEdges(_edges);
     if(_edges.empty()) return;
@@ -73,11 +72,23 @@ void LineEdges::Rebuild(const std::vector<Edge>& edges) {
     unsigned numBillboardIndices = M::Max(1u, 5 * numEdges) - 1; // max handles case size = 0
     assert(numBillboardIndices == _edgeBBoardIndices.size());
 
+    // rebuild mesh
     _meshDesc.vertices = &_edgeBBoards[0].verts[0];
     _meshDesc.numVertices = 4 * _edgeBBoards.size();
     _meshDesc.indices = &_edgeBBoardIndices[0];
     _meshDesc.numIndices = _edgeBBoardIndices.size();
     _meshDesc.primType = GL_TRIANGLE_FAN;
+
+    if(_mesh) DestroyMesh();
+
+    if(!_edges.empty()) {
+        M::Matrix4 lastTransform = M::Mat4::Identity();
+        if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
+
+        _mesh = meshMgr.Create(_meshDesc);
+        _tfmesh = meshMgr.Create(_mesh);
+        meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
+    }
 }
 
 void LineEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
@@ -98,25 +109,7 @@ void LineEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4& mode
 void LineEdges::BuildRenderMesh() {
 	SYS::ScopedLock lock(_mtx);
 
-    M::Matrix4 lastTransform = M::Mat4::Identity();
-    if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
-
-    if(_needsRebuild) {
-        if(_mesh) DestroyMesh();
-
-		if(!_edges.empty()) {
-            _mesh = meshMgr.Create(_meshDesc);
-            _tfmesh = meshMgr.Create(_mesh);
-            meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
-		}
-
-        _needsRebuild = false;
-	}
-
-    if(_isInvalid && _mesh) {
-        meshMgr.GetMesh(_mesh).Invalidate(&_edgeBBoards[0].verts[0]);
-        _isInvalid = false;
-	}
+    // nothing to do here
 }
 
 void LineEdges::DestroyRenderMesh() {

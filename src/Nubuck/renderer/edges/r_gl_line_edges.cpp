@@ -20,13 +20,10 @@ void GL_LineEdges::DestroyMesh() {
 GL_LineEdges::GL_LineEdges()
     : _mesh(NULL)
     , _tfmesh(NULL)
-    , _needsRebuild(false)
-    , _isInvalid(false)
 { }
 
 void GL_LineEdges::Rebuild(const std::vector<Edge>& edges) {
     _edges = edges;
-    _needsRebuild = true;
 
     RemoveDegeneratedEdges(_edges);
     if(_edges.empty()) return;
@@ -54,11 +51,23 @@ void GL_LineEdges::Rebuild(const std::vector<Edge>& edges) {
     for(unsigned i = 0; i < numVerts; ++i)
         _meshIndices[i] = i;
 
+    // rebuild mesh
     _meshDesc.vertices      = &_meshVertices[0];
     _meshDesc.numVertices   = numVerts;
     _meshDesc.indices       = &_meshIndices[0];
     _meshDesc.numIndices    = numVerts;
     _meshDesc.primType      = GL_LINES;
+
+    if(_mesh) DestroyMesh();
+
+    if(!_edges.empty()) {
+        M::Matrix4 lastTransform = M::Mat4::Identity();
+        if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
+
+        _mesh = meshMgr.Create(_meshDesc);
+        _tfmesh = meshMgr.Create(_mesh);
+        meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
+    }
 }
 
 void GL_LineEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos) {
@@ -76,25 +85,7 @@ void GL_LineEdges::SetTransform(const M::Matrix4& transform, const M::Matrix4& m
 }
 
 void GL_LineEdges::BuildRenderMesh() {
-    M::Matrix4 lastTransform = M::Mat4::Identity();
-    if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
-
-    if(_needsRebuild) {
-        if(_mesh) DestroyMesh();
-
-        if(!_edges.empty()) {
-            _mesh = meshMgr.Create(_meshDesc);
-            _tfmesh = meshMgr.Create(_mesh);
-            meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
-        }
-
-        _needsRebuild = false;
-    }
-
-    if(_isInvalid && _mesh) {
-        meshMgr.GetMesh(_mesh).Invalidate(&_meshVertices[0]);
-        _isInvalid = false;
-    }
+    // nothing to do here
 }
 
 void GL_LineEdges::DestroyRenderMesh() {

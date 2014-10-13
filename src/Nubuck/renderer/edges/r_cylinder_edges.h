@@ -19,21 +19,19 @@ private:
     std::vector<FatEdge>        _edges;
     std::vector<Mesh::Vertex>   _edgeBBoxVertices;
     std::vector<Mesh::Index>    _edgeBBoxIndices;
-    Mesh::Desc                  _meshDesc; 
+    Mesh::Desc                  _meshDesc;
     meshPtr_t                   _mesh;
     tfmeshPtr_t                 _tfmesh;
-    bool                        _needsRebuild;
-    bool                        _isInvalid;
 
     void DestroyMesh();
     void RebuildVertices(unsigned edgeIdx, const M::Matrix4& transform);
 public:
-    CylinderEdges() : _mesh(NULL), _tfmesh(NULL), _needsRebuild(false), _isInvalid(false) { }
+    CylinderEdges() : _mesh(NULL), _tfmesh(NULL) { }
     ~CylinderEdges();
 
-    bool IsEmpty() const override { 
+    bool IsEmpty() const override {
 		SYS::ScopedLock lock(_mtx);
-		return _edges.empty(); 
+		return _edges.empty();
 	}
 
     void Rebuild(const std::vector<Edge>& edges) override;

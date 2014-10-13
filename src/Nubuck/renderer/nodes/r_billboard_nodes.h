@@ -24,12 +24,10 @@ private:
     std::vector<Mesh::Index>        _billboardIndices;
     meshPtr_t                       _mesh;
     tfmeshPtr_t                     _tfmesh;
-    bool                            _needsRebuild;
-    bool                            _isInvalid;
 
     void DestroyMesh();
 public:
-    BillboardNodes() : _mesh(NULL), _tfmesh(NULL), _needsRebuild(false), _isInvalid(false) { }
+    BillboardNodes() : _mesh(NULL), _tfmesh(NULL) { }
     ~BillboardNodes();
 
     bool IsEmpty() const override {

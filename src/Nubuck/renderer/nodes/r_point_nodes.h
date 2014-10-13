@@ -14,12 +14,10 @@ private:
     std::vector<Mesh::Index>        _indices;
     meshPtr_t                       _mesh;
     tfmeshPtr_t                     _tfmesh;
-    bool                            _needsRebuild;
-    bool                            _isInvalid;
 
     void DestroyMesh();
 public:
-    PointNodes() : _mesh(NULL), _tfmesh(NULL), _needsRebuild(false), _isInvalid(false) { }
+    PointNodes() : _mesh(NULL), _tfmesh(NULL) { }
 
     bool IsEmpty() const override { return _nodes.empty(); }
 

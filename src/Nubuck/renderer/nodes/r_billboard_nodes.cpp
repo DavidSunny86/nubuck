@@ -72,7 +72,27 @@ void BillboardNodes::Rebuild(const leda::nb::RatPolyMesh& mesh, const std::vecto
     }
     assert(numBillboardIndices == _billboardIndices.size());
 
-    _needsRebuild = true;
+    // rebuild mesh
+    if(_mesh) DestroyMesh();
+
+    if(!_nodes.empty()) {
+        unsigned numBillboards = _nodes.size();
+        unsigned numBillboardIndices = 5 * numBillboards - 1;
+
+        M::Matrix4 lastTransform = M::Mat4::Identity();
+        if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
+
+        Mesh::Desc meshDesc;
+        meshDesc.vertices = &_billboards[0].verts[0];
+        meshDesc.numVertices = 4 * numBillboards;
+        meshDesc.indices = &_billboardIndices[0];
+        meshDesc.numIndices = numBillboardIndices;
+        meshDesc.primType = GL_TRIANGLE_FAN;
+
+        _mesh = meshMgr.Create(meshDesc);
+        _tfmesh = meshMgr.Create(_mesh);
+        meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
+    }
 }
 
 void BillboardNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::Vector3>& fpos, float scale) {
@@ -93,7 +113,6 @@ void BillboardNodes::Update(const leda::nb::RatPolyMesh& mesh, const std::vector
             const unsigned off = vertSz * (&_billboards[i].verts[0] - &_billboards[0].verts[0]);
             const unsigned size = 4 * vertSz;
             if(_mesh) {
-                COM_assert(!_needsRebuild);
                 meshMgr.GetMesh(_mesh).Invalidate(&_billboards[0].verts[0], off, size);
             }
         }
@@ -107,7 +126,7 @@ void BillboardNodes::SetColor(leda::node pv, const Color& color) {
     for(unsigned k = 0; k < 4; ++k)
         _billboards[ridx].verts[k].color = _nodes[ridx].color;
 
-    if(!_needsRebuild && _mesh) {
+    if(_mesh) {
         const unsigned vertSz = sizeof(Mesh::Vertex);
         const unsigned off = vertSz * (&_billboards[ridx].verts[0] - &_billboards[0].verts[0]);
         const unsigned size = 4 * vertSz;
@@ -124,35 +143,7 @@ void BillboardNodes::Transform(const M::Matrix4& objToWorld) {
 void BillboardNodes::BuildRenderMesh() {
 	SYS::ScopedLock lock(_mtx);
 
-    unsigned numBillboards = _nodes.size();
-    unsigned numBillboardIndices = 5 * numBillboards - 1;
-
-    if(_isInvalid && _mesh) {
-		meshMgr.GetMesh(_mesh).Invalidate(&_billboards[0].verts[0]);
-        _isInvalid = false;
-	}
-
-    M::Matrix4 lastTransform = M::Mat4::Identity();
-    if(_tfmesh) lastTransform = meshMgr.GetMesh(_tfmesh).GetTransform();
-
-    if(_needsRebuild && !_nodes.empty()) {
-        if(_mesh) DestroyMesh();
-
-		if(!_nodes.empty()) {
-			Mesh::Desc meshDesc;
-			meshDesc.vertices = &_billboards[0].verts[0];
-			meshDesc.numVertices = 4 * numBillboards;
-			meshDesc.indices = &_billboardIndices[0];
-			meshDesc.numIndices = numBillboardIndices;
-			meshDesc.primType = GL_TRIANGLE_FAN;
-
-			_mesh = meshMgr.Create(meshDesc);
-			_tfmesh = meshMgr.Create(_mesh);
-			meshMgr.GetMesh(_tfmesh).SetTransform(lastTransform);
-		}
-
-        _needsRebuild = false;
-    }
+    // nothing to do here
 }
 
 void BillboardNodes::DestroyRenderMesh() {

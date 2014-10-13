@@ -21,17 +21,15 @@ private:
 	Mesh::Desc                  _meshDesc;
     meshPtr_t               	_mesh;
     tfmeshPtr_t             	_tfmesh;
-    bool                    	_needsRebuild;
-    bool                    	_isInvalid;
 
     void DestroyMesh();
 public:
-    LineEdges() : _mesh(NULL), _tfmesh(NULL), _needsRebuild(false), _isInvalid(false) { }
+    LineEdges() : _mesh(NULL), _tfmesh(NULL) { }
     ~LineEdges();
 
-    bool IsEmpty() const override { 
+    bool IsEmpty() const override {
 	    SYS::ScopedLock lock(_mtx);
-		return _edges.empty(); 
+		return _edges.empty();
 	}
 
     void Rebuild(const std::vector<Edge>& edges) override;
