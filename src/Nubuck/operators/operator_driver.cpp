@@ -131,6 +131,11 @@ void Driver::Event_Key(const EV::Event& event) {
     SignalCompletion();
 }
 
+void Driver::Event_RebuildAll(const EV::Event& event) {
+    W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
+    SignalCompletion();
+}
+
 void Driver::Event_Default(const EV::Event& event, const char* className) {
     Operator* op = ActiveOperator();
     if(op) {
@@ -154,6 +159,7 @@ Driver::Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx)
     AddEventHandler(EV::def_EditModeChanged, this, &Driver::Event_EditModeChanged);
 	AddEventHandler(EV::def_Mouse, this, &Driver::Event_Mouse);
     AddEventHandler(EV::def_Key, this, &Driver::Event_Key);
+    AddEventHandler(EV::def_RebuildAll, this, &Driver::Event_RebuildAll);
 }
 
 bool Driver::IsBlocked() const {

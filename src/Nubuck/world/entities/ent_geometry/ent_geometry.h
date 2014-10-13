@@ -50,6 +50,9 @@ private:
     R::meshPtr_t                    _mesh;
     R::tfmeshPtr_t                  _tfmesh;
     bool                            _meshCompiled; // TODO: might be a race cond
+    bool                            _forceRebuild;
+
+    void ForceRebuild();
 
     void CacheFPos();
     void RebuildRenderMesh();

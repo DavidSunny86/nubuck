@@ -26,6 +26,7 @@ private:
     void Event_EditModeChanged(const EV::Event& event);
     void Event_Mouse(const EV::Event& event);
     void Event_Key(const EV::Event& event);
+    void Event_RebuildAll(const EV::Event& event);
 protected:
     void Event_Default(const EV::Event& event, const char* className) override;
 public:

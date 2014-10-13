@@ -5,7 +5,9 @@
 #include <UI\outliner\outliner.h>
 #include <UI\userinterface.h>
 #include <renderer\metrics\metrics.h>
+#include <world\world_events.h>
 #include <world\world.h>
+#include <operators\operators.h>
 #include "ent_geometry_outln.h"
 #include "ent_geometry.h"
 
@@ -22,6 +24,11 @@ namespace W {
 
 static R::Color selectedVertexColor     = R::Color::Yellow;
 static R::Color unselectedVertexColor   = R::Color::Black;
+
+void ENT_Geometry::ForceRebuild() {
+    OP::g_operators.InvokeAction(EV::def_RebuildAll.Create(EV::Params_RebuildAll()), OP::Operators::InvokationMode::ALWAYS);
+    _forceRebuild = true;
+}
 
 void ENT_Geometry::CacheFPos() {
     leda::node v;
@@ -152,7 +159,7 @@ void ENT_Geometry::DestroyRenderMesh() {
 
 void ENT_Geometry::ComputeBoundingBox() {
     M::Box bbox;
-    bbox.min = bbox.max = _fpos[_ratPolyMesh.first_node()->id()];
+    bbox.min = bbox.max = M::Vector3::Zero;
     leda::node v;
     forall_nodes(v, _ratPolyMesh) {
         M::Vector3 p = _fpos[v->id()];
@@ -163,6 +170,10 @@ void ENT_Geometry::ComputeBoundingBox() {
         bbox.max.y = M::Max(bbox.max.y, p.y);
         bbox.max.z = M::Max(bbox.max.z, p.z);
     }
+    if(M::AlmostEqual(0.0f, M::SquaredDistance(bbox.min, bbox.max))) {
+        // set empty bbox to some minimum size
+        bbox.min = -bbox.max = M::Vector3(0.1f, 0.1f, 0.1f);
+    }
     SetBoundingBox(bbox);
 }
 
@@ -170,21 +181,21 @@ void ENT_Geometry::Event_VertexScaleChanged(const EV::Event& event) {
     SYS::ScopedLock lock(_mtx);
     const EV::Params_ENT_Geometry_VertexScaleChanged& args = EV::def_ENT_Geometry_VertexScaleChanged.GetArgs(event);
     _vertexScale = args.vertexScale;
-    _nodeRenderer->Rebuild(_ratPolyMesh, _fpos, _vertexScale);
+    ForceRebuild();
 }
 
 void ENT_Geometry::Event_EdgeScaleChanged(const EV::Event& event) {
 	SYS::ScopedLock lock(_mtx);
 	const EV::Params_ENT_Geometry_EdgeScaleChanged& args = EV::def_ENT_Geometry_EdgeScaleChanged.GetArgs(event);
 	_edgeScale = args.edgeScale;
-    RebuildRenderEdges();
+    ForceRebuild();
 }
 
 void ENT_Geometry::Event_EdgeColorChanged(const EV::Event& event) {
 	SYS::ScopedLock lock(_mtx);
 	const EV::Params_ENT_Geometry_EdgeColorChanged& args = EV::def_ENT_Geometry_EdgeColorChanged.GetArgs(event);
 	_edgeColor = args.edgeColor;
-    RebuildRenderEdges();
+    ForceRebuild();
 }
 
 void ENT_Geometry::Event_TransparencyChanged(const EV::Event& event) {
@@ -212,6 +223,7 @@ ENT_Geometry::ENT_Geometry()
     , _mesh(NULL)
     , _tfmesh(NULL)
     , _meshCompiled(true)
+    , _forceRebuild(false)
     , _isHidden(false)
     , _renderMode(0)
     , _renderLayer(0)
@@ -347,11 +359,11 @@ void ENT_Geometry::Rebuild() {
 
     int state = GetUpdateState(_ratPolyMesh);
 
-    if(state_t::CACHED == state) return; // nothing to do
+    if(!_forceRebuild && state_t::CACHED == state) return; // nothing to do
 
     CacheFPos();
 
-    if(state_t::TOPOLOGY_CHANGED == state) {
+    if(_forceRebuild || state_t::TOPOLOGY_CHANGED == state) {
         _ratPolyMesh.cache_all();
         _nodeRenderer->Rebuild(_ratPolyMesh, _fpos, _vertexScale);
         RebuildRenderEdges();
@@ -359,6 +371,8 @@ void ENT_Geometry::Rebuild() {
 
         // TODO. used to colorize vertices
         SetEditMode(world.GetEditMode().GetMode());
+
+        _forceRebuild = false;
     } else {
         _nodeRenderer->Update(_ratPolyMesh, _fpos, _vertexScale);
         _edgeRenderer->Update(_ratPolyMesh, _fpos);
@@ -509,7 +523,6 @@ void ENT_Geometry::SetRenderLayer(unsigned layer) {
 }
 
 void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
-    bool rebuild = false;
     _mtx.Lock();
     if(_shadingMode != mode) {
         switch(mode) {
@@ -533,14 +546,9 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
             assert(0 && "ENT_Geometry::SetShadingMode(): unkown shading mode");
         };
         _shadingMode = mode;
-        rebuild = true;
+        ForceRebuild();
     }
     _mtx.Unlock();
-
-    if(rebuild) {
-        _nodeRenderer->Rebuild(_ratPolyMesh, _fpos, _vertexScale);
-        RebuildRenderEdges();
-    }
 }
 
 void ENT_Geometry::SetEditMode(editMode_t::Enum mode) {
