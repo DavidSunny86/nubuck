@@ -14,16 +14,17 @@ Animator::Animator()
 void Animator::Move(float secsPassed) {
     SYS::ScopedLock lock(_animsMtx);
 
-    Animation* anim = _anims;
+    Animation *next, *anim = _anims;
     _isIdle = true;
     while(anim) {
+        next = anim->animatorLink.next;
         if(!anim->IsDone()) {
             anim->Move(secsPassed);
             _isIdle = false;
         } else {
             UnlinkAnimation(anim);
         }
-        anim = anim->animatorLink.next;
+        anim = next;
     }
 }
 
