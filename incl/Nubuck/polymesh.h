@@ -67,6 +67,8 @@ public:
 
     PolyMesh& operator=(const PolyMesh& other);
 
+    void force_rebuild();
+
     void join(PolyMesh& other);
 
     edge split(const edge e);
@@ -191,6 +193,16 @@ inline PolyMesh<VEC3>& PolyMesh<VEC3>::operator=(const PolyMesh& other) {
         InitFaceAttributes();
     }
     return *this;
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::force_rebuild() {
+    node v;
+    edge e;
+    face f;
+    forall_nodes(v, *this) _vatt_state[v] = State::TOPOLOGY_CHANGED;
+    forall_edges(e, *this) _eatt_state[e] = State::TOPOLOGY_CHANGED;
+    forall_faces(f, *this) _fatt_state[f] = State::TOPOLOGY_CHANGED;
 }
 
 template<typename VEC3>
