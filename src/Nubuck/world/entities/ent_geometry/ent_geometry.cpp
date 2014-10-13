@@ -359,6 +359,10 @@ void ENT_Geometry::Rebuild() {
 
     int state = GetUpdateState(_ratPolyMesh);
 
+    // HACK: PolyMesh::force_rebuild does not affect newly-empty meshes,
+    // so we always rebuild meshes with no vertices
+    _forceRebuild = _forceRebuild || 0 == _ratPolyMesh.number_of_nodes();
+
     if(!_forceRebuild && state_t::CACHED == state) return; // nothing to do
 
     CacheFPos();
