@@ -52,7 +52,7 @@ void NubuckImpl::log_printf(const char* format, ...) {
     vsprintf(buffer, format, args);
     va_end(args);
 
-    UI::logWidget().printf(format);
+    UI::logWidget().printf(buffer);
 }
 
 QMenu* NubuckImpl::scene_menu() {
