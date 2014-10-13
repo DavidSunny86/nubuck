@@ -4,6 +4,10 @@ QWidget {
     font-size:          14px;
 }
 
+QMenu {
+    background-color:   #1E1E1E;
+}
+
 QMenuBar::item, QMenu::item {
     border-width: 1px;
     border-style: solid;
