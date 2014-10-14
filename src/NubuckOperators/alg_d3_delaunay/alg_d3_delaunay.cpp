@@ -5,6 +5,8 @@
 #include <Nubuck\operators\standard_algorithm.h>
 #include "d3_delaunay.h"
 
+static const float animDur = 0.05f;
+
 typedef leda::d3_rat_point point_t;
 
 struct Simplex {
@@ -35,6 +37,23 @@ struct Globals {
     GEN::Pointer<OP::ALG::Phase>    phaseIdle;
 };
 
+static void ClearGlobals(Globals& g) {
+    g.L.clear();
+    g.C.clear();
+    g.trhull.clear();
+    g.last = 0;
+    g.counter = 0;
+    g.TQ.clear();
+    g.PV = 0;
+    g.Trl.clear();
+    g.trGeom = 0;
+    g.trCloud = 0;
+    g.rel = 0;
+    g.phaseT0.Drop();
+    g.phaseTI.Drop();
+    g.phaseIdle.Drop();
+}
+
 void SetSimplexColor(leda::nb::RatPolyMesh& mesh, leda::sc_simplex simplex, const R::Color& color) {
     if(simplex->meshInf.isValid) {
         mesh.set_color(simplex->GetMeshFace(1), color);
@@ -61,20 +80,19 @@ public:
     { }
 protected:
     bool DoMove(float secsPassed) override {
-        double l = time / duration;
-        double scale = (1.0f - l) * v0 + l * v1;
+        double l = M::Min(1.0f, time / duration);
+        double s = (1.0f - l) * v0 + l * v1;
 
-        //std::cout << "DoMove! " << s << std::endl;
+        g.C.set_scale(s);
 
-        g.C.set_scale(scale);
-
-        leda::node v;
         leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(g.trGeom);
-        forall_nodes(v, mesh) mesh.set_color(v, mesh.color_of(v));
+        mesh.force_rebuild();
+
+        if(duration <= time) return true;
 
         time += secsPassed;
 
-        return duration <= time;
+        return false;
     }
 };
 
@@ -98,11 +116,12 @@ public:
     { }
 protected:
     bool DoMove(float secsPassed) override {
-        float l = time / duration;
+        float l = M::Min(1.0f, time / duration);
         R::Color c = R::Lerp(c0, c1, l);
         SetSimplexColor(nubuck().poly_mesh(g.trGeom), simp, c);
+        if(duration <= time) return true;
         time += secsPassed;
-        return duration <= time;
+        return false;
     }
 };
 
@@ -179,8 +198,14 @@ void BuildRelevantMesh(Globals& g, bool update = true) {
 ===============================================================================
 */
 struct PhaseIdle : OP::ALG::Phase {
+    Globals& g;
+
+    PhaseIdle(Globals& g) : g(g) { }
+
     void Enter() override {
-		std::cout << "entering idle phase" << std::endl;
+        nubuck().log_printf("entering idle phase\n");
+
+        g.C.compute_mesh();
 	}
 
     StepRet::Enum Step() override {
@@ -199,7 +224,7 @@ struct PhaseTI : OP::ALG::Phase {
     Globals& g;
 
     leda::Simpl_Triang Trl;
-    leda::sc_simplex S1,S2;
+    leda::sc_simplex S1,S2,S3;
     int wert;
 
     bool isExploded;
@@ -213,6 +238,8 @@ struct PhaseTI : OP::ALG::Phase {
 
     PhaseTI(Globals& g);
 
+    void Enter() override;
+
     StepRet::Enum StepSearch();
     StepRet::Enum StepFlip();
 
@@ -222,7 +249,17 @@ struct PhaseTI : OP::ALG::Phase {
 
 PhaseTI::PhaseTI(Globals& g) : g(g), isExploded(false), stepMode(SEARCH) { }
 
+void PhaseTI::Enter() {
+    S1 = S2 = S3 = 0;
+}
+
 PhaseTI::StepRet::Enum PhaseTI::StepSearch() {
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(g.trGeom);
+    if(S1) SetSimplexColor(mesh, S1, R::Color::White);
+    if(S2) SetSimplexColor(mesh, S2, R::Color::White);
+    if(S3) SetSimplexColor(mesh, S3, R::Color::White);
+    S1 = S2 = S3 = 0;
+
     while (! g.TQ.empty()){
         Trl= g.TQ.pop();
         // still there ?
@@ -235,20 +272,17 @@ PhaseTI::StepRet::Enum PhaseTI::StepSearch() {
                 g.C.compute_mesh(); // triggers rebuild
                 BuildRelevantMesh(g);
 
-                MoveSimplicesAnimation anim0(g, 1.0f, 2.0f, 2.0f); // scope!
+                MoveSimplicesAnimation anim0(g, 1.0f, 2.0f, animDur); // scope!
                 if(!isExploded) {
                     anim0.PlayUntilIsDone();
+                    nubuck().wait_for_animations();
                     isExploded = true;
                 } else {
                     g.C.set_scale(leda::rational(2, 1));
                 }
 
-                ColorSimplicesAnimation anim1(g, S1, R::Color::White, R::Color::Blue, 2.0f);
-                ColorSimplicesAnimation anim2(g, S2, R::Color::White, R::Color::Blue, 2.0f);
-                anim1.PlayUntilIsDone();
-                anim2.PlayUntilIsDone();
-
-                nubuck().wait_for_animations();
+                SetSimplexColor(mesh, S1, R::Color::Blue);
+                SetSimplexColor(mesh, S2, R::Color::Blue);
 
                 stepMode = FLIP;
                 return StepRet::CONTINUE;
@@ -258,11 +292,19 @@ PhaseTI::StepRet::Enum PhaseTI::StepSearch() {
     }
 
     if(isExploded) {
-        MoveSimplicesAnimation anim0(g, 2.0f, 1.0f, 2.0f);
+        MoveSimplicesAnimation anim0(g, 2.0f, 1.0f, animDur);
         anim0.PlayUntilIsDone();
         nubuck().wait_for_animations();
         isExploded = false;
     }
+
+    nubuck().log_printf("PhaseTI: face stack empty\n");
+
+    leda::nb::RatPolyMesh& cloudMesh = nubuck().poly_mesh(g.trCloud);
+    cloudMesh.del_node(cloudMesh.first_node());
+    cloudMesh.force_rebuild();
+
+    nubuck().log_printf("number of nodes: %d\n", cloudMesh.number_of_nodes());
 
     return StepRet::DONE;
 }
@@ -275,7 +317,17 @@ PhaseTI::StepRet::Enum PhaseTI::StepFlip() {
 
     g.C.compute_mesh();
     BuildRelevantMesh(g);
-    g.C.set_scale(leda::rational(2, 1));
+    g.C.set_scale(2.0f);
+
+    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(g.trGeom);
+    SetSimplexColor(mesh, S1, R::Color::Red);
+    SetSimplexColor(mesh, S2, R::Color::Red);
+
+    if(1 == wert) {
+        // one new simplex has been appended to complex
+        S3 = g.C.all_simplices().back();
+        SetSimplexColor(mesh, S3, R::Color::Red);
+    }
 
     stepMode = SEARCH;
     return StepRet::CONTINUE;
@@ -327,7 +379,7 @@ PhaseT0::StepRet::Enum PhaseT0::StepFindTriangles() {
 
     if(g.L.empty()) {
         nubuck().log_printf("PhaseT0: L is empty, done\n");
-        return StepRet::CONTINUE;
+        return StepRet::DONE;
     }
 
     p = g.L.pop();
@@ -372,9 +424,6 @@ PhaseT0::StepRet::Enum PhaseT0::StepFindTriangles() {
 PhaseT0::StepRet::Enum PhaseT0::StepAddSimplices() {
     nubuck().log_printf("PhaseT0: StepAddSimplices\n");
 
-    leda::nb::RatPolyMesh& cloudMesh = nubuck().poly_mesh(g.trCloud);
-    cloudMesh.del_node(cloudMesh.first_node());
-
     g.TQ.clear();
     g.trhull.clear();
 
@@ -401,6 +450,7 @@ PhaseT0::StepRet::Enum PhaseT0::Step() {
 }
 
 GEN::Pointer<OP::ALG::Phase> PhaseT0::NextPhase() {
+    if(FIND_TRIANGLES == stepMode && g.L.empty()) return g.phaseIdle;
     return g.phaseTI;
 }
 
@@ -423,20 +473,16 @@ PhaseInit::PhaseInit(Globals& g) : g(g) { }
 PhaseInit::StepRet::Enum PhaseInit::Step() {
     nubuck().log_printf("PhaseInit: stepping\n");
 
+    const int oldSize = g.L.size();
+
     g.last = leda::comp_initial_tr(g.L, g.C, g.lastp, g.trhull);
 
     g.C.compute_mesh();
 
-    // create cloud geometry
-    g.trCloud = nubuck().create_geometry();
-    nubuck().set_geometry_render_mode(g.trCloud, Nubuck::RenderMode::NODES);
-    nubuck().set_geometry_name(g.trCloud, "input cloud");
-
+    const int numPopped = oldSize - g.L.size(); // number of points popped from L in comp_initial_tr
     leda::nb::RatPolyMesh& cloudMesh = nubuck().poly_mesh(g.trCloud);
-    leda::list_item it;
-    forall_items(it, g.L) {
-        leda::node v = cloudMesh.new_node();
-        cloudMesh.set_position(v, g.L[it]);
+    for(int i = 0; i < numPopped; ++i) {
+        cloudMesh.del_node(cloudMesh.first_node());
     }
 
     return StepRet::DONE;
@@ -465,15 +511,12 @@ OP::ALG::Phase* D3_Delaunay::Init() {
         return 0;
     }
 
+    ClearGlobals(_g);
+
     // setup phases
     _g.phaseT0 = GEN::MakePtr(new PhaseT0(_g));
     _g.phaseTI = GEN::MakePtr(new PhaseTI(_g));
-    _g.phaseIdle = GEN::MakePtr(new PhaseIdle);
-
-    // clear previous complex
-    _g.C.clear();
-
-    _g.rel = 0;
+    _g.phaseIdle = GEN::MakePtr(new PhaseIdle(_g));
 
     // create list of input points from first selected geometry entity
     _g.L.clear();
@@ -484,6 +527,18 @@ OP::ALG::Phase* D3_Delaunay::Init() {
     }
     _g.L.sort();
     _g.L.unique();
+
+    // create cloud geometry
+    _g.trCloud = nubuck().create_geometry();
+    nubuck().set_geometry_render_mode(_g.trCloud, Nubuck::RenderMode::NODES);
+    nubuck().set_geometry_name(_g.trCloud, "input cloud");
+
+    leda::nb::RatPolyMesh& cloudMesh = nubuck().poly_mesh(_g.trCloud);
+    leda::list_item it;
+    forall_items(it, _g.L) {
+        leda::node v = cloudMesh.new_node();
+        cloudMesh.set_position(v, _g.L[it]);
+    }
 
     // create triangulation geometry
     const int renderAll =
