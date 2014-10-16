@@ -403,7 +403,8 @@ PhaseT0::StepRet::Enum PhaseT0::StepFindTriangles() {
 
         const int vertIdx = adjSimp->FindLinkVertex(g.Trl[it]);
         assert(g.Trl[it] == g.C.opposite_simplex(adjSimp, vertIdx));
-        nubuck().poly_mesh(g.trGeom).set_color(adjSimp->GetMeshFace(vertIdx), R::Color::Red);
+        // nubuck().poly_mesh(g.trGeom).set_color(adjSimp->GetMeshFace(vertIdx), R::Color::Red);
+        nubuck().poly_mesh(g.trGeom).set_pattern(adjSimp->GetMeshFace(vertIdx), R::Color::Yellow);
 
         leda::sc_simplex simp = adjSimp;
         if(simp->in_rel) continue;
@@ -541,13 +542,10 @@ OP::ALG::Phase* D3_Delaunay::Init() {
     }
 
     // create triangulation geometry
-    const int renderAll =
-        Nubuck::RenderMode::NODES |
-        Nubuck::RenderMode::EDGES |
-        Nubuck::RenderMode::FACES;
-
     _g.trGeom = nubuck().create_geometry();
-    nubuck().set_geometry_render_mode(_g.trGeom, renderAll);
+    nubuck().set_geometry_render_mode(_g.trGeom, Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES);
+    nubuck().set_geometry_shading_mode(_g.trGeom, Nubuck::ShadingMode::LINES);
+    nubuck().set_geometry_pattern(_g.trGeom, Nubuck::Pattern::CHECKER);
 
     // link complex to mesh
     _g.C.SetMesh(&nubuck().poly_mesh(_g.trGeom));

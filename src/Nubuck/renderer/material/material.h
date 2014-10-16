@@ -16,15 +16,17 @@ private:
 
     struct UniformType {
         enum Enum {
-            TEXTURE = 0
+            TEXTURE = 0,
+            COLOR
         };
     };
 
     struct UniformBinding {
         const char*         name;
-        UniformType::Enum   type; 
+        UniformType::Enum   type;
         union Variant {
-            Texture* v_tex;
+            Texture*    v_tex;
+            float       v_color[4];
         } variant;
 
         UniformBinding() : name(0) { }
@@ -45,6 +47,7 @@ public:
     Material(const Color& diffuseColor) : diffuseColor(diffuseColor) { }
 
     void SetUniformBinding(const char* name, Texture* val);
+    void SetUniformBinding(const char* name, const Color& val);
     void ClearUniformBinding(const char* name);
 };
 

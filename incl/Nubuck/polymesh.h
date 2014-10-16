@@ -50,6 +50,10 @@ private:
     leda::face_map<float>   _fatt_colorG;
     leda::face_map<float>   _fatt_colorB;
     leda::face_map<float>   _fatt_colorA;
+    leda::face_map<float>   _fatt_patternR;
+    leda::face_map<float>   _fatt_patternG;
+    leda::face_map<float>   _fatt_patternB;
+    leda::face_map<float>   _fatt_patternA;
 
     void InitVertexAttributes();
     void InitEdgeAttributes();
@@ -84,6 +88,7 @@ public:
 
     bool            is_visible(const face f) const;
     R::Color        color_of(const face f) const;
+    R::Color        pattern_of(const face f) const;
 
     void set_position(const node v, const VEC3& p);
     void set_radius(const node v, const float radius);
@@ -96,6 +101,7 @@ public:
 
     void set_visible(const face f, bool visible);
     void set_color(const face f, const R::Color& color);
+    void set_pattern(const face f, const R::Color& color);
 
     edge make_triangle(const VEC3& p0, const VEC3& p1, const VEC3& p2);
 };
@@ -149,6 +155,10 @@ inline void PolyMesh<VEC3>::InitFaceAttributes() {
     _fatt_colorG.init(*this, 1.0f);
     _fatt_colorB.init(*this, 1.0f);
     _fatt_colorA.init(*this, 1.0f);
+    _fatt_patternR.init(*this, 0.0f);
+    _fatt_patternG.init(*this, 0.0f);
+    _fatt_patternB.init(*this, 0.0f);
+    _fatt_patternA.init(*this, 0.0f);
 }
 
 template<typename VEC3>
@@ -267,6 +277,11 @@ inline R::Color PolyMesh<VEC3>::color_of(const face f) const {
 }
 
 template<typename VEC3>
+inline R::Color PolyMesh<VEC3>::pattern_of(const face f) const {
+    return R::Color(_fatt_patternR[f], _fatt_patternG[f], _fatt_patternB[f], _fatt_patternA[f]);
+}
+
+template<typename VEC3>
 inline void PolyMesh<VEC3>::set_position(const node v, const VEC3& p) {
     _vatt_state[v] = M::Max(_vatt_state[v], static_cast<char>(State::GEOMETRY_CHANGED));
 
@@ -336,6 +351,16 @@ inline void PolyMesh<VEC3>::set_color(const face f, const R::Color& color) {
     _fatt_colorG[f] = color.g;
     _fatt_colorB[f] = color.b;
     _fatt_colorA[f] = color.a;
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::set_pattern(const face f, const R::Color& color) {
+    _fatt_state[f] = M::Max(_fatt_state[f], static_cast<char>(State::GEOMETRY_CHANGED));
+
+    _fatt_patternR[f] = color.r;
+    _fatt_patternG[f] = color.g;
+    _fatt_patternB[f] = color.b;
+    _fatt_patternA[f] = color.a;
 }
 
 template<typename VEC3>

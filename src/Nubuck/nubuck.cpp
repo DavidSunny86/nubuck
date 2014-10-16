@@ -230,6 +230,14 @@ void NubuckImpl::set_geometry_shading_mode(const nb::geometry obj, ShadingMode::
     obj->SetShadingMode(mode);
 }
 
+void NubuckImpl::set_geometry_pattern(const nb::geometry obj, const Pattern::Enum pattern) {
+    obj->SetPattern(pattern);
+}
+
+void NubuckImpl::set_geometry_pattern_color(const nb::geometry obj, const R::Color& color) {
+    obj->SetPatternColor(color);
+}
+
 const M::Vector2& NubuckImpl::text_content_size(const nb::text obj) const {
     return obj->GetContentSize();
 }

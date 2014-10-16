@@ -58,6 +58,10 @@ bool Loop::Invoke() {
 	leda::CONVEX_HULL(L, mesh);
 	mesh.compute_faces();
 
+    nubuck().set_geometry_pattern(_geom, Nubuck::Pattern::DOTS);
+    leda::face f = mesh.first_face();
+    mesh.set_pattern(f, R::Color::Red);
+
     W::ENT_Text* text = W::world.CreateText();
 
     return true;

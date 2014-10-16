@@ -83,6 +83,11 @@ void ENT_Geometry::RebuildRenderMesh() {
         vert.normal = normal;
         vert.color = _ratPolyMesh.color_of(f);
         vert.color.a *= _transparency;
+
+        const R::Color& pc = _ratPolyMesh.pattern_of(f);
+        vert.A[0] = M::Vector3(pc.r, pc.g, pc.b);
+        vert.A[1].x = pc.a;
+
         if(1.0f > vert.color.a) _isTransparent = true;
 
         leda::edge it = e;
@@ -228,6 +233,8 @@ ENT_Geometry::ENT_Geometry()
     , _renderMode(0)
     , _renderLayer(0)
     , _shadingMode(ShadingMode::NICE)
+    , _pattern(Pattern::NONE)
+    , _patternColor(R::Color::White)
     , _stylizedHiddenLines(false)
     , _showWireframe(false)
     , _showNormals(false)
@@ -555,6 +562,14 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
     _mtx.Unlock();
 }
 
+void ENT_Geometry::SetPattern(Pattern::Enum pattern) {
+    _pattern = pattern;
+}
+
+void ENT_Geometry::SetPatternColor(const R::Color& color) {
+    _patternColor = color;
+}
+
 void ENT_Geometry::SetEditMode(editMode_t::Enum mode) {
 	SYS::ScopedLock lock(_mtx);
 
@@ -621,6 +636,19 @@ void ENT_Geometry::BuildRenderList() {
             _renderList.meshJobs.push_back(rjob);
         }
 
+        if(Pattern::NONE != _pattern) {
+            const char* patternTextures[] = {
+                "", /* none */
+                "pattern_checker.tga",
+                "pattern_dots.tga",
+                "pattern_lines.tga"
+            };
+
+            R::Texture* patternTex = R::TextureManager::Instance().Get(common.BaseDir() + "Textures\\" + patternTextures[_pattern]).Raw();
+            rjob.material.SetUniformBinding("patternColor", _patternColor);
+            rjob.material.SetUniformBinding("patternTex", patternTex);
+        }
+
         if(_isTransparent) {
             rjob.fx     = "DepthOnly";
             rjob.layer  = R::Renderer::Layers::GEOMETRY_0_DEPTH_ONLY;
@@ -648,6 +676,7 @@ void ENT_Geometry::BuildRenderList() {
         } else {
             rjob.fx         = "LitDirectionalTwosided";
             rjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+
             _renderList.meshJobs.push_back(rjob);
         }
     }

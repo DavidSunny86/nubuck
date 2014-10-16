@@ -25,9 +25,14 @@ layout(std140) uniform UniformsRenderTarget {
 uniform sampler2D depthTex;
 uniform sampler2D solidDepth;
 
+// pattern is enabled if patternColor.a > 0.0
+uniform vec4        patternColor;
+uniform sampler2D   patternTex;
+
 varying vec4 vPosition;
 varying vec3 vNormal;
 varying vec4 vColor;
+varying vec4 vPatternColor;
 
 void main() {
     vec4 color = vColor;
@@ -68,6 +73,14 @@ void main() {
         vec4 spec = vec4(0.0, 0.0, 0.0, 0.0);
 
         color.rgb *= (diff + spec).rgb;
+    }
+
+    if(0.0 < patternColor.a) {
+        // the pattern texture occupies 8x8 pixels, which looks pretty good for small textures.
+        vec2 texCoords = vec2(gl_FragCoord.x, gl_FragCoord.y) / 8.0;
+        vec4 pattern = texture2D(patternTex, texCoords);
+        float alpha = pattern.a * patternColor.a * vPatternColor.a;
+        color.rgb = (1.0 - alpha) * color.rgb + alpha * patternColor.rgb * vPatternColor.rgb * pattern.rgb;
     }
 
     if(PREMULT_ALPHA) color.rgb *= color.a;

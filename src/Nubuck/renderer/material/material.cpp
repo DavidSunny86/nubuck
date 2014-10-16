@@ -15,6 +15,14 @@ void Material::Bind(Program& prog, const Material& mat) {
                 ub.variant.v_tex->Bind(texUnit);
                 texUnit++;
             }
+            if(UniformType::COLOR == ub.type) {
+                Color c(
+                    ub.variant.v_color[0],
+                    ub.variant.v_color[1],
+                    ub.variant.v_color[2],
+                    ub.variant.v_color[3]);
+                prog.SetUniform(ub.name, Color(c));
+            }
         }
     }
 }
@@ -31,6 +39,20 @@ void Material::SetUniformBinding(const char* name, Texture* val) {
     UniformBinding& ub = uniformBindings[_numBindings++];
     ub.name             = name;
     ub.variant.v_tex    = val;
+}
+
+void Material::SetUniformBinding(const char* name, const Color& val) {
+    if(NUM_UNIFORM_BINDINGS <= _numBindings) {
+        common.printf("ERROR - Material: cannot find a free uniform binding point\n");
+        Crash();
+    }
+    UniformBinding& ub = uniformBindings[_numBindings++];
+    ub.type                 = UniformType::COLOR;
+    ub.name                 = name;
+    ub.variant.v_color[0]   = val.r;
+    ub.variant.v_color[1]   = val.g;
+    ub.variant.v_color[2]   = val.b;
+    ub.variant.v_color[3]   = val.a;
 }
 
 void Material::ClearUniformBinding(const char* name) {

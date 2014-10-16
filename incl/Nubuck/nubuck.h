@@ -20,6 +20,12 @@ struct Vector2;
 
 } // namespace M
 
+namespace R {
+
+struct Color;
+
+} // namespace R
+
 namespace W {
 
 class Entity;
@@ -107,6 +113,15 @@ struct Nubuck {
         };
     };
 
+    struct Pattern {
+        enum Enum {
+            NONE,
+            CHECKER,
+            DOTS,
+            LINES
+        };
+    };
+
     virtual const std::string&  geometry_name(const nb::geometry obj) = 0;
     virtual M::Vector3          geometry_position(const nb::geometry obj) = 0;
 
@@ -131,6 +146,8 @@ struct Nubuck {
     virtual void                set_geometry_render_mode(const nb::geometry obj, int flags) = 0;
     virtual void                set_geometry_render_layer(const nb::geometry obj, unsigned layer) = 0;
     virtual void                set_geometry_shading_mode(const nb::geometry obj, ShadingMode::Enum mode) = 0;
+    virtual void                set_geometry_pattern(const nb::geometry obj, const Pattern::Enum pattern) = 0;
+    virtual void                set_geometry_pattern_color(const nb::geometry obj, const R::Color& color) = 0;
 
     // text
     virtual const M::Vector2&   text_content_size(const nb::text obj) const = 0;

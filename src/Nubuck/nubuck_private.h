@@ -69,6 +69,8 @@ struct NubuckImpl : Nubuck {
     void                set_geometry_render_mode(const nb::geometry obj, int flags);
     void                set_geometry_render_layer(const nb::geometry obj, unsigned layer);
     void                set_geometry_shading_mode(const nb::geometry obj, ShadingMode::Enum mode);
+    void                set_geometry_pattern(const nb::geometry obj, const Pattern::Enum pattern);
+    void                set_geometry_pattern_color(const nb::geometry obj, const R::Color& color);
 
     // text
     const M::Vector2&   text_content_size(const nb::text obj) const;
