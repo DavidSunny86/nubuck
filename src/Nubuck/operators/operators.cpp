@@ -15,54 +15,22 @@ namespace OP {
 
 Operators g_operators;
 
-/*
-====================
-Operators::UpdateOperatorPanel
-    sets the panel of the currently active (ie. topmost) operator
-====================
-*/
-void Operators::UpdateOperatorPanel() {
-    Operator* op = _activeOps.back();
-    OperatorPanel* panel = NULL;
-    for(unsigned i = 0; !panel && i < _ops.size(); ++i) {
-        if(_ops[i].op == op) panel = _ops[i].panel;
-    }
-    assert(panel);
-    g_ui.GetOperatorPanel().Clear();
-    g_nubuck.set_operator_panel(panel);
-}
-
-void Operators::Event_Push(const EV::Event& event) {
-    const ED::Params_Push& args = ED::def_Push.GetArgs(event);
-
-    if(NULL == args.op) {
-        // invocation has been declined
-        event.Accept();
-        return;
-    }
-
-    while(1 < _activeOps.size()) // keep bottommost op in stack (usually OP::Translate)
-        _activeOps.pop_back();
-    _activeOps.push_back(args.op);
+void Operators::Event_SetOperator(const EV::Event& event) {
+    const ED::Params_SetOperator& args = ED::def_SetOperator.GetArgs(event);
 
     // find panel of active operator
-    Operator* op = _activeOps.back();
     OperatorPanel* panel = NULL;
     for(unsigned i = 0; !panel && i < _ops.size(); ++i) {
-        if(_ops[i].op == op) panel = _ops[i].panel;
+        if(_ops[i].op == args.op) panel = _ops[i].panel;
     }
     assert(panel);
 
     panel->Invoke();
-    UpdateOperatorPanel();
-    event.Accept();
-}
+    g_ui.GetOperatorPanel().Clear();
+    g_nubuck.set_operator_panel(panel);
 
-void Operators::Event_Pop(const EV::Event& event) {
-    assert(0 < event.args);
-    const ED::Params_Pop& args = ED::def_Pop.GetArgs(event);
-    for(unsigned i = 0; i < args.count; ++i) _activeOps.pop_back();
-    UpdateOperatorPanel();
+    _panel = panel;
+
     event.Accept();
 }
 
@@ -78,18 +46,17 @@ void Operators::OnInvokeOperator(unsigned id) {
     UI::LogWidget::Instance()->sys_printf("INFO - invoking operator with id = %d\n", id);
 
 	if(!_driver.IsValid()) {
-        _driver = GEN::MakePtr(new Driver(_activeOps, _activeOpsMtx));
+        _driver = GEN::MakePtr(new Driver());
         _driver->Thread_StartAsync();
 	}
 
     Operator* op = _ops[id].op;
-	ED::Params_Push args = { op };
-	InvokeAction(ED::def_Push.Create(args));
+	ED::Params_SetOperator args = { op };
+	InvokeAction(ED::def_SetOperator.Create(args));
 }
 
-Operators::Operators() : _actionsPending(0) {
-    AddEventHandler(ED::def_Push, this, &Operators::Event_Push);
-    AddEventHandler(ED::def_Pop, this, &Operators::Event_Pop);
+Operators::Operators() : _actionsPending(0), _panel(0) {
+    AddEventHandler(ED::def_SetOperator, this, &Operators::Event_SetOperator);
     AddEventHandler(ED::def_ActionFinished, this, &Operators::Event_ActionFinished);
 
     // forward other known events
@@ -108,15 +75,7 @@ unsigned Operators::GetDriverQueueSize() const {
 void Operators::FrameUpdate() {
     HandleEvents();
 
-    if(!_activeOps.empty()) {
-        Operator* op = _activeOps.back();
-        OperatorPanel* panel = NULL;
-        for(unsigned i = 0; !panel && i < _ops.size(); ++i) {
-            if(_ops[i].op == op) panel = _ops[i].panel;
-        }
-        assert(panel);
-        panel->HandleEvents();
-    }
+    if(_panel) _panel->HandleEvents();
 }
 
 unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module) {
@@ -153,22 +112,15 @@ void Operators::InvokeAction(const EV::Event& event, InvokationMode::Enum mode) 
 }
 
 void Operators::SetInitOp(unsigned id) {
-    assert(_activeOps.empty());
     OnInvokeOperator(id);
 }
 
 void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
-	if(!_renderThread.IsValid()) {
-        _renderThread = GEN::MakePtr(new RenderThread(_activeOps, _activeOpsMtx, _meshJobs, _meshJobsMtx));
-        // _renderThread->Thread_StartAsync();
-	}
-
-    // gather jobs synchronously
-    // NOTE: blocks when driver is busy. eg. op_loop
-    _renderThread->GatherJobs();
-
-	SYS::ScopedLock lockJobs(_meshJobsMtx);
-	meshJobs.insert(meshJobs.end(), _meshJobs.begin(), _meshJobs.end());
+    // URGENT: not threadsafe!!!
+    if(_driver.IsValid()) {
+        Operator* activeOp = _driver->ActiveOperator();
+        if(activeOp) activeOp->GetMeshJobs(meshJobs);
+    }
 }
 
 NUBUCK_API void SendToOperator(const EV::Event& event) {

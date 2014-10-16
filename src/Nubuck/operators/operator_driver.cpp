@@ -14,46 +14,27 @@ inline void SignalCompletion() {
     g_operators.Send(ED::def_ActionFinished.Create(ED::Params_ActionFinished()));
 }
 
-Operator* Driver::ActiveOperator() {
-    if(_activeOps.empty()) return NULL;
-    return _activeOps.back();
-}
-
-void Driver::Event_Push(const EV::Event& event) {
-    const ED::Params_Push& args = ED::def_Push.GetArgs(event);
+void Driver::Event_SetOperator(const EV::Event& event) {
+    const ED::Params_SetOperator& args = ED::def_SetOperator.GetArgs(event);
 
 	if(args.op->Invoke()) {
-        Operator* op = ActiveOperator();
-        if(op) op->Finish();
+        if(_activeOp) _activeOp->Finish();
+        _activeOp = args.op;
 
         W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 	    g_operators.SendAndWait(event);
-    } else {
-        ED::Params_Push args;
-        args.op = NULL; // indicates declined invocation
-        g_operators.SendAndWait(ED::def_Push.Create(args));
     }
 
     SignalCompletion();
 }
 
 void Driver::Event_SelectionChanged(const EV::Event& event) {
-    for(std::vector<Operator*>::reverse_iterator it(_activeOps.rbegin());
-        _activeOps.rend() != it; ++it)
-    {
-        (*it)->OnGeometrySelected();
-    }
-
+    if(_activeOp) _activeOp->OnGeometrySelected();
     SignalCompletion();
 }
 
 void Driver::Event_CameraChanged(const EV::Event& event) {
-    for(std::vector<Operator*>::reverse_iterator it(_activeOps.rbegin());
-        _activeOps.rend() != it; ++it)
-    {
-        (*it)->OnCameraChanged();
-    }
-
+    if(_activeOp) _activeOp->OnCameraChanged();
     SignalCompletion();
 }
 
@@ -78,54 +59,27 @@ static KeyEvent ConvertKeyEvent(const EV::Params_Key& from) {
 
 void Driver::Event_EditModeChanged(const EV::Event& event) {
     const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
-    for(std::vector<Operator*>::reverse_iterator it(_activeOps.rbegin());
-        _activeOps.rend() != it; ++it)
-    {
-        (*it)->OnEditModeChanged(W::editMode_t::Enum(args.editMode));
-    }
-
+    if(_activeOp) _activeOp->OnEditModeChanged(W::editMode_t::Enum(args.editMode));
     SignalCompletion();
 }
 
 void Driver::Event_Mouse(const EV::Event& event) {
 	const EV::Params_Mouse& args = EV::def_Mouse.GetArgs(event);
 	bool shiftKey = args.mods & EV::Params_Mouse::MODIFIER_SHIFT;
-    unsigned ret = 0;
-    unsigned N;
-    for(int i = _activeOps.size() - 1; !ret && 0 <= i; --i) {
-        Operator* op = _activeOps[i];
-		if(op->OnMouse(ConvertMouseEvent(args))) {
-            N = _activeOps.size() - 1 - i;
-            for(unsigned j = i; j < _activeOps.size(); ++j)
-                _activeOps[j]->Finish();
-            if(0 < N) op->Invoke();
-            ret = 1;
-        }
-    }
-
-    if(!ret) {
-        // forward event
-        W::world.Send(event);
-    } else {
+	if(_activeOp && _activeOp->OnMouse(ConvertMouseEvent(args))) {
         // TODO: remove me
         W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
-
-        if(0 < N) {
-            ED::Params_Pop popArgs = { N };
-            g_operators.SendAndWait(ED::def_Pop.Create(popArgs));
-        }
+    } else {
+        // forward event
+        W::world.Send(event);
     }
 	event.Accept();
-
     SignalCompletion();
 }
 
 void Driver::Event_Key(const EV::Event& event) {
     const EV::Params_Key& args = EV::def_Key.GetArgs(event);
-    for(int i = _activeOps.size() - 1; 0 <= i; --i) {
-        Operator* op = _activeOps[i];
-        op->OnKey(ConvertKeyEvent(args));
-    }
+    if(_activeOp) _activeOp->OnKey(ConvertKeyEvent(args));
     W::world.Send(event);
 
     SignalCompletion();
@@ -137,10 +91,9 @@ void Driver::Event_RebuildAll(const EV::Event& event) {
 }
 
 void Driver::Event_Default(const EV::Event& event, const char* className) {
-    Operator* op = ActiveOperator();
-    if(op) {
-        op->Send(event);
-        op->HandleEvents();
+    if(_activeOp) {
+        _activeOp->Send(event);
+        _activeOp->HandleEvents();
 
         W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 	}
@@ -148,12 +101,11 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
     SignalCompletion();
 }
 
-Driver::Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx)
+Driver::Driver()
     : _isBlocked(false)
-    , _activeOps(activeOps)
-    , _activeOpsMtx(activeOpsMtx)
+    , _activeOp(0)
 {
-	AddEventHandler(ED::def_Push, this, &Driver::Event_Push);
+	AddEventHandler(ED::def_SetOperator, this, &Driver::Event_SetOperator);
 	AddEventHandler(EV::def_SelectionChanged, this, &Driver::Event_SelectionChanged);
 	AddEventHandler(EV::def_CameraChanged, this, &Driver::Event_CameraChanged);
     AddEventHandler(EV::def_EditModeChanged, this, &Driver::Event_EditModeChanged);

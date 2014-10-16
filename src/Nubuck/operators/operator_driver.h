@@ -14,12 +14,9 @@ private:
 
     bool _isBlocked;
 
-    std::vector<Operator*>& _activeOps;
-    SYS::SpinLock&          _activeOpsMtx;
+    Operator* _activeOp;
 
-    Operator* ActiveOperator();
-
-    void Event_Push(const EV::Event& event);
+    void Event_SetOperator(const EV::Event& event);
 
     void Event_SelectionChanged(const EV::Event& event);
     void Event_CameraChanged(const EV::Event& event);
@@ -30,7 +27,10 @@ private:
 protected:
     void Event_Default(const EV::Event& event, const char* className) override;
 public:
-    Driver(std::vector<Operator*>& activeOps, SYS::SpinLock& activeOpsMtx);
+    Driver();
+
+    // URGENT: removeme!!!
+    Operator* ActiveOperator() { return _activeOp; }
 
     unsigned GetEventQueueSize() const { return EV::EventHandler<EV::EventHandlerPolicies::Blocking>::GetEventQueueSize(); }
 

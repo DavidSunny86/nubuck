@@ -1,6 +1,7 @@
 #include <maxint.h>
 
 #include <Nubuck\polymesh.h>
+#include <Nubuck\operators\operator_invoker.h>
 #include <Nubuck\math\intersections.h>
 #include <world\world.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
@@ -193,9 +194,9 @@ void Translate::SetCursorPosition(const M::Vector3& pos) {
 void Translate::Register(const Nubuck& nb, Invoker& invoker) {
     /*
     no need for explicit invokation
-    QAction* action = _nb.ui->GetSceneMenu()->addAction("Translate");
-    QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
     */
+    QAction* action = nubuck().scene_menu()->addAction("Translate");
+    QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 
     if(!nubuck().first_selected_entity()) HideCursor();
 }
@@ -210,6 +211,7 @@ static M::Vector3 Axis(int i) {
 
 bool Translate::Invoke() {
     nubuck().set_operator_name("Translate");
+    OnGeometrySelected();
     return true;
 }
 
