@@ -658,9 +658,9 @@ void World::Render(R::RenderList& renderList) {
     renderList.worldMat = _camArcball.GetWorldToEyeMatrix();
 
     if(g_showRenderViewControls) {
-        Grid_GetRenderJobs(renderList.meshJobs);
         BBoxes_GetRenderJobs(renderList.meshJobs);
     }
+    Grid_GetRenderJobs(renderList.meshJobs);
 
     SYS::ScopedLock lockEntities(_entitiesMtx);
 
