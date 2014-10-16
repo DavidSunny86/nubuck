@@ -158,6 +158,9 @@ public:
     void Show();
     void Hide();
 
+    ShadingMode::Enum   GetShadingMode() const;
+    bool                StylizedHiddenLinesEnabled() const;
+
     void SetRenderMode(int flags);
     void SetRenderLayer(unsigned layer);
     void SetShadingMode(ShadingMode::Enum mode);

@@ -519,6 +519,14 @@ void ENT_Geometry::Hide() {
 	_isHidden = true;
 }
 
+Nubuck::ShadingMode::Enum ENT_Geometry::GetShadingMode() const {
+    return _shadingMode;
+}
+
+bool ENT_Geometry::StylizedHiddenLinesEnabled() const {
+    return _stylizedHiddenLines;
+}
+
 void ENT_Geometry::SetRenderMode(int flags) {
 	SYS::ScopedLock lock(_mtx);
 	_renderMode = flags;
@@ -558,6 +566,12 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
         };
         _shadingMode = mode;
         ForceRebuild();
+
+        EV::Params_ENT_Geometry_EdgeShadingChanged args;
+        args.shadingMode = _shadingMode;
+        args.showHiddenLines = _stylizedHiddenLines;
+        EV::Event event = EV::def_ENT_Geometry_EdgeShadingChanged.Create(args);
+        g_ui.GetOutliner().SendToView(_outlinerItem, event);
     }
     _mtx.Unlock();
 }

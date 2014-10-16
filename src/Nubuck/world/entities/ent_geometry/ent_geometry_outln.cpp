@@ -68,6 +68,7 @@ ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) 
     AddEventHandler(EV::def_ENT_Geometry_VertexScaleChanged, this, &ENT_GeometryOutln::Event_VertexScaleChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeScaleChanged, this, &ENT_GeometryOutln::Event_EdgeScaleChanged);
 	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_GeometryOutln::Event_EdgeColorChanged);
+	AddEventHandler(EV::def_ENT_Geometry_EdgeShadingChanged, this, &ENT_GeometryOutln::Event_EdgeShadingChanged);
     AddEventHandler(EV::def_ENT_Geometry_RenderModeChanged, this, &ENT_GeometryOutln::Event_RenderModeChanged);
 }
 
@@ -99,8 +100,10 @@ void ENT_GeometryOutln::InitOutline() {
     _cbEdgeShading->addItem("fast");
     _cbEdgeShading->addItem("lines");
     _cbEdgeShading->addItem("billboards (nice)");
+    _cbEdgeShading->setCurrentIndex(_subject.GetShadingMode());
 
     _cbHiddenLines = new QCheckBox("show hidden lines");
+    _cbHiddenLines->setChecked(_subject.StylizedHiddenLinesEnabled());
 
     _sbHullAlpha = new NBW_SpinBox;
     _sbHullAlpha->showProgressBar(true);
@@ -195,6 +198,13 @@ void ENT_GeometryOutln::Event_EdgeColorChanged(const EV::Event& event) {
 	_btnEdgeColor->blockSignals(true);
 	_btnEdgeColor->SetColor(args.edgeColor.r, args.edgeColor.g, args.edgeColor.b);
 	_btnEdgeColor->blockSignals(false);
+}
+
+void ENT_GeometryOutln::Event_EdgeShadingChanged(const EV::Event& event) {
+    const EV::Params_ENT_Geometry_EdgeShadingChanged& args = EV::def_ENT_Geometry_EdgeShadingChanged.GetArgs(event);
+    UI::BlockSignals blockSignals(_btnRenderVertices, _btnRenderEdges, _btnRenderFaces);
+    _cbEdgeShading->setCurrentIndex(args.shadingMode);
+    _cbHiddenLines->setChecked(args.showHiddenLines);
 }
 
 void ENT_GeometryOutln::Event_RenderModeChanged(const EV::Event& event) {

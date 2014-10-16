@@ -40,6 +40,7 @@ private:
     void Event_VertexScaleChanged(const EV::Event& event);
     void Event_EdgeScaleChanged(const EV::Event& event);
     void Event_EdgeColorChanged(const EV::Event& event);
+    void Event_EdgeShadingChanged(const EV::Event& event);
     void Event_RenderModeChanged(const EV::Event& event);
 private slots:
     void OnVertexScaleChanged(leda::rational value);
