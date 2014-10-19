@@ -54,6 +54,8 @@ public:
 
     Driver& GetDriver() { assert(_driver.IsValid()); return *_driver; }
 
+    Operator* GetDefaultOperator() { return _ops[0].op; }
+
     void FrameUpdate();
 
     unsigned Register(OperatorPanel* panel, Operator* op, HMODULE module = NULL);

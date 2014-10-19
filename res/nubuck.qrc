@@ -21,5 +21,6 @@
         <file>Images/edit.svg</file>
         <file>Images/arrow-left.svg</file>
         <file>Images/focus_camera.svg</file>
+        <file>Images/pop.svg</file>
     </qresource>
 </RCC>

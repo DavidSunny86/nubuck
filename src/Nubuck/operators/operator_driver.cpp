@@ -15,6 +15,8 @@ inline void SignalCompletion() {
 }
 
 void Driver::SetOperator(Operator* op) {
+    if(_activeOp == op) return;
+
 	if(op->Invoke()) {
         if(_activeOp) _activeOp->Finish();
         _activeOp = op;

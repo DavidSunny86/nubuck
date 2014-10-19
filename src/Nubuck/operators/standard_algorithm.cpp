@@ -121,5 +121,20 @@ bool StandardAlgorithm::Invoke() {
     return false;
 }
 
+void StandardAlgorithm::Finish() {
+}
+
+bool StandardAlgorithm::OnMouse(const MouseEvent&) {
+    // algorithms accepts all mouse events, so default operator
+    // op_translate can't become active
+    return true;
+}
+
+bool StandardAlgorithm::OnKey(const KeyEvent&) {
+    // algorithms accepts all key events, so default operator
+    // op_translate can't become active
+    return true;
+}
+
 } // namespace ALG
 } // namespace OP

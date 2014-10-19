@@ -69,7 +69,10 @@ public:
     void Register(const Nubuck& nb, Invoker& invoker) override;
 
     bool Invoke() override;
-    void Finish() override { }
+    void Finish() override;
+
+	bool OnMouse(const MouseEvent& mouseEvent) override;
+    bool OnKey(const KeyEvent& keyEvent) override;
 };
 
 } // namespace ALG
