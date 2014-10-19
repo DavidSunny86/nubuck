@@ -19,6 +19,12 @@
 #include <world\editmode\editmode.h>
 #include "entity.h"
 
+namespace EV {
+
+struct Params_Mouse;
+
+} // namespace EV
+
 namespace W {
 
     class ENT_Polyhedron;
@@ -142,6 +148,8 @@ namespace W {
         void RebuildAll();
         void Update(void);
         void Render(R::RenderList& renderList);
+
+        void HandleMouseEvent(const EV::Params_Mouse& args);
 
         // exported to client
         ENT_Geometry* CreateGeometry(); // thread-safe

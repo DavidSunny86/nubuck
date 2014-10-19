@@ -274,42 +274,7 @@ static float aspect;
 
 void World::Event_Mouse(const EV::Event& event) {
     const EV::Params_Mouse& args = EV::def_Mouse.GetArgs(event);
-
-    if(EV::Params_Mouse::MOUSE_DOWN == args.type) {
-        if(EV::Params_Mouse::BUTTON_LEFT == args.button) {
-            if(EV::Params_Mouse::MODIFIER_SHIFT == args.mods)
-                _camArcball.StartZooming(args.x, args.y);
-            else if(EV::Params_Mouse::MODIFIER_CTRL == args.mods)
-                _camArcball.StartPanning(args.x, args.y);
-            else _camArcball.StartDragging(args.x, args.y);
-        }
-		if(EV::Params_Mouse::BUTTON_MIDDLE == args.button) {
-            _camArcball.StartPanning(args.x, args.y);
-        }
-    }
-
-    if(EV::Params_Mouse::MOUSE_UP == args.type) {
-        if(EV::Params_Mouse::BUTTON_LEFT  == args.button) {
-            _camArcball.StopDragging();
-            _camArcball.StopPanning();
-            _camArcball.StopZooming();
-        }
-        if(EV::Params_Mouse::BUTTON_MIDDLE == args.button)
-            _camArcball.StopPanning();
-    }
-
-    if(EV::Params_Mouse::MOUSE_MOVE == args.type) {
-        _camArcball.Drag(args.x, args.y);
-        _camArcball.Pan(args.x, args.y);
-        _camArcball.Zoom(args.x, args.y);
-        mouseX = args.x;
-        mouseY = args.y;
-    }
-
-    if(EV::Params_Mouse::MOUSE_WHEEL == args.type) {
-        if(args.delta > 0) _camArcball.ZoomIn();
-        if(args.delta < 0) _camArcball.ZoomOut();
-    }
+    HandleMouseEvent(args);
 }
 
 GEN::Pointer<Entity> World::FindByEntityID(unsigned entId) {
@@ -656,6 +621,44 @@ void World::Render(R::RenderList& renderList) {
                 transformGizmo.GetRenderJobs(renderList);
             }
         }
+    }
+}
+
+void World::HandleMouseEvent(const EV::Params_Mouse& args) {
+    if(EV::Params_Mouse::MOUSE_DOWN == args.type) {
+        if(EV::Params_Mouse::BUTTON_LEFT == args.button) {
+            if(EV::Params_Mouse::MODIFIER_SHIFT == args.mods)
+                _camArcball.StartZooming(args.x, args.y);
+            else if(EV::Params_Mouse::MODIFIER_CTRL == args.mods)
+                _camArcball.StartPanning(args.x, args.y);
+            else _camArcball.StartDragging(args.x, args.y);
+        }
+		if(EV::Params_Mouse::BUTTON_MIDDLE == args.button) {
+            _camArcball.StartPanning(args.x, args.y);
+        }
+    }
+
+    if(EV::Params_Mouse::MOUSE_UP == args.type) {
+        if(EV::Params_Mouse::BUTTON_LEFT  == args.button) {
+            _camArcball.StopDragging();
+            _camArcball.StopPanning();
+            _camArcball.StopZooming();
+        }
+        if(EV::Params_Mouse::BUTTON_MIDDLE == args.button)
+            _camArcball.StopPanning();
+    }
+
+    if(EV::Params_Mouse::MOUSE_MOVE == args.type) {
+        _camArcball.Drag(args.x, args.y);
+        _camArcball.Pan(args.x, args.y);
+        _camArcball.Zoom(args.x, args.y);
+        mouseX = args.x;
+        mouseY = args.y;
+    }
+
+    if(EV::Params_Mouse::MOUSE_WHEEL == args.type) {
+        if(args.delta > 0) _camArcball.ZoomIn();
+        if(args.delta < 0) _camArcball.ZoomOut();
     }
 }
 

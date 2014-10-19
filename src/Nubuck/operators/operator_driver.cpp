@@ -72,9 +72,6 @@ void Driver::Event_Mouse(const EV::Event& event) {
     } else if(_defaultOp->OnMouse(mouseEvent)) {
         // default operator becomes active, implicit rebuild
         SetOperator(_defaultOp);
-    } else {
-        // forward event
-        W::world.Send(event);
     }
     W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 	event.Accept();
@@ -89,6 +86,7 @@ void Driver::Event_Key(const EV::Event& event) {
         // default operator becomes active, implicit rebuild
         SetOperator(_defaultOp);
     } else {
+        // forward event
         W::world.Send(event);
     }
 

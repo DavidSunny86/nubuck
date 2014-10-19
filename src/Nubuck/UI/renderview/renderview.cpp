@@ -94,8 +94,10 @@ namespace UI {
         args.y = qevent->y();
 		args.ret = NULL;
 
-        EV::Event event = EV::def_Mouse.Create(args);
-        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
+        if(EV::Params_Mouse::BUTTON_RIGHT == args.button) {
+            EV::Event event = EV::def_Mouse.Create(args);
+            OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
+        } else W::world.HandleMouseEvent(args);
     }
 
     void RenderView::mouseReleaseEvent(QMouseEvent* qevent) {
@@ -107,8 +109,10 @@ namespace UI {
         args.y = qevent->y();
 		args.ret = NULL;
 
-        EV::Event event = EV::def_Mouse.Create(args);
-        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
+        if(EV::Params_Mouse::BUTTON_RIGHT == args.button) {
+            EV::Event event = EV::def_Mouse.Create(args);
+            OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
+        } else W::world.HandleMouseEvent(args);
     }
 
     void RenderView::mouseMoveEvent(QMouseEvent* qevent) {
@@ -121,7 +125,8 @@ namespace UI {
 		args.ret = NULL;
 
         EV::Event event = EV::def_Mouse.Create(args);
-        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
+        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::DROP_WHEN_BUSY);
+        W::world.HandleMouseEvent(args);
     }
 
     void RenderView::wheelEvent(QWheelEvent* qevent) {
@@ -132,8 +137,7 @@ namespace UI {
         args.x = qevent->x();
         args.y = qevent->y();
 
-        EV::Event event = EV::def_Mouse.Create(args);
-        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
+        W::world.HandleMouseEvent(args);
     }
 
     void RenderView::keyPressEvent(QKeyEvent* qevent) {
@@ -163,7 +167,7 @@ namespace UI {
 
 
         EV::Event event = EV::def_Key.Create(args);
-        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
+        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::DROP_WHEN_BUSY);
     }
 
     void RenderView::keyReleaseEvent(QKeyEvent* qevent) {
