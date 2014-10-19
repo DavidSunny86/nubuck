@@ -25,6 +25,7 @@ namespace W {
     class ENT_Mesh;
     class ENT_Geometry;
     class ENT_Text;
+    class ENT_TransformGizmo;
 
     extern SYS::Semaphore g_worldSem;
 
@@ -70,6 +71,8 @@ namespace W {
 
         std::vector<GEN::Pointer<Entity> > _entities;
         SYS::SpinLock _entitiesMtx;
+
+        ENT_TransformGizmo* _globalTransformGizmo;
 
         SYS::Timer  _timer;
         float       _secsPassed;
@@ -143,6 +146,9 @@ namespace W {
         // exported to client
         ENT_Geometry* CreateGeometry(); // thread-safe
         ENT_Text* CreateText();
+        ENT_TransformGizmo* CreateTransformGizmo();
+
+        ENT_TransformGizmo* GlobalTransformGizmo();
 
         // selection, exported to client
         // MUST be called from inside operator

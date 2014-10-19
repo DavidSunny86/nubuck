@@ -11,6 +11,7 @@
 #include <common\commands.h>
 #include <world\world.h>
 #include <world\entities\ent_text\ent_text.h>
+#include <world\entities\ent_transform_gizmo\ent_transform_gizmo.h>
 #include <renderer\effects\effect.h>
 #include <renderer\effects\statedesc_gen\statedesc_gen.h>
 #include <algdriver\algdriver.h>
@@ -93,6 +94,10 @@ void NubuckImpl::destroy_geometry(const nb::geometry obj) {
 
 nb::text NubuckImpl::create_text() {
     return W::world.CreateText();
+}
+
+nb::transform_gizmo NubuckImpl::create_transform_gizmo() {
+    return W::world.CreateTransformGizmo();
 }
 
 void NubuckImpl::clear_selection() {
@@ -252,6 +257,38 @@ void NubuckImpl::set_text_content(const nb::text obj, const std::string& content
 
 void NubuckImpl::set_text_content_scale(const nb::text obj, const char refChar, const float refCharSize) {
     obj->SetContentScale(refChar, refCharSize);
+}
+
+NubuckImpl::TransformGizmoMode::Enum NubuckImpl::transform_gizmo_mode(const nb::transform_gizmo obj) {
+    return obj->GetTransformMode();
+}
+
+void NubuckImpl::set_transform_gizmo_mode(const nb::transform_gizmo obj, TransformGizmoMode::Enum mode) {
+    obj->SetTransformMode(mode);
+}
+
+void NubuckImpl::set_transform_gizmo_position(const nb::transform_gizmo obj, const M::Vector3& pos) {
+    obj->SetCursorPosition(pos);
+}
+
+void NubuckImpl::hide_transform_gizmo(const nb::transform_gizmo obj) {
+    obj->HideCursor();
+}
+
+void NubuckImpl::show_transform_gizmo(const nb::transform_gizmo obj) {
+    obj->ShowCursor();
+}
+
+nb::transform_gizmo NubuckImpl::global_transform_gizmo() {
+    return W::world.GlobalTransformGizmo();
+}
+
+bool NubuckImpl::transform_gizmo_handle_mouse_event(
+    const nb::transform_gizmo obj,
+    const OP::MouseEvent& event,
+    transform_gizmo_mouse_info& info)
+{
+    return obj->HandleMouseEvent(event, info);
 }
 
 void NubuckImpl::wait_for_animations() {

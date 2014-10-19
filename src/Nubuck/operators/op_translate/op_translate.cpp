@@ -13,200 +13,20 @@
 
 namespace OP {
 
-struct AxisMesh {
-    std::vector<R::Mesh::Vertex>    vertices;
-    std::vector<R::Mesh::Index>     indices;
-
-    AxisMesh(
-        float size,
-        int subdiv,
-        float spacing,
-        const R::Color& colX,
-        const R::Color& colY,
-        const R::Color& colZ)
-    {
-        unsigned idxCnt = 0;
-        R::Color colors[] = { colX, colY, colZ };
-
-        unsigned N = (1 << subdiv);
-        float f = size / N;
-        for(int i = 0; i < 3; ++i) {
-            M::Vector3 d = M::Vector3::Zero;
-            d.vec[i] = 1.0f;
-
-            for(int j = 0; j < N; ++j) {
-                R::Mesh::Vertex vert;
-                vert.position = f * d * j;
-                vert.color = colors[i];
-                vertices.push_back(vert);
-                indices.push_back(idxCnt++);
-
-                M::Vector3 p = f * d * (j + 1) - spacing * f * d;
-                vert.position = p;
-                vert.color = colors[i];
-                vertices.push_back(vert);
-                indices.push_back(idxCnt++);
-            }
-        }
-    }
-
-    R::Mesh::Desc GetDesc() {
-        R::Mesh::Desc desc;
-        desc.vertices = &vertices[0];
-        desc.numVertices = vertices.size();
-        desc.indices = &indices[0];
-        desc.numIndices = indices.size();
-        desc.primType = GL_LINES;
-        return desc;
-    }
-};
-
-void Translate::BuildAxis() {
-    AxisMesh axisDesc(1.0f, 4, 0.4f, R::Color::Red, R::Color::Blue, R::Color::Green);
-    _axisMesh = R::meshMgr.Create(axisDesc.GetDesc());
-    _axisTFMesh = R::meshMgr.Create(_axisMesh);
-}
-
-void Translate::BuildArrowHeads() {
-    R::Cone arrowHead(0.1f, 0.5f, 20, R::Color::Red);
-    R::meshPtr_t meshPtr = _arrowHeadMeshes[0] = R::meshMgr.Create(R::Cone(0.1f, 0.5f, 20, R::Color::Red).GetDesc());
-    _arrowHeadTFMeshes[0] = R::meshMgr.Create(meshPtr);
-    _arrowHeadTF[0] = M::Mat4::Translate(1.0f, 0.0f, 0.0f) * M::Mat4::RotateY( 90.0f);
-    R::meshMgr.GetMesh(_arrowHeadTFMeshes[0]).SetTransform(_arrowHeadTF[0]);
-
-    meshPtr = _arrowHeadMeshes[1] = R::meshMgr.Create(R::Cone(0.1f, 0.5f, 20, R::Color::Blue).GetDesc());
-    _arrowHeadTFMeshes[1] = R::meshMgr.Create(meshPtr);
-    _arrowHeadTF[1] = M::Mat4::Translate(0.0f, 1.0f, 0.0f) * M::Mat4::RotateX(-90.0f);
-    R::meshMgr.GetMesh(_arrowHeadTFMeshes[1]).SetTransform(_arrowHeadTF[1]);
-
-    meshPtr = _arrowHeadMeshes[2] = R::meshMgr.Create(R::Cone(0.1f, 0.5f, 20, R::Color::Green).GetDesc());
-    _arrowHeadTFMeshes[2] = R::meshMgr.Create(meshPtr);
-    _arrowHeadTF[2] = M::Mat4::Translate(0.0f, 0.0f, 1.0f);
-    R::meshMgr.GetMesh(_arrowHeadTFMeshes[2]).SetTransform(_arrowHeadTF[2]);
-}
-
-void Translate::BuildBoxHeads() {
-    const unsigned subdiv = 4;
-
-    R::meshPtr_t meshPtr;
-
-    R::Sphere sphere(subdiv, true);
-    sphere.Scale(0.1f);
-
-    sphere.SetColor(R::Color::Red);
-    meshPtr = _boxHeadMeshes[0] = R::meshMgr.Create(sphere.GetDesc());
-    _boxHeadTFMeshes[0] = R::meshMgr.Create(meshPtr);
-    _boxHeadTF[0] = M::Mat4::Translate(1.0f, 0.0f, 0.0f);
-    R::meshMgr.GetMesh(_boxHeadTFMeshes[0]).SetTransform(_boxHeadTF[0]);
-
-    sphere.SetColor(R::Color::Blue);
-    meshPtr = _boxHeadMeshes[1] = R::meshMgr.Create(sphere.GetDesc());
-    _boxHeadTFMeshes[1] = R::meshMgr.Create(meshPtr);
-    _boxHeadTF[1] = M::Mat4::Translate(0.0f, 1.0f, 0.0f);
-    R::meshMgr.GetMesh(_boxHeadTFMeshes[1]).SetTransform(_boxHeadTF[1]);
-
-    sphere.SetColor(R::Color::Green);
-    meshPtr = _boxHeadMeshes[2] = R::meshMgr.Create(sphere.GetDesc());
-    _boxHeadTFMeshes[2] = R::meshMgr.Create(meshPtr);
-    _boxHeadTF[2] = M::Mat4::Translate(0.0f, 0.0f, 1.0f);
-    R::meshMgr.GetMesh(_boxHeadTFMeshes[2]).SetTransform(_boxHeadTF[2]);
-}
-
-Translate::Translate()
-    : _mode(TransformMode::TRANSLATE)
-    , _dragging(false)
-{
+Translate::Translate() : _gizmo(0) {
 	AddEventHandler(EV::def_SelectionChanged, this, &Translate::Event_SelectionChanged);
 
-    _cursorPos = M::Vector3::Zero;
-    _hidden = true;
-
-    BuildAxis();
-    BuildArrowHeads();
-    BuildBoxHeads();
-}
-
-void Translate::BuildBBoxes() {
-    const float l = 1.2f;
-    const float w = 0.4f;
-    _bboxes[X] = M::Box::FromCenterSize(M::Vector3(0.5f, 0.0f, 0.0f), M::Vector3(l, w, w));
-    _bboxes[Y] = M::Box::FromCenterSize(M::Vector3(0.0f, 0.5f, 0.0f), M::Vector3(w, l, w));
-    _bboxes[Z] = M::Box::FromCenterSize(M::Vector3(0.0f, 0.0f, 0.5f), M::Vector3(w, w, l));
-}
-
-void Translate::HideCursor() {
-    _hidden = true;
-}
-
-void Translate::ShowCursor() {
-    _hidden = false;
-}
-
-static void SetCenterPosition(M::Box& box, const M::Vector3& center) {
-    const M::Vector3 oldCenter = 0.5f * (box.max - box.min) + box.min;
-    const M::Vector3 d = (center - oldCenter);
-    box.min += d;
-    box.max += d;
-}
-
-void Translate::SetRenderPosition(const M::Vector3& pos) {
-    M::Matrix4 T = M::Mat4::Translate(pos);
-    R::meshMgr.GetMesh(_axisTFMesh).SetTransform(T);
-    for(int i = 0; i < DIM; ++i) {
-        R::meshMgr.GetMesh(_arrowHeadTFMeshes[i]).SetTransform(T * _arrowHeadTF[i]);
-        R::meshMgr.GetMesh(_boxHeadTFMeshes[i]).SetTransform(T * _boxHeadTF[i]);
-    }
-    for(unsigned i = 0; i < DIM; ++i) {
-        SetCenterPosition(_bboxes[i], pos);
-        const float l = 1.2f;
-        const float w = 0.2f;
-        _bboxes[X] = M::Box::FromCenterSize(pos + M::Vector3(0.5f, 0.0f, 0.0f), M::Vector3(l, w, w));
-        _bboxes[Y] = M::Box::FromCenterSize(pos + M::Vector3(0.0f, 0.5f, 0.0f), M::Vector3(w, l, w));
-        _bboxes[Z] = M::Box::FromCenterSize(pos + M::Vector3(0.0f, 0.0f, 0.5f), M::Vector3(w, w, l));
-    }
-}
-
-/*
-====================
-AlignWithCamera
-    moves vector v at constant distance to camera.
-    note: worldToEye = modelview matrix
-====================
-*/
-static M::Vector3 AlignWithCamera(const M::Matrix4& worldToEye, const M::Vector3& v) {
-    M::Matrix4 eyeToWorld;
-    bool r = true;
-    r = M::TryInvert(worldToEye, eyeToWorld);
-    COM_assert(r);
-    M::Vector3 eye = M::Transform(eyeToWorld, M::Vector3::Zero); // eye pos in world space
-    const float c = 10.0f;
-    M::Vector3 d = v - eye;
-    M::Matrix4 M = M::Mat4::Translate(-(d.Length() - c) * M::Normalize(d));
-    return M::Transform(M, v);
-}
-
-void Translate::SetCursorPosition(const M::Vector3& pos) {
-    _cursorPos = pos;
-    M::Vector3 renderPos = AlignWithCamera(W::world.GetModelView(), _cursorPos);
-    SetRenderPosition(renderPos);
+    _gizmo = nubuck().global_transform_gizmo();
 }
 
 void Translate::Register(const Nubuck& nb, Invoker& invoker) {
     /*
     no need for explicit invokation
-    */
     QAction* action = nubuck().scene_menu()->addAction("Translate");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
+    */
 
-    if(!nubuck().first_selected_entity()) HideCursor();
-}
-
-static M::Vector3 Axis(int i) {
-    if(0 == i) return M::Vector3(1.0f, 0.0f, 0.0f);
-    if(1 == i) return M::Vector3(0.0f, 1.0f, 0.0f);
-    if(2 == i) return M::Vector3(0.0f, 0.0f, 1.0f);
-    assert(false && "Axis(int i): parameter out of range");
-    return M::Vector3::Zero;
+    if(!nubuck().first_selected_entity()) nubuck().hide_transform_gizmo(_gizmo);
 }
 
 bool Translate::Invoke() {
@@ -215,60 +35,8 @@ bool Translate::Invoke() {
     return true;
 }
 
-void Translate::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
-    if(_hidden || !g_showRenderViewControls) return;
-
-    R::MeshJob meshJob;
-
-    meshJob.fx = "UnlitThickLines";
-    meshJob.layer = R::Renderer::Layers::GEOMETRY_1;
-    meshJob.material = R::Material::White;
-    meshJob.primType = 0;
-    meshJob.tfmesh = _axisTFMesh;
-    meshJobs.push_back(meshJob);
-
-    meshJob.fx = "LitDirectional";
-    meshJob.layer = R::Renderer::Layers::GEOMETRY_1;
-    meshJob.material = R::Material::White;
-    meshJob.primType = 0;
-    for(int i = 0; i < 3; ++i) {
-        switch(_mode) {
-        case TransformMode::TRANSLATE:
-            meshJob.tfmesh = _arrowHeadTFMeshes[i];
-            break;
-        case TransformMode::SCALE:
-            meshJob.tfmesh = _boxHeadTFMeshes[i];
-            break;
-        }
-        meshJobs.push_back(meshJob);
-    }
-}
-
 void Translate::OnGeometrySelected() {
     UpdateCursor();
-}
-
-void Translate::OnCameraChanged() {
-    SetCursorPosition(_cursorPos); // updates renderpos
-}
-
-bool Translate::TraceCursor(const M::Ray& ray, int& axis, M::IS::Info* inf) {
-    for(int i = 0; i < DIM; ++i) {
-        if(M::IS::Intersects(ray, _bboxes[i], inf)) {
-            axis = i;
-            return true;
-        }
-    }
-    return false;
-}
-
-// returns z axis of eye space in world space
-static M::Vector3 EyeZ(const M::Matrix4& modelView) {
-    M::Matrix3 M = M::RotationOf(modelView);
-    float det = M::Det(M);
-    if(M::AlmostEqual(0.0f, det)) common.printf("WARNING - modelview matrix is singular\n");
-    M::Matrix3 invM = M::Inverse(M, det);
-    return M::Transform(invM, M::Vector3(0.0f, 0.0f, 1.0f));
 }
 
 static M::Vector3 ToVector(const leda::d3_rat_point& p) { // TODO: duplicate of ent_geometry.cpp:ToVector
@@ -311,146 +79,122 @@ Translate::UpdateCursor
 ====================
 */
 void Translate::UpdateCursor() {
-    if(!nubuck().first_selected_entity()) HideCursor();
+    bool isValidObjSelection = false, isValidVertSelection = false;
+    nb::entity ent = nubuck().first_selected_entity();
+    if(ent) {
+        if(W::editMode_t::OBJECTS == _editMode) {
+            isValidObjSelection = true;
+        } else {
+            assert(W::editMode_t::VERTICES == _editMode);
+            if(nb::EntityType::GEOMETRY == nubuck().type_of(ent)) {
+                nb::geometry geom = nubuck().to_geometry(ent);
+                isValidVertSelection = !geom->GetVertexSelection().empty();
+            }
+        }
+    }
+    if(isValidObjSelection || isValidVertSelection) {
+        nubuck().set_transform_gizmo_position(_gizmo, FindCursorPosition());
+        nubuck().show_transform_gizmo(_gizmo);
+    }
     else {
-        SetCursorPosition(FindCursorPosition());
-        ShowCursor();
+        nubuck().hide_transform_gizmo(_gizmo);
     }
 }
 
-bool Translate::OnMouseDown(const MouseEvent& event) {
+bool Translate::DoPicking(const MouseEvent& event) {
 	if(MouseEvent::BUTTON_RIGHT != event.button) return false;
-
-    if(_dragging) return false;
 
     M::Ray ray = W::world.PickingRay(event.coords);
 
-    int         axis;
-    M::IS::Info inf;
+    if(W::editMode_t::OBJECTS == _editMode) {
+        nb::entity ent = NULL;
+        if(W::world.TraceEntity(ray, &ent)) {
+            if(MouseEvent::MODIFIER_SHIFT & event.mods) nubuck().select(Nubuck::SELECT_MODE_ADD, ent);
+            else nubuck().select(Nubuck::SELECT_MODE_NEW, ent);
+            return true;
+        }
+    }
 
-    _editMode = W::world.GetEditMode().GetMode();
+    if(W::editMode_t::VERTICES == _editMode && nubuck().first_selected_geometry()) {
+        W::ENT_Geometry* geom = nubuck().first_selected_geometry();
+        std::vector<W::ENT_Geometry::VertexHit> hits;
+        if(geom->TraceVertices(ray, 0.2f, hits)) {
+            // find nearest hit
+            unsigned nidx = 0;
+            for(unsigned i = 1; i < hits.size(); ++i) {
+                if(hits[nidx].dist > hits[i].dist)
+                    nidx = i;
+            }
 
-    if(nubuck().first_selected_entity() && TraceCursor(ray, axis, &inf)) {
-        M::Vector3 eyeZ = EyeZ(W::world.GetModelView());
-        M::Vector3 vAxis = Axis(axis);
-        _dragAxis = axis;
-        _dragPlane = M::Plane::FromPointSpan(_cursorPos, M::Cross(eyeZ, vAxis), vAxis);
-        bool is = M::IS::Intersects(ray, _dragPlane, &inf);
-        assert(is);
-        _dragOrig = inf.where;
+            Nubuck::SelectMode selectMode = Nubuck::SELECT_MODE_ADD;
+            if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = Nubuck::SELECT_MODE_NEW;
+            nubuck().select_vertex(selectMode, geom, hits[nidx].vert);
+            nubuck().set_transform_gizmo_position(_gizmo, FindCursorPosition());
+        }
+    }
 
-        unsigned selectionSize = 0;
+    return true;
+
+}
+
+void Translate::OnBeginDragging() {
+    assert(nubuck().first_selected_entity());
+
+    unsigned selectionSize = 0;
+    nb::entity ent = nubuck().first_selected_entity();
+    while(ent) {
+        selectionSize++;
+        ent = nubuck().next_selected_entity(ent);
+    }
+
+    _center = M::Vector3::Zero;
+
+    // save entity positions
+    if(W::editMode_t::OBJECTS == _editMode) {
+        _oldEntityPos.resize(selectionSize);
+        unsigned i = 0;
         nb::entity ent = nubuck().first_selected_entity();
         while(ent) {
-            selectionSize++;
+            _oldEntityPos[i] = nubuck().position(ent);
+            _center += _oldEntityPos[i];
+            i++;
             ent = nubuck().next_selected_entity(ent);
         }
+        _center /= _oldEntityPos.size();
+    }
 
-        _center = M::Vector3::Zero;
-
-        // save entity positions
-        if(W::editMode_t::OBJECTS == _editMode) {
-            _oldEntityPos.resize(selectionSize);
-            unsigned i = 0;
-            nb::entity ent = nubuck().first_selected_entity();
-            while(ent) {
-                _oldEntityPos[i] = nubuck().position(ent);
-                _center += _oldEntityPos[i];
-                i++;
-                ent = nubuck().next_selected_entity(ent);
-            }
-            _center /= _oldEntityPos.size();
+    // save vertex positions
+    nb::geometry geom = nubuck().first_selected_geometry();
+    if(geom) {
+        const leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
+        _oldVertPos.init(mesh);
+        leda::node v;
+        forall_nodes(v, mesh) {
+            const M::Vector3 pos = ToVector(mesh.position_of(v));
+            _oldVertPos[v] = pos;
         }
 
-        // save vertex positions
-        nb::geometry geom = nubuck().first_selected_geometry();
-        if(geom) {
-            const leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
-            _oldVertPos.init(mesh);
-            leda::node v;
-            forall_nodes(v, mesh) {
-                const M::Vector3 pos = ToVector(mesh.position_of(v));
-                _oldVertPos[v] = pos;
-            }
+        if(W::editMode_t::VERTICES == _editMode) {
+            std::vector<leda::node> verts = geom->GetVertexSelection();
+            for(unsigned i = 0; i < verts.size(); ++i)
+                _center += _oldVertPos[verts[i]];
+            _center /= verts.size();
 
-            if(W::editMode_t::VERTICES == _editMode) {
-                std::vector<leda::node> verts = geom->GetVertexSelection();
-                for(unsigned i = 0; i < verts.size(); ++i)
-                    _center += _oldVertPos[verts[i]];
-                _center /= verts.size();
-            }
-        } // if(geom)
-
-        _oldCursorPos = _cursorPos;
-        _dragging = true;
-    } else { // cursor not hit
-        if(W::editMode_t::OBJECTS == _editMode) {
-            nb::entity ent = NULL;
-            if(W::world.TraceEntity(ray, &ent)) {
-                if(MouseEvent::MODIFIER_SHIFT & event.mods) nubuck().select(Nubuck::SELECT_MODE_ADD, ent);
-                else nubuck().select(Nubuck::SELECT_MODE_NEW, ent);
-                return true;
-            }
-        }
-
-        if(W::editMode_t::VERTICES == _editMode && nubuck().first_selected_geometry()) {
-            W::ENT_Geometry* geom = nubuck().first_selected_geometry();
-            std::vector<W::ENT_Geometry::VertexHit> hits;
-            if(geom->TraceVertices(ray, 0.2f, hits)) {
-                // find nearest hit
-                unsigned nidx = 0;
-                for(unsigned i = 1; i < hits.size(); ++i) {
-                    if(hits[nidx].dist > hits[i].dist)
-                        nidx = i;
-                }
-
-                Nubuck::SelectMode selectMode = Nubuck::SELECT_MODE_ADD;
-                if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = Nubuck::SELECT_MODE_NEW;
-                nubuck().select_vertex(selectMode, geom, hits[nidx].vert);
-                SetCursorPosition(FindCursorPosition());
-            }
+            std::cout << "saving vert positions! " << verts.size() << std::endl;
         }
     }
-    return false;
 }
 
-bool Translate::OnMouseUp(const MouseEvent&) {
-    if(_dragging) {
-        _dragging = false;
-        return true;
-    }
-    return false;
-}
+void Translate::OnDragging(const Nubuck::transform_gizmo_mouse_info& info) {
+    Nubuck::TransformGizmoMode::Enum mode = nubuck().transform_gizmo_mode(_gizmo);
 
-namespace {
-
-leda::d3_rat_point Scale(float s, leda::d3_rat_point p) {
-    leda::rational r(8, 7);
-    return leda::d3_rat_point(
-        r * p.xcoord(),
-        r * p.ycoord(),
-        r * p.zcoord());
-}
-
-} // unnamed namespace
-
-bool Translate::OnMouseMove(const MouseEvent& event) {
-    if(_dragging && TransformMode::TRANSLATE == _mode) {
-        M::Ray ray = W::world.PickingRay(event.coords);
-        M::IS::Info inf;
-        bool is = M::IS::Intersects(ray, _dragPlane, &inf);
-        assert(is);
-        M::Vector3 p = inf.where;
-        M::Vector3 pos = _cursorPos;
-        pos.vec[_dragAxis] = _oldCursorPos.vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
-        SetCursorPosition(pos);
-
+    if(Nubuck::TransformGizmoMode::TRANSLATE == mode) {
         if(W::editMode_t::OBJECTS == _editMode) {
             unsigned i = 0;
             nb::entity ent = nubuck().first_selected_entity();
             while(ent) {
                 M::Vector3 pos = _oldEntityPos[i];
-                pos.vec[_dragAxis] = _oldEntityPos[i].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
+                pos.vec[info.axis] = _oldEntityPos[i].vec[info.axis] + info.value;
                 nubuck().set_position(ent, pos);
                 i++;
                 ent = nubuck().next_selected_entity(ent);
@@ -467,24 +211,12 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
             for(unsigned i = 0; i < verts.size(); ++i) {
                 const leda::node v = verts[i];
                 M::Vector3 pos = _oldVertPos[v];
-                pos.vec[_dragAxis] = _oldVertPos[v].vec[_dragAxis] + (p - _dragOrig).vec[_dragAxis];
+                pos.vec[info.axis] = _oldVertPos[v].vec[info.axis] + info.value;
                 mesh.set_position(v, ToRatPoint(pos));
             }
         }
-        return true;
     }
-    if(_dragging && TransformMode::SCALE == _mode) {
-        M::Vector2 mousePos = event.coords;
-        float base = M::Length(_dragOrig - _oldCursorPos);
-
-        M::Ray ray = W::world.PickingRay(event.coords);
-        M::IS::Info inf;
-        bool is = M::IS::Intersects(ray, _dragPlane, &inf);
-        assert(is);
-        M::Vector3 p = inf.where;
-
-        float scale = M::Length(p - _oldCursorPos) / base;
-
+    if(Nubuck::TransformGizmoMode::SCALE == mode) {
         if(W::editMode_t::OBJECTS == _editMode) {
             // TODO: this is broken, does not work for multiple selected geometry objects
             nb::geometry geom = nubuck().first_selected_geometry();
@@ -493,7 +225,7 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
                 leda::node v;
                 forall_nodes(v, mesh) {
                     M::Vector3 pos = _oldVertPos[v];
-                    pos.vec[_dragAxis] *= scale;
+                    pos.vec[info.axis] *= info.value;
                     mesh.set_position(v, ToRatPoint(pos));
                 }
             }
@@ -509,28 +241,39 @@ bool Translate::OnMouseMove(const MouseEvent& event) {
             for(unsigned i = 0; i < verts.size(); ++i) {
                 leda::node v = verts[i];
                 M::Vector3 pos = _oldVertPos[v] - _center;
-                pos.vec[_dragAxis] *= scale;
+                pos.vec[info.axis] *= info.value;
                 pos += _center;
                 mesh.set_position(v, ToRatPoint(pos));
             }
         }
-
-        return true;
     }
-    return false;
 }
 
 void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {
-    _dragging = false;
+    // stop dragging by resetting mode
+    Nubuck::TransformGizmoMode::Enum tfMode = nubuck().transform_gizmo_mode(_gizmo);
+    nubuck().set_transform_gizmo_mode(_gizmo, tfMode);
+
+    _editMode = mode;
     UpdateCursor();
 }
 
 bool Translate::OnMouse(const MouseEvent& event) {
-	switch(event.type) {
-	case MouseEvent::MOUSE_DOWN:  return OnMouseDown(event);
-	case MouseEvent::MOUSE_UP:    return OnMouseUp(event);
-	case MouseEvent::MOUSE_MOVE:  return OnMouseMove(event);
-	}
+    _editMode = W::world.GetEditMode().GetMode();
+
+    Nubuck::transform_gizmo_mouse_info mouseInfo;
+    if(nubuck().transform_gizmo_handle_mouse_event(_gizmo, event, mouseInfo)) {
+        if(Nubuck::transform_gizmo_action::BEGIN_DRAGGING == mouseInfo.action) {
+            OnBeginDragging();
+        }
+        if(Nubuck::transform_gizmo_action::DRAGGING == mouseInfo.action) {
+            OnDragging(mouseInfo);
+        }
+        return true;
+    } else { // event not handled by gizmo
+        if(MouseEvent::MOUSE_DOWN == event.type) return DoPicking(event);
+    }
+
     return false;
 }
 
@@ -539,15 +282,14 @@ bool Translate::OnKey(const KeyEvent& event) {
     static const unsigned numrow[3] = { 11, 2, 3 };
 
     if(numrow[1] == event.nativeScanCode) {
-        _mode = TransformMode::TRANSLATE;
-        _dragging = false;
+        nubuck().set_transform_gizmo_mode(_gizmo, Nubuck::TransformGizmoMode::TRANSLATE);
     }
     if(numrow[2] == event.nativeScanCode) {
-        _mode = TransformMode::SCALE;
-        _dragging = false;
+        nubuck().set_transform_gizmo_mode(_gizmo, Nubuck::TransformGizmoMode::SCALE);
     }
 
-    return true;
+    // do not become active when only mode changes
+    return false;
 }
 
 } // namespace OP

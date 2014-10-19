@@ -46,7 +46,7 @@ void Operators::OnInvokeOperator(unsigned id) {
     UI::LogWidget::Instance()->sys_printf("INFO - invoking operator with id = %d\n", id);
 
 	if(!_driver.IsValid()) {
-        _driver = GEN::MakePtr(new Driver());
+        _driver = GEN::MakePtr(new Driver(_ops[0].op)); // op_translate is first operator
         _driver->Thread_StartAsync();
 	}
 
@@ -115,12 +115,9 @@ void Operators::SetInitOp(unsigned id) {
     OnInvokeOperator(id);
 }
 
+// REMOVEME
 void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
-    // URGENT: not threadsafe!!!
-    if(_driver.IsValid()) {
-        Operator* activeOp = _driver->ActiveOperator();
-        if(activeOp) activeOp->GetMeshJobs(meshJobs);
-    }
+    // ...
 }
 
 NUBUCK_API void SendToOperator(const EV::Event& event) {

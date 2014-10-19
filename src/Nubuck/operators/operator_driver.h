@@ -14,12 +14,14 @@ private:
 
     bool _isBlocked;
 
+    Operator* _defaultOp;
     Operator* _activeOp;
+
+    void SetOperator(Operator* op);
 
     void Event_SetOperator(const EV::Event& event);
 
     void Event_SelectionChanged(const EV::Event& event);
-    void Event_CameraChanged(const EV::Event& event);
     void Event_EditModeChanged(const EV::Event& event);
     void Event_Mouse(const EV::Event& event);
     void Event_Key(const EV::Event& event);
@@ -27,10 +29,7 @@ private:
 protected:
     void Event_Default(const EV::Event& event, const char* className) override;
 public:
-    Driver();
-
-    // URGENT: removeme!!!
-    Operator* ActiveOperator() { return _activeOp; }
+    Driver(Operator* defaultOp);
 
     unsigned GetEventQueueSize() const { return EV::EventHandler<EV::EventHandlerPolicies::Blocking>::GetEventQueueSize(); }
 

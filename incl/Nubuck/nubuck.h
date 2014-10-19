@@ -31,14 +31,22 @@ namespace W {
 class Entity;
 class ENT_Geometry;
 class ENT_Text;
+class ENT_TransformGizmo;
 
 } // namespace W
 
+namespace OP {
+
+struct MouseEvent;
+
+} // namespace OP
+
 namespace nb {
 
-typedef W::Entity*          entity;
-typedef W::ENT_Geometry*    geometry;
-typedef W::ENT_Text*        text;
+typedef W::Entity*              entity;
+typedef W::ENT_Geometry*        geometry;
+typedef W::ENT_Text*            text;
+typedef W::ENT_TransformGizmo*  transform_gizmo;
 
 struct EntityType {
     enum Enum {
@@ -62,10 +70,11 @@ struct Nubuck {
     virtual void    set_operator_panel(QWidget* panel) = 0;
 
     // world
-    virtual void            destroy(const nb::entity obj) = 0;
-    virtual nb::geometry    create_geometry() = 0;
-    virtual void            destroy_geometry(const nb::geometry obj) = 0;
-    virtual nb::text        create_text() = 0;
+    virtual void                destroy(const nb::entity obj) = 0;
+    virtual nb::geometry        create_geometry() = 0;
+    virtual void                destroy_geometry(const nb::geometry obj) = 0;
+    virtual nb::text            create_text() = 0;
+    virtual nb::transform_gizmo create_transform_gizmo() = 0;
 
     // selection
     enum SelectMode {
@@ -155,6 +164,52 @@ struct Nubuck {
     virtual void                set_text_position(const nb::text obj, const M::Vector3& pos) = 0;
     virtual void                set_text_content(const nb::text obj, const std::string& content) = 0;
     virtual void                set_text_content_scale(const nb::text obj, const char refChar, const float refCharSize) = 0;
+
+    // transform gizmo
+    struct TransformGizmoMode {
+        enum Enum {
+            TRANSLATE = 0,
+            SCALE,
+            ROTATE,
+            NUM_MODES
+        };
+    };
+
+    struct transform_gizmo_action {
+        enum Enum {
+            NO_ACTION,
+            BEGIN_DRAGGING,
+            END_DRAGGING,
+            DRAGGING
+        };
+    };
+
+    struct transform_gizmo_axis {
+        enum Enum {
+            X, Y, Z, INVALID_AXIS
+        };
+    };
+
+    struct transform_gizmo_mouse_info {
+        transform_gizmo_action::Enum    action;
+        transform_gizmo_axis::Enum      axis;
+        float                           value; // either translation or scale
+    };
+
+    virtual TransformGizmoMode::Enum transform_gizmo_mode(const nb::transform_gizmo obj) = 0;
+
+    virtual void                set_transform_gizmo_mode(const nb::transform_gizmo obj, TransformGizmoMode::Enum mode) = 0;
+
+    virtual void                set_transform_gizmo_position(const nb::transform_gizmo obj, const M::Vector3& pos) = 0;
+
+    virtual void                hide_transform_gizmo(const nb::transform_gizmo obj) = 0;
+    virtual void                show_transform_gizmo(const nb::transform_gizmo obj) = 0;
+
+    virtual nb::transform_gizmo global_transform_gizmo() = 0;
+    virtual bool                transform_gizmo_handle_mouse_event(
+        const nb::transform_gizmo obj,
+        const OP::MouseEvent& event,
+        transform_gizmo_mouse_info& info) = 0;
 
     // animation
     virtual void wait_for_animations() = 0;

@@ -30,64 +30,18 @@ private:
     typedef leda::rational      scalar_t;
     typedef leda::d3_rat_point  point3_t;
 
-    struct TransformMode {
-        enum Enum {
-            TRANSLATE = 0,
-            SCALE,
-            ROTATE,
-            NUM_MODES
-        };
-    };
-
-    TransformMode::Enum _mode;
-
-    R::meshPtr_t    _axisMesh;
-    R::tfmeshPtr_t  _axisTFMesh;
-
-    enum { X = 0, Y, Z, DIM };
-    R::meshPtr_t    _arrowHeadMeshes[3];
-    R::tfmeshPtr_t  _arrowHeadTFMeshes[3];
-    M::Matrix4      _arrowHeadTF[3];
-
-    R::meshPtr_t    _boxHeadMeshes[3];
-    R::tfmeshPtr_t  _boxHeadTFMeshes[3];
-    M::Matrix4      _boxHeadTF[3];
-
-    void BuildAxis();
-    void BuildArrowHeads();
-    void BuildBoxHeads();
-
-    M::Box _bboxes[DIM]; // bounding boxes of cursor
-
-    void BuildBBoxes();
-
-    bool _hidden;
-
-    void ShowCursor();
-    void HideCursor();
+    nb::transform_gizmo _gizmo;
 
     void UpdateCursor();
 
-    void SetRenderPosition(const M::Vector3& pos);
-    void SetCursorPosition(const M::Vector3& pos);
-
-    M::Vector3                      _cursorPos; // use cursorPos as readonly and SetCursorPosition() for writes
-    M::Vector3              		_oldCursorPos;
     std::vector<M::Vector3> 		_oldEntityPos;
     leda::node_array<M::Vector3>    _oldVertPos;
     M::Vector3                      _center;
     W::editMode_t::Enum             _editMode;
 
-    bool        _dragging;
-    int         _dragAxis;
-    M::Vector3  _dragOrig;
-    M::Plane    _dragPlane;
-
-    bool TraceCursor(const M::Ray& ray, int& axis, M::IS::Info* inf = NULL);
-
-    bool OnMouseDown(const MouseEvent& event);
-    bool OnMouseUp(const MouseEvent& event);
-    bool OnMouseMove(const MouseEvent& event);
+    bool DoPicking(const MouseEvent& event);
+    void OnBeginDragging();
+    void OnDragging(const Nubuck::transform_gizmo_mouse_info& info);
 
     void Event_SelectionChanged(const EV::Event& event) {
         OnGeometrySelected();
@@ -99,9 +53,7 @@ public:
     bool Invoke() override;
     void Finish() override { }
 
-    void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) override;
     void OnGeometrySelected() override;
-    void OnCameraChanged() override;
     void OnEditModeChanged(const W::editMode_t::Enum mode) override;
     bool OnMouse(const MouseEvent& event) override;
     bool OnKey(const KeyEvent& event) override;

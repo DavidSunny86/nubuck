@@ -20,6 +20,7 @@
 #include <operators\operator_driver.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <world\entities\ent_text\ent_text.h>
+#include <world\entities\ent_transform_gizmo\ent_transform_gizmo.h>
 #include <nubuck_private.h>
 #include "entity.h"
 #include "world_events.h"
@@ -297,28 +298,17 @@ void World::Event_Mouse(const EV::Event& event) {
             _camArcball.StopPanning();
     }
 
-    bool cameraChanged = false;
-
     if(EV::Params_Mouse::MOUSE_MOVE == args.type) {
         _camArcball.Drag(args.x, args.y);
         _camArcball.Pan(args.x, args.y);
         _camArcball.Zoom(args.x, args.y);
         mouseX = args.x;
         mouseY = args.y;
-        cameraChanged = true;
     }
 
     if(EV::Params_Mouse::MOUSE_WHEEL == args.type) {
         if(args.delta > 0) _camArcball.ZoomIn();
         if(args.delta < 0) _camArcball.ZoomOut();
-        cameraChanged = true;
-    }
-
-    // TODO: do this once per world.Update()
-    if(cameraChanged) {
-        OP::g_operators.InvokeAction(
-            EV::def_CameraChanged.Create(EV::Params_CameraChanged()),
-            OP::Operators::InvokationMode::ALWAYS);
     }
 }
 
@@ -394,15 +384,11 @@ void World::Event_Key(const EV::Event& event) {
 
     const float transitionDur = 0.25f;
 
-    bool cameraChanged = false;
-
     if('R' == args.keyCode) {
         _camArcball.ResetRotation();
-        cameraChanged = true;
     }
     if('E' == args.keyCode) {
         _camArcball.Reset();
-        cameraChanged = true;
     }
     if(numpad[1] == args.nativeScanCode) {
         if(EV::Params_Key::MODIFIER_SHIFT & args.mods) {
@@ -430,13 +416,6 @@ void World::Event_Key(const EV::Event& event) {
     if(EV::Params_Key::KEY_DOWN == args.type && !args.autoRepeat) {
         GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
         if(phase.IsValid()) phase->OnKeyPressed((char)args.keyCode);
-    }
-
-    // TODO: do this once per world.Update()
-    if(cameraChanged) {
-        OP::g_operators.InvokeAction(
-            EV::def_CameraChanged.Create(EV::Params_CameraChanged()),
-            OP::Operators::InvokationMode::ALWAYS);
     }
 }
 
@@ -526,6 +505,8 @@ World::World(void) : _camArcball(800, 400) /* init values arbitrary */
     AddEventHandler(EV::def_Key,                  this, &World::Event_Key);
 
     Grid_Build();
+
+    _globalTransformGizmo = CreateTransformGizmo();
 }
 
 M::Ray World::PickingRay(const M::Vector2& mouseCoords) {
@@ -627,11 +608,7 @@ void World::Update(void) {
         }
     }
 
-    if(_camArcball.FrameUpdate(_secsPassed)) {
-        OP::g_operators.InvokeAction(
-            EV::def_CameraChanged.Create(EV::Params_CameraChanged()),
-            OP::Operators::InvokationMode::ALWAYS);
-    }
+    _camArcball.FrameUpdate(_secsPassed);
 
     if(OP::g_operators.GetDriver().IsBlocked() || OP::g_operators.IsDriverIdle()) {
         A::g_animator.Move(_secsPassed);
@@ -674,6 +651,9 @@ void World::Render(R::RenderList& renderList) {
             } else if(EntityType::ENT_TEXT == _entities[i]->GetType()) {
                 ENT_Text& text = static_cast<ENT_Text&>(*_entities[i]);
                 text.GetRenderJobs(renderList);
+            } else if(EntityType::ENT_TRANSFORM_GIZMO == _entities[i]->GetType()) {
+                ENT_TransformGizmo& transformGizmo = static_cast<ENT_TransformGizmo&>(*_entities[i]);
+                transformGizmo.GetRenderJobs(renderList);
             }
         }
     }
@@ -717,6 +697,29 @@ ENT_Text* World::CreateText() {
     Send(EV::def_LinkEntity.Create(args));
 
     return text;
+}
+
+ENT_TransformGizmo* World::CreateTransformGizmo() {
+    entIdCntMtx.Lock();
+    unsigned entId = entIdCnt++;
+    entIdCntMtx.Unlock();
+
+    ENT_TransformGizmo* transformGizmo = new ENT_TransformGizmo();
+    transformGizmo->SetID(entId);
+
+    transformGizmo->SetPosition(M::Vector3::Zero);
+    transformGizmo->SetOrientation(M::Quat::Identity());
+    transformGizmo->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
+
+    EV::Params_LinkEntity args;
+    args.entity = transformGizmo;
+    Send(EV::def_LinkEntity.Create(args));
+
+    return transformGizmo;
+}
+
+ENT_TransformGizmo* World::GlobalTransformGizmo() {
+    return _globalTransformGizmo;
 }
 
 void World::ClearSelection() {

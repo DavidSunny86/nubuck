@@ -19,10 +19,11 @@ struct NubuckImpl : Nubuck {
     void    set_operator_panel(QWidget* panel);
 
     // world
-    void            destroy(const nb::entity obj);
-    nb::geometry    create_geometry();
-    void            destroy_geometry(const nb::geometry obj);
-    nb::text        create_text();
+    void                destroy(const nb::entity obj);
+    nb::geometry        create_geometry();
+    void                destroy_geometry(const nb::geometry obj);
+    nb::text            create_text();
+    nb::transform_gizmo create_transform_gizmo();
 
     void                    clear_selection();
     void                	select_geometry(SelectMode mode, const nb::geometry obj);
@@ -78,6 +79,22 @@ struct NubuckImpl : Nubuck {
     void                set_text_position(const nb::text obj, const M::Vector3& position);
     void                set_text_content(const nb::text obj, const std::string& content);
     void                set_text_content_scale(const nb::text obj, const char refChar, const float refCharSize);
+
+    // transform gizmo
+    TransformGizmoMode::Enum transform_gizmo_mode(const nb::transform_gizmo obj);
+
+    void                set_transform_gizmo_mode(const nb::transform_gizmo obj, TransformGizmoMode::Enum mode);
+
+    void                set_transform_gizmo_position(const nb::transform_gizmo obj, const M::Vector3& pos);
+
+    void                hide_transform_gizmo(const nb::transform_gizmo obj);
+    void                show_transform_gizmo(const nb::transform_gizmo obj);
+
+    nb::transform_gizmo global_transform_gizmo();
+    bool                transform_gizmo_handle_mouse_event(
+        const nb::transform_gizmo obj,
+        const OP::MouseEvent& event,
+        transform_gizmo_mouse_info& info);
 
     // animation
     void wait_for_animations();

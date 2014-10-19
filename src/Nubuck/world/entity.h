@@ -14,7 +14,8 @@ namespace W {
 struct EntityType {
     enum Enum {
         ENT_GEOMETRY = 0,
-        ENT_TEXT
+        ENT_TEXT,
+        ENT_TRANSFORM_GIZMO
     };
 };
 

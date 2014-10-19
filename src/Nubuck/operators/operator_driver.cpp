@@ -14,27 +14,27 @@ inline void SignalCompletion() {
     g_operators.Send(ED::def_ActionFinished.Create(ED::Params_ActionFinished()));
 }
 
-void Driver::Event_SetOperator(const EV::Event& event) {
-    const ED::Params_SetOperator& args = ED::def_SetOperator.GetArgs(event);
-
-	if(args.op->Invoke()) {
+void Driver::SetOperator(Operator* op) {
+	if(op->Invoke()) {
         if(_activeOp) _activeOp->Finish();
-        _activeOp = args.op;
+        _activeOp = op;
 
         W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
-	    g_operators.SendAndWait(event);
-    }
 
+        ED::Params_SetOperator args = { op };
+        g_operators.SendAndWait(ED::def_SetOperator.Create(args));
+    }
+}
+
+void Driver::Event_SetOperator(const EV::Event& event) {
+    const ED::Params_SetOperator& args = ED::def_SetOperator.GetArgs(event);
+    SetOperator(args.op);
     SignalCompletion();
 }
 
 void Driver::Event_SelectionChanged(const EV::Event& event) {
     if(_activeOp) _activeOp->OnGeometrySelected();
-    SignalCompletion();
-}
-
-void Driver::Event_CameraChanged(const EV::Event& event) {
-    if(_activeOp) _activeOp->OnCameraChanged();
+    _defaultOp->OnGeometrySelected();
     SignalCompletion();
 }
 
@@ -59,29 +59,40 @@ static KeyEvent ConvertKeyEvent(const EV::Params_Key& from) {
 
 void Driver::Event_EditModeChanged(const EV::Event& event) {
     const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
-    if(_activeOp) _activeOp->OnEditModeChanged(W::editMode_t::Enum(args.editMode));
+    const W::editMode_t::Enum editMode = W::editMode_t::Enum(args.editMode);
+    if(_activeOp) _activeOp->OnEditModeChanged(editMode);
+    _defaultOp->OnEditModeChanged(editMode);
     SignalCompletion();
 }
 
 void Driver::Event_Mouse(const EV::Event& event) {
 	const EV::Params_Mouse& args = EV::def_Mouse.GetArgs(event);
-	bool shiftKey = args.mods & EV::Params_Mouse::MODIFIER_SHIFT;
-	if(_activeOp && _activeOp->OnMouse(ConvertMouseEvent(args))) {
-        // TODO: remove me
-        W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
+    const MouseEvent mouseEvent = ConvertMouseEvent(args);
+	if(_activeOp && _activeOp->OnMouse(mouseEvent)) {
+    } else if(_defaultOp->OnMouse(mouseEvent)) {
+        // default operator becomes active, implicit rebuild
+        SetOperator(_defaultOp);
     } else {
         // forward event
         W::world.Send(event);
     }
+    W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
 	event.Accept();
     SignalCompletion();
 }
 
 void Driver::Event_Key(const EV::Event& event) {
     const EV::Params_Key& args = EV::def_Key.GetArgs(event);
-    if(_activeOp) _activeOp->OnKey(ConvertKeyEvent(args));
-    W::world.Send(event);
+    const KeyEvent keyEvent = ConvertKeyEvent(args);
+    if(_activeOp && _activeOp->OnKey(keyEvent)) {
+    } else if(_defaultOp->OnKey(keyEvent)) {
+        // default operator becomes active, implicit rebuild
+        SetOperator(_defaultOp);
+    } else {
+        W::world.Send(event);
+    }
 
+    W::world.SendAndWait(EV::def_RebuildAll.Create(EV::Params_RebuildAll()));
     SignalCompletion();
 }
 
@@ -101,13 +112,15 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
     SignalCompletion();
 }
 
-Driver::Driver()
+Driver::Driver(Operator* defaultOp)
     : _isBlocked(false)
+    , _defaultOp(defaultOp)
     , _activeOp(0)
 {
+    assert(_defaultOp);
+
 	AddEventHandler(ED::def_SetOperator, this, &Driver::Event_SetOperator);
 	AddEventHandler(EV::def_SelectionChanged, this, &Driver::Event_SelectionChanged);
-	AddEventHandler(EV::def_CameraChanged, this, &Driver::Event_CameraChanged);
     AddEventHandler(EV::def_EditModeChanged, this, &Driver::Event_EditModeChanged);
 	AddEventHandler(EV::def_Mouse, this, &Driver::Event_Mouse);
     AddEventHandler(EV::def_Key, this, &Driver::Event_Key);
