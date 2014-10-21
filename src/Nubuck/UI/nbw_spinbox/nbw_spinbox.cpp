@@ -201,6 +201,7 @@ void NBW_SpinBoxControls::SetValue(const leda::rational rval) {
     leda::rational clamped = leda::max(_min, leda::min(_max, rval));
     if(clamped != _rval) {
         _rval = clamped;
+        repaint();
         emit SigValueChanged();
     }
 }
