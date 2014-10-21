@@ -15,7 +15,10 @@ void Operators::UnloadModules() {
 
 
 static bool IsOperatorFilename(const std::basic_string<TCHAR>& filename) {
-    bool prefix = 0 == filename.find(TEXT("alg_")) || 0 == filename.find(TEXT("op_")); 
+    bool prefix =
+        0 == filename.find(TEXT("alg_")) ||
+        0 == filename.find(TEXT("gen_")) ||
+        0 == filename.find(TEXT("op_"));
     bool suffix = true;
     return prefix && suffix;
 }
