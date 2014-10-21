@@ -128,6 +128,7 @@ bool Delaunay3D::Invoke() {
 
     geom = nubuck().create_geometry();
     nubuck().set_geometry_render_mode(geom, Nubuck::RenderMode::NODES | Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES);
+    nubuck().set_geometry_position(geom, nubuck().geometry_position(cloud));
     leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
 
     std::cout << "Delaunay3D: creating simplex geometries ... " << std::flush;
