@@ -68,6 +68,27 @@ QGroupBox::title {
     subcontrol-position: top left;
 }
 
+QGroupBox#vectorGroup {
+    border:             none;
+    border-radius:      6;
+    background-color:   #1E1E1E;
+}
+
+QGroupBox::title#vectorGroup {
+    subcontrol-origin:      margin;
+    subcontrol-position:    top center;
+
+    border-style:           none;
+    border-width:           2;
+    border-radius:          6;
+
+    padding-left:           4;
+    padding-right:          4;
+
+    background-color:       #1E1E1E;
+}
+
+
 QAbstractButton, QAbstractSpinBox, QComboBox, QFrame#nbw_spinBox {
     border-color:   #1E1E1E;
     border-style:   solid;
