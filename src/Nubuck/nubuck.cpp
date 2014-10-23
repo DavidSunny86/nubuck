@@ -329,7 +329,13 @@ QGLFormat FmtAlphaMultisampling(int numSamples) {
 	return fmt;
 }
 
+void TestPageAlloc();
+
 int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
+#ifdef _DEBUG
+    TestPageAlloc();
+#endif
+
     QGLFormat::setDefaultFormat(FmtAlphaMultisampling(0));
     QApplication app(argc, argv);
 

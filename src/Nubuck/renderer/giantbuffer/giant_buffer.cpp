@@ -67,6 +67,7 @@ static void InsertPatchCmd(GB_PatchCmd** list, unsigned off, unsigned size) {
     COM_assert(!next || off <= next->off);
 
     GB_PatchCmd* it = patchCmdAlloc.Malloc();
+    COM_assert(it);
     it->next = next;
     it->off = off;
     it->size = size;

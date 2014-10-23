@@ -4,4 +4,5 @@ add_sources(
     maxint.h
     nubuck.cpp
     nubuck_private.h
+    page_alloc_test.cpp
 )
