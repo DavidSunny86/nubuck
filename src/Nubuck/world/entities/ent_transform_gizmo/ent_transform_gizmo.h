@@ -69,6 +69,7 @@ public:
 
     void ShowCursor();
     void HideCursor();
+    bool IsHidden() const;
 
     bool HandleMouseEvent(const MouseEvent& event, MouseInfo& info);
 

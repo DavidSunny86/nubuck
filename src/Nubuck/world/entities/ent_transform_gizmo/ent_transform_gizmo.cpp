@@ -131,6 +131,10 @@ void ENT_TransformGizmo::HideCursor() {
     _hidden = true;
 }
 
+bool ENT_TransformGizmo::IsHidden() const {
+    return _hidden || !g_showRenderViewControls;
+}
+
 void ENT_TransformGizmo::ShowCursor() {
     _hidden = false;
 }
@@ -181,7 +185,6 @@ static M::Vector3 AlignWithCamera(const M::Matrix4& worldToEye, const M::Vector3
 void ENT_TransformGizmo::SetTransformMode(Mode::Enum mode) {
     _mode = mode;
     _dragging = false;
-    std::cout << "dragging = false!" << std::endl;
 }
 
 void ENT_TransformGizmo::SetCursorPosition(const M::Vector3& pos) {
@@ -246,7 +249,6 @@ bool ENT_TransformGizmo::OnMouseDown(const MouseEvent& event, MouseInfo& info) {
 
         _oldCursorPos = _cursorPos;
         _dragging = true;
-        std::cout << "dragging = true!" << std::endl;
 
         info.action = static_cast<Action::Enum>(Action::BEGIN_DRAGGING);
         info.axis = static_cast<Axis::Enum>(axis);
@@ -314,6 +316,8 @@ bool ENT_TransformGizmo::HandleMouseEvent(const MouseEvent& event, MouseInfo& in
     info.axis   = Axis::INVALID_AXIS;
     info.value  = 0.0f;
 
+    if(IsHidden()) return false;
+
 	switch(event.type) {
 	case MouseEvent::MOUSE_DOWN:  return OnMouseDown(event, info);
 	case MouseEvent::MOUSE_UP:    return OnMouseUp(event, info);
@@ -329,7 +333,7 @@ UI::OutlinerView* ENT_TransformGizmo::CreateOutlinerView() {
 }
 
 void ENT_TransformGizmo::GetRenderJobs(R::RenderList& renderList) {
-    if(_hidden || !g_showRenderViewControls) return;
+    if(IsHidden()) return;
 
     SetCursorPosition(_cursorPos); // updates renderpos
 
