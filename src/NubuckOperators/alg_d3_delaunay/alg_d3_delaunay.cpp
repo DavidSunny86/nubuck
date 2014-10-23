@@ -385,7 +385,9 @@ PhaseT0::StepRet::Enum PhaseT0::StepFindTriangles() {
     p = g.L.pop();
 
     leda::nb::RatPolyMesh& cloudMesh = nubuck().poly_mesh(g.trCloud);
-    cloudMesh.set_color(cloudMesh.first_node(), R::Color::Yellow);
+    const leda::node v = cloudMesh.first_node();
+    cloudMesh.set_color(v, R::Color::Yellow);
+    cloudMesh.set_radius(v, 5.0f * cloudMesh.radius_of(v));
 
     g.Trl.clear();
     find_visible_triangles(g.C,g.Trl,Border,g.last,p,g.counter,g.trhull);
@@ -511,6 +513,9 @@ OP::ALG::Phase* D3_Delaunay::Init() {
         nubuck().log_printf("no input geometry entity selected.\n");
         return 0;
     }
+
+    // hide input points
+    nubuck().set_geometry_render_mode(inputGeom, 0);
 
     ClearGlobals(_g);
 
