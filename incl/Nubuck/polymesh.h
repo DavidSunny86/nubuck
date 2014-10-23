@@ -294,7 +294,7 @@ inline void PolyMesh<VEC3>::set_position(const node v, const VEC3& p) {
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_radius(const node v, const float radius) {
     _vatt_state[v] = M::Max(_vatt_state[v], static_cast<char>(State::GEOMETRY_CHANGED));
-    _vatt_radius[e] = radius;
+    _vatt_radius[v] = radius;
 }
 
 template<typename VEC3>
