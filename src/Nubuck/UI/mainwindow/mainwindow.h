@@ -21,7 +21,9 @@ namespace UI {
         Console*        _console;
         RenderView*     _renderView;
         RenderConfig*   _renderConfig;
+        QDockWidget*    _operatorDock;
         QDockWidget*    _outlinerDock;
+        QDockWidget*    _logDock;
 
         // operator menus
         struct OperatorMenu {
@@ -51,8 +53,11 @@ namespace UI {
 	    void OnRandomPoints(void);
         void OnShowRenderMetrics(void);
         void OnShowRenderConfig(void);
-        void OnShowOutliner(void) { }
         void OnLoadOperatorPlugin();
+
+        void OnShowOperator();
+        void OnShowOutliner();
+        void OnShowLog();
     public:
 		MainWindow(void);
 

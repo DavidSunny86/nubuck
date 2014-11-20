@@ -33,6 +33,9 @@
     <addaction name="actShowRenderMetrics"/>
     <addaction name="actShowRenderConfig"/>
     <addaction name="actShowConsole"/>
+    <addaction name="actShowOperator"/>
+    <addaction name="actShowOutliner"/>
+    <addaction name="actShowLog"/>
     <addaction name="separator"/>
     <addaction name="actToggleRenderViewControls"/>
    </widget>
@@ -79,6 +82,21 @@
   <action name="actChooseBackgroundColor">
    <property name="text">
     <string>Choose Background Color</string>
+   </property>
+  </action>
+  <action name="actShowOperator">
+   <property name="text">
+    <string>Operator</string>
+   </property>
+  </action>
+  <action name="actShowOutliner">
+   <property name="text">
+    <string>Outliner</string>
+   </property>
+  </action>
+  <action name="actShowLog">
+   <property name="text">
+    <string>Log</string>
    </property>
   </action>
  </widget>
@@ -180,6 +198,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actShowOperator</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OnShowOperator()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actShowOutliner</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OnShowOutliner()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actShowLog</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OnShowLog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>OnRandomPoints()</slot>
@@ -188,5 +254,8 @@
   <slot>OnLoadOperatorPlugin()</slot>
   <slot>OnShowConsole()</slot>
   <slot>OnToggleRenderViewControls()</slot>
+  <slot>OnShowOperator()</slot>
+  <slot>OnShowOutliner()</slot>
+  <slot>OnShowLog()</slot>
  </slots>
 </ui>

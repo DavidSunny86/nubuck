@@ -30,7 +30,7 @@ public:
 };
 
 OperatorPanel::OperatorPanel(QWidget* parent)
-    : QDockWidget("Operator", parent)
+    : QWidget(parent)
     , _opWidget(NULL)
 {
     _header = new QWidget;
@@ -39,9 +39,7 @@ OperatorPanel::OperatorPanel(QWidget* parent)
     PopOperatorButton* btnPopOp = new PopOperatorButton;
     _headerUi.hboxLayout->addWidget(btnPopOp);
 
-    _scrollArea = new QScrollArea();
-    QDockWidget::setWidget(_scrollArea);
-    setWidget(NULL);
+    setWidget(NULL); // for initial size
 }
 
 void OperatorPanel::SetOperatorName(const QString& name) {
@@ -51,16 +49,15 @@ void OperatorPanel::SetOperatorName(const QString& name) {
 void OperatorPanel::setWidget(QWidget* widget) {
     if(_opWidget) _opWidget->setParent(0); // prevents opWidget from being deleted
 
+    if(layout()) delete layout();
+
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(_header);
     if(widget) {
         layout->addWidget(widget);
     }
     layout->addStretch();
-    QWidget* dummy = new QWidget;
-    dummy->setLayout(layout);
-    _scrollArea->setWidget(dummy);
-    _scrollArea->setWidgetResizable(true);
+    setLayout(layout);
 
     _opWidget = widget;
 }

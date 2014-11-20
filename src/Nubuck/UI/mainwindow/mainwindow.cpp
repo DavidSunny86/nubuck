@@ -137,6 +137,18 @@ namespace UI {
 		}
 	}
 
+    void MainWindow::OnShowOperator() {
+        _operatorDock->show();
+    }
+
+    void MainWindow::OnShowOutliner() {
+        _outlinerDock->show();
+    }
+
+    void MainWindow::OnShowLog() {
+        _logDock->show();
+    }
+
     MainWindow::OperatorMenu::OperatorMenu(QWidget* parent, const W::editMode_t::Enum mode, const QString& name) {
         this->mode = mode;
         menu = new QMenu(name);
@@ -172,9 +184,11 @@ namespace UI {
         addDockWidget(Qt::RightDockWidgetArea, _outlinerDock);
 
         UI::LogWidget* logWidget = UI::LogWidget::Instance();
-        addDockWidget(Qt::RightDockWidgetArea, ScrollableDockWidget("LogWidget", logWidget));
+        _logDock = ScrollableDockWidget("LogWidget", logWidget);
+        addDockWidget(Qt::RightDockWidgetArea, _logDock);
 
-        addDockWidget(Qt::LeftDockWidgetArea, &g_ui.GetOperatorPanel());
+        _operatorDock = ScrollableDockWidget("Operator", &g_ui.GetOperatorPanel());
+        addDockWidget(Qt::LeftDockWidgetArea, _operatorDock);
 
         _renderConfig = new RenderConfig(_renderView, this);
         _renderConfig->setFloating(true);
