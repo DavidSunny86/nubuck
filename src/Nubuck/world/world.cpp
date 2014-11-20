@@ -26,6 +26,9 @@
 #include "world_events.h"
 #include "world.h"
 
+COM::Config::Variable<int> cvar_w_showGrid("w_showGrid", 1);
+COM::Config::Variable<int> cvar_w_gridPlane("w_gridPlane", 0); // 0 = xy, 1 = yz, 2 = xz
+
 namespace {
 
 struct WireframeBox {
@@ -398,6 +401,22 @@ void World::Grid_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
     meshJob.tfmesh = _gridTFMesh;
     meshJob.primType = 0;
 
+    M::Matrix4 gridTransform;
+    switch(cvar_w_gridPlane) {
+    case 0:
+        gridTransform = M::Mat4::Identity();
+        break;
+    case 1:
+        gridTransform = M::Mat4::RotateX(90.0f);
+        break;
+    case 2:
+        gridTransform = M::Mat4::RotateZ(90.0f);
+        break;
+    default:
+        COM_assert(0 && "invalid grid plane");
+    };
+    R::meshMgr.GetMesh(_gridTFMesh).SetTransform(gridTransform);
+
     meshJob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
     rjobs.push_back(meshJob);
 
@@ -602,7 +621,7 @@ void World::Render(R::RenderList& renderList) {
     if(g_showRenderViewControls) {
         BBoxes_GetRenderJobs(renderList.meshJobs);
     }
-    Grid_GetRenderJobs(renderList.meshJobs);
+    if(cvar_w_showGrid) Grid_GetRenderJobs(renderList.meshJobs);
 
     SYS::ScopedLock lockEntities(_entitiesMtx);
 
