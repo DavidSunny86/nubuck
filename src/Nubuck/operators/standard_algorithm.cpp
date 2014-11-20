@@ -130,9 +130,25 @@ bool StandardAlgorithm::OnMouse(const MouseEvent&) {
     return true;
 }
 
-bool StandardAlgorithm::OnKey(const KeyEvent&) {
+bool StandardAlgorithm::OnKey(const KeyEvent& event) {
     // algorithms accepts all key events, so default operator
     // op_translate can't become active
+
+    // hacky HACK: pass through numpad keys to control camera
+
+    // numpad scancodes of generic usb keyboard
+    static const int numpad[] = {
+        82,
+        79, 80, 81,
+        75, 76, 77,
+        71, 72, 73
+    };
+    for(int i = 0; i < 10; ++i) {
+        if(numpad[i] == event.nativeScanCode) {
+            return false;
+        }
+    }
+
     return true;
 }
 
