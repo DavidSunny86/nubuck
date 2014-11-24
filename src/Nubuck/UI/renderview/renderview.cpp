@@ -53,6 +53,14 @@ namespace UI {
         renderList.meshJobs.push_back(mjob);
     }
 
+    // p in widget relative coordinates, as returned by QMouseEvent::posF()
+    void RenderView::EmitPenVertex(const QPointF& p) {
+        R::PenVertex pv;
+        pv.pos = M::Vector2(p.x(), height() - p.y());
+        pv.col = R::Color::Black;
+        _pen.push_back(pv);
+    }
+
     void RenderView::initializeGL(void) {
         _renderer.Init();
         _debugText.Init(GetRenderingContext().GetDeviceContext());
@@ -97,7 +105,14 @@ namespace UI {
         if(EV::Params_Mouse::BUTTON_RIGHT == args.button) {
             EV::Event event = EV::def_Mouse.Create(args);
             OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
-        } else W::world.HandleMouseEvent(args);
+        } else {
+            if(CAMERA == _inputMode) W::world.HandleMouseEvent(args);
+            else {
+                assert(PEN == _inputMode);
+                _isPenDown = true;
+                EmitPenVertex(qevent->posF());
+            }
+        }
     }
 
     void RenderView::mouseReleaseEvent(QMouseEvent* qevent) {
@@ -112,7 +127,14 @@ namespace UI {
         if(EV::Params_Mouse::BUTTON_RIGHT == args.button) {
             EV::Event event = EV::def_Mouse.Create(args);
             OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
-        } else W::world.HandleMouseEvent(args);
+        } else {
+            if(CAMERA == _inputMode) W::world.HandleMouseEvent(args);
+            else {
+                assert(PEN == _inputMode);
+                _isPenDown = false;
+                _pen.push_back(R::Pen_RestartVertex());
+            }
+        }
     }
 
     void RenderView::mouseMoveEvent(QMouseEvent* qevent) {
@@ -126,7 +148,11 @@ namespace UI {
 
         EV::Event event = EV::def_Mouse.Create(args);
         OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::DROP_WHEN_BUSY);
-        W::world.HandleMouseEvent(args);
+        if(CAMERA == _inputMode) W::world.HandleMouseEvent(args);
+        else if(_isPenDown) {
+            assert(PEN == _inputMode);
+            EmitPenVertex(qevent->posF());
+        }
     }
 
     void RenderView::wheelEvent(QWheelEvent* qevent) {
@@ -155,6 +181,23 @@ namespace UI {
 
         if(Qt::Key_Tab == qevent->key() && !qevent->isAutoRepeat()) {
             W::world.GetEditMode().CycleModes();
+            return;
+        }
+
+        // toggle pen
+        if(Qt::Key_P == qevent->key() && !qevent->isAutoRepeat()) {
+            _inputMode = InputMode(1 - _inputMode);
+            if(_isPenDown) {
+                _pen.push_back(R::Pen_RestartVertex());
+                _isPenDown = false;
+            }
+            return;
+        }
+
+        // clear pen (pen mode only)
+        // TODO: Key_C conflicts with shortcut for convex hull
+        if(PEN == _inputMode && Qt::Key_X == qevent->key() && !qevent->isAutoRepeat()) {
+            _pen.clear();
             return;
         }
 
@@ -206,6 +249,8 @@ namespace UI {
         , _fpsLabel(NULL)
         , _time(0.0f)
         , _bgColor(defaultBackgroundColor)
+        , _inputMode(CAMERA)
+        , _isPenDown(false)
     {
         setFocusPolicy(Qt::StrongFocus);
         setMouseTracking(true);
@@ -253,12 +298,15 @@ namespace UI {
 
         _renderer.BeginFrame();
         _renderer.Render(_renderList);
+        _renderer.RenderPen(_pen);
         _renderer.EndFrame();
 
         _debugText.BeginFrame();
         _debugText.Printf("frame time: %f\n", R::metrics.frame.time);
         _debugText.Printf("number of draw calls: %d\n", R::metrics.frame.numDrawCalls);
         _debugText.Printf("operator driver queue size: %d\n", OP::g_operators.GetDriverQueueSize());
+        _debugText.Printf(" \n");
+        if(PEN == _inputMode) _debugText.Printf("--- USING PEN");
         _debugText.EndFrame();
 
         updateGL();

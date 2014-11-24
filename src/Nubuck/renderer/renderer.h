@@ -7,11 +7,17 @@
 #include <Nubuck\system\locks\spinlock.h>
 #include <Nubuck\system\locks\semaphore.h>
 #include <system\timer\timer.h>
+#include <Nubuck\math\vector2.h>
 #include <Nubuck\math\matrix4.h>
 #include "material\material.h"
 #include "mesh\meshmgr_fwd.h"
 #include "skin\skinmgr.h"
 #include "light\light.h"
+
+/*
+GENERAL NOTES:
+pen drawing uses immediate mode line strips.
+*/
 
 namespace R {
 
@@ -36,6 +42,13 @@ namespace R {
 
 class   Effect;
 class   Mesh;
+
+struct PenVertex {
+    M::Vector2  pos;
+    R::Color    col;
+};
+
+const PenVertex& Pen_RestartVertex();
 
 struct MeshJob {
     unsigned        layer;
@@ -128,6 +141,7 @@ public:
     void BeginFrame();
     void Render(const M::Matrix4& perspective, const M::Matrix4& ortho, RenderList& renderList);
     void Render(RenderList& renderList);
+    void RenderPen(const std::vector<PenVertex>& verts);
     void EndFrame(bool present = true);
 
     void Screenshot() { _screenshotRequested = true; }

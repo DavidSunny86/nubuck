@@ -1128,4 +1128,53 @@ void Renderer::LargeScreenshot(const int imgWidth, const int imgHeight, RenderLi
     std::cout << "large screenshot DONE!" << std::endl;
 }
 
+const PenVertex& Pen_RestartVertex() {
+    const float nan = std::numeric_limits<float>::quiet_NaN();
+    static const PenVertex v = {
+        M::Vector2(nan, nan),
+        Color::Black
+    };
+    return v;
+}
+
+void Renderer::RenderPen(const std::vector<PenVertex>& verts) {
+    glUseProgram(0);
+
+    State defaultState;
+    SetDefaultState(defaultState);
+    SetState(defaultState);
+
+    glPushAttrib(GL_CURRENT_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    const float hmargin = 0.5f * vpMargin;
+    glOrtho(-hmargin, _width + hmargin, -hmargin, _height + hmargin, -1.0f, 1.0f);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glBegin(GL_LINE_STRIP);
+
+    for(unsigned i = 0; i < verts.size(); ++i) {
+        PenVertex v = verts[i];
+        if(0 == memcmp(&v, &Pen_RestartVertex(), sizeof(PenVertex))) {
+            GL_CALL(glPrimitiveRestartNV());
+        } else {
+            glColor4f(v.col.r, v.col.g, v.col.b, v.col.a);
+            glVertex2f(v.pos.x, v.pos.y);
+        }
+    }
+
+    glEnd();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+
+    glPopAttrib();
+}
+
 } // namespace R

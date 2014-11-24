@@ -15,6 +15,10 @@ namespace UI {
 
     class RenderView : public GLWidget {
         Q_OBJECT
+    public:
+        enum InputMode {
+            CAMERA, PEN
+        };
     private:
         QLabel* _fpsLabel;
 
@@ -36,11 +40,17 @@ namespace UI {
         void BuildBackgroundGradient();
         void RenderBackgroundGradient(R::RenderList& renderList);
 
-        R::Renderer     _renderer;
-        R::RenderList   _renderList;
-        R::DebugText    _debugText;
+        R::Renderer                 _renderer;
+        R::RenderList               _renderList;
+        std::vector<R::PenVertex>   _pen;
+        R::DebugText                _debugText;
 
         bool _largeScreenshotRequested;
+
+        InputMode   _inputMode;
+        bool        _isPenDown;
+
+        void EmitPenVertex(const QPointF& p);
     protected:
         void initializeGL(void) override;
         void resizeGL(int width, int height) override;
