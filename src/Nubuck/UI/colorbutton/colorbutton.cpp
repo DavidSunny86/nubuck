@@ -17,12 +17,14 @@ void ColorButton::mousePressEvent(QMouseEvent* event) {
 
 void ColorButton::paintEvent(QPaintEvent* event) {
     QPainter painter(this);
+    painter.setPen(QPen(Qt::NoPen));
     painter.setBrush(QBrush(_color));
     painter.drawRoundedRect(rect(), 5, 5);
 }
 
 void ColorButton::OnColorChanged(const QColor& color) {
     _color = color;
+    repaint();
     emit SigColorChanged(color.redF(), color.greenF(), color.blueF());
 }
 

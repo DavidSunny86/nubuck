@@ -12,7 +12,7 @@ private:
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void paintEvent(QPaintEvent* event) override;
-private slots:
+public slots:
     void OnColorChanged(const QColor& color);
 signals:
     void SigColorChanged(float r, float g, float b);
