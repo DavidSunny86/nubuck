@@ -18,6 +18,7 @@
 #include <UI\logwidget\logwidget.h>
 #include <UI\outliner\outliner.h>
 #include <UI\operatorpanel\operatorpanel.h>
+#include <UI\penoptions\pen_options.h>
 #include <UI\userinterface.h>
 #include "mainwindow.h"
 
@@ -149,6 +150,10 @@ namespace UI {
         _logDock->show();
     }
 
+    void MainWindow::OnShowPenOptions() {
+        _penOptionsDock->show();
+    }
+
     MainWindow::OperatorMenu::OperatorMenu(QWidget* parent, const W::editMode_t::Enum mode, const QString& name) {
         this->mode = mode;
         menu = new QMenu(name);
@@ -189,6 +194,11 @@ namespace UI {
 
         _operatorDock = ScrollableDockWidget("Operator", &g_ui.GetOperatorPanel());
         addDockWidget(Qt::LeftDockWidgetArea, _operatorDock);
+
+        _penOptionsDock = ScrollableDockWidget("Pen Options", &g_ui.GetPenOptions());
+        _penOptionsDock->setParent(this);
+        _penOptionsDock->setFloating(true);
+        _penOptionsDock->hide();
 
         _renderConfig = new RenderConfig(_renderView, this);
         _renderConfig->setFloating(true);

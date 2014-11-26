@@ -5,6 +5,8 @@
 #include <system\opengl\opengl.h>
 #include <UI\window_events.h>
 #include <UI\outliner\outliner.h>
+#include <UI\penoptions\pen_options.h>
+#include <UI\userinterface.h>
 #include <world\world.h>
 #include <operators\operators.h>
 #include <renderer\metrics\metrics.h>
@@ -57,8 +59,8 @@ namespace UI {
     void RenderView::EmitPenVertex(const QPointF& p) {
         R::PenVertex pv;
         pv.pos = M::Vector2(p.x(), height() - p.y());
-        pv.col = R::Color::Black;
-        pv.size = 2.0f;
+        pv.col = g_ui.GetPenOptions().GetColor();
+        pv.size = g_ui.GetPenOptions().GetSize();
         _pen.push_back(pv);
     }
 

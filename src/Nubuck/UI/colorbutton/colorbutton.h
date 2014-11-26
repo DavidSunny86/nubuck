@@ -19,7 +19,8 @@ signals:
 public:
     ColorButton(QWidget* parent = NULL);
 
-    void SetColor(float r, float g, float b);
+    void            SetColor(float r, float g, float b);
+    const QColor&   GetColor() const;
 };
 
 } // namespace UI

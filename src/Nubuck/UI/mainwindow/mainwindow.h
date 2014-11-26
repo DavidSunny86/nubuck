@@ -24,6 +24,7 @@ namespace UI {
         QDockWidget*    _operatorDock;
         QDockWidget*    _outlinerDock;
         QDockWidget*    _logDock;
+        QDockWidget*    _penOptionsDock;
 
         // operator menus
         struct OperatorMenu {
@@ -58,6 +59,7 @@ namespace UI {
         void OnShowOperator();
         void OnShowOutliner();
         void OnShowLog();
+        void OnShowPenOptions();
     public:
 		MainWindow(void);
 

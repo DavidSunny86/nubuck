@@ -35,4 +35,8 @@ void ColorButton::SetColor(float r, float g, float b) {
     repaint();
 }
 
+const QColor& ColorButton::GetColor() const {
+    return _color;
+}
+
 } // namespace UI
