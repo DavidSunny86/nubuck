@@ -1138,43 +1138,48 @@ const PenVertex& Pen_RestartVertex() {
 }
 
 void Renderer::RenderPen(const std::vector<PenVertex>& verts) {
-    glUseProgram(0);
-
-    State defaultState;
-    SetDefaultState(defaultState);
-    SetState(defaultState);
-
-    glPushAttrib(GL_CURRENT_BIT);
-
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
+    DirectionalLight dirLights[3]; // unused
     const float hmargin = 0.5f * vpMargin;
-    glOrtho(-hmargin, _width + hmargin, -hmargin, _height + hmargin, -1.0f, 1.0f);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
+    const M::Matrix4 projection = M::Mat4::Ortho(
+        -hmargin, _width + hmargin,
+        -hmargin, _height + hmargin,
+        -10.0f, 10.0f);
+    const M::Matrix4 worldToEye = M::Mat4::Translate(0.0f, 0.0f, -1.0f);
+    Uniforms_Update(projection, worldToEye, dirLights);
 
-    glBegin(GL_LINE_STRIP);
+    framebuffer->Bind();
 
-    for(unsigned i = 0; i < verts.size(); ++i) {
-        PenVertex v = verts[i];
-        if(0 == memcmp(&v, &Pen_RestartVertex(), sizeof(PenVertex))) {
-            GL_CALL(glPrimitiveRestartNV());
-        } else {
-            glColor4f(v.col.r, v.col.g, v.col.b, v.col.a);
-            glVertex2f(v.pos.x, v.pos.y);
+    GEN::Pointer<Effect> fx = effectMgr.GetEffect("Pen");
+    fx->Compile();
+    const int numPasses = fx->NumPasses();
+    for(int i = 0; i < numPasses; ++i) {
+        Pass* pass = fx->GetPass(i);
+        pass->Use();
+
+        Program& prog           = pass->GetProgram();
+        const PassDesc&  desc   = pass->GetDesc();
+        Uniforms_BindBlocks(prog);
+        Uniforms_BindBuffers();
+        SetState(desc.state);
+
+        BindMeshAttributes();
+
+        glBegin(GL_LINE_STRIP);
+
+        for(unsigned i = 0; i < verts.size(); ++i) {
+            PenVertex v = verts[i];
+            if(0 == memcmp(&v, &Pen_RestartVertex(), sizeof(PenVertex))) {
+                GL_CALL(glPrimitiveRestartNV());
+            } else {
+                glVertexAttrib4f(IN_COLOR, v.col.r, v.col.g, v.col.b, v.size);
+                glVertexAttrib2f(IN_POSITION, v.pos.x, v.pos.y);
+            }
         }
+
+        glEnd();
+
+        UnbindMeshAttributes();
     }
-
-    glEnd();
-
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
-
-    glPopAttrib();
 }
 
 } // namespace R

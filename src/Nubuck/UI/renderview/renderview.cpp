@@ -58,6 +58,7 @@ namespace UI {
         R::PenVertex pv;
         pv.pos = M::Vector2(p.x(), height() - p.y());
         pv.col = R::Color::Black;
+        pv.size = 2.0f;
         _pen.push_back(pv);
     }
 

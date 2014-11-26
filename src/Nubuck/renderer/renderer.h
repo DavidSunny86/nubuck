@@ -46,6 +46,7 @@ class   Mesh;
 struct PenVertex {
     M::Vector2  pos;
     R::Color    col;
+    float       size;
 };
 
 const PenVertex& Pen_RestartVertex();

@@ -1,0 +1,7 @@
+fx Pen {
+    pass Pass0 {
+        vs = "#include <Shaders\edge_line_billboard_gs.vert>";
+        gs = "#include <Shaders\pen.geom>";
+        fs = "#include <Shaders\pen.frag>";
+    }
+}
