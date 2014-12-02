@@ -64,3 +64,11 @@ inline bool IsMarkedPlanar(leda::nb::RatPolyMesh& mesh, leda::edge e) {
 }
 
 void ApplyEdgeColors(leda::nb::RatPolyMesh& mesh);
+
+struct EdgeInfo {
+    bool isBlue;
+    bool isConvex;
+    bool isFlippable;
+};
+
+EdgeInfo GetEdgeInfo(leda::nb::RatPolyMesh& mesh, leda::edge e);

@@ -69,6 +69,18 @@ void Phase_Strip::Enter() {
 
     _numStrips = 0;
     _stepMode = StepMode::SEARCH;
+
+    // checking some invariantes
+    leda::edge e;
+    forall_edges(e, mesh) {
+        EdgeInfo ei = GetEdgeInfo(mesh, e);
+        if(Color::RED == GetColor(mesh, e)) {
+            assert(!ei.isConvex);
+        }
+        if(Color::BLACK == GetColor(mesh, e)) {
+            assert(ei.isConvex);
+        }
+    }
 }
 
 Phase_Strip::StepRet::Enum Phase_Strip::StepSearch() {

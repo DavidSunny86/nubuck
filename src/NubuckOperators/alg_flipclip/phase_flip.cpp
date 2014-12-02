@@ -105,6 +105,23 @@ Phase_Flip::StepRet::Enum Phase_Flip::StepSearch() {
 
     }
 
+    // check invariants after flipping phase
+    leda::edge e;
+    forall_edges(e, mesh) {
+        EdgeInfo ei = GetEdgeInfo(mesh, e);
+        if(!ei.isBlue && !ei.isConvex) {
+            assert(Color::RED == GetColor(mesh, e));
+            assert(!ei.isFlippable);
+        }
+        if(Color::RED == GetColor(mesh, e)) {
+            assert(!ei.isConvex);
+            assert(!ei.isFlippable);
+        }
+        if(Color::BLACK == GetColor(mesh, e)) {
+            assert(ei.isConvex);
+        }
+    }
+
     // at this point S is empty
     if(RunMode::STEP == GetRunConf().mode) {
         ApplyEdgeColors(mesh);
