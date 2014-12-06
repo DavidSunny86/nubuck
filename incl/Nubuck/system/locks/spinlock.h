@@ -14,6 +14,12 @@ namespace SYS {
         SpinLock(void);
         ~SpinLock(void);
 
+        /*
+        the Lock() method is reeentrant which means a thread can call
+        Lock() again without blocking, if it already owns the resource.
+        There must be a matching call to Unlock() for each call to Lock().
+        see http://msdn.microsoft.com/en-us/library/ms682608.aspx
+        */
         void Lock(void);
         void Unlock(void);
 
