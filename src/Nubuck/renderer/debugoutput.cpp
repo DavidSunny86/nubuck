@@ -2,7 +2,7 @@
 #include <Nubuck\common\common.h>
 #include "renderer.h"
 
-#define CASE_ENUM_STR(x) case x: return #x 
+#define CASE_ENUM_STR(x) case x: return #x
 
 namespace R {
 
@@ -35,17 +35,18 @@ namespace R {
         CASE_ENUM_STR(GL_DEBUG_SEVERITY_HIGH_ARB);
         CASE_ENUM_STR(GL_DEBUG_SEVERITY_MEDIUM_ARB);
         CASE_ENUM_STR(GL_DEBUG_SEVERITY_LOW_ARB);
+        CASE_ENUM_STR(GL_DEBUG_SEVERITY_NOTIFICATION); // KHR_debug ext
         };
         return "<unknown severity>";
     }
 
     void __stdcall DebugOutputCallback(
-        GLenum source, 
-        GLenum target, 
-        GLuint id, 
-        GLenum severity, 
+        GLenum source,
+        GLenum target,
+        GLuint id,
+        GLenum severity,
         GLsizei /* length */,
-        const char* message, 
+        const char* message,
         void* /* userParam */)
     {
         const char* fmt =
@@ -56,7 +57,11 @@ namespace R {
             "   severity: %s\n"
             "   message: %s\n"
             "}\n";
-        common.printf(fmt,
+        /*
+        FIXME: using common.printf triggers breakpoints all over
+        the place
+        */
+        printf(fmt,
             SourceToStr(source),
             TargetToStr(target),
             id,
