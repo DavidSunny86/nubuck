@@ -20,7 +20,7 @@ private:
     void Event_Save(const EV::Event& event);
 public:
     SaveGeomPanel(QWidget* parent = NULL);
-    
+
     void Invoke() override;
 };
 
@@ -32,7 +32,7 @@ private:
 public:
     SaveGeom();
 
-    void Register(const Nubuck& nb, Invoker& invoker) override;
+    void Register(Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }
 };

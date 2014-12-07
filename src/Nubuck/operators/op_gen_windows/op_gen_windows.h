@@ -12,7 +12,7 @@ public:
 
 class Windows : public Operator {
 public:
-    void Register(const Nubuck& nb, Invoker& invoker) override;
+    void Register(Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }
 };

@@ -76,7 +76,7 @@ Delaunay3D::Delaunay3D() {
     AddEventHandler(EV::def_OP_Delaunay3D_SetScale, this, &Delaunay3D::Event_SetScale);
 }
 
-void Delaunay3D::Register(const Nubuck& nb, Invoker& invoker) {
+void Delaunay3D::Register(Invoker& invoker) {
     QAction* action = nubuck().object_menu()->addAction("Delaunay 3D");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }

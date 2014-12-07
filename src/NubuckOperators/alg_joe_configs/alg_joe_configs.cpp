@@ -58,7 +58,7 @@ JoeConfigsPanel::JoeConfigsPanel() {
         "4: ",
         "5: "
     };
-    
+
     QVBoxLayout* layout = new QVBoxLayout;
 
     for(int i = 0; i < NUM_CONFIGS; ++i) {
@@ -98,7 +98,7 @@ class JoeConfigs : public OP::Operator {
 private:
     enum {
         // total number of simplices in all configurations
-        NUM_SIMPLICES   = 18  
+        NUM_SIMPLICES   = 18
     };
 
     Config  _configs[NUM_CONFIGS];
@@ -119,7 +119,7 @@ private:
 public:
     JoeConfigs();
 
-    void Register(const Nubuck& nb, OP::Invoker& invoker) override;
+    void Register(OP::Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }
 };
@@ -162,7 +162,7 @@ void JoeConfigs::SetScale(Config& config, const leda::rational scale) {
     }
 }
 
-void JoeConfigs::Register(const Nubuck& nb, OP::Invoker& invoker) {
+void JoeConfigs::Register(OP::Invoker& invoker) {
     QAction* action = nubuck().algorithm_menu()->addAction("Joe Configs");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }

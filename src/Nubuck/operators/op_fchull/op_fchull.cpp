@@ -11,7 +11,7 @@
 
 namespace OP {
 
-void FlipClip::Register(const Nubuck& nb, Invoker& invoker) {
+void FlipClip::Register(Invoker& invoker) {
     QAction* action = nubuck().object_menu()->addAction("FlipClip Hull");
     action->setShortcut(QKeySequence("Shift+C"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));

@@ -6,7 +6,7 @@
 
 namespace OP {
 
-void Delete::Register(const Nubuck& nb, Invoker& invoker) {
+void Delete::Register(Invoker& invoker) {
     QAction* action = nubuck().object_menu()->addAction("Delete");
     action->setShortcut(QKeySequence("D"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));

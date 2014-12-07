@@ -87,7 +87,7 @@ unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module)
     if(!panel) panel = new OperatorPanel();
 
     op->SetPanel(panel);
-    op->Register(g_nubuck, *invoker);
+    op->Register(*invoker);
 
     OperatorDesc desc;
     desc.id = id;

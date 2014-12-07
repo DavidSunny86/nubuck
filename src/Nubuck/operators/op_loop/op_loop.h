@@ -22,7 +22,7 @@ public slots:
         g_operators.InvokeAction(EV::def_OP_Loop_Start.Create(EV::Params_OP_Loop_Start()));
     }
 public:
-    LoopPanel(QWidget* parent = NULL) : OperatorPanel(parent) { 
+    LoopPanel(QWidget* parent = NULL) : OperatorPanel(parent) {
         QPushButton* button = new QPushButton("Start Loop");
         QVBoxLayout* layout = new QVBoxLayout;
         layout->addWidget(button);
@@ -40,7 +40,7 @@ private:
 public:
     Loop();
 
-    void Register(const Nubuck& nb, Invoker& invoker) override;
+    void Register(Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }
 };

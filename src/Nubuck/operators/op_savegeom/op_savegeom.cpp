@@ -57,7 +57,7 @@ SaveGeom::SaveGeom() {
     AddEventHandler(EV::def_OP_SaveGeom_Save, this, &SaveGeom::Event_Save);
 }
 
-void SaveGeom::Register(const Nubuck& nb, Invoker& invoker) {
+void SaveGeom::Register(Invoker& invoker) {
     QAction* action = nubuck().object_menu()->addAction("Save as .geom file");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }

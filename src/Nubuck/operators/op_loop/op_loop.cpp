@@ -33,7 +33,7 @@ Loop::Loop() : _geom(NULL) {
     AddEventHandler(EV::def_OP_Loop_Start, this, &Loop::Event_OP_Loop_Start);
 }
 
-void Loop::Register(const Nubuck& nb, Invoker& invoker) {
+void Loop::Register(Invoker& invoker) {
     QAction* action = nubuck().object_menu()->addAction("Loop");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }

@@ -6,7 +6,7 @@
 
 namespace OP {
 
-void MergeVertices::Register(const Nubuck& nb, Invoker& invoker) {
+void MergeVertices::Register(Invoker& invoker) {
     QAction* action = nubuck().vertex_menu()->addAction("Merge");
     action->setShortcut(QKeySequence("M"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));

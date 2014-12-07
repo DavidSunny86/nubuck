@@ -15,7 +15,7 @@ namespace GEN {
 
 MergePanel::MergePanel(QWidget* parent) : OperatorPanel(parent) { }
 
-void Merge::Register(const Nubuck& nb, Invoker& invoker) {
+void Merge::Register(Invoker& invoker) {
     QAction* action = nubuck().scene_menu()->addAction("Create Merge Scene");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
@@ -35,7 +35,7 @@ bool Merge::Invoke() {
         L1.push_back(L[it].translate( tl, 0, 0));
     }
 
-    const int renderAll = 
+    const int renderAll =
         Nubuck::RenderMode::NODES |
         Nubuck::RenderMode::EDGES |
         Nubuck::RenderMode::FACES;
@@ -49,7 +49,7 @@ bool Merge::Invoke() {
     nubuck().set_geometry_render_mode(geom1, renderAll);
     leda::CONVEX_HULL(L1, nubuck().poly_mesh(geom1));
     nubuck().poly_mesh(geom1).compute_faces();
-    
+
     nubuck().clear_selection();
     nubuck().select_geometry(Nubuck::SELECT_MODE_ADD, geom0);
     nubuck().select_geometry(Nubuck::SELECT_MODE_ADD, geom1);

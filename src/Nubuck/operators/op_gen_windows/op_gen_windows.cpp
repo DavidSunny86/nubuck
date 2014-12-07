@@ -13,7 +13,7 @@
 namespace OP {
 namespace GEN {
 
-void Windows::Register(const Nubuck& nb, Invoker& invoker) {
+void Windows::Register(Invoker& invoker) {
     QAction* action = nubuck().scene_menu()->addAction("Create Windows Scene");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }

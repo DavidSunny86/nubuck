@@ -104,7 +104,7 @@ StandardAlgorithm::StandardAlgorithm() {
     AddEventHandler(EV::def_ALG_Run, this, &StandardAlgorithm::Event_Run);
 }
 
-void StandardAlgorithm::Register(const Nubuck& nb, Invoker& invoker) {
+void StandardAlgorithm::Register(Invoker& invoker) {
     QAction* action = nubuck().algorithm_menu()->addAction(GetName());
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }

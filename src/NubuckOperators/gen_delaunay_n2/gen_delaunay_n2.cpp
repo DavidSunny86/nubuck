@@ -11,12 +11,12 @@ class D3_DelaunayN2_Panel : public OP::OperatorPanel {
 
 class D3_DelaunayN2 : public OP::Operator {
 public:
-    void Register(const Nubuck& nb, OP::Invoker& invoker) override;
+    void Register(OP::Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }
 };
 
-void D3_DelaunayN2::Register(const Nubuck&, OP::Invoker& invoker) {
+void D3_DelaunayN2::Register(OP::Invoker& invoker) {
     QAction* action = nubuck().scene_menu()->addAction("Delaunay O(n^2)");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }

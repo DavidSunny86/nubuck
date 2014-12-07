@@ -60,7 +60,7 @@ private:
 public:
     JoePlont();
 
-    void Register(const Nubuck& nb, OP::Invoker& invoker) override;
+    void Register(OP::Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }
 };
@@ -69,7 +69,7 @@ JoePlont::JoePlont() {
     AddEventHandler(EV::def_OP_JoePlont_SetScale, this, &JoePlont::Event_SetScale);
 }
 
-void JoePlont::Register(const Nubuck&, OP::Invoker& invoker) {
+void JoePlont::Register(OP::Invoker& invoker) {
     QAction* action = nubuck().algorithm_menu()->addAction("Joe PLONT");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }

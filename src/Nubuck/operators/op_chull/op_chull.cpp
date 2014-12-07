@@ -10,7 +10,7 @@
 
 namespace OP {
 
-void ConvexHull::Register(const Nubuck& nb, Invoker& invoker) {
+void ConvexHull::Register(Invoker& invoker) {
     QAction* action = nubuck().object_menu()->addAction("Convex Hull");
     action->setShortcut(QKeySequence("C"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));

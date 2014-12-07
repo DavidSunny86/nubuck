@@ -184,7 +184,7 @@ PlatonicSolids::PlatonicSolids() {
     AddEventHandler(EV::def_CreatePlatonicSolid, this, &PlatonicSolids::Event_CreatePlatonicSolid);
 }
 
-void PlatonicSolids::Register(const Nubuck&, Invoker& invoker) {
+void PlatonicSolids::Register(Invoker& invoker) {
     QAction* action = nubuck().scene_menu()->addAction("Platonic Solids");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }

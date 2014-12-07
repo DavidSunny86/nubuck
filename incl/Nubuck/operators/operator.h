@@ -49,7 +49,7 @@ public:
 
     void SendToPanel(const EV::Event& event);
 
-    virtual void Register(const Nubuck& nb, Invoker& invoker) = 0;
+    virtual void Register(Invoker& invoker) = 0;
     virtual bool Invoke() = 0; // return false to decline invocation
     virtual void Finish() = 0;
 

@@ -59,7 +59,7 @@ LoadGeom::LoadGeom() {
     AddEventHandler(EV::def_OP_LoadGeom_Load, this, &LoadGeom::Event_Load);
 }
 
-void LoadGeom::Register(const Nubuck& nb, Invoker& invoker) {
+void LoadGeom::Register(Invoker& invoker) {
     QAction* action = nubuck().scene_menu()->addAction("Load .geom file");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }

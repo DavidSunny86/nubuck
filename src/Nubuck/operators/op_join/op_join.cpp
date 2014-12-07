@@ -9,7 +9,7 @@
 
 namespace OP {
 
-void Join::Register(const Nubuck& nb, Invoker& invoker) {
+void Join::Register(Invoker& invoker) {
     QAction* action = nubuck().object_menu()->addAction("Join");
     action->setShortcut(QKeySequence("J"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));

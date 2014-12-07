@@ -243,7 +243,7 @@ RandomPoints::RandomPoints()
     _discPrefab.compute_faces();
 }
 
-void RandomPoints::Register(const Nubuck& nb, Invoker& invoker) {
+void RandomPoints::Register(Invoker& invoker) {
     QMenu* sceneMenu = nubuck().scene_menu();
     QAction* action = sceneMenu->addAction("Random Points");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));

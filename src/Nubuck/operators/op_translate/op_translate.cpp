@@ -19,7 +19,7 @@ Translate::Translate() : _gizmo(0) {
     _gizmo = nubuck().global_transform_gizmo();
 }
 
-void Translate::Register(const Nubuck& nb, Invoker& invoker) {
+void Translate::Register(Invoker& invoker) {
     /*
     no need for explicit invokation
     QAction* action = nubuck().scene_menu()->addAction("Translate");

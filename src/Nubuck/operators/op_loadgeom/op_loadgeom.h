@@ -29,7 +29,7 @@ private:
 public:
     LoadGeom();
 
-    void Register(const Nubuck& nb, Invoker& invoker) override;
+    void Register(Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }
 };

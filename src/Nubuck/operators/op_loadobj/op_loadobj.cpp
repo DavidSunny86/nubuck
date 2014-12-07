@@ -93,7 +93,7 @@ LoadOBJ::LoadOBJ() : _geom(NULL) {
 	AddEventHandler(EV::def_OP_LoadOBJ_LoadScene, this, &LoadOBJ::Event_LoadScene);
 }
 
-void LoadOBJ::Register(const Nubuck& nb, Invoker& invoker) {
+void LoadOBJ::Register(Invoker& invoker) {
     nubuck().log_printf("LoadOBJ: preloading mesh\n");
     std::string filename = common.BaseDir() + "Meshes\\laurana_hp.obj";
     preload.FromObj(filename.c_str());
