@@ -84,6 +84,8 @@ unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module)
     Invoker* invoker = new Invoker(id);
     connect(invoker, SIGNAL(SigInvokeOperator(unsigned)), this, SLOT(OnInvokeOperator(unsigned)));
 
+    if(!panel) panel = new OperatorPanel();
+
     op->SetPanel(panel);
     op->Register(g_nubuck, *invoker);
 
