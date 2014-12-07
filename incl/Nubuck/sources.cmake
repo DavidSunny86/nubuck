@@ -1,6 +1,7 @@
 recurse()
 add_sources(
     math_conv.h
+    nb_common.h
     nubuck.h
     nubuck_api.h
     polymesh.h
