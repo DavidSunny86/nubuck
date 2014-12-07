@@ -56,10 +56,11 @@ void LoadOperators(void) {
             typedef OP::OperatorPanel* (*createPanel_t)();
             createOperator_t opFunc = (createOperator_t)GetProcAddress(lib, "CreateOperator");
             createPanel_t panelFunc = (createPanel_t)GetProcAddress(lib, "CreateOperatorPanel");
-            if(!opFunc || !panelFunc) printf("ERROR - unable to load createoperator() function\n");
+            if(!opFunc) printf("ERROR - unable to load createoperator() function\n");
 			else {
 				OP::Operator* op = opFunc();
-                OP::OperatorPanel* panel = panelFunc();
+                OP::OperatorPanel* panel = NULL;
+                if(panelFunc) panel = panelFunc();
 				OP::g_operators.Register(panel, op, lib);
 			}
         }
