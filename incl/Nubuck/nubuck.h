@@ -37,6 +37,8 @@ class ENT_TransformGizmo;
 
 namespace OP {
 
+class Operator;
+class OperatorPanel;
 class Invoker;
 struct MouseEvent;
 
@@ -219,5 +221,28 @@ struct Nubuck {
 
 NUBUCK_API Nubuck& nubuck();
 
-// main entry point, returns exit code
-NUBUCK_API int RunNubuck(int argc, char* argv[]);
+typedef OP::Operator*       (*createOperatorFunc_t)();
+typedef OP::OperatorPanel*  (*createOperatorPanelFunc_t)();
+
+template<typename TYPE> OP::Operator*       CreateOperator() { return new TYPE; }
+template<typename TYPE> OP::OperatorPanel*  CreateOperatorPanel() { return new TYPE; }
+
+// use the macros if you're afraid of template syntax
+#define CREATE_OPERATOR(type)        CreateOperator<type>
+#define CREATE_OPERATOR_PANEL(type)  CreateOperatorPanel<type>
+
+/*
+main entry point, returns exit code.
+if panel creation function is NULL an empty panel is provided.
+the operator creation function may be NULL, in which case Nubuck
+is started with build-in operators only.
+typical usage:
+RunNubuck(argc, argv, CreateOperator<MyOperator>, CreateOperatorPanel<MyOperatorPanel>);
+*/
+NUBUCK_API int RunNubuck(
+    int                         argc,
+    char*                       argv[],
+    createOperatorFunc_t        createOperatorFunc,
+    createOperatorPanelFunc_t   createOperatorPanelFunc);
+
+

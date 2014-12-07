@@ -337,7 +337,12 @@ QGLFormat FmtAlphaMultisampling(int numSamples) {
 
 void TestPageAlloc();
 
-int RunNubuck(int argc, char* argv[]) {
+int RunNubuck(
+    int                         argc,
+    char*                       argv[],
+    createOperatorFunc_t        createOperatorFunc,
+    createOperatorPanelFunc_t   createOperatorPanelFunc)
+{
 #ifdef _DEBUG
     TestPageAlloc();
 #endif
@@ -415,6 +420,17 @@ int RunNubuck(int argc, char* argv[]) {
     OP::g_operators.Register(new OP::MergeVerticesPanel, new OP::MergeVertices);
 	OP::g_operators.OnInvokeOperator(0); // call OP::Translate
     OP::LoadOperators();
+
+    // register user operator
+    OP::Operator*       userOperator = NULL;
+    OP::OperatorPanel*  userOperatorPanel = NULL;
+    if(createOperatorFunc) {
+        userOperator = createOperatorFunc();
+        if(createOperatorPanelFunc) {
+            userOperatorPanel = createOperatorPanelFunc();
+        }
+        OP::g_operators.Register(userOperatorPanel, userOperator);
+    }
 
     g_ui.GetMainWindow().show();
     return app.exec();
