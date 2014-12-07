@@ -88,6 +88,7 @@ struct NubuckImpl : Nubuck {
     nb::geometry        first_selected_mesh();
     nb::geometry        next_selected_mesh(nb::mesh obj);
 
+    void                set_graph(nb::mesh obj, const leda::NbGraph& graph);
     leda::NbGraph&      graph_of(const nb::mesh obj);
 
     void                set_mesh_name(const nb::mesh obj, const std::string& name);

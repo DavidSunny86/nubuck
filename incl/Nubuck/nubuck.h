@@ -115,9 +115,10 @@ struct Nubuck {
     // geometry
     struct RenderMode {
         enum Flags {
-            FACES    = (1 << 0),
-            NODES    = (1 << 1),
-            EDGES    = (1 << 2)
+            FACES       = (1 << 0),
+            NODES       = (1 << 1),
+            EDGES       = (1 << 2),
+            ALL         = NODES | EDGES | FACES
         };
     };
 
@@ -177,6 +178,7 @@ struct Nubuck {
     virtual nb::geometry        first_selected_mesh() = 0;
     virtual nb::geometry        next_selected_mesh(nb::mesh obj) = 0;
 
+    virtual void                set_graph(nb::mesh obj, const leda::NbGraph& graph) = 0;
     virtual leda::NbGraph&      graph_of(const nb::mesh obj) = 0;
 
     virtual void                set_mesh_name(const nb::mesh obj, const std::string& name) = 0;

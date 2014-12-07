@@ -300,6 +300,10 @@ nb::mesh NubuckImpl::next_selected_mesh(nb::mesh obj) {
     return NULL;
 }
 
+void NubuckImpl::set_graph(nb::mesh obj, const leda::NbGraph& graph) {
+    obj->GetRatPolyMesh() = graph;
+}
+
 leda::NbGraph& NubuckImpl::graph_of(const nb::mesh obj) {
     return obj->GetRatPolyMesh();
 }
