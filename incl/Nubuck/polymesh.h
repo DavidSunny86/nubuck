@@ -485,4 +485,7 @@ size_t PolyMesh<VEC3>::FromObj(const char* filename) {
 }
 
 } // namespace nb
+
+typedef nb::PolyMesh<d3_rat_point> NbGraph;
+
 } // namespace leda

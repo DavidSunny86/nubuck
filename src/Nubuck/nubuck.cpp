@@ -90,11 +90,23 @@ void NubuckImpl::destroy(const nb::entity obj) {
     obj->Destroy();
 }
 
+#pragma region DEPRECATED
+
 nb::geometry NubuckImpl::create_geometry() {
     return W::world.CreateGeometry();
 }
 
 void NubuckImpl::destroy_geometry(const nb::geometry obj) {
+    obj->Destroy();
+}
+
+#pragma endregion
+
+nb::mesh NubuckImpl::create_mesh() {
+    return W::world.CreateGeometry();
+}
+
+void NubuckImpl::destroy_mesh(const nb::mesh obj) {
     obj->Destroy();
 }
 
@@ -146,6 +158,11 @@ nb::geometry NubuckImpl::to_geometry(nb::entity obj) {
     return static_cast<W::ENT_Geometry*>(obj); // ugly but safe downcast
 }
 
+nb::mesh NubuckImpl::to_mesh(nb::entity obj) {
+    assert(W::EntityType::ENT_GEOMETRY == obj->GetType());
+    return static_cast<W::ENT_Geometry*>(obj); // ugly but safe downcast
+}
+
 nb::text NubuckImpl::to_text(nb::entity obj) {
     assert(W::EntityType::ENT_TEXT == obj->GetType());
     return static_cast<W::ENT_Text*>(obj); // ugly but safe downcast
@@ -162,6 +179,8 @@ nb::entity NubuckImpl::next_selected_entity(nb::entity obj) {
 void NubuckImpl::set_position(nb::entity obj, const M::Vector3& pos) {
     obj->SetPosition(pos);
 }
+
+#pragma region DEPRECATED
 
 const std::string& NubuckImpl::geometry_name(const nb::geometry obj) {
     return obj->GetName();
@@ -246,6 +265,94 @@ void NubuckImpl::set_geometry_pattern(const nb::geometry obj, const Pattern::Enu
 }
 
 void NubuckImpl::set_geometry_pattern_color(const nb::geometry obj, const R::Color& color) {
+    obj->SetPatternColor(color);
+}
+
+#pragma endregion
+
+const std::string& NubuckImpl::mesh_name(const nb::mesh obj) {
+    return obj->GetName();
+}
+
+M::Vector3 NubuckImpl::mesh_position(const nb::mesh obj) {
+    return obj->GetPosition();
+}
+
+nb::mesh NubuckImpl::first_selected_mesh() {
+    W::Entity* ent = W::world.FirstSelectedEntity();
+    while(ent) {
+        if(W::EntityType::ENT_GEOMETRY == ent->GetType()) {
+            return static_cast<W::ENT_Geometry*>(ent); // ugly but safe downcast
+        }
+        ent = ent->selectionLink.next;
+    }
+    return NULL;
+}
+
+nb::mesh NubuckImpl::next_selected_mesh(nb::mesh obj) {
+    W::Entity* ent = obj->selectionLink.next;
+    while(ent) {
+        if(W::EntityType::ENT_GEOMETRY == ent->GetType()) {
+            return static_cast<W::ENT_Geometry*>(ent); // ugly but safe downcast
+        }
+        ent = ent->selectionLink.next;
+    }
+    return NULL;
+}
+
+leda::NbGraph& NubuckImpl::graph_of(const nb::mesh obj) {
+    return obj->GetRatPolyMesh();
+}
+
+void NubuckImpl::set_mesh_name(const nb::mesh obj, const std::string& name) {
+    obj->SetName(name);
+}
+
+void NubuckImpl::apply_mesh_transformation(const nb::mesh obj) {
+    obj->ApplyTransformation();
+}
+
+void NubuckImpl::set_mesh_position(const nb::mesh obj, const M::Vector3& position) {
+    obj->SetPosition(position);
+}
+
+void NubuckImpl::set_mesh_scale(const nb::mesh obj, const M::Vector3& scale) {
+    obj->SetScale(scale);
+}
+
+void NubuckImpl::hide_mesh_outline(const nb::mesh obj) {
+    obj->HideOutline();
+}
+
+void NubuckImpl::hide_mesh(const nb::mesh obj) {
+    obj->Hide();
+}
+
+void NubuckImpl::show_mesh(const nb::mesh obj) {
+    obj->Show();
+}
+
+void NubuckImpl::set_mesh_solid(const nb::mesh obj, bool solid) {
+    obj->SetSolid(solid);
+}
+
+void NubuckImpl::set_mesh_render_mode(const nb::mesh obj, int flags) {
+    obj->SetRenderMode(flags);
+}
+
+void NubuckImpl::set_mesh_render_layer(const nb::mesh obj, unsigned layer) {
+    obj->SetRenderLayer(layer);
+}
+
+void NubuckImpl::set_mesh_shading_mode(const nb::mesh obj, ShadingMode::Enum mode) {
+    obj->SetShadingMode(mode);
+}
+
+void NubuckImpl::set_mesh_pattern(const nb::mesh obj, const Pattern::Enum pattern) {
+    obj->SetPattern(pattern);
+}
+
+void NubuckImpl::set_mesh_pattern_color(const nb::mesh obj, const R::Color& color) {
     obj->SetPatternColor(color);
 }
 

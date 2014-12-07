@@ -47,7 +47,8 @@ struct MouseEvent;
 namespace nb {
 
 typedef W::Entity*              entity;
-typedef W::ENT_Geometry*        geometry;
+typedef W::ENT_Geometry*        mesh;
+typedef W::ENT_Geometry*        geometry; // DEPRECATED
 typedef W::ENT_Text*            text;
 typedef W::ENT_TransformGizmo*  transform_gizmo;
 
@@ -75,8 +76,12 @@ struct Nubuck {
 
     // world
     virtual void                destroy(const nb::entity obj) = 0;
+#pragma region DEPRECATED
     virtual nb::geometry        create_geometry() = 0;
     virtual void                destroy_geometry(const nb::geometry obj) = 0;
+#pragma endregion
+    virtual nb::mesh            create_mesh() = 0;
+    virtual void                destroy_mesh(const nb::mesh obj) = 0;
     virtual nb::text            create_text() = 0;
     virtual nb::transform_gizmo create_transform_gizmo() = 0;
 
@@ -87,7 +92,7 @@ struct Nubuck {
     };
 
     virtual void                    clear_selection() = 0;
-    virtual void                	select_geometry(SelectMode mode, const nb::geometry obj) = 0;
+    virtual void                	select_geometry(SelectMode mode, const nb::geometry obj) = 0; // DEPRECATED
     virtual void                    select(SelectMode mode, const nb::entity obj) = 0;
     virtual void                	select_vertex(SelectMode, const nb::geometry obj, const leda::node vert) = 0;
 
@@ -98,7 +103,8 @@ struct Nubuck {
     virtual M::Vector3              position(nb::entity obj) = 0;
 
     virtual nb::EntityType::Enum    type_of(nb::entity obj) = 0;
-    virtual nb::geometry            to_geometry(nb::entity obj) = 0;
+    virtual nb::geometry            to_geometry(nb::entity obj) = 0; // DEPRECATED
+    virtual nb::mesh                to_mesh(nb::entity obj) = 0;
     virtual nb::text                to_text(nb::entity obj) = 0;
 
     virtual nb::entity              first_selected_entity() = 0;
@@ -135,6 +141,7 @@ struct Nubuck {
         };
     };
 
+#pragma region DEPRECTED
     virtual const std::string&  geometry_name(const nb::geometry obj) = 0;
     virtual M::Vector3          geometry_position(const nb::geometry obj) = 0;
 
@@ -161,6 +168,35 @@ struct Nubuck {
     virtual void                set_geometry_shading_mode(const nb::geometry obj, ShadingMode::Enum mode) = 0;
     virtual void                set_geometry_pattern(const nb::geometry obj, const Pattern::Enum pattern) = 0;
     virtual void                set_geometry_pattern_color(const nb::geometry obj, const R::Color& color) = 0;
+#pragma endregion
+
+    // mesh
+    virtual const std::string&  mesh_name(const nb::geometry obj) = 0;
+    virtual M::Vector3          mesh_position(const nb::geometry obj) = 0;
+
+    virtual nb::geometry        first_selected_mesh() = 0;
+    virtual nb::geometry        next_selected_mesh(nb::mesh obj) = 0;
+
+    virtual leda::NbGraph&      graph_of(const nb::mesh obj) = 0;
+
+    virtual void                set_mesh_name(const nb::mesh obj, const std::string& name) = 0;
+
+    virtual void                apply_mesh_transformation(const nb::mesh obj) = 0;
+
+    virtual void                set_mesh_position(const nb::mesh obj, const M::Vector3& position) = 0;
+    virtual void                set_mesh_scale(const nb::mesh obj, const M::Vector3& scale) = 0;
+
+    virtual void                hide_mesh_outline(const nb::mesh obj) = 0;
+
+    virtual void                hide_mesh(const nb::mesh obj) = 0;
+    virtual void                show_mesh(const nb::mesh obj) = 0;
+
+    virtual void                set_mesh_solid(const nb::mesh obj, bool solid) = 0;
+    virtual void                set_mesh_render_mode(const nb::mesh obj, int flags) = 0;
+    virtual void                set_mesh_render_layer(const nb::mesh obj, unsigned layer) = 0;
+    virtual void                set_mesh_shading_mode(const nb::mesh obj, ShadingMode::Enum mode) = 0;
+    virtual void                set_mesh_pattern(const nb::mesh obj, const Pattern::Enum pattern) = 0;
+    virtual void                set_mesh_pattern_color(const nb::mesh obj, const R::Color& color) = 0;
 
     // text
     virtual const M::Vector2&   text_content_size(const nb::text obj) const = 0;

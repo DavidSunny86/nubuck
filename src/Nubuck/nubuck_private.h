@@ -21,8 +21,12 @@ struct NubuckImpl : Nubuck {
 
     // world
     void                destroy(const nb::entity obj);
+#pragma region DEPRECATED
     nb::geometry        create_geometry();
     void                destroy_geometry(const nb::geometry obj);
+#pragma endregion
+    nb::mesh            create_mesh();
+    void                destroy_mesh(const nb::mesh obj);
     nb::text            create_text();
     nb::transform_gizmo create_transform_gizmo();
 
@@ -39,6 +43,7 @@ struct NubuckImpl : Nubuck {
 
     nb::EntityType::Enum    type_of(nb::entity obj);
     nb::geometry            to_geometry(nb::entity obj);
+    nb::mesh                to_mesh(nb::entity obj);
     nb::text                to_text(nb::entity obj);
 
     nb::entity              first_selected_entity();
@@ -46,6 +51,7 @@ struct NubuckImpl : Nubuck {
 
     void                    set_position(nb::entity obj, const M::Vector3& pos);
 
+#pragma region DEPRECATED
     // geometry
     const std::string&  geometry_name(const nb::geometry obj);
     M::Vector3          geometry_position(const nb::geometry obj);
@@ -73,6 +79,35 @@ struct NubuckImpl : Nubuck {
     void                set_geometry_shading_mode(const nb::geometry obj, ShadingMode::Enum mode);
     void                set_geometry_pattern(const nb::geometry obj, const Pattern::Enum pattern);
     void                set_geometry_pattern_color(const nb::geometry obj, const R::Color& color);
+#pragma endregion
+
+    // mesh
+    const std::string&  mesh_name(const nb::geometry obj);
+    M::Vector3          mesh_position(const nb::geometry obj);
+
+    nb::geometry        first_selected_mesh();
+    nb::geometry        next_selected_mesh(nb::mesh obj);
+
+    leda::NbGraph&      graph_of(const nb::mesh obj);
+
+    void                set_mesh_name(const nb::mesh obj, const std::string& name);
+
+    void                apply_mesh_transformation(const nb::mesh obj);
+
+    void                set_mesh_position(const nb::mesh obj, const M::Vector3& position);
+    void                set_mesh_scale(const nb::mesh obj, const M::Vector3& scale);
+
+    void                hide_mesh_outline(const nb::mesh obj);
+
+    void                hide_mesh(const nb::mesh obj);
+    void                show_mesh(const nb::mesh obj);
+
+    void                set_mesh_solid(const nb::mesh obj, bool solid);
+    void                set_mesh_render_mode(const nb::mesh obj, int flags);
+    void                set_mesh_render_layer(const nb::mesh obj, unsigned layer);
+    void                set_mesh_shading_mode(const nb::mesh obj, ShadingMode::Enum mode);
+    void                set_mesh_pattern(const nb::mesh obj, const Pattern::Enum pattern);
+    void                set_mesh_pattern_color(const nb::mesh obj, const R::Color& color);
 
     // text
     const M::Vector2&   text_content_size(const nb::text obj) const;

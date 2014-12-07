@@ -9,4 +9,7 @@ template<typename VEC3> class PolyMesh;
 typedef PolyMesh<leda::d3_rat_point> RatPolyMesh;
 
 } // namespace nb
+
+typedef nb::PolyMesh<d3_rat_point> NbGraph;
+
 } // namespace leda
