@@ -15,6 +15,7 @@ struct NubuckImpl : Nubuck {
     QMenu*  object_menu();
     QMenu*  algorithm_menu();
     QMenu*  vertex_menu();
+    void    add_menu_item(QMenu* menu, const char* name, OP::Invoker& invoker);
     void    set_operator_name(const char* name);
     void    set_operator_panel(QWidget* panel);
 

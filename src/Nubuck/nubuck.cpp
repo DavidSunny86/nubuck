@@ -22,6 +22,7 @@
 #include "nubuck_private.h"
 
 // REMOVEME
+#include <Nubuck\operators\operator_invoker.h>
 #include <operators\operators.h>
 #include <operators\op_loop\op_loop.h>
 #include <operators\op_gen_randompoints\op_gen_randompoints.h>
@@ -71,6 +72,11 @@ QMenu* NubuckImpl::algorithm_menu() {
 
 QMenu* NubuckImpl::vertex_menu() {
     return g_ui.GetMainWindow().GetVertexMenu();
+}
+
+void NubuckImpl::add_menu_item(QMenu* menu, const char* name, OP::Invoker& invoker) {
+    QAction* action = menu->addAction(name);
+    QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 void NubuckImpl::set_operator_name(const char* name) {

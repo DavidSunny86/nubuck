@@ -37,6 +37,7 @@ class ENT_TransformGizmo;
 
 namespace OP {
 
+class Invoker;
 struct MouseEvent;
 
 } // namespace OP
@@ -66,6 +67,7 @@ struct Nubuck {
     virtual QMenu*  object_menu() = 0;
     virtual QMenu*  algorithm_menu() = 0;
     virtual QMenu*  vertex_menu() = 0;
+    virtual void    add_menu_item(QMenu* menu, const char* name, OP::Invoker& invoker) = 0;
     virtual void    set_operator_name(const char* name) = 0;
     virtual void    set_operator_panel(QWidget* panel) = 0;
 
