@@ -51,7 +51,6 @@ namespace UI {
     public slots:
         void OnToggleRenderViewControls();
         void OnShowConsole();
-	    void OnRandomPoints(void);
         void OnShowRenderMetrics(void);
         void OnShowRenderConfig(void);
         void OnLoadOperatorPlugin();

@@ -1,6 +1,5 @@
 recurse()
 add_sources(
-    algorithm.ui
     console.ui
     logwidget.ui
     mainwindow.ui

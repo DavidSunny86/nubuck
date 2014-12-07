@@ -219,42 +219,5 @@ struct Nubuck {
 
 NUBUCK_API Nubuck& nubuck();
 
-struct IPhase {
-    enum StepRet {
-        DONE = 0,
-        CONTINUE
-    };
-
-    virtual ~IPhase(void) { }
-
-    virtual void Enter(void) = 0;
-    virtual void Leave(void) = 0;
-
-    virtual bool IsWall(void) const = 0;
-    virtual bool IsDone(void) const = 0;
-
-    virtual StepRet     Step(void) = 0;
-    virtual IPhase*     NextPhase(void) = 0;
-
-    virtual void        OnNodesMoved(void) = 0;
-    virtual void        OnKeyPressed(char c) = 0;
-};
-
-struct IAlgorithm {
-    virtual ~IAlgorithm(void) { }
-
-    virtual IPhase* Init(const Nubuck& nubuck, const leda::GRAPH<leda::d3_rat_point, int>& G) = 0;
-
-    // return false if the algorithm implements no special Run method
-    virtual bool Run(void) = 0;
-};
-
-typedef IAlgorithm* (*algAlloc_t)(void);
-
-template<typename ALGORITHM>
-IAlgorithm* CreateAlgorithm(void) {
-    return new ALGORITHM();
-}
-
 // main entry point, returns exit code
-NUBUCK_API int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc);
+NUBUCK_API int RunNubuck(int argc, char* argv[]);

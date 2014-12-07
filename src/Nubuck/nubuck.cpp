@@ -14,7 +14,6 @@
 #include <world\entities\ent_transform_gizmo\ent_transform_gizmo.h>
 #include <renderer\effects\effect.h>
 #include <renderer\effects\statedesc_gen\statedesc_gen.h>
-#include <algdriver\algdriver.h>
 #include <UI\mainwindow\mainwindow.h>
 #include <UI\logwidget\logwidget.h>
 #include <UI\userinterface.h>
@@ -338,7 +337,7 @@ QGLFormat FmtAlphaMultisampling(int numSamples) {
 
 void TestPageAlloc();
 
-int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
+int RunNubuck(int argc, char* argv[]) {
 #ifdef _DEBUG
     TestPageAlloc();
 #endif
@@ -393,8 +392,6 @@ int RunNubuck(int argc, char* argv[], algAlloc_t algAlloc) {
 
     MainLoop mainLoop;
     mainLoop.Enter();
-
-    ALG::gs_algorithm.SetAlloc(algAlloc);
 
     // register commands
     COM::CMD::RegisterCommand("lsvars", "list config variables", COM::CMD_ListVariables);

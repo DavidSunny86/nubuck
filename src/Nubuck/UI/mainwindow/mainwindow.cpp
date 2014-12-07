@@ -6,7 +6,6 @@
 #include <QColorDialog>
 
 #include <nubuck_private.h>
-#include <algdriver\algdriver.h>
 #include <world\world_events.h>
 #include <Nubuck\operators\operator.h>
 #include <operators\operators.h>
@@ -95,15 +94,6 @@ namespace UI {
 
     void MainWindow::OnShowConsole() {
         _console->show();
-    }
-
-    void MainWindow::OnRandomPoints(void) {
-        RandomPoints randomPoints;
-        if(QDialog::Accepted == randomPoints.exec()) {
-            W::world.Send(EV::def_Apocalypse.Create(EV::Params_Apocalypse()));
-
-            ALG::gs_algorithm.Init(randomPoints.AsGraph());
-        }
     }
 
     void MainWindow::OnShowRenderMetrics(void) {

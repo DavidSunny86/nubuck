@@ -2,7 +2,6 @@
 #include <algorithm>
 
 #include <Nubuck\common\common.h>
-#include <algdriver\algdriver.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <Nubuck\math\intersections.h>
 #include <Nubuck\animation\animation.h>
@@ -380,11 +379,6 @@ void World::Event_Key(const EV::Event& event) {
         }
     }
     if(numpad[5] == args.nativeScanCode) _camArcball.ToggleProjection(transitionDur);
-
-    if(EV::Params_Key::KEY_DOWN == args.type && !args.autoRepeat) {
-        GEN::Pointer<IPhase> phase = ALG::gs_algorithm.GetPhase();
-        if(phase.IsValid()) phase->OnKeyPressed((char)args.keyCode);
-    }
 }
 
 void World::Grid_Build() {
