@@ -1,0 +1,5 @@
+*.obj
+*.exe
+*.dll
+logfile.txt
+last_cloud.geom
