@@ -21,10 +21,10 @@ private:
     float   duration;
     float   time;
 protected:
-    bool DoMove(float secsPassed) override {
+    bool Animate() override {
         float s = Max(0.0f, f(time));
         nubuck().set_mesh_scale(M, Vector3(s, s, s));
-        time += secsPassed;
+        time += GetSecsPassed();
         return duration <= time;
     }
 public:
