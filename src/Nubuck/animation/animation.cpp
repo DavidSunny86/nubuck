@@ -7,6 +7,14 @@
 
 namespace A {
 
+float Animation::GetTime() const {
+    return _time;
+}
+
+float Animation::GetSecsPassed() const {
+    return _secsPassed;
+}
+
 Animation::Animation()
     : _isDone(true) // animation starts paused
     , _isMoveDone(false)
@@ -22,7 +30,8 @@ bool Animation::IsDone() const { return _isDone; }
 
 void Animation::Move(float secsPassed) {
     if(!_isMoveDone) {
-        _isMoveDone = Animate(secsPassed);
+        _secsPassed = secsPassed;
+        _isMoveDone = Animate();
 
         if(AnimMode::PLAY_UNTIL_DONE == _mode && _isMoveDone) {
             _isDone = true;

@@ -33,8 +33,13 @@ private:
     float           _time;
     float           _duration;
     eventFilter_t   _eventFilter;
+
+    float           _secsPassed;
 protected:
-    virtual bool Animate(float secsPassed) = 0;
+    virtual bool    Animate() = 0;
+
+    float           GetTime() const;
+    float           GetSecsPassed() const;
 public:
     Animation();
     virtual ~Animation();

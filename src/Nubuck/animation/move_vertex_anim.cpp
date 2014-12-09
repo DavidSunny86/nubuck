@@ -28,7 +28,7 @@ void MoveVertexAnimation::Init(const nb::geometry subject, leda::node vert, cons
     geom->AttachAnimation(this);
 }
 
-bool MoveVertexAnimation::Animate(float secsPassed) {
+bool MoveVertexAnimation::Animate() {
     float l = _time / _duration;
 
     leda::nb::RatPolyMesh& mesh = _subject->GetRatPolyMesh();
@@ -36,7 +36,7 @@ bool MoveVertexAnimation::Animate(float secsPassed) {
     M::Vector3 p = (1.0f - l) * ToVector(_p0) + l * ToVector(_p1);
     mesh.set_position(_vert, ToRatPoint(p));
 
-    _time += secsPassed;
+    _time += GetSecsPassed();
 
     W::ENT_Geometry* geom = (W::ENT_Geometry*)_subject;
     geom->Rebuild();
