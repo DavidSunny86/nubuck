@@ -20,7 +20,7 @@ struct ConvexHull : Operator {
 
         if(nil == M) {
             nubuck().log_printf("no input mesh selected.\n");
-            return DECLINE_INVOCATION;
+            return false;
         }
 
         NbGraph& G = nubuck().graph_of(M);
@@ -38,7 +38,7 @@ struct ConvexHull : Operator {
 
         nubuck().set_mesh_render_mode(M, Nubuck::RenderMode::ALL);
 
-        return ACCEPT_INVOCATION;
+        return true;
     }
 
     void Finish() override {

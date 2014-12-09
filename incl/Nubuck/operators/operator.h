@@ -31,10 +31,6 @@ public:
     virtual void Invoke() { }
 };
 
-// improves readability of returns in Operator::Invoke()
-#define ACCEPT_INVOCATION true
-#define DECLINE_INVOCATION false
-
 class Operator : public EV::EventHandler<> {
 private:
     OperatorPanel* _panel;
