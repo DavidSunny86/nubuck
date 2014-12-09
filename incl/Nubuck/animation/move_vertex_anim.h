@@ -21,7 +21,7 @@ private:
     float       _time;
     float       _duration;
 protected:
-    bool DoMove(float secsPassed) override;
+    bool Animate(float secsPassed) override;
 public:
     MoveVertexAnimation();
 

@@ -79,7 +79,7 @@ public:
         , duration(duration)
     { }
 protected:
-    bool DoMove(float secsPassed) override {
+    bool Animate(float secsPassed) override {
         double l = M::Min(1.0f, time / duration);
         double s = (1.0f - l) * v0 + l * v1;
 
@@ -115,7 +115,7 @@ public:
         , duration(duration)
     { }
 protected:
-    bool DoMove(float secsPassed) override {
+    bool Animate(float secsPassed) override {
         float l = M::Min(1.0f, time / duration);
         R::Color c = R::Lerp(c0, c1, l);
         SetSimplexColor(nubuck().poly_mesh(g.trGeom), simp, c);

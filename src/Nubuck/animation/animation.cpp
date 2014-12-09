@@ -22,7 +22,7 @@ bool Animation::IsDone() const { return _isDone; }
 
 void Animation::Move(float secsPassed) {
     if(!_isMoveDone) {
-        _isMoveDone = DoMove(secsPassed);
+        _isMoveDone = Animate(secsPassed);
 
         if(AnimMode::PLAY_UNTIL_DONE == _mode && _isMoveDone) {
             _isDone = true;

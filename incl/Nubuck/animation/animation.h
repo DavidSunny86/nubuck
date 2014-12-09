@@ -34,7 +34,7 @@ private:
     float           _duration;
     eventFilter_t   _eventFilter;
 protected:
-    virtual bool DoMove(float secsPassed) = 0;
+    virtual bool Animate(float secsPassed) = 0;
 public:
     Animation();
     virtual ~Animation();

@@ -28,7 +28,7 @@ void MoveVertexAnimation::Init(const nb::geometry subject, leda::node vert, cons
     geom->AttachAnimation(this);
 }
 
-bool MoveVertexAnimation::DoMove(float secsPassed) {
+bool MoveVertexAnimation::Animate(float secsPassed) {
     float l = _time / _duration;
 
     leda::nb::RatPolyMesh& mesh = _subject->GetRatPolyMesh();
