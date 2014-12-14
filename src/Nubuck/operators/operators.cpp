@@ -49,7 +49,7 @@ void Operators::OnInvokeOperator(unsigned id) {
 	}
 
     Operator* op = _ops[id].op;
-    InvokeAction(ev_op_setOperator.Tag(EV::Arg<Operator*>(op)));
+    InvokeAction(ev_op_setOperator.Tag(op));
 }
 
 Operators::Operators() : _actionsPending(0), _panel(0) {

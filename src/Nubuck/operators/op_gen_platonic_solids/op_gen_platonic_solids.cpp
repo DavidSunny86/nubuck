@@ -19,7 +19,7 @@ namespace OP {
 // namespace GEN {
 
 void PlatonicSolidsPanel::OnNameChanged(int idx) {
-    OP::SendToOperator(ev_createPlatonicSolid.Tag(EV::Arg<int>(idx)));
+    OP::SendToOperator(ev_createPlatonicSolid.Tag(idx));
 }
 
 PlatonicSolidsPanel::PlatonicSolidsPanel(QWidget* parent) : OperatorPanel(parent) {

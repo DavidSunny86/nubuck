@@ -15,20 +15,20 @@
 namespace W {
 
 void ENT_GeometryOutln::OnVertexScaleChanged(leda::rational value) {
-    _subject.Send(ev_geom_vertexScaleChanged.Tag(EV::Arg<float>(value.to_float())));
+    _subject.Send(ev_geom_vertexScaleChanged.Tag(value.to_float()));
 }
 
 void ENT_GeometryOutln::OnEdgeScaleChanged(leda::rational value) {
-    _subject.Send(ev_geom_edgeScaleChanged.Tag(EV::Arg<float>(value.to_float())));
+    _subject.Send(ev_geom_edgeScaleChanged.Tag(value.to_float()));
 }
 
 void ENT_GeometryOutln::OnEdgeColorChanged(float r, float g, float b) {
 	R::Color edgeColor = R::Color(r, g, b);
-    _subject.Send(ev_geom_edgeColorChanged.Tag(EV::Arg<R::Color>(edgeColor)));
+    _subject.Send(ev_geom_edgeColorChanged.Tag(edgeColor));
 }
 
 void ENT_GeometryOutln::OnTransparencyChanged(leda::rational value) {
-    _subject.Send(ev_geom_transparencyChanged.Tag(EV::Arg<float>(value.to_float())));
+    _subject.Send(ev_geom_transparencyChanged.Tag(value.to_float()));
 }
 
 void ENT_GeometryOutln::OnRenderModeChanged(bool) {

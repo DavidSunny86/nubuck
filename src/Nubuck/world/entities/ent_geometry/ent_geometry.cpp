@@ -427,7 +427,7 @@ void ENT_Geometry::SetVertexScale(float vertexScale) {
     _nodeRenderer->Rebuild(_ratPolyMesh, _fpos, _vertexScale);
 
     g_ui.GetOutliner().SendToView(_outlinerItem,
-        ev_geom_vertexScaleChanged.Tag(EV::Arg<float>(_vertexScale)));
+        ev_geom_vertexScaleChanged.Tag(_vertexScale));
 }
 
 void ENT_Geometry::SetEdgeScale(float edgeScale) {
@@ -436,7 +436,7 @@ void ENT_Geometry::SetEdgeScale(float edgeScale) {
     RebuildRenderEdges();
 
     g_ui.GetOutliner().SendToView(_outlinerItem,
-        ev_geom_edgeScaleChanged.Tag(EV::Arg<float>(_edgeScale)));
+        ev_geom_edgeScaleChanged.Tag(_edgeScale));
 }
 
 void ENT_Geometry::SetEdgeColor(const R::Color& color) {
@@ -445,7 +445,7 @@ void ENT_Geometry::SetEdgeColor(const R::Color& color) {
     RebuildRenderEdges();
 
     g_ui.GetOutliner().SendToView(_outlinerItem,
-        ev_geom_edgeColorChanged.Tag(EV::Arg<R::Color>(_edgeColor)));
+        ev_geom_edgeColorChanged.Tag(_edgeColor));
 }
 
 M::Vector3 ENT_Geometry::GetPosition() const {

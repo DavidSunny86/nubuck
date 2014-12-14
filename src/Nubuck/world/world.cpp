@@ -684,7 +684,7 @@ ENT_Geometry* World::CreateGeometry() {
     geom->SetOrientation(M::Quat::Identity());
     geom->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 
-    Send(ev_w_linkEntity.Tag(EV::Arg<Entity*>(geom)));
+    Send(ev_w_linkEntity.Tag(geom));
 
     return geom;
 }
@@ -701,7 +701,7 @@ ENT_Text* World::CreateText() {
     text->SetOrientation(M::Quat::Identity());
     text->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 
-    Send(ev_w_linkEntity.Tag(EV::Arg<Entity*>(text)));
+    Send(ev_w_linkEntity.Tag(text));
 
     return text;
 }
@@ -718,7 +718,7 @@ ENT_TransformGizmo* World::CreateTransformGizmo() {
     transformGizmo->SetOrientation(M::Quat::Identity());
     transformGizmo->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 
-    Send(ev_w_linkEntity.Tag(EV::Arg<Entity*>(transformGizmo)));
+    Send(ev_w_linkEntity.Tag(transformGizmo));
 
     return transformGizmo;
 }

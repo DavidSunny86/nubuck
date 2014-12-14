@@ -129,6 +129,39 @@ public:
     }
 };
 
+template<typename T>
+struct ConcreteEventDef<Arg<T> > : EventDef {
+private:
+    eventID_t       _eventID;
+    eventTypeID_t   _eventTypeID;
+public:
+    ConcreteEventDef() {
+        _eventID = EV_GetNextID();
+        _eventTypeID = Arg<T>::GetEventTypeID();
+    }
+
+    eventID_t GetEventID() const {
+        return _eventID;
+    }
+
+    eventTypeID_t GetEventTypeID() const {
+        return _eventTypeID;
+    }
+
+    // NOTE: in case of default argument a referenced to a temporary object is
+    // returned. this is fine, however, because the event gets cloned anyways
+    const Arg<T>& Tag(Arg<T>& event = Arg<T>()) const {
+        event.id = _eventID;
+        event.tagged = true;
+        return event;
+    }
+
+    Arg<T> Tag(const T& value) const {
+        Arg<T> event(value);
+        return Tag(event);
+    }
+};
+
 namespace EventHandlerPolicies {
 
 struct Nonblocking {

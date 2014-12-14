@@ -119,7 +119,7 @@ Outliner::itemHandle_t Outliner::AddItem(const QString& name, W::Entity* entity)
 	if(item->next) item->next->prev = item;
     _items = item;
 
-    baseHandler_t::Send(ev_outl_createView.Tag(EV::Arg<LinkedItem*>(item)));
+    baseHandler_t::Send(ev_outl_createView.Tag(item));
 
     return item;
 }
@@ -131,7 +131,7 @@ void Outliner::DeleteItem(itemHandle_t item) {
 }
 
 void Outliner::HideItem(itemHandle_t item) {
-    baseHandler_t::Send(ev_outl_hide.Tag(EV::Arg<LinkedItem*>(item)));
+    baseHandler_t::Send(ev_outl_hide.Tag(item));
 }
 
 void Outliner::SetItemName(itemHandle_t item, const QString& name) {

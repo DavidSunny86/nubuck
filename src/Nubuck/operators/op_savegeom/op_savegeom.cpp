@@ -74,7 +74,7 @@ bool SaveGeom::Invoke() {
 
     _geom = geomSel[0];
 
-    SendToPanel(ev_save.Tag(EV::Arg<std::string*>(NULL)));
+    SendToPanel(ev_save.Tag(NULL));
 
     return true;
 }

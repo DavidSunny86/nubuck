@@ -16,7 +16,7 @@ static EV::ConcreteEventDef<EV::Arg<double> > ev_setScale;
 namespace OP {
 
 void Delaunay3DPanel::OnScaleChanged(leda::rational value) {
-    SendToOperator(ev_setScale.Tag(EV::Arg<double>(value.to_double())));
+    SendToOperator(ev_setScale.Tag(value.to_double()));
 }
 
 Delaunay3DPanel::Delaunay3DPanel(QWidget* parent) : OperatorPanel(parent) {
