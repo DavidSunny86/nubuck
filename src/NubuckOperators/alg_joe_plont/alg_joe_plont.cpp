@@ -8,9 +8,7 @@
 #include <Nubuck\operators\operator_invoker.h>
 #include <Nubuck\UI\nbw_spinbox.h>
 
-BEGIN_EVENT_DEF(OP_JoePlont_SetScale)
-    double value;
-END_EVENT_DEF
+static EV::ConcreteEventDef<EV::Arg<double> > ev_setScale;
 
 class JoePlontPanel : public OP::OperatorPanel {
     Q_OBJECT
@@ -23,9 +21,7 @@ public:
 };
 
 void JoePlontPanel::OnScaleChanged(leda::rational value) {
-    EV::Params_OP_JoePlont_SetScale args;
-    args.value = value.to_double();
-    OP::SendToOperator(EV::def_OP_JoePlont_SetScale.Create(args));
+    OP::SendToOperator(ev_setScale, EV::Arg<double>(value.to_double()));
 }
 
 JoePlontPanel::JoePlontPanel() {
@@ -56,7 +52,7 @@ private:
     nb::geometry            _geom;
     std::vector<Simplex>    _simplices;
 
-    void Event_SetScale(const EV::Event& event);
+    void Event_SetScale(const EV::Arg<double>& event);
 public:
     JoePlont();
 
@@ -66,7 +62,7 @@ public:
 };
 
 JoePlont::JoePlont() {
-    AddEventHandler(EV::def_OP_JoePlont_SetScale, this, &JoePlont::Event_SetScale);
+    AddEventHandler(ev_setScale, this, &JoePlont::Event_SetScale);
 }
 
 void JoePlont::Register(OP::Invoker& invoker) {
@@ -174,15 +170,13 @@ static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
     return leda::d3_rat_point(leda::d3_point(v.x, v.y, v.z));
 }
 
-void JoePlont::Event_SetScale(const EV::Event& event) {
-    const EV::Params_OP_JoePlont_SetScale& args = EV::def_OP_JoePlont_SetScale.GetArgs(event);
-
+void JoePlont::Event_SetScale(const EV::Arg<double>& event) {
     if(_simplices.empty()) return;
 
     for(unsigned j = 0; j < _simplices.size(); ++j) {
         Simplex& simplex = _simplices[j];
 
-        leda::rational scale = 1 + 5 * args.value;
+        leda::rational scale = 1 + 5 * event.value;
         leda::rat_vector center = scale * simplex.center;
 
         leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_geom);
