@@ -21,7 +21,7 @@ public:
 };
 
 void JoePlontPanel::OnScaleChanged(leda::rational value) {
-    OP::SendToOperator(ev_setScale, EV::Arg<double>(value.to_double()));
+    OP::SendToOperator(ev_setScale.Tag(value.to_double()));
 }
 
 JoePlontPanel::JoePlontPanel() {
