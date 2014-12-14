@@ -6,10 +6,6 @@
 
 #include "ui_op_delaunay3d.h"
 
-BEGIN_EVENT_DEF(OP_Delaunay3D_SetScale)
-    double value;
-END_EVENT_DEF
-
 namespace OP {
 
 class Delaunay3DPanel : public OperatorPanel {
@@ -34,7 +30,7 @@ private:
     nb::geometry              geom;
     std::vector<Simplex> _simplices;
 
-    void Event_SetScale(const EV::Event& event);
+    void Event_SetScale(const EV::Arg<double>& event);
 public:
     Delaunay3D();
 

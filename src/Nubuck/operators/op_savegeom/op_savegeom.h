@@ -7,17 +7,13 @@
 
 class QLineEdit;
 
-BEGIN_EVENT_DEF(OP_SaveGeom_Save)
-    std::string* filename;
-END_EVENT_DEF
-
 namespace OP {
 
 class SaveGeomPanel : public OperatorPanel {
 private:
     QLineEdit* _leFilename;
 
-    void Event_Save(const EV::Event& event);
+    void Event_Save(const EV::Arg<std::string*>& event);
 public:
     SaveGeomPanel(QWidget* parent = NULL);
 
@@ -28,7 +24,7 @@ class SaveGeom : public Operator {
 private:
     nb::geometry _geom;
 
-    void Event_Save(const EV::Event& event);
+    void Event_Save(const EV::Arg<std::string*>& event);
 public:
     SaveGeom();
 

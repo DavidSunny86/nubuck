@@ -5,4 +5,5 @@ add_sources(
     nubuck.cpp
     nubuck_private.h
     page_alloc_test.cpp
+    events.cpp
 )

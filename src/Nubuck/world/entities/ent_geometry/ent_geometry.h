@@ -16,6 +16,7 @@
 #include <renderer\edges\r_gl_line_edges.h>
 #include <UI\outliner\outliner.h>
 #include <world\entity.h>
+#include "ent_geometry_events.h"
 
 namespace W {
 
@@ -90,12 +91,12 @@ private:
     A::Animation* _anims;
 
 #pragma region EventHandlers
-    void Event_VertexScaleChanged(const EV::Event& event);
-    void Event_EdgeScaleChanged(const EV::Event& event);
-    void Event_EdgeColorChanged(const EV::Event& event);
-    void Event_TransparencyChanged(const EV::Event& event);
-    void Event_RenderModeChanged(const EV::Event& event);
-    void Event_EdgeShadingChanged(const EV::Event& event);
+    void Event_VertexScaleChanged(const EV::Arg<float>& event);
+    void Event_EdgeScaleChanged(const EV::Arg<float>& event);
+    void Event_EdgeColorChanged(const EV::Arg<R::Color>& event);
+    void Event_TransparencyChanged(const EV::Arg<float>& event);
+    void Event_RenderModeChanged(const RenderModeEvent& event);
+    void Event_EdgeShadingChanged(const EdgeShadingEvent& event);
 #pragma endregion
 public:
     ENT_Geometry();

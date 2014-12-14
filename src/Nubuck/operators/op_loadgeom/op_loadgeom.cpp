@@ -9,6 +9,8 @@
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include "op_loadgeom.h"
 
+static EV::ConcreteEventDef<EV::Arg<std::string*> > ev_load;
+
 namespace OP {
 
 void LoadGeomPanel::OnChooseFilename() {
@@ -20,8 +22,8 @@ void LoadGeomPanel::OnChooseFilename() {
 	if(!filename.isNull()) {
 		_leFilename->setText(filename);
 
-        EV::Params_OP_LoadGeom_Load args = { new std::string(filename.toStdString()) };
-		SendToOperator(EV::def_OP_LoadGeom_Load.Create(args));
+        EV::Arg<std::string*> event(new std::string(filename.toStdString()));
+		SendToOperator(ev_load, event);
 	}
 }
 
@@ -39,9 +41,8 @@ LoadGeomPanel::LoadGeomPanel(QWidget* parent) : OperatorPanel(NULL) {
     setLayout(layout);
 }
 
-void LoadGeom::Event_Load(const EV::Event& event) {
-    const EV::Params_OP_LoadGeom_Load& args = EV::def_OP_LoadGeom_Load.GetArgs(event);
-    const std::string& filename(*args.filename);
+void LoadGeom::Event_Load(const EV::Arg<std::string*>& event) {
+    const std::string& filename(*event.value);
 
     nb::geometry geom = nubuck().create_geometry();
     const int renderAll =
@@ -52,11 +53,11 @@ void LoadGeom::Event_Load(const EV::Event& event) {
     W::LoadGeometryFromFile(filename, geom);
     nubuck().poly_mesh(geom).compute_faces();
 
-    delete args.filename;
+    delete event.value;
 }
 
 LoadGeom::LoadGeom() {
-    AddEventHandler(EV::def_OP_LoadGeom_Load, this, &LoadGeom::Event_Load);
+    AddEventHandler(ev_load, this, &LoadGeom::Event_Load);
 }
 
 void LoadGeom::Register(Invoker& invoker) {

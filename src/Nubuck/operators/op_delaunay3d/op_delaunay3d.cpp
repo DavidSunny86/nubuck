@@ -11,12 +11,12 @@
 #include "d3_delaunay.h"
 #include "op_delaunay3d.h"
 
+static EV::ConcreteEventDef<EV::Arg<double> > ev_setScale;
+
 namespace OP {
 
 void Delaunay3DPanel::OnScaleChanged(leda::rational value) {
-    EV::Params_OP_Delaunay3D_SetScale args;
-    args.value = value.to_double();
-    SendToOperator(EV::def_OP_Delaunay3D_SetScale.Create(args));
+    SendToOperator(ev_setScale, EV::Arg<double>(value.to_double()));
 }
 
 Delaunay3DPanel::Delaunay3DPanel(QWidget* parent) : OperatorPanel(parent) {
@@ -50,16 +50,14 @@ leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
 
 } // unnamed namespace
 
-void Delaunay3D::Event_SetScale(const EV::Event& event) {
-    const EV::Params_OP_Delaunay3D_SetScale& args = EV::def_OP_Delaunay3D_SetScale.GetArgs(event);
-
+void Delaunay3D::Event_SetScale(const EV::Arg<double>& event) {
     if(_simplices.empty()) return;
 
     std::cout << "Delaunay3D: scaling simplices ... ";
     for(unsigned j = 0; j < _simplices.size(); ++j) {
         Simplex& simplex = _simplices[j];
 
-        leda::rational scale = 1 + 5 * args.value;
+        leda::rational scale = 1 + 5 * event.value;
         leda::rat_vector center = scale * simplex.center;
 
         leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
@@ -73,7 +71,7 @@ void Delaunay3D::Event_SetScale(const EV::Event& event) {
 }
 
 Delaunay3D::Delaunay3D() {
-    AddEventHandler(EV::def_OP_Delaunay3D_SetScale, this, &Delaunay3D::Event_SetScale);
+    AddEventHandler(ev_setScale, this, &Delaunay3D::Event_SetScale);
 }
 
 void Delaunay3D::Register(Invoker& invoker) {

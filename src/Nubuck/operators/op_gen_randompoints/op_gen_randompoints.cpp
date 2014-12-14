@@ -3,18 +3,20 @@
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include "op_gen_randompoints.h"
 
+static EV::ConcreteEventDef<RandomPointsUpdate> ev_randomPointsUpdate;
+
 namespace OP {
 namespace GEN {
 
 // RandomPointsPanel ---
 
 void RandomPointsPanel::_OnArgsChanged() {
-    EV::Params_OP_RandomPoints_Update args;
-    args.domain = _cbDomain->currentIndex();
-    args.size   = _sbSize->value().numerator().to_long();
-    args.radius = _sbRadius->value().numerator().to_long();
-    args.save   = _cbSave->isChecked();
-    g_operators.InvokeAction(EV::def_OP_RandomPoints_Update.Create(args));
+    RandomPointsUpdate event;
+    event.domain = _cbDomain->currentIndex();
+    event.size   = _sbSize->value().numerator().to_long();
+    event.radius = _sbRadius->value().numerator().to_long();
+    event.save   = _cbSave->isChecked();
+    g_operators.InvokeAction(ev_randomPointsUpdate, event);
 }
 
 void RandomPointsPanel::OnArgsChanged(leda::rational) {
@@ -192,21 +194,19 @@ void RandomPoints::UpdateCloud(Domain::Enum domain, int size, int radius) {
     nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, _cloud);
 }
 
-void RandomPoints::Event_Update(const EV::Event& event) {
-    const EV::Params_OP_RandomPoints_Update& args = EV::def_OP_RandomPoints_Update.GetArgs(event);
+void RandomPoints::Event_Update(const RandomPointsUpdate& event) {
+    Domain::Enum domain = Domain::Enum(event.domain);
 
-    Domain::Enum domain = Domain::Enum(args.domain);
-
-    if(_lastDomain != args.domain || _lastRadius != args.radius || _lastSize != args.size) {
-        UpdateHull(domain, args.radius);
-        UpdateCloud(Domain::Enum(args.domain), args.size, args.radius);
+    if(_lastDomain != event.domain || _lastRadius != event.radius || _lastSize != event.size) {
+        UpdateHull(domain, event.radius);
+        UpdateCloud(Domain::Enum(event.domain), event.size, event.radius);
         _cloudCopy->GetRatPolyMesh() = _cloud->GetRatPolyMesh();
     }
 
     _lastDomain = domain;
-    _lastSize   = args.size;
-    _lastRadius = args.radius;
-    _lastSave   = args.save;
+    _lastSize   = event.size;
+    _lastRadius = event.radius;
+    _lastSave   = event.save;
 }
 
 RandomPoints::RandomPoints()
@@ -217,7 +217,7 @@ RandomPoints::RandomPoints()
     , _lastRadius(DEFAULT_RADIUS)
     , _lastSave(DEFAULT_SAVE)
 {
-    AddEventHandler(EV::def_OP_RandomPoints_Update, this, &RandomPoints::Event_Update);
+    AddEventHandler(ev_randomPointsUpdate, this, &RandomPoints::Event_Update);
 
     leda::list<point3_t> L;
     leda::random_d3_rat_points_on_sphere(1000, 1, L);

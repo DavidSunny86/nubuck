@@ -38,9 +38,8 @@ void NameEntityButton::mousePressEvent(QMouseEvent*) {
     }
 }
 
-void Outliner::Event_CreateView(const EV::Event& event) {
-    const EV::Params_Outliner_CreateView& args = EV::def_Outliner_CreateView.GetArgs(event);
-    LinkedItem* item = args.item;
+void Outliner::Event_CreateView(const EV::Arg<outlinerItem_t>& event) {
+    LinkedItem* item = event.value;
 
     // build header widget
     item->header.selection = new SelectEntityButton(item->entity);
@@ -74,23 +73,22 @@ void Outliner::Event_CreateView(const EV::Event& event) {
     item->isVisible = true;
 }
 
-void Outliner::Event_Hide(const EV::Event& event) {
+void Outliner::Event_Hide(const EV::Arg<outlinerItem_t>& event) {
     SYS::ScopedLock lock(_itemsMtx);
-    const EV::Params_Outliner_Hide& args = EV::def_Outliner_Hide.GetArgs(event);
-    args.item->headerIt->setHidden(true);
+    event.value->headerIt->setHidden(true);
 }
 
-void Outliner::Event_SetName(const EV::Event& event) {
-    const EV::Params_Outliner_SetName& args = EV::def_Outliner_SetName.GetArgs(event);
-    args.item->header.name->setText(*args.name);
-    delete args.name;
+void Outliner::Event_SetName(const EV::Args2<outlinerItem_t, QString*>& event) {
+    LinkedItem* item = event.value0;
+    QString* name = event.value1;
+    item->header.name->setText(*name);
+    delete name;
 }
 
-void Outliner::Event_Delete(const EV::Event& event) {
+void Outliner::Event_Delete(const EV::Arg<outlinerItem_t>& event) {
     SYS::ScopedLock lock(_itemsMtx);
 
-    const EV::Params_Outliner_Delete& args = EV::def_Outliner_Delete.GetArgs(event);
-    LinkedItem* item = args.item;
+    LinkedItem* item = event.value;
 
 	if(item->next) item->next->prev = item->prev;
 	if(item->prev) item->prev->next = item->next;
@@ -121,8 +119,7 @@ Outliner::itemHandle_t Outliner::AddItem(const QString& name, W::Entity* entity)
 	if(item->next) item->next->prev = item;
     _items = item;
 
-    EV::Params_Outliner_CreateView args = { item };
-    baseHandler_t::Send(EV::def_Outliner_CreateView.Create(args));
+    baseHandler_t::Send(ev_outl_createView, EV::Arg<LinkedItem*>(item));
 
     return item;
 }
@@ -130,22 +127,20 @@ Outliner::itemHandle_t Outliner::AddItem(const QString& name, W::Entity* entity)
 // NOTE that this method must be called from main/ui thread
 // for the event handler is called directly
 void Outliner::DeleteItem(itemHandle_t item) {
-    EV::Params_Outliner_Delete args = { item };
-    Event_Delete(EV::def_Outliner_Delete.Create(args));
+    Event_Delete(EV::Arg<LinkedItem*>(item));
 }
 
 void Outliner::HideItem(itemHandle_t item) {
-    EV::Params_Outliner_Hide args = { item };
-    baseHandler_t::Send(EV::def_Outliner_Hide.Create(args));
+    baseHandler_t::Send(ev_outl_hide, EV::Arg<LinkedItem*>(item));
 }
 
 void Outliner::SetItemName(itemHandle_t item, const QString& name) {
-    EV::Params_Outliner_SetName args = { item, new QString(name) };
-    baseHandler_t::Send(EV::def_Outliner_SetName.Create(args));
+    EV::Args2<LinkedItem*, QString*> event(item, new QString(name));
+    baseHandler_t::Send(ev_outl_setName, event);
 }
 
-void Outliner::SendToView(itemHandle_t item, const EV::Event& event) {
-    if(item->view) item->view->Send(event);
+void Outliner::SendToView(itemHandle_t item, const EV::EventDef& def, const EV::Event& event) {
+    if(item->view) item->view->Send(def, event);
 }
 
 Outliner::Outliner(QWidget* parent) : QWidget(parent), _items(NULL) {
@@ -164,11 +159,11 @@ Outliner::Outliner(QWidget* parent) : QWidget(parent), _items(NULL) {
     layout->addWidget(_treeWidget);
     setLayout(layout);
 
-    AddEventHandler(EV::def_Outliner_CreateView, this, &Outliner::Event_CreateView);
-    AddEventHandler(EV::def_Outliner_Hide, this, &Outliner::Event_Hide);
-    AddEventHandler(EV::def_Outliner_SetName, this, &Outliner::Event_SetName);
-    AddEventHandler(EV::def_Outliner_Delete, this, &Outliner::Event_Delete);
-    AddEventHandler(EV::def_SelectionChanged, this, &Outliner::Event_SelectionChanged);
+    AddEventHandler(ev_outl_createView, this, &Outliner::Event_CreateView);
+    AddEventHandler(ev_outl_hide, this, &Outliner::Event_Hide);
+    AddEventHandler(ev_outl_setName, this, &Outliner::Event_SetName);
+    AddEventHandler(ev_outl_delete, this, &Outliner::Event_Delete);
+    AddEventHandler(ev_w_selectionChanged, this, &Outliner::Event_SelectionChanged);
 }
 
 void Outliner::HandleEvents() {

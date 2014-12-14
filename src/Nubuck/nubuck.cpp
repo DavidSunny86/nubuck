@@ -500,6 +500,9 @@ int RunNubuck(
 
     common.printf("INFO - Nubuck compiled with Qt version '%s'\n", QT_VERSION_STR);
 
+    OP::g_operators.Init();
+    W::world.Init();
+
     g_ui.Init();
     W::world.GetEditMode().AddObserver(&g_ui);
     W::world.GetEditMode().AddObserver(&W::world);

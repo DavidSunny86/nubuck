@@ -7,10 +7,6 @@
 
 class QLineEdit;
 
-BEGIN_EVENT_DEF(OP_LoadGeom_Load)
-    std::string* filename;
-END_EVENT_DEF
-
 namespace OP {
 
 class LoadGeomPanel : public OperatorPanel {
@@ -25,7 +21,7 @@ public:
 
 class LoadGeom : public Operator {
 private:
-    void Event_Load(const EV::Event& event);
+    void Event_Load(const EV::Arg<std::string*>& event);
 public:
     LoadGeom();
 

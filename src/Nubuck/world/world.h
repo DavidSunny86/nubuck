@@ -16,6 +16,7 @@
 #include <renderer\renderer.h>
 #include <camera\arcball_camera.h>
 #include <Nubuck\events\events.h>
+#include <Nubuck\events\core_events.h>
 #include <world\editmode\editmode.h>
 #include "entity.h"
 
@@ -120,18 +121,20 @@ namespace W {
 
 #pragma region EventHandlers
         void Event_Apocalypse(const EV::Event& event);
-        void Event_LinkEntity(const EV::Event& event);
-        void Event_DestroyEntity(const EV::Event& event);
+        void Event_LinkEntity(const EV::Arg<Entity*>& event);
+        void Event_DestroyEntity(const EV::Arg<unsigned>& event);
         void Event_SelectionChanged(const EV::Event& event);
         void Event_RebuildAll(const EV::Event& event);
-        void Event_EditModeChanged(const EV::Event& event);
-        void Event_Resize(const EV::Event& event);
-        void Event_Mouse(const EV::Event& event);
-        void Event_Key(const EV::Event& event);
+        void Event_EditModeChanged(const EV::Arg<int>& event);
+        void Event_Resize(const EV::ResizeEvent& event);
+        void Event_Mouse(const EV::MouseEvent& event);
+        void Event_Key(const EV::KeyEvent& event);
 // region EventHandlers
 #pragma endregion
     public:
 		World(void);
+
+        void Init();
 
         const EditMode& GetEditMode() const { return _editMode; }
         EditMode&       GetEditMode() { return _editMode; };
@@ -149,7 +152,7 @@ namespace W {
         void Update(void);
         void Render(R::RenderList& renderList);
 
-        void HandleMouseEvent(const EV::Params_Mouse& args);
+        void HandleMouseEvent(const EV::MouseEvent& event);
 
         // exported to client
         ENT_Geometry* CreateGeometry(); // thread-safe

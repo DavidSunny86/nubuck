@@ -15,6 +15,28 @@
 // sending thread blocks until the receiving thread signals the event has been
 // processed.
 
+typedef unsigned eventID_t;
+typedef unsigned eventTypeID_t;
+
+NUBUCK_API eventID_t EV_GetNextID();
+
+#define EVENT_TYPE(classname)                                       \
+    public:                                                         \
+        static eventTypeID_t GetEventTypeID() {                     \
+            static int inf;                                         \
+            return reinterpret_cast<eventTypeID_t>(&inf);           \
+        }                                                           \
+        eventTypeID_t GetDynamicEventTypeID() const override {      \
+            return GetEventTypeID();                                \
+        }                                                           \
+        Event* Clone() const override {                             \
+            return new classname(*this);                            \
+        }
+
+#define EVENT_GENERIC_CLONE(classname) \
+    public: Event* Clone() const override { return new classname(*this); }
+
+
 namespace EV {
 
 struct BlockingEvent {
@@ -24,11 +46,17 @@ struct BlockingEvent {
 };
 
 struct Event {
-    enum { ARGS_SIZE = 68 };
-    unsigned        id;
-    const char*     name;
+    eventID_t       id;
     BlockingEvent*  block;
-    char            args[ARGS_SIZE];
+    bool            isSealed;
+
+    Event() : block(NULL), isSealed(false) { }
+
+    static eventTypeID_t GetEventTypeID() { return 0; }
+
+    virtual eventTypeID_t GetDynamicEventTypeID() const { return 0; }
+    virtual bool Merge(const Event& other) { return false; }
+    virtual Event* Clone() const { return new Event(*this); }
 
     void Accept() const {
         if(block) {
@@ -42,58 +70,56 @@ struct Event {
     }
 };
 
-} // namespace EV
+template<typename T>
+struct Arg : Event {
+    EVENT_TYPE(Arg)
 
-namespace EV {
+    T value;
 
-template<typename PARAMS>
-class EventDefinition {
-private:
-    const char* _eventName;
-    unsigned    _eventID;
-public:
-    EventDefinition(const char* name) : _eventName(name), _eventID(COM::StringHash(name)) { }
-
-    unsigned GetEventID() const { return _eventID; }
-
-    Event Create(const PARAMS& params) {
-        Event event;
-        event.block = NULL;
-        event.id = _eventID;
-        event.name = _eventName;
-        memcpy(event.args, &params, sizeof(PARAMS));
-        return event;
-    }
-
-    const PARAMS& GetArgs(const Event& event) {
-        assert(event.id == _eventID);
-        return *(PARAMS*)event.args;
-    }
+    Arg() { }
+    Arg(const T& value) : value(value) { }
 };
 
-} // namespace EV
+template<typename T0, typename T1>
+struct Args2 : Event {
+    EVENT_TYPE(Args2)
 
-#define BEGIN_EVENT_DEF(IDENT)                                      \
-    namespace EV {              									\
-        struct Params_##IDENT;                                      \
-        static EventDefinition<Params_##IDENT> def_##IDENT(#IDENT); \
-        struct Params_##IDENT {
+    T0 value0;
+    T1 value1;
 
-#define END_EVENT_DEF                                               \
-        }; /* struct Params_##IDENT */                              \
-    } /* namespace EV */
+    Args2() { }
+    Args2(const T0& value0, const T1& value1)
+        : value0(value0), value1(value1)
+    { }
+};
 
-// same as above, but without namespace. CS suffix stands for 'current scope'
-#define BEGIN_EVENT_DEF_CS(IDENT)                                     \
-    struct Params_##IDENT;                                            \
-    static ::EV::EventDefinition<Params_##IDENT> def_##IDENT(#IDENT); \
-    struct Params_##IDENT {
+// links id to type
+struct EventDef {
+    virtual ~EventDef() { }
+    
+    virtual eventID_t GetEventID() const = 0;
+    virtual eventTypeID_t GetEventTypeID() const = 0;
+};
 
-#define END_EVENT_DEF_CS                                        \
-    }; /* struct Params_##IDENT */                              \
+template<typename T_Event>
+struct ConcreteEventDef : EventDef {
+private:
+    eventID_t       _eventID;
+    eventTypeID_t   _eventTypeID;
+public:
+    ConcreteEventDef() {
+        _eventID = EV_GetNextID();
+        _eventTypeID = T_Event::GetEventTypeID();
+    }
 
+    eventID_t GetEventID() const {
+        return _eventID;
+    }
 
-namespace EV {
+    eventTypeID_t GetEventTypeID() const {
+        return _eventTypeID;
+    }
+};
 
 namespace EventHandlerPolicies {
 
@@ -112,52 +138,54 @@ struct Blocking {
 } // namespace EventHandlerPolicies
 
 template<
-    typename POLICY = EventHandlerPolicies::Nonblocking
+    typename T_Policy = EventHandlerPolicies::Nonblocking
 >
 class EventHandler {
 protected:
     struct AbstractHandler;
 private:
-    std::queue<EV::Event>                           _ev_events;
+    std::queue<EV::Event*>                          _ev_events;
     SYS::SpinLock                       			_ev_eventsMtx;
-    POLICY                              			_ev_policy;
+    T_Policy                              			_ev_policy;
     std::vector<GEN::Pointer<AbstractHandler> >     _ev_handlers;
 protected:
     struct AbstractHandler {
-        unsigned    eventID;
+        eventID_t    eventID;
         virtual void Call(const Event& event) = 0;
     };
 
-    template<typename TYPE>
+    template<typename T_Instance, typename T_Event>
     struct ConcreteHandler : AbstractHandler {
-        typedef void (TYPE::*Memfunc)(const Event& event);
-        TYPE*   instance;
-        Memfunc memfunc;
+        typedef void (T_Instance::*memfunc_t)(const T_Event& event);
+        T_Instance* instance;
+        memfunc_t   memfunc;
 
-        void Call(const EV::Event& event) override {
-            (instance->*memfunc)(event);
+        void Call(const Event& event) override {
+            const T_Event& realEvent = (const T_Event&)event;
+            (instance->*memfunc)(realEvent);
         }
     };
 public:
-    template<typename PARAMS, typename TYPE>
-    void AddEventHandler(const EventDefinition<PARAMS>& eventDef, TYPE* instance, typename ConcreteHandler<TYPE>::Memfunc memfunc) {
+    template<typename T_Instance, typename T_Event>
+    void AddEventHandler(const ConcreteEventDef<T_Event>& eventDef, T_Instance* instance, typename ConcreteHandler<T_Instance, T_Event>::memfunc_t memfunc) {
         assert(instance);
         assert(memfunc);
-        GEN::Pointer<ConcreteHandler<TYPE> > item(new ConcreteHandler<TYPE>());
+        assert(eventDef.GetEventTypeID() == T_Event::GetEventTypeID()); // type compatibility
+        GEN::Pointer<ConcreteHandler<T_Instance, T_Event> > item(new ConcreteHandler<T_Instance, T_Event>);
         item->eventID = eventDef.GetEventID();
-        item->memfunc = memfunc;
         item->instance = instance;
+        item->memfunc = memfunc;
         _ev_handlers.push_back(item);
     }
 protected:
     unsigned GetEventQueueSize() const { return _ev_events.size(); }
 
-    template<typename TYPE>
-    void _EV_HandleEvents(TYPE* instance, const char* className) {
+    template<typename T_Instance>
+    void _EV_HandleEvents(T_Instance* instance, const char* className) {
         bool done = false;
         while(!done) {
             _ev_policy.WaitEvent();
-            EV::Event event;
+            Event* event;
             _ev_eventsMtx.Lock();
             if(_ev_events.empty()) done = true;
             else {
@@ -168,31 +196,48 @@ protected:
             if(done) break;
             bool called = false;
             for(unsigned i = 0; i < _ev_handlers.size(); ++i) {
-                if(_ev_handlers[i]->eventID == event.id) {
-                    _ev_handlers[i]->Call(event);
+                if(_ev_handlers[i]->eventID == event->id) {
+                    _ev_handlers[i]->Call(*event);
                     called = true;
                 }
             }
-            if(!called) Event_Default(event, className);
+            if(!called) Event_Default(*event, className);
         } /* while(!done) */
     }
 
-    virtual void Event_Default(const EV::Event& event, const char* className) {
+    virtual void Event_Default(const Event& event, const char* className) {
+        const char* name = "<unnamed event>";
         COM_printf("WARNING - unhandled event '%s' (id = '%d') in class '%s'.\n",
-            event.name, event.id, className);
+            name, event.id, className);
     }
 public:
     virtual ~EventHandler() { }
 
-    void Send(const EV::Event& event) { // nonblocking
+    void Send(const EventDef& def, const Event& event) { // nonblocking
+        assert(def.GetEventTypeID() == event.GetDynamicEventTypeID()); // type compatibility
         assert(NULL == event.block);
         _ev_eventsMtx.Lock();
-        _ev_events.push(event);
+        Event* copy = event.Clone();
+        copy->id = def.GetEventID();
+        copy->isSealed = true;
+        _ev_events.push(copy);
         _ev_eventsMtx.Unlock();
         _ev_policy.SignalEvent();
     }
 
-    void SendAndWait(EV::Event event) { // blocking
+    void Send(const Event& event) { // nonblocking
+        assert(NULL == event.block);
+        assert(event.isSealed);
+        _ev_eventsMtx.Lock();
+        Event* copy = event.Clone();
+        copy->id = event.id;
+        _ev_events.push(copy);
+        _ev_eventsMtx.Unlock();
+        _ev_policy.SignalEvent();
+    }
+
+    void SendAndWait(const EventDef& def, const EV::Event& event) { // blocking
+        assert(def.GetEventTypeID() == event.GetDynamicEventTypeID());
         SYS::SharedResource<SYS::SpinLock> mtx;
         SYS::SharedResource<SYS::ConditionVariable> cv;
 
@@ -200,10 +245,14 @@ public:
         block.mtx = &mtx.Resource();
         block.cv = &cv.Resource();
         block.sig = false;
-        event.block = &block;
+        // event.block = &block;
 
         _ev_eventsMtx.Lock();
-        _ev_events.push(event);
+        Event* copy = event.Clone();
+        copy->id = def.GetEventID();
+        copy->isSealed = true;
+        copy->block = &block;
+        _ev_events.push(copy);
         _ev_eventsMtx.Unlock();
         _ev_policy.SignalEvent();
 

@@ -1,3 +1,4 @@
+#include <Nubuck\events\core_events.h>
 #include <nubuck_private.h>
 #include <Nubuck\animation\animation.h>
 #include <Nubuck\animation\animator.h>
@@ -77,10 +78,10 @@ void Animation::PlayUntilIsDone() {
 // stock event filters
 
 bool IsWidgetEvent(const EV::Event& event) {
-    if(EV::def_Key.GetEventID()                 == event.id) return false;
-    if(EV::def_Mouse.GetEventID()   			== event.id) return false;
-    if(EV::def_Resize.GetEventID()  			== event.id) return false;
-    if(EV::def_SelectionChanged.GetEventID()    == event.id) return false;
+    if(ev_key.GetEventID() == event.id) return false;
+    if(ev_mouse.GetEventID() == event.id) return false;
+    if(ev_resize.GetEventID() == event.id) return false;
+    if(ev_w_selectionChanged.GetEventID() == event.id) return false;
     // TODO ... event tags would be nice
 
     return true;

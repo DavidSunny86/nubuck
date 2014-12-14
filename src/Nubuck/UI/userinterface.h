@@ -26,7 +26,7 @@ private:
 
     SYS::Thread::threadID_t _uiThreadID;
 
-    void Event_EditModeChanged(const EV::Event& event);
+    void Event_EditModeChanged(const EV::Arg<int>& event);
 public slots:
     void OnQuit();
 public:

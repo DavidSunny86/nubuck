@@ -37,11 +37,11 @@ private:
 
     void SendEdgeShading();
 
-    void Event_VertexScaleChanged(const EV::Event& event);
-    void Event_EdgeScaleChanged(const EV::Event& event);
-    void Event_EdgeColorChanged(const EV::Event& event);
-    void Event_EdgeShadingChanged(const EV::Event& event);
-    void Event_RenderModeChanged(const EV::Event& event);
+    void Event_VertexScaleChanged(const EV::Arg<float>& event);
+    void Event_EdgeScaleChanged(const EV::Arg<float>& event);
+    void Event_EdgeColorChanged(const EV::Arg<R::Color>& event);
+    void Event_EdgeShadingChanged(const EdgeShadingEvent& event);
+    void Event_RenderModeChanged(const RenderModeEvent& event);
 private slots:
     void OnVertexScaleChanged(leda::rational value);
     void OnEdgeScaleChanged(leda::rational value);

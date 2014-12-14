@@ -13,6 +13,9 @@
 #include <Nubuck\operators\operator_invoker.h>
 #include "op_loadobj.h"
 
+static EV::ConcreteEventDef<EV::Arg<QString*> >     ev_load;
+static EV::ConcreteEventDef<EV::Event>              ev_loadScene;
+
 namespace OP {
 
 // LoadOBJPanel impl ---
@@ -26,13 +29,13 @@ void LoadOBJPanel::OnChooseFilename() {
 	if(!filename.isNull()) {
 		_ui.lneFilename->setText(filename);
 
-		EV::Params_OP_LoadOBJ_Load args = { new QString(filename) };
-		g_operators.InvokeAction(EV::def_OP_LoadOBJ_Load.Create(args));
+        EV::Arg<QString*> event(new QString(filename));
+		g_operators.InvokeAction(ev_load, event);
 	}
 }
 
 void LoadOBJPanel::OnLoadScene() {
-	g_operators.InvokeAction(EV::def_OP_LoadOBJ_LoadScene.Create(EV::Params_OP_LoadOBJ_LoadScene()));
+    OP::SendToOperator(ev_loadScene, EV::Event());
 }
 
 LoadOBJPanel::LoadOBJPanel(QWidget* parent) : OperatorPanel(parent) {
@@ -49,23 +52,21 @@ void LoadOBJPanel::Invoke() {
 
 static leda::nb::RatPolyMesh preload;
 
-void LoadOBJ::Event_Load(const EV::Event& event) {
-	const EV::Params_OP_LoadOBJ_Load& args = EV::def_OP_LoadOBJ_Load.GetArgs(event);
-
+void LoadOBJ::Event_Load(const EV::Arg<QString*>& event) {
 	nubuck().clear_selection();
 	if(_geom) _geom->Destroy();
 
     _geom = (W::ENT_Geometry*)nubuck().create_geometry();
 	_geom->SetRenderMode(Nubuck::RenderMode::NODES | Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES);
 	leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
-	mesh.FromObj(args.filename->toAscii());
+    mesh.FromObj(event.value->toAscii());
 
     nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, _geom);
 
     nubuck().log_printf("loaded object: |V| = %d, |E| = %d, |F| = %d\n",
         mesh.number_of_nodes(), mesh.number_of_edges(), mesh.number_of_faces());
 
-	delete args.filename;
+    delete event.value;
 }
 
 void LoadOBJ::Event_LoadScene(const EV::Event& event) {
@@ -89,8 +90,8 @@ void LoadOBJ::Event_LoadScene(const EV::Event& event) {
 }
 
 LoadOBJ::LoadOBJ() : _geom(NULL) {
-	AddEventHandler(EV::def_OP_LoadOBJ_Load, this, &LoadOBJ::Event_Load);
-	AddEventHandler(EV::def_OP_LoadOBJ_LoadScene, this, &LoadOBJ::Event_LoadScene);
+	AddEventHandler(ev_load, this, &LoadOBJ::Event_Load);
+	AddEventHandler(ev_loadScene, this, &LoadOBJ::Event_LoadScene);
 }
 
 void LoadOBJ::Register(Invoker& invoker) {

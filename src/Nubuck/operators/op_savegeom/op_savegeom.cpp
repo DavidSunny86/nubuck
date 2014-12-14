@@ -10,9 +10,11 @@
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include "op_savegeom.h"
 
+static EV::ConcreteEventDef<EV::Arg<std::string*> > ev_save;
+
 namespace OP {
 
-void SaveGeomPanel::Event_Save(const EV::Event& event) {
+void SaveGeomPanel::Event_Save(const EV::Arg<std::string*>& event) {
     QString filename = QFileDialog::getSaveFileName(
         this,
         "Save as...",
@@ -21,13 +23,13 @@ void SaveGeomPanel::Event_Save(const EV::Event& event) {
     if(!filename.isNull()) {
         _leFilename->setText(filename);
 
-        EV::Params_OP_SaveGeom_Save args = { new std::string(filename.toStdString()) };
-        SendToOperator(EV::def_OP_SaveGeom_Save.Create(args));
+        EV::Arg<std::string*> event(new std::string(filename.toStdString()));
+        SendToOperator(ev_save, event);
     }
 }
 
 SaveGeomPanel::SaveGeomPanel(QWidget* parent) : OperatorPanel(parent) {
-    AddEventHandler(EV::def_OP_SaveGeom_Save, this, &SaveGeomPanel::Event_Save);
+    AddEventHandler(ev_save, this, &SaveGeomPanel::Event_Save);
 
     QHBoxLayout* layout = new QHBoxLayout;
 
@@ -44,17 +46,16 @@ void SaveGeomPanel::Invoke() {
     _leFilename->setText("[...]");
 }
 
-void SaveGeom::Event_Save(const EV::Event& event) {
-    const EV::Params_OP_SaveGeom_Save& args = EV::def_OP_SaveGeom_Save.GetArgs(event);
-    const std::string& filename(*args.filename);
+void SaveGeom::Event_Save(const EV::Arg<std::string*>& event) {
+    const std::string& filename(*event.value);
 
     W::SaveGeometryToFile(filename, _geom);
 
-    delete args.filename;
+    delete event.value;
 }
 
 SaveGeom::SaveGeom() {
-    AddEventHandler(EV::def_OP_SaveGeom_Save, this, &SaveGeom::Event_Save);
+    AddEventHandler(ev_save, this, &SaveGeom::Event_Save);
 }
 
 void SaveGeom::Register(Invoker& invoker) {
@@ -73,8 +74,7 @@ bool SaveGeom::Invoke() {
 
     _geom = geomSel[0];
 
-    EV::Params_OP_SaveGeom_Save args = { NULL };
-    SendToPanel(EV::def_OP_SaveGeom_Save.Create(args));
+    SendToPanel(ev_save, EV::Arg<std::string*>(NULL));
 
     return true;
 }

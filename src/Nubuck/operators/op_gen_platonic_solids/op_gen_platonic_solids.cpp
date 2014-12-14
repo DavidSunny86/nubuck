@@ -13,13 +13,13 @@
 
 typedef leda::d3_rat_point point_t;
 
+static EV::ConcreteEventDef<EV::Arg<int> > ev_createPlatonicSolid;
+
 namespace OP {
 // namespace GEN {
 
 void PlatonicSolidsPanel::OnNameChanged(int idx) {
-    EV::Params_CreatePlatonicSolid args;
-    args.type = idx;
-    OP::SendToOperator(EV::def_CreatePlatonicSolid.Create(args));
+    OP::SendToOperator(ev_createPlatonicSolid, EV::Arg<int>(idx));
 }
 
 PlatonicSolidsPanel::PlatonicSolidsPanel(QWidget* parent) : OperatorPanel(parent) {
@@ -175,13 +175,12 @@ void PlatonicSolids::CreateMesh(int type) {
     mesh.compute_faces();
 }
 
-void PlatonicSolids::Event_CreatePlatonicSolid(const EV::Event& event) {
-    const EV::Params_CreatePlatonicSolid& args = EV::def_CreatePlatonicSolid.GetArgs(event);
-    CreateMesh(args.type);
+void PlatonicSolids::Event_CreatePlatonicSolid(const EV::Arg<int>& event) {
+    CreateMesh(event.value);
 }
 
 PlatonicSolids::PlatonicSolids() {
-    AddEventHandler(EV::def_CreatePlatonicSolid, this, &PlatonicSolids::Event_CreatePlatonicSolid);
+    AddEventHandler(ev_createPlatonicSolid, this, &PlatonicSolids::Event_CreatePlatonicSolid);
 }
 
 void PlatonicSolids::Register(Invoker& invoker) {

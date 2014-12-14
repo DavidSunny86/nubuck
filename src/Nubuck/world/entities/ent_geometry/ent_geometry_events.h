@@ -3,30 +3,24 @@
 #include <Nubuck\renderer\color\color.h>
 #include <Nubuck\events\events.h>
 
-BEGIN_EVENT_DEF(ENT_Geometry_VertexScaleChanged)
-    float vertexScale;
-END_EVENT_DEF
+struct RenderModeEvent : EV::Event {
+    EVENT_TYPE(RenderModeEvent)
 
-BEGIN_EVENT_DEF(ENT_Geometry_EdgeScaleChanged)
-    float edgeScale;
-END_EVENT_DEF
-
-BEGIN_EVENT_DEF(ENT_Geometry_EdgeColorChanged)
-    R::Color edgeColor;
-END_EVENT_DEF
-
-BEGIN_EVENT_DEF(ENT_Geometry_TransparencyChanged)
-    float transparency;
-END_EVENT_DEF
-
-BEGIN_EVENT_DEF(ENT_Geometry_RenderModeChanged)
     int     renderMode;
     bool    showWireframe;
     bool    showNormals;
-END_EVENT_DEF
+};
 
-BEGIN_EVENT_DEF(ENT_Geometry_EdgeShadingChanged)
+struct EdgeShadingEvent : EV::Event {
+    EVENT_TYPE(EdgeShadingEvent)
+
     int     shadingMode; // in Nubuck::ShadingMode
     bool    showHiddenLines;
-END_EVENT_DEF
+};
 
+extern EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_vertexScaleChanged;
+extern EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_edgeScaleChanged;
+extern EV::ConcreteEventDef<EV::Arg<R::Color> > ev_geom_edgeColorChanged;
+extern EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_transparencyChanged;
+extern EV::ConcreteEventDef<RenderModeEvent>    ev_geom_renderModeChanged;
+extern EV::ConcreteEventDef<EdgeShadingEvent>   ev_geom_edgeShadingChanged;

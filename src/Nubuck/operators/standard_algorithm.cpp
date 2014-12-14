@@ -10,6 +10,10 @@
 #include <Nubuck\operators\standard_algorithm.h>
 #include <operators\operators.h>
 
+EV::ConcreteEventDef<EV::Event> ev_step;
+EV::ConcreteEventDef<EV::Event> ev_next;
+EV::ConcreteEventDef<EV::Event> ev_run;
+
 namespace OP {
 namespace ALG {
 
@@ -26,15 +30,15 @@ struct IdlePhase : Phase {
 };
 
 void StandardAlgorithmPanel::OnStep() {
-	OP::g_operators.InvokeAction(EV::def_ALG_Step.Create(EV::Params_ALG_Step()));
+    OP::SendToOperator(ev_step, EV::Event());
 }
 
 void StandardAlgorithmPanel::OnNext() {
-    OP::g_operators.InvokeAction(EV::def_ALG_Next.Create(EV::Params_ALG_Next()));
+    OP::SendToOperator(ev_next, EV::Event());
 }
 
 void StandardAlgorithmPanel::OnRun() {
-    OP::g_operators.InvokeAction(EV::def_ALG_Run.Create(EV::Params_ALG_Run()));
+    OP::SendToOperator(ev_run, EV::Event());
 }
 
 StandardAlgorithmPanel::StandardAlgorithmPanel(QWidget* parent) : OperatorPanel(parent) {
@@ -99,9 +103,9 @@ void StandardAlgorithm::Event_Run(const EV::Event& event) {
 }
 
 StandardAlgorithm::StandardAlgorithm() {
-	AddEventHandler(EV::def_ALG_Step, this, &StandardAlgorithm::Event_Step);
-    AddEventHandler(EV::def_ALG_Next, this, &StandardAlgorithm::Event_Next);
-    AddEventHandler(EV::def_ALG_Run, this, &StandardAlgorithm::Event_Run);
+	AddEventHandler(ev_step, this, &StandardAlgorithm::Event_Step);
+    AddEventHandler(ev_next, this, &StandardAlgorithm::Event_Next);
+    AddEventHandler(ev_run, this, &StandardAlgorithm::Event_Run);
 }
 
 void StandardAlgorithm::Register(Invoker& invoker) {

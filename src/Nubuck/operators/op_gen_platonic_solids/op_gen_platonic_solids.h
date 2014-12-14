@@ -2,10 +2,6 @@
 
 #include <Nubuck\operators\operator.h>
 
-BEGIN_EVENT_DEF(CreatePlatonicSolid)
-    int type;
-END_EVENT_DEF
-
 class QComboBox;
 
 namespace OP {
@@ -29,7 +25,7 @@ private:
 
     void CreateMesh(int type);
 
-    void Event_CreatePlatonicSolid(const EV::Event& event);
+    void Event_CreatePlatonicSolid(const EV::Arg<int>& event);
 public:
     PlatonicSolids();
 

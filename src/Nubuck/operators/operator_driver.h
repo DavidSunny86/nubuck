@@ -2,6 +2,7 @@
 
 #include <system\thread\thread.h>
 #include <Nubuck\events\events.h>
+#include <Nubuck\events\core_events.h>
 #include <renderer\renderer.h>
 
 namespace OP {
@@ -19,12 +20,12 @@ private:
 
     void SetOperator(Operator* op);
 
-    void Event_SetOperator(const EV::Event& event);
+    void Event_SetOperator(const EV::Arg<Operator*>& event);
 
     void Event_SelectionChanged(const EV::Event& event);
-    void Event_EditModeChanged(const EV::Event& event);
-    void Event_Mouse(const EV::Event& event);
-    void Event_Key(const EV::Event& event);
+    void Event_EditModeChanged(const EV::Arg<int>& event);
+    void Event_Mouse(const EV::MouseEvent& event);
+    void Event_Key(const EV::KeyEvent& event);
     void Event_RebuildAll(const EV::Event& event);
 protected:
     void Event_Default(const EV::Event& event, const char* className) override;

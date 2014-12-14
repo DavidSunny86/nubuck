@@ -10,17 +10,12 @@
 #include <Nubuck\operators\operator.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 
-BEGIN_EVENT_DEF(OP_Loop_Start)
-END_EVENT_DEF
-
 namespace OP {
 
 struct LoopPanel : OperatorPanel {
     Q_OBJECT
 public slots:
-    void OnButtonClicked() {
-        g_operators.InvokeAction(EV::def_OP_Loop_Start.Create(EV::Params_OP_Loop_Start()));
-    }
+    void OnButtonClicked();
 public:
     LoopPanel(QWidget* parent = NULL) : OperatorPanel(parent) {
         QPushButton* button = new QPushButton("Start Loop");

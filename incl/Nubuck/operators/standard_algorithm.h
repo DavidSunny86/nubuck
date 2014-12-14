@@ -7,10 +7,6 @@
 #include <Nubuck\events\events.h>
 #include <Nubuck\operators\standard_algorithm_fwd.h>
 
-BEGIN_EVENT_DEF(ALG_Step) END_EVENT_DEF
-BEGIN_EVENT_DEF(ALG_Next) END_EVENT_DEF
-BEGIN_EVENT_DEF(ALG_Run) END_EVENT_DEF
-
 namespace OP {
 namespace ALG {
 

@@ -6,13 +6,6 @@
 #include <operators\operators.h>
 #include "ui_op_loadobj.h"
 
-BEGIN_EVENT_DEF(OP_LoadOBJ_Load)
-    QString* filename;
-END_EVENT_DEF
-
-BEGIN_EVENT_DEF(OP_LoadOBJ_LoadScene)
-END_EVENT_DEF
-
 namespace W {
 
 class ENT_Geometry;
@@ -38,7 +31,7 @@ class LoadOBJ : public Operator {
 private:
 	W::ENT_Geometry*    _geom;
 
-    void Event_Load(const EV::Event& event);
+    void Event_Load(const EV::Arg<QString*>& event);
     void Event_LoadScene(const EV::Event& event);
 public:
 	LoadOBJ();

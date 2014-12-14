@@ -8,9 +8,9 @@
 
 UserInterface g_ui;
 
-void UserInterface::Event_EditModeChanged(const EV::Event& event) {
-    const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
-    _mainWindow->ToolBar_UpdateEditMode(W::editMode_t::Enum(args.editMode));
+void UserInterface::Event_EditModeChanged(const EV::Arg<int>& event) {
+    int editMode = event.value;
+    _mainWindow->ToolBar_UpdateEditMode(W::editMode_t::Enum(editMode));
 }
 
 void UserInterface::OnQuit() {
@@ -22,7 +22,7 @@ void UserInterface::OnQuit() {
 }
 
 void UserInterface::Init() {
-    AddEventHandler(EV::def_EditModeChanged, this, &UserInterface::Event_EditModeChanged);
+    AddEventHandler(ev_w_editModeChanged, this, &UserInterface::Event_EditModeChanged);
 
     // order matters
     _outliner = GEN::MakePtr(new UI::Outliner());

@@ -12,12 +12,14 @@
 
 #include <LEDA\geo\d3_hull.h>
 
-BEGIN_EVENT_DEF(OP_RandomPoints_Update)
+struct RandomPointsUpdate : EV::Event {
+    EVENT_TYPE(RandomPointsUpdate)
+
     int     domain;
     int     size;
     int     radius;
     bool    save;
-END_EVENT_DEF
+};
 
 class NBW_SpinBox;
 
@@ -73,7 +75,7 @@ private:
     void UpdateHull(Domain::Enum domain, int radius);
     void UpdateCloud(Domain::Enum domain, int size, int radius);
 
-    void Event_Update(const EV::Event& event);
+    void Event_Update(const RandomPointsUpdate& event);
 public:
     enum {
         DEFAULT_DOMAIN  = Domain::IN_BALL,

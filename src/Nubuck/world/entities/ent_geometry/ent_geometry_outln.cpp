@@ -15,43 +15,36 @@
 namespace W {
 
 void ENT_GeometryOutln::OnVertexScaleChanged(leda::rational value) {
-    EV::Params_ENT_Geometry_VertexScaleChanged args;
-    args.vertexScale = value.to_float();
-    _subject.Send(EV::def_ENT_Geometry_VertexScaleChanged.Create(args));
+    _subject.Send(ev_geom_vertexScaleChanged, EV::Arg<float>(value.to_float()));
 }
 
 void ENT_GeometryOutln::OnEdgeScaleChanged(leda::rational value) {
-	EV::Params_ENT_Geometry_EdgeScaleChanged args;
-    args.edgeScale = value.to_float();
-	_subject.Send(EV::def_ENT_Geometry_EdgeScaleChanged.Create(args));
+    _subject.Send(ev_geom_edgeScaleChanged, EV::Arg<float>(value.to_float()));
 }
 
 void ENT_GeometryOutln::OnEdgeColorChanged(float r, float g, float b) {
-	EV::Params_ENT_Geometry_EdgeColorChanged args;
-	args.edgeColor = R::Color(r, g, b);
-	_subject.Send(EV::def_ENT_Geometry_EdgeColorChanged.Create(args));
+	R::Color edgeColor = R::Color(r, g, b);
+    _subject.Send(ev_geom_edgeColorChanged, EV::Arg<R::Color>(edgeColor));
 }
 
 void ENT_GeometryOutln::OnTransparencyChanged(leda::rational value) {
-    EV::Params_ENT_Geometry_TransparencyChanged args;
-    args.transparency = value.to_float();
-    _subject.Send(EV::def_ENT_Geometry_TransparencyChanged.Create(args));
+    _subject.Send(ev_geom_transparencyChanged, EV::Arg<float>(value.to_float()));
 }
 
 void ENT_GeometryOutln::OnRenderModeChanged(bool) {
-    EV::Params_ENT_Geometry_RenderModeChanged args;
+    RenderModeEvent event;
     int renderMode = 0;
     if(_btnRenderVertices->isChecked()) renderMode |= Nubuck::RenderMode::NODES;
     if(_btnRenderEdges->isChecked()) renderMode |= Nubuck::RenderMode::EDGES;
     if(_btnRenderFaces->isChecked()) renderMode |= Nubuck::RenderMode::FACES;
-    args.renderMode = renderMode;
-    args.showWireframe = _cbWireframe->isChecked();
-    args.showNormals = _cbNormals->isChecked();
+    event.renderMode = renderMode;
+    event.showWireframe = _cbWireframe->isChecked();
+    event.showNormals = _cbNormals->isChecked();
 
     _cbWireframe->setEnabled(_btnRenderFaces->isChecked());
     _cbNormals->setEnabled(_btnRenderFaces->isChecked());
 
-    _subject.Send(EV::def_ENT_Geometry_RenderModeChanged.Create(args));
+    _subject.Send(ev_geom_renderModeChanged, event);
 }
 
 void ENT_GeometryOutln::OnEdgeShadingChanged(int) {
@@ -65,11 +58,11 @@ void ENT_GeometryOutln::OnHiddenLinesChanged(int) {
 ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) {
     InitOutline();
 
-    AddEventHandler(EV::def_ENT_Geometry_VertexScaleChanged, this, &ENT_GeometryOutln::Event_VertexScaleChanged);
-	AddEventHandler(EV::def_ENT_Geometry_EdgeScaleChanged, this, &ENT_GeometryOutln::Event_EdgeScaleChanged);
-	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_GeometryOutln::Event_EdgeColorChanged);
-	AddEventHandler(EV::def_ENT_Geometry_EdgeShadingChanged, this, &ENT_GeometryOutln::Event_EdgeShadingChanged);
-    AddEventHandler(EV::def_ENT_Geometry_RenderModeChanged, this, &ENT_GeometryOutln::Event_RenderModeChanged);
+    AddEventHandler(ev_geom_vertexScaleChanged, this, &ENT_GeometryOutln::Event_VertexScaleChanged);
+	AddEventHandler(ev_geom_edgeScaleChanged, this, &ENT_GeometryOutln::Event_EdgeScaleChanged);
+	AddEventHandler(ev_geom_edgeColorChanged, this, &ENT_GeometryOutln::Event_EdgeColorChanged);
+	AddEventHandler(ev_geom_edgeShadingChanged, this, &ENT_GeometryOutln::Event_EdgeShadingChanged);
+    AddEventHandler(ev_geom_renderModeChanged, this, &ENT_GeometryOutln::Event_RenderModeChanged);
 }
 
 void ENT_GeometryOutln::InitOutline() {
@@ -171,48 +164,44 @@ void ENT_GeometryOutln::InitOutline() {
 }
 
 void ENT_GeometryOutln::SendEdgeShading() {
-    EV::Params_ENT_Geometry_EdgeShadingChanged args;
+    EdgeShadingEvent event;
     int idx = _cbEdgeShading->currentIndex();
     assert(0 <= idx && idx < Nubuck::ShadingMode::NUM_MODES);
-    args.shadingMode = Nubuck::ShadingMode::Enum(idx);
-    args.showHiddenLines = _cbHiddenLines->isChecked();
-    _subject.Send(EV::def_ENT_Geometry_EdgeShadingChanged.Create(args));
+    event.shadingMode = Nubuck::ShadingMode::Enum(idx);
+    event.showHiddenLines = _cbHiddenLines->isChecked();
+    _subject.Send(ev_geom_edgeShadingChanged, event);
 }
 
-void ENT_GeometryOutln::Event_VertexScaleChanged(const EV::Event& event) {
-    const EV::Params_ENT_Geometry_VertexScaleChanged& args = EV::def_ENT_Geometry_VertexScaleChanged.GetArgs(event);
+void ENT_GeometryOutln::Event_VertexScaleChanged(const EV::Arg<float>& event) {
     _sbVertexScale->blockSignals(true);
-    _sbVertexScale->setValue(args.vertexScale);
+    _sbVertexScale->setValue(event.value);
     _sbVertexScale->blockSignals(false);
 }
 
-void ENT_GeometryOutln::Event_EdgeScaleChanged(const EV::Event& event) {
-	const EV::Params_ENT_Geometry_EdgeScaleChanged& args = EV::def_ENT_Geometry_EdgeScaleChanged.GetArgs(event);
+void ENT_GeometryOutln::Event_EdgeScaleChanged(const EV::Arg<float>& event) {
 	_sbEdgeScale->blockSignals(true);
-	_sbEdgeScale->setValue(args.edgeScale);
+	_sbEdgeScale->setValue(event.value);
 	_sbEdgeScale->blockSignals(false);
 }
 
-void ENT_GeometryOutln::Event_EdgeColorChanged(const EV::Event& event) {
-	const EV::Params_ENT_Geometry_EdgeColorChanged& args = EV::def_ENT_Geometry_EdgeColorChanged.GetArgs(event);
+void ENT_GeometryOutln::Event_EdgeColorChanged(const EV::Arg<R::Color>& event) {
+    const R::Color& edgeColor = event.value;
 	_btnEdgeColor->blockSignals(true);
-	_btnEdgeColor->SetColor(args.edgeColor.r, args.edgeColor.g, args.edgeColor.b);
+	_btnEdgeColor->SetColor(edgeColor.r, edgeColor.g, edgeColor.b);
 	_btnEdgeColor->blockSignals(false);
 }
 
-void ENT_GeometryOutln::Event_EdgeShadingChanged(const EV::Event& event) {
-    const EV::Params_ENT_Geometry_EdgeShadingChanged& args = EV::def_ENT_Geometry_EdgeShadingChanged.GetArgs(event);
+void ENT_GeometryOutln::Event_EdgeShadingChanged(const EdgeShadingEvent& event) {
     UI::BlockSignals blockSignals(_btnRenderVertices, _btnRenderEdges, _btnRenderFaces);
-    _cbEdgeShading->setCurrentIndex(args.shadingMode);
-    _cbHiddenLines->setChecked(args.showHiddenLines);
+    _cbEdgeShading->setCurrentIndex(event.shadingMode);
+    _cbHiddenLines->setChecked(event.showHiddenLines);
 }
 
-void ENT_GeometryOutln::Event_RenderModeChanged(const EV::Event& event) {
-    const EV::Params_ENT_Geometry_RenderModeChanged& args = EV::def_ENT_Geometry_RenderModeChanged.GetArgs(event);
+void ENT_GeometryOutln::Event_RenderModeChanged(const RenderModeEvent& event) {
     UI::BlockSignals blockSignals(_btnRenderVertices, _btnRenderEdges, _btnRenderFaces);
-    _btnRenderVertices->setChecked(Nubuck::RenderMode::NODES & args.renderMode);
-    _btnRenderEdges->setChecked(Nubuck::RenderMode::EDGES & args.renderMode);
-    _btnRenderFaces->setChecked(Nubuck::RenderMode::FACES & args.renderMode);
+    _btnRenderVertices->setChecked(Nubuck::RenderMode::NODES & event.renderMode);
+    _btnRenderEdges->setChecked(Nubuck::RenderMode::EDGES & event.renderMode);
+    _btnRenderFaces->setChecked(Nubuck::RenderMode::FACES & event.renderMode);
 }
 
 void ENT_GeometryOutln::ExecEvents(const std::vector<EV::Event>& events) {

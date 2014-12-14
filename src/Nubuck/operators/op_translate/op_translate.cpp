@@ -14,7 +14,7 @@
 namespace OP {
 
 Translate::Translate() : _gizmo(0) {
-	AddEventHandler(EV::def_SelectionChanged, this, &Translate::Event_SelectionChanged);
+	AddEventHandler(ev_w_selectionChanged, this, &Translate::Event_SelectionChanged);
 
     _gizmo = nubuck().global_transform_gizmo();
 }

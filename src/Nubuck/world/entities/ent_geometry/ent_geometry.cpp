@@ -26,7 +26,7 @@ static R::Color selectedVertexColor     = R::Color::Yellow;
 static R::Color unselectedVertexColor   = R::Color::Black;
 
 void ENT_Geometry::ForceRebuild() {
-    OP::g_operators.InvokeAction(EV::def_RebuildAll.Create(EV::Params_RebuildAll()), OP::Operators::InvokationMode::ALWAYS);
+    OP::g_operators.InvokeAction(ev_w_rebuildAll, EV::Event(), OP::Operators::InvokationMode::ALWAYS);
     _forceRebuild = true;
 }
 
@@ -182,44 +182,38 @@ void ENT_Geometry::ComputeBoundingBox() {
     SetBoundingBox(bbox);
 }
 
-void ENT_Geometry::Event_VertexScaleChanged(const EV::Event& event) {
+void ENT_Geometry::Event_VertexScaleChanged(const EV::Arg<float>& event) {
     SYS::ScopedLock lock(_mtx);
-    const EV::Params_ENT_Geometry_VertexScaleChanged& args = EV::def_ENT_Geometry_VertexScaleChanged.GetArgs(event);
-    _vertexScale = args.vertexScale;
+    _vertexScale = event.value;
     ForceRebuild();
 }
 
-void ENT_Geometry::Event_EdgeScaleChanged(const EV::Event& event) {
+void ENT_Geometry::Event_EdgeScaleChanged(const EV::Arg<float>& event) {
 	SYS::ScopedLock lock(_mtx);
-	const EV::Params_ENT_Geometry_EdgeScaleChanged& args = EV::def_ENT_Geometry_EdgeScaleChanged.GetArgs(event);
-	_edgeScale = args.edgeScale;
+    _edgeScale = event.value;
     ForceRebuild();
 }
 
-void ENT_Geometry::Event_EdgeColorChanged(const EV::Event& event) {
+void ENT_Geometry::Event_EdgeColorChanged(const EV::Arg<R::Color>& event) {
 	SYS::ScopedLock lock(_mtx);
-	const EV::Params_ENT_Geometry_EdgeColorChanged& args = EV::def_ENT_Geometry_EdgeColorChanged.GetArgs(event);
-	_edgeColor = args.edgeColor;
+    _edgeColor = event.value;
     ForceRebuild();
 }
 
-void ENT_Geometry::Event_TransparencyChanged(const EV::Event& event) {
-    const EV::Params_ENT_Geometry_TransparencyChanged& args = EV::def_ENT_Geometry_TransparencyChanged.GetArgs(event);
-    SetTransparency(args.transparency);
+void ENT_Geometry::Event_TransparencyChanged(const EV::Arg<float>& event) {
+    SetTransparency(event.value);
 }
 
-void ENT_Geometry::Event_RenderModeChanged(const EV::Event& event) {
-    const EV::Params_ENT_Geometry_RenderModeChanged& args = EV::def_ENT_Geometry_RenderModeChanged.GetArgs(event);
+void ENT_Geometry::Event_RenderModeChanged(const RenderModeEvent& event) {
     std::cout << "RECEIVED!" << std::endl;
-    if(_renderMode != args.renderMode) SetRenderMode(args.renderMode);
-    _showWireframe = args.showWireframe;
-    _showNormals = args.showNormals;
+    if(_renderMode != event.renderMode) SetRenderMode(event.renderMode);
+    _showWireframe = event.showWireframe;
+    _showNormals = event.showNormals;
 }
 
-void ENT_Geometry::Event_EdgeShadingChanged(const EV::Event& event) {
-    const EV::Params_ENT_Geometry_EdgeShadingChanged& args = EV::def_ENT_Geometry_EdgeShadingChanged.GetArgs(event);
-    _stylizedHiddenLines = args.showHiddenLines;
-    SetShadingMode(Nubuck::ShadingMode::Enum(args.shadingMode));
+void ENT_Geometry::Event_EdgeShadingChanged(const EdgeShadingEvent& event) {
+    _stylizedHiddenLines = event.showHiddenLines;
+    SetShadingMode(Nubuck::ShadingMode::Enum(event.shadingMode));
 }
 
 ENT_Geometry::ENT_Geometry()
@@ -255,12 +249,12 @@ ENT_Geometry::ENT_Geometry()
 
     SetName("Mesh");
 
-    AddEventHandler(EV::def_ENT_Geometry_VertexScaleChanged, this, &ENT_Geometry::Event_VertexScaleChanged);
-	AddEventHandler(EV::def_ENT_Geometry_EdgeScaleChanged, this, &ENT_Geometry::Event_EdgeScaleChanged);
-	AddEventHandler(EV::def_ENT_Geometry_EdgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
-    AddEventHandler(EV::def_ENT_Geometry_TransparencyChanged, this, &ENT_Geometry::Event_TransparencyChanged);
-    AddEventHandler(EV::def_ENT_Geometry_RenderModeChanged, this, &ENT_Geometry::Event_RenderModeChanged);
-    AddEventHandler(EV::def_ENT_Geometry_EdgeShadingChanged, this, &ENT_Geometry::Event_EdgeShadingChanged);
+    AddEventHandler(ev_geom_vertexScaleChanged, this, &ENT_Geometry::Event_VertexScaleChanged);
+	AddEventHandler(ev_geom_edgeScaleChanged, this, &ENT_Geometry::Event_EdgeScaleChanged);
+	AddEventHandler(ev_geom_edgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
+    AddEventHandler(ev_geom_transparencyChanged, this, &ENT_Geometry::Event_TransparencyChanged);
+    AddEventHandler(ev_geom_renderModeChanged, this, &ENT_Geometry::Event_RenderModeChanged);
+    AddEventHandler(ev_geom_edgeShadingChanged, this, &ENT_Geometry::Event_EdgeShadingChanged);
 }
 
 bool ENT_Geometry::TraceVertices(const M::Ray& ray, float radius, std::vector<VertexHit>& hits) {
@@ -432,9 +426,8 @@ void ENT_Geometry::SetVertexScale(float vertexScale) {
     _vertexScale = vertexScale;
     _nodeRenderer->Rebuild(_ratPolyMesh, _fpos, _vertexScale);
 
-    EV::Params_ENT_Geometry_VertexScaleChanged args = { _vertexScale };
-    EV::Event event = EV::def_ENT_Geometry_VertexScaleChanged.Create(args);
-    g_ui.GetOutliner().SendToView(_outlinerItem, event);
+    g_ui.GetOutliner().SendToView(_outlinerItem,
+        ev_geom_vertexScaleChanged, EV::Arg<float>(_vertexScale));
 }
 
 void ENT_Geometry::SetEdgeScale(float edgeScale) {
@@ -442,9 +435,8 @@ void ENT_Geometry::SetEdgeScale(float edgeScale) {
     _edgeScale = edgeScale;
     RebuildRenderEdges();
 
-    EV::Params_ENT_Geometry_EdgeScaleChanged args = { _edgeScale };
-    EV::Event event = EV::def_ENT_Geometry_EdgeScaleChanged.Create(args);
-    g_ui.GetOutliner().SendToView(_outlinerItem, event);
+    g_ui.GetOutliner().SendToView(_outlinerItem,
+        ev_geom_edgeScaleChanged, EV::Arg<float>(_edgeScale));
 }
 
 void ENT_Geometry::SetEdgeColor(const R::Color& color) {
@@ -452,9 +444,8 @@ void ENT_Geometry::SetEdgeColor(const R::Color& color) {
     _edgeColor = color;
     RebuildRenderEdges();
 
-    EV::Params_ENT_Geometry_EdgeColorChanged args = { _edgeColor };
-    EV::Event event = EV::def_ENT_Geometry_EdgeColorChanged.Create(args);
-    g_ui.GetOutliner().SendToView(_outlinerItem, event);
+    g_ui.GetOutliner().SendToView(_outlinerItem,
+        ev_geom_edgeColorChanged, EV::Arg<R::Color>(_edgeColor));
 }
 
 M::Vector3 ENT_Geometry::GetPosition() const {
@@ -531,9 +522,10 @@ void ENT_Geometry::SetRenderMode(int flags) {
 	SYS::ScopedLock lock(_mtx);
 	_renderMode = flags;
 
-    EV::Params_ENT_Geometry_RenderModeChanged args = { _renderMode };
-    EV::Event event = EV::def_ENT_Geometry_RenderModeChanged.Create(args);
-    g_ui.GetOutliner().SendToView(_outlinerItem, event);
+    // TODO: wireframe, normals
+    RenderModeEvent event;
+    event.renderMode = _renderMode;
+    g_ui.GetOutliner().SendToView(_outlinerItem, ev_geom_renderModeChanged, event);
 }
 
 void ENT_Geometry::SetRenderLayer(unsigned layer) {
@@ -567,11 +559,10 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
         _shadingMode = mode;
         ForceRebuild();
 
-        EV::Params_ENT_Geometry_EdgeShadingChanged args;
-        args.shadingMode = _shadingMode;
-        args.showHiddenLines = _stylizedHiddenLines;
-        EV::Event event = EV::def_ENT_Geometry_EdgeShadingChanged.Create(args);
-        g_ui.GetOutliner().SendToView(_outlinerItem, event);
+        EdgeShadingEvent event;
+        event.shadingMode = _shadingMode;
+        event.showHiddenLines = _stylizedHiddenLines;
+        g_ui.GetOutliner().SendToView(_outlinerItem, ev_geom_edgeShadingChanged, event);
     }
     _mtx.Unlock();
 }

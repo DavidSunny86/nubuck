@@ -2,6 +2,7 @@
 #include <QKeyEvent>
 
 #include <Nubuck\common\common.h>
+#include <Nubuck\events\core_events.h>
 #include <system\opengl\opengl.h>
 #include <UI\window_events.h>
 #include <UI\outliner\outliner.h>
@@ -72,10 +73,10 @@ namespace UI {
     }
 
     void RenderView::resizeGL(int width, int height) {
-        EV::Params_Resize args;
-        args.width = width;
-        args.height = height;
-        W::world.Send(EV::def_Resize.Create(args));
+        EV::ResizeEvent event;
+        event.width = width;
+        event.height = height;
+        W::world.Send(ev_resize, event);
 
         _renderer.Resize(width, height);
         _debugText.Resize(width, height);
@@ -97,19 +98,18 @@ namespace UI {
     }
 
     void RenderView::mousePressEvent(QMouseEvent* qevent) {
-        EV::Params_Mouse args;
-        args.type = EV::Params_Mouse::MOUSE_DOWN;
-        args.button = qevent->button();
-        args.mods = qevent->modifiers();
-        args.x = qevent->x();
-        args.y = qevent->y();
-		args.ret = NULL;
+        EV::MouseEvent event;
+        event.type = EV::MouseEvent::MOUSE_DOWN;
+        event.button = qevent->button();
+        event.mods = qevent->modifiers();
+        event.x = qevent->x();
+        event.y = qevent->y();
+		event.ret = NULL;
 
-        if(EV::Params_Mouse::BUTTON_RIGHT == args.button) {
-            EV::Event event = EV::def_Mouse.Create(args);
-            OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
+        if(EV::MouseEvent::BUTTON_RIGHT == event.button) {
+            OP::g_operators.InvokeAction(ev_mouse, event, OP::Operators::InvokationMode::ALWAYS);
         } else {
-            if(CAMERA == _inputMode) W::world.HandleMouseEvent(args);
+            if(CAMERA == _inputMode) W::world.HandleMouseEvent(event);
             else {
                 assert(PEN == _inputMode);
                 _isPenDown = true;
@@ -119,19 +119,18 @@ namespace UI {
     }
 
     void RenderView::mouseReleaseEvent(QMouseEvent* qevent) {
-        EV::Params_Mouse args;
-        args.type = EV::Params_Mouse::MOUSE_UP;
-        args.button = qevent->button();
-        args.mods = qevent->modifiers();
-        args.x = qevent->x();
-        args.y = qevent->y();
-		args.ret = NULL;
+        EV::MouseEvent event;
+        event.type = EV::MouseEvent::MOUSE_UP;
+        event.button = qevent->button();
+        event.mods = qevent->modifiers();
+        event.x = qevent->x();
+        event.y = qevent->y();
+		event.ret = NULL;
 
-        if(EV::Params_Mouse::BUTTON_RIGHT == args.button) {
-            EV::Event event = EV::def_Mouse.Create(args);
-            OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::ALWAYS);
+        if(EV::MouseEvent::BUTTON_RIGHT == event.button) {
+            OP::g_operators.InvokeAction(ev_mouse, event, OP::Operators::InvokationMode::ALWAYS);
         } else {
-            if(CAMERA == _inputMode) W::world.HandleMouseEvent(args);
+            if(CAMERA == _inputMode) W::world.HandleMouseEvent(event);
             else {
                 assert(PEN == _inputMode);
                 _isPenDown = false;
@@ -141,17 +140,16 @@ namespace UI {
     }
 
     void RenderView::mouseMoveEvent(QMouseEvent* qevent) {
-        EV::Params_Mouse args;
-        args.type = EV::Params_Mouse::MOUSE_MOVE;
-        args.button = qevent->button();
-        args.mods = qevent->modifiers();
-        args.x = qevent->x();
-        args.y = qevent->y();
-		args.ret = NULL;
+        EV::MouseEvent event;
+        event.type = EV::MouseEvent::MOUSE_MOVE;
+        event.button = qevent->button();
+        event.mods = qevent->modifiers();
+        event.x = qevent->x();
+        event.y = qevent->y();
+		event.ret = NULL;
 
-        EV::Event event = EV::def_Mouse.Create(args);
-        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::DROP_WHEN_BUSY);
-        if(CAMERA == _inputMode) W::world.HandleMouseEvent(args);
+        OP::g_operators.InvokeAction(ev_mouse, event, OP::Operators::InvokationMode::DROP_WHEN_BUSY);
+        if(CAMERA == _inputMode) W::world.HandleMouseEvent(event);
         else if(_isPenDown) {
             assert(PEN == _inputMode);
             EmitPenVertex(qevent->posF());
@@ -159,14 +157,14 @@ namespace UI {
     }
 
     void RenderView::wheelEvent(QWheelEvent* qevent) {
-        EV::Params_Mouse args;
-        args.type = EV::Params_Mouse::MOUSE_WHEEL;
-        args.mods = qevent->modifiers();
-        args.delta = qevent->delta();
-        args.x = qevent->x();
-        args.y = qevent->y();
+        EV::MouseEvent event;
+        event.type = EV::MouseEvent::MOUSE_WHEEL;
+        event.mods = qevent->modifiers();
+        event.delta = qevent->delta();
+        event.x = qevent->x();
+        event.y = qevent->y();
 
-        W::world.HandleMouseEvent(args);
+        W::world.HandleMouseEvent(event);
     }
 
     void RenderView::keyPressEvent(QKeyEvent* qevent) {
@@ -204,23 +202,22 @@ namespace UI {
             return;
         }
 
-        EV::Params_Key args;
-        args.type = EV::Params_Key::KEY_DOWN;
-        args.keyCode = qevent->key();
-        args.nativeScanCode = qevent->nativeScanCode();
-        args.autoRepeat = qevent->isAutoRepeat();
-        args.mods = qevent->modifiers();
+        EV::KeyEvent event;
+        event.type = EV::KeyEvent::KEY_DOWN;
+        event.keyCode = qevent->key();
+        event.nativeScanCode = qevent->nativeScanCode();
+        event.autoRepeat = qevent->isAutoRepeat();
+        event.mods = qevent->modifiers();
 
 
-        EV::Event event = EV::def_Key.Create(args);
-        OP::g_operators.InvokeAction(event, OP::Operators::InvokationMode::DROP_WHEN_BUSY);
+        OP::g_operators.InvokeAction(ev_key, event, OP::Operators::InvokationMode::DROP_WHEN_BUSY);
     }
 
     void RenderView::keyReleaseEvent(QKeyEvent* qevent) {
-        EV::Params_Key args;
-        args.type = EV::Params_Key::KEY_UP;
-        args.keyCode = qevent->key();
-        if(!qevent->isAutoRepeat()) W::world.Send(EV::def_Key.Create(args));
+        EV::KeyEvent event;
+        event.type = EV::KeyEvent::KEY_UP;
+        event.keyCode = qevent->key();
+        if(!qevent->isAutoRepeat()) W::world.Send(ev_key, event);
     }
 
     void RenderView::OnSetBackgroundColor(float r, float g, float b) {

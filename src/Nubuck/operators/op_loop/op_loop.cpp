@@ -11,7 +11,13 @@
 
 #include "op_loop.h"
 
+static EV::ConcreteEventDef<EV::Event> ev_loopStart;
+
 namespace OP {
+
+void LoopPanel::OnButtonClicked() {
+    OP::SendToOperator(ev_loopStart, EV::Event());
+}
 
 void Loop::Event_OP_Loop_Start(const EV::Event& event) {
     if(_geom) {
@@ -30,7 +36,7 @@ void Loop::Event_OP_Loop_Start(const EV::Event& event) {
 }
 
 Loop::Loop() : _geom(NULL) {
-    AddEventHandler(EV::def_OP_Loop_Start, this, &Loop::Event_OP_Loop_Start);
+    AddEventHandler(ev_loopStart, this, &Loop::Event_OP_Loop_Start);
 }
 
 void Loop::Register(Invoker& invoker) {

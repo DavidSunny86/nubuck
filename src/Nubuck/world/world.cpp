@@ -122,10 +122,9 @@ void World::Selection::ComputeCenter() {
 }
 
 void World::Selection::SignalChange() {
-    EV::Event ev= EV::def_SelectionChanged.Create(EV::Params_SelectionChanged());
-    world.Send(ev);
-	OP::g_operators.Send(ev);
-    g_ui.GetOutliner().Send(ev);
+    world.Send(ev_w_selectionChanged, EV::Event());
+	OP::g_operators.Send(ev_w_selectionChanged, EV::Event());
+    g_ui.GetOutliner().Send(ev_w_selectionChanged, EV::Event());
 }
 
 void World::Selection::Set(Entity* ent) {
@@ -274,9 +273,8 @@ static float mouseX, mouseY;
 static float screenWidth, screenHeight;
 static float aspect;
 
-void World::Event_Mouse(const EV::Event& event) {
-    const EV::Params_Mouse& args = EV::def_Mouse.GetArgs(event);
-    HandleMouseEvent(args);
+void World::Event_Mouse(const EV::MouseEvent& event) {
+    HandleMouseEvent(event);
 }
 
 GEN::Pointer<Entity> World::FindByEntityID(unsigned entId) {
@@ -290,19 +288,18 @@ void World::Event_Apocalypse(const EV::Event& event) {
     _entities.clear();
 }
 
-void World::Event_LinkEntity(const EV::Event& event) {
-    const EV::Params_LinkEntity& args = EV::def_LinkEntity.GetArgs(event);
-    GEN::Pointer<Entity> entity(args.entity);
+void World::Event_LinkEntity(const EV::Arg<Entity*>& event) {
+    GEN::Pointer<Entity> entity(event.value);
 	if(W::EntityType::ENT_GEOMETRY == entity->GetType()) {
         ENT_Geometry& geom = (ENT_Geometry&)*entity;
 	}
     _entities.push_back(entity);
 }
 
-void World::Event_DestroyEntity(const EV::Event& event) {
-    const EV::Params_DestroyEntity& args = EV::def_DestroyEntity.GetArgs(event);
+void World::Event_DestroyEntity(const EV::Arg<unsigned>& event) {
+    unsigned entId = event.value;
     for(unsigned i = 0; i < _entities.size(); ++i) {
-        if(_entities[i]->GetID() == args.entId) {
+        if(_entities[i]->GetID() == entId) {
 			_entities[i]->OnDestroy();
             std::swap(_entities[i], _entities.back());
             _entities.erase(_entities.end() - 1);
@@ -320,27 +317,23 @@ void World::Event_RebuildAll(const EV::Event& event) {
     event.Accept();
 }
 
-void World::Event_EditModeChanged(const EV::Event& event) {
-    const EV::Params_EditModeChanged& args = EV::def_EditModeChanged.GetArgs(event);
-
+void World::Event_EditModeChanged(const EV::Arg<int>& event) {
+    int editMode = event.value;
     std::vector<ENT_Geometry*> geomSel = _selection.GetGeometryList();
     if(!geomSel.empty()) {
         ENT_Geometry* ent = (ENT_Geometry*)geomSel.front();
-        ent->SetEditMode(editMode_t::Enum(args.editMode));
+        ent->SetEditMode(editMode_t::Enum(editMode));
     }
 }
 
-void World::Event_Resize(const EV::Event& event) {
-    const EV::Params_Resize& args = EV::def_Resize.GetArgs(event);
-    _camArcball.SetScreenSize(args.width, args.height);
-    aspect = (float)args.width / args.height;
-    screenWidth = args.width;
-    screenHeight = args.height;
+void World::Event_Resize(const EV::ResizeEvent& event) {
+    _camArcball.SetScreenSize(event.width, event.height);
+    aspect = (float)event.width / event.height;
+    screenWidth = event.width;
+    screenHeight = event.height;
 }
 
-void World::Event_Key(const EV::Event& event) {
-    const EV::Params_Key& args = EV::def_Key.GetArgs(event);
-
+void World::Event_Key(const EV::KeyEvent& event) {
     // numpad scancodes of generic usb keyboard
     static const int numpad[] = {
         82,
@@ -351,34 +344,34 @@ void World::Event_Key(const EV::Event& event) {
 
     const float transitionDur = 0.25f;
 
-    if('R' == args.keyCode) {
+    if('R' == event.keyCode) {
         _camArcball.ResetRotation();
     }
-    if('E' == args.keyCode) {
+    if('E' == event.keyCode) {
         _camArcball.Reset();
     }
-    if(numpad[1] == args.nativeScanCode) {
-        if(EV::Params_Key::MODIFIER_SHIFT & args.mods) {
+    if(numpad[1] == event.nativeScanCode) {
+        if(EV::KeyEvent::MODIFIER_SHIFT & event.mods) {
             _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(0.0f, 1.0f, 0.0f), 180.0f), transitionDur); // back view
         } else {
             _camArcball.RotateTo(M::Quat::Identity(), transitionDur); // front view
         }
     }
-    if(numpad[3] == args.nativeScanCode) {
-        if(EV::Params_Key::MODIFIER_SHIFT & args.mods) {
+    if(numpad[3] == event.nativeScanCode) {
+        if(EV::KeyEvent::MODIFIER_SHIFT & event.mods) {
             _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(0.0f, 1.0f, 0.0f), -90.0f), transitionDur); // left view
         } else {
             _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(0.0f, 1.0f, 0.0f), 90.0f), transitionDur); // right view
         }
     }
-    if(numpad[7] == args.nativeScanCode) {
-        if(EV::Params_Key::MODIFIER_SHIFT & args.mods) {
+    if(numpad[7] == event.nativeScanCode) {
+        if(EV::KeyEvent::MODIFIER_SHIFT & event.mods) {
             _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(1.0f, 0.0f, 0.0f), 90.0f), transitionDur); // bottom view
         } else {
             _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(1.0f, 0.0f, 0.0f), -90.0f), transitionDur); // top view
         }
     }
-    if(numpad[5] == args.nativeScanCode) _camArcball.ToggleProjection(transitionDur);
+    if(numpad[5] == event.nativeScanCode) _camArcball.ToggleProjection(transitionDur);
 }
 
 void World::Grid_Build() {
@@ -471,16 +464,18 @@ void World::BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
 }
 
 World::World(void) : _camArcball(800, 400) /* init values arbitrary */
-{
-    AddEventHandler(EV::def_Apocalypse,           this, &World::Event_Apocalypse);
-    AddEventHandler(EV::def_LinkEntity,           this, &World::Event_LinkEntity);
-    AddEventHandler(EV::def_DestroyEntity,        this, &World::Event_DestroyEntity);
-    AddEventHandler(EV::def_SelectionChanged,     this, &World::Event_SelectionChanged);
-    AddEventHandler(EV::def_RebuildAll,           this, &World::Event_RebuildAll);
-    AddEventHandler(EV::def_EditModeChanged,      this, &World::Event_EditModeChanged);
-    AddEventHandler(EV::def_Resize,               this, &World::Event_Resize);
-    AddEventHandler(EV::def_Mouse,                this, &World::Event_Mouse);
-    AddEventHandler(EV::def_Key,                  this, &World::Event_Key);
+{ }
+
+void World::Init() {
+    AddEventHandler(ev_w_apocalypse,           this, &World::Event_Apocalypse);
+    AddEventHandler(ev_w_linkEntity,           this, &World::Event_LinkEntity);
+    AddEventHandler(ev_w_destroyEntity,        this, &World::Event_DestroyEntity);
+    AddEventHandler(ev_w_selectionChanged,     this, &World::Event_SelectionChanged);
+    AddEventHandler(ev_w_rebuildAll,           this, &World::Event_RebuildAll);
+    AddEventHandler(ev_w_editModeChanged,      this, &World::Event_EditModeChanged);
+    AddEventHandler(ev_resize,               this, &World::Event_Resize);
+    AddEventHandler(ev_mouse,                this, &World::Event_Mouse);
+    AddEventHandler(ev_key,                  this, &World::Event_Key);
 
     Grid_Build();
 
@@ -637,41 +632,41 @@ void World::Render(R::RenderList& renderList) {
     }
 }
 
-void World::HandleMouseEvent(const EV::Params_Mouse& args) {
-    if(EV::Params_Mouse::MOUSE_DOWN == args.type) {
-        if(EV::Params_Mouse::BUTTON_LEFT == args.button) {
-            if(EV::Params_Mouse::MODIFIER_SHIFT == args.mods)
-                _camArcball.StartZooming(args.x, args.y);
-            else if(EV::Params_Mouse::MODIFIER_CTRL == args.mods)
-                _camArcball.StartPanning(args.x, args.y);
-            else _camArcball.StartDragging(args.x, args.y);
+void World::HandleMouseEvent(const EV::MouseEvent& event) {
+    if(EV::MouseEvent::MOUSE_DOWN == event.type) {
+        if(EV::MouseEvent::BUTTON_LEFT == event.button) {
+            if(EV::MouseEvent::MODIFIER_SHIFT == event.mods)
+                _camArcball.StartZooming(event.x, event.y);
+            else if(EV::MouseEvent::MODIFIER_CTRL == event.mods)
+                _camArcball.StartPanning(event.x, event.y);
+            else _camArcball.StartDragging(event.x, event.y);
         }
-		if(EV::Params_Mouse::BUTTON_MIDDLE == args.button) {
-            _camArcball.StartPanning(args.x, args.y);
+		if(EV::MouseEvent::BUTTON_MIDDLE == event.button) {
+            _camArcball.StartPanning(event.x, event.y);
         }
     }
 
-    if(EV::Params_Mouse::MOUSE_UP == args.type) {
-        if(EV::Params_Mouse::BUTTON_LEFT  == args.button) {
+    if(EV::MouseEvent::MOUSE_UP == event.type) {
+        if(EV::MouseEvent::BUTTON_LEFT  == event.button) {
             _camArcball.StopDragging();
             _camArcball.StopPanning();
             _camArcball.StopZooming();
         }
-        if(EV::Params_Mouse::BUTTON_MIDDLE == args.button)
+        if(EV::MouseEvent::BUTTON_MIDDLE == event.button)
             _camArcball.StopPanning();
     }
 
-    if(EV::Params_Mouse::MOUSE_MOVE == args.type) {
-        _camArcball.Drag(args.x, args.y);
-        _camArcball.Pan(args.x, args.y);
-        _camArcball.Zoom(args.x, args.y);
-        mouseX = args.x;
-        mouseY = args.y;
+    if(EV::MouseEvent::MOUSE_MOVE == event.type) {
+        _camArcball.Drag(event.x, event.y);
+        _camArcball.Pan(event.x, event.y);
+        _camArcball.Zoom(event.x, event.y);
+        mouseX = event.x;
+        mouseY = event.y;
     }
 
-    if(EV::Params_Mouse::MOUSE_WHEEL == args.type) {
-        if(args.delta > 0) _camArcball.ZoomIn();
-        if(args.delta < 0) _camArcball.ZoomOut();
+    if(EV::MouseEvent::MOUSE_WHEEL == event.type) {
+        if(event.delta > 0) _camArcball.ZoomIn();
+        if(event.delta < 0) _camArcball.ZoomOut();
     }
 }
 
@@ -689,9 +684,7 @@ ENT_Geometry* World::CreateGeometry() {
     geom->SetOrientation(M::Quat::Identity());
     geom->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 
-    EV::Params_LinkEntity args;
-    args.entity = geom;
-    Send(EV::def_LinkEntity.Create(args));
+    Send(ev_w_linkEntity, EV::Arg<Entity*>(geom));
 
     return geom;
 }
@@ -708,9 +701,7 @@ ENT_Text* World::CreateText() {
     text->SetOrientation(M::Quat::Identity());
     text->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 
-    EV::Params_LinkEntity args;
-    args.entity = text;
-    Send(EV::def_LinkEntity.Create(args));
+    Send(ev_w_linkEntity, EV::Arg<Entity*>(text));
 
     return text;
 }
@@ -727,9 +718,7 @@ ENT_TransformGizmo* World::CreateTransformGizmo() {
     transformGizmo->SetOrientation(M::Quat::Identity());
     transformGizmo->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 
-    EV::Params_LinkEntity args;
-    args.entity = transformGizmo;
-    Send(EV::def_LinkEntity.Create(args));
+    Send(ev_w_linkEntity, EV::Arg<Entity*>(transformGizmo));
 
     return transformGizmo;
 }

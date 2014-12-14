@@ -4,26 +4,10 @@
 
 namespace W { class Entity; }
 
-BEGIN_EVENT_DEF(Apocalypse)
-END_EVENT_DEF
-
-BEGIN_EVENT_DEF(LinkEntity)
-    W::Entity* entity;
-END_EVENT_DEF
-
-BEGIN_EVENT_DEF(DestroyEntity)
-    unsigned    entId;
-END_EVENT_DEF
-
-BEGIN_EVENT_DEF(RebuildAll)
-END_EVENT_DEF
-
-BEGIN_EVENT_DEF(SelectionChanged)
-END_EVENT_DEF
-
-BEGIN_EVENT_DEF(CameraChanged)
-END_EVENT_DEF
-
-BEGIN_EVENT_DEF(EditModeChanged)
-    int editMode;
-END_EVENT_DEF
+extern EV::ConcreteEventDef<EV::Event>              ev_w_apocalypse;
+extern EV::ConcreteEventDef<EV::Arg<W::Entity*> >   ev_w_linkEntity;
+extern EV::ConcreteEventDef<EV::Arg<unsigned> >     ev_w_destroyEntity;
+extern EV::ConcreteEventDef<EV::Event>              ev_w_rebuildAll;
+extern EV::ConcreteEventDef<EV::Event>              ev_w_selectionChanged;
+extern EV::ConcreteEventDef<EV::Event>              ev_w_cameraChanged;
+extern EV::ConcreteEventDef<EV::Arg<int> >          ev_w_editModeChanged;

@@ -39,7 +39,7 @@ private:
 
     void UnloadModules();
 
-    void Event_SetOperator(const EV::Event& event);
+    void Event_SetOperator(const EV::Arg<Operator*>& event);
     void Event_ActionFinished(const EV::Event& event);
     void Event_ForwardToDriver(const EV::Event& event);
 public slots:
@@ -47,6 +47,8 @@ public slots:
 public:
     Operators();
     ~Operators();
+
+    void Init();
 
     unsigned GetDriverQueueSize() const;
 
@@ -67,6 +69,7 @@ public:
         };
     };
 
+    void InvokeAction(const EV::EventDef& def, const EV::Event& event, InvokationMode::Enum mode = InvokationMode::DROP_WHEN_BUSY);
     void InvokeAction(const EV::Event& event, InvokationMode::Enum mode = InvokationMode::DROP_WHEN_BUSY);
 
     void SetInitOp(unsigned id);

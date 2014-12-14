@@ -15,13 +15,11 @@ namespace OP {
 
 Operators g_operators;
 
-void Operators::Event_SetOperator(const EV::Event& event) {
-    const ED::Params_SetOperator& args = ED::def_SetOperator.GetArgs(event);
-
+void Operators::Event_SetOperator(const EV::Arg<Operator*>& event) {
     // find panel of active operator
     OperatorPanel* panel = NULL;
     for(unsigned i = 0; !panel && i < _ops.size(); ++i) {
-        if(_ops[i].op == args.op) panel = _ops[i].panel;
+        if(_ops[i].op == event.value) panel = _ops[i].panel;
     }
     assert(panel);
 
@@ -51,21 +49,23 @@ void Operators::OnInvokeOperator(unsigned id) {
 	}
 
     Operator* op = _ops[id].op;
-	ED::Params_SetOperator args = { op };
-	InvokeAction(ED::def_SetOperator.Create(args));
+    InvokeAction(ev_op_setOperator, EV::Arg<Operator*>(op));
 }
 
 Operators::Operators() : _actionsPending(0), _panel(0) {
-    AddEventHandler(ED::def_SetOperator, this, &Operators::Event_SetOperator);
-    AddEventHandler(ED::def_ActionFinished, this, &Operators::Event_ActionFinished);
-
-    // forward other known events
-    AddEventHandler(EV::def_EditModeChanged, this, &Operators::Event_ForwardToDriver);
-    AddEventHandler(EV::def_SelectionChanged, this, &Operators::Event_ForwardToDriver);
 }
 
 Operators::~Operators() {
     UnloadModules();
+}
+
+void Operators::Init() {
+    AddEventHandler(ev_op_setOperator, this, &Operators::Event_SetOperator);
+    AddEventHandler(ev_op_actionFinished, this, &Operators::Event_ActionFinished);
+
+    // forward other known events
+    // AddEventHandler(ev_w_editModeChanged, this, &Operators::Event_ForwardToDriver); // URGENT
+    AddEventHandler(ev_w_selectionChanged, this, &Operators::Event_ForwardToDriver);
 }
 
 unsigned Operators::GetDriverQueueSize() const {
@@ -101,6 +101,19 @@ unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module)
     return id;
 }
 
+void Operators::InvokeAction(const EV::EventDef& def, const EV::Event& event, InvokationMode::Enum mode) {
+    A::g_animator.Filter(event);
+
+    if(InvokationMode::DROP_WHEN_BUSY == mode && BUSY_THRESHOLD < _actionsPending) {
+	    printf("INFO - Operators::InvokeAction: wait for driver, %d actions pending\n", _actionsPending);
+        return;
+    }
+
+    _actionsPending++;
+    _driver->Send(def, event);
+}
+
+// TODO: duplicate of InvokeAction(def, event, ...)
 void Operators::InvokeAction(const EV::Event& event, InvokationMode::Enum mode) {
     A::g_animator.Filter(event);
 
@@ -122,8 +135,8 @@ void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
     // ...
 }
 
-NUBUCK_API void SendToOperator(const EV::Event& event) {
-    g_operators.InvokeAction(event);
+NUBUCK_API void SendToOperator(const EV::EventDef& def, const EV::Event& event) {
+    g_operators.InvokeAction(def, event);
 }
 
 } // namespace OP

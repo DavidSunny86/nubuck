@@ -43,7 +43,7 @@ public:
 
     void SetPanel(OperatorPanel* panel); // called by operators manager only
 
-    void SendToPanel(const EV::Event& event);
+    void SendToPanel(const EV::EventDef& def, const EV::Event& event);
 
     virtual void Register(Invoker& invoker) = 0;
     virtual bool Invoke() = 0; // return false to decline invocation
@@ -57,7 +57,7 @@ public:
     virtual bool OnKey(const KeyEvent& keyEvent) { return false; }
 };
 
-NUBUCK_API void SendToOperator(const EV::Event& event);
+NUBUCK_API void SendToOperator(const EV::EventDef& def, const EV::Event& event);
 
 NUBUCK_API void WaitForAnimations();
 
@@ -65,9 +65,9 @@ inline void Operator::SetPanel(OperatorPanel* panel) {
     _panel = panel;
 }
 
-inline void Operator::SendToPanel(const EV::Event& event) {
+inline void Operator::SendToPanel(const EV::EventDef& def, const EV::Event& event) {
     assert(_panel);
-    _panel->Send(event);
+    _panel->Send(def, event);
 }
 
 } // namespace OP
