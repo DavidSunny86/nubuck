@@ -18,7 +18,7 @@ protected:
             if(QMessageBox::Yes == btn) {
                 EV::Arg<OP::Operator*> event;
                 event.value = OP::g_operators.GetDefaultOperator();
-                OP::g_operators.InvokeAction(ev_op_setOperator, event);
+                OP::g_operators.InvokeAction(ev_op_setOperator.Tag(event));
             }
         }
     }

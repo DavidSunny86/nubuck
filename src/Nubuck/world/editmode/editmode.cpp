@@ -6,7 +6,7 @@ namespace W {
 
 void EditMode::_NotifyObservers() {
     EV::Arg<int> event(_mode);
-    for(unsigned i = 0; i < _obs.size(); ++i) _obs[i]->Send(ev_w_editModeChanged, event);
+    for(unsigned i = 0; i < _obs.size(); ++i) _obs[i]->Send(ev_w_editModeChanged.Tag(event));
 }
 
 void EditMode::_SetMode(Enum mode) {

@@ -24,7 +24,7 @@ void SaveGeomPanel::Event_Save(const EV::Arg<std::string*>& event) {
         _leFilename->setText(filename);
 
         EV::Arg<std::string*> event(new std::string(filename.toStdString()));
-        SendToOperator(ev_save, event);
+        SendToOperator(ev_save.Tag(event));
     }
 }
 
@@ -74,7 +74,7 @@ bool SaveGeom::Invoke() {
 
     _geom = geomSel[0];
 
-    SendToPanel(ev_save, EV::Arg<std::string*>(NULL));
+    SendToPanel(ev_save.Tag(EV::Arg<std::string*>(NULL)));
 
     return true;
 }

@@ -140,7 +140,7 @@ public:
     void            HideItem(itemHandle_t item);
     void            SetItemName(itemHandle_t item, const QString& name);
 
-    void            SendToView(const itemHandle_t item, const EV::EventDef& def, const EV::Event&);
+    void            SendToView(const itemHandle_t item, const EV::Event&);
 
 }; // class Outliner
 

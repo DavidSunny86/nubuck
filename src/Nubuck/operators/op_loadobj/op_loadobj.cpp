@@ -30,12 +30,12 @@ void LoadOBJPanel::OnChooseFilename() {
 		_ui.lneFilename->setText(filename);
 
         EV::Arg<QString*> event(new QString(filename));
-		g_operators.InvokeAction(ev_load, event);
+		g_operators.InvokeAction(ev_load.Tag(event));
 	}
 }
 
 void LoadOBJPanel::OnLoadScene() {
-    OP::SendToOperator(ev_loadScene, EV::Event());
+    OP::SendToOperator(ev_loadScene.Tag());
 }
 
 LoadOBJPanel::LoadOBJPanel(QWidget* parent) : OperatorPanel(parent) {

@@ -16,7 +16,7 @@ void RandomPointsPanel::_OnArgsChanged() {
     event.size   = _sbSize->value().numerator().to_long();
     event.radius = _sbRadius->value().numerator().to_long();
     event.save   = _cbSave->isChecked();
-    g_operators.InvokeAction(ev_randomPointsUpdate, event);
+    g_operators.InvokeAction(ev_randomPointsUpdate.Tag(event));
 }
 
 void RandomPointsPanel::OnArgsChanged(leda::rational) {

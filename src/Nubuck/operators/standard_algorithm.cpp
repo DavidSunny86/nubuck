@@ -30,15 +30,15 @@ struct IdlePhase : Phase {
 };
 
 void StandardAlgorithmPanel::OnStep() {
-    OP::SendToOperator(ev_step, EV::Event());
+    OP::SendToOperator(ev_step.Tag());
 }
 
 void StandardAlgorithmPanel::OnNext() {
-    OP::SendToOperator(ev_next, EV::Event());
+    OP::SendToOperator(ev_next.Tag());
 }
 
 void StandardAlgorithmPanel::OnRun() {
-    OP::SendToOperator(ev_run, EV::Event());
+    OP::SendToOperator(ev_run.Tag());
 }
 
 StandardAlgorithmPanel::StandardAlgorithmPanel(QWidget* parent) : OperatorPanel(parent) {

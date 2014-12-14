@@ -122,9 +122,9 @@ void World::Selection::ComputeCenter() {
 }
 
 void World::Selection::SignalChange() {
-    world.Send(ev_w_selectionChanged, EV::Event());
-	OP::g_operators.Send(ev_w_selectionChanged, EV::Event());
-    g_ui.GetOutliner().Send(ev_w_selectionChanged, EV::Event());
+    world.Send(ev_w_selectionChanged.Tag());
+	OP::g_operators.Send(ev_w_selectionChanged.Tag());
+    g_ui.GetOutliner().Send(ev_w_selectionChanged.Tag());
 }
 
 void World::Selection::Set(Entity* ent) {
@@ -684,7 +684,7 @@ ENT_Geometry* World::CreateGeometry() {
     geom->SetOrientation(M::Quat::Identity());
     geom->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 
-    Send(ev_w_linkEntity, EV::Arg<Entity*>(geom));
+    Send(ev_w_linkEntity.Tag(EV::Arg<Entity*>(geom)));
 
     return geom;
 }
@@ -701,7 +701,7 @@ ENT_Text* World::CreateText() {
     text->SetOrientation(M::Quat::Identity());
     text->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 
-    Send(ev_w_linkEntity, EV::Arg<Entity*>(text));
+    Send(ev_w_linkEntity.Tag(EV::Arg<Entity*>(text)));
 
     return text;
 }
@@ -718,7 +718,7 @@ ENT_TransformGizmo* World::CreateTransformGizmo() {
     transformGizmo->SetOrientation(M::Quat::Identity());
     transformGizmo->SetScale(M::Vector3(1.0f, 1.0f, 1.0f));
 
-    Send(ev_w_linkEntity, EV::Arg<Entity*>(transformGizmo));
+    Send(ev_w_linkEntity.Tag(EV::Arg<Entity*>(transformGizmo)));
 
     return transformGizmo;
 }

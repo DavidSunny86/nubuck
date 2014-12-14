@@ -11,7 +11,7 @@ namespace OP {
 
 // IMPORTANT: must be called for every event
 inline void SignalCompletion() {
-    g_operators.Send(ev_op_actionFinished, EV::Event());
+    g_operators.Send(ev_op_actionFinished.Tag());
 }
 
 void Driver::SetOperator(Operator* op) {
@@ -21,10 +21,10 @@ void Driver::SetOperator(Operator* op) {
         if(_activeOp) _activeOp->Finish();
         _activeOp = op;
 
-        W::world.SendAndWait(ev_w_rebuildAll, EV::Event());
+        W::world.SendAndWait(ev_w_rebuildAll.Tag());
 
         EV::Arg<Operator*> event(op);
-        g_operators.SendAndWait(ev_op_setOperator, event);
+        g_operators.SendAndWait(ev_op_setOperator.Tag(event));
     }
 }
 
@@ -72,7 +72,7 @@ void Driver::Event_Mouse(const EV::MouseEvent& event) {
         // default operator becomes active, implicit rebuild
         SetOperator(_defaultOp);
     }
-    W::world.SendAndWait(ev_w_rebuildAll, EV::Event());
+    W::world.SendAndWait(ev_w_rebuildAll.Tag());
 	event.Accept();
     SignalCompletion();
 }
@@ -88,12 +88,12 @@ void Driver::Event_Key(const EV::KeyEvent& event) {
         W::world.Send(event);
     }
 
-    W::world.SendAndWait(ev_w_rebuildAll, EV::Event());
+    W::world.SendAndWait(ev_w_rebuildAll.Tag());
     SignalCompletion();
 }
 
 void Driver::Event_RebuildAll(const EV::Event& event) {
-    W::world.SendAndWait(ev_w_rebuildAll, EV::Event());
+    W::world.SendAndWait(ev_w_rebuildAll.Tag());
     SignalCompletion();
 }
 
@@ -102,7 +102,7 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
         _activeOp->Send(event);
         _activeOp->HandleEvents();
 
-        W::world.SendAndWait(ev_w_rebuildAll, EV::Event());
+        W::world.SendAndWait(ev_w_rebuildAll.Tag());
 	}
 
     SignalCompletion();

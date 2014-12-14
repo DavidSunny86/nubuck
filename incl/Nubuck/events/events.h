@@ -48,9 +48,9 @@ struct BlockingEvent {
 struct Event {
     eventID_t       id;
     BlockingEvent*  block;
-    bool            isSealed;
+    bool            tagged;
 
-    Event() : block(NULL), isSealed(false) { }
+    Event() : block(NULL), tagged(false) { }
 
     static eventTypeID_t GetEventTypeID() { return 0; }
 
@@ -118,6 +118,14 @@ public:
 
     eventTypeID_t GetEventTypeID() const {
         return _eventTypeID;
+    }
+
+    // NOTE: in case of default argument a referenced to a temporary object is
+    // returned. this is fine, however, because the event gets cloned anyways
+    const T_Event& Tag(T_Event& event = T_Event()) const {
+        event.id = _eventID;
+        event.tagged = true;
+        return event;
     }
 };
 
@@ -213,31 +221,17 @@ protected:
 public:
     virtual ~EventHandler() { }
 
-    void Send(const EventDef& def, const Event& event) { // nonblocking
-        assert(def.GetEventTypeID() == event.GetDynamicEventTypeID()); // type compatibility
-        assert(NULL == event.block);
-        _ev_eventsMtx.Lock();
-        Event* copy = event.Clone();
-        copy->id = def.GetEventID();
-        copy->isSealed = true;
-        _ev_events.push(copy);
-        _ev_eventsMtx.Unlock();
-        _ev_policy.SignalEvent();
-    }
-
     void Send(const Event& event) { // nonblocking
+        assert(event.tagged);
         assert(NULL == event.block);
-        assert(event.isSealed);
         _ev_eventsMtx.Lock();
         Event* copy = event.Clone();
-        copy->id = event.id;
         _ev_events.push(copy);
         _ev_eventsMtx.Unlock();
         _ev_policy.SignalEvent();
     }
 
-    void SendAndWait(const EventDef& def, const EV::Event& event) { // blocking
-        assert(def.GetEventTypeID() == event.GetDynamicEventTypeID());
+    void SendAndWait(const EV::Event& event) { // blocking
         SYS::SharedResource<SYS::SpinLock> mtx;
         SYS::SharedResource<SYS::ConditionVariable> cv;
 
@@ -249,8 +243,6 @@ public:
 
         _ev_eventsMtx.Lock();
         Event* copy = event.Clone();
-        copy->id = def.GetEventID();
-        copy->isSealed = true;
         copy->block = &block;
         _ev_events.push(copy);
         _ev_eventsMtx.Unlock();

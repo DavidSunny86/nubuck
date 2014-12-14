@@ -76,7 +76,7 @@ namespace UI {
         EV::ResizeEvent event;
         event.width = width;
         event.height = height;
-        W::world.Send(ev_resize, event);
+        W::world.Send(ev_resize.Tag(event));
 
         _renderer.Resize(width, height);
         _debugText.Resize(width, height);
@@ -107,7 +107,7 @@ namespace UI {
 		event.ret = NULL;
 
         if(EV::MouseEvent::BUTTON_RIGHT == event.button) {
-            OP::g_operators.InvokeAction(ev_mouse, event, OP::Operators::InvokationMode::ALWAYS);
+            OP::g_operators.InvokeAction(ev_mouse.Tag(event), OP::Operators::InvokationMode::ALWAYS);
         } else {
             if(CAMERA == _inputMode) W::world.HandleMouseEvent(event);
             else {
@@ -128,7 +128,7 @@ namespace UI {
 		event.ret = NULL;
 
         if(EV::MouseEvent::BUTTON_RIGHT == event.button) {
-            OP::g_operators.InvokeAction(ev_mouse, event, OP::Operators::InvokationMode::ALWAYS);
+            OP::g_operators.InvokeAction(ev_mouse.Tag(event), OP::Operators::InvokationMode::ALWAYS);
         } else {
             if(CAMERA == _inputMode) W::world.HandleMouseEvent(event);
             else {
@@ -148,7 +148,7 @@ namespace UI {
         event.y = qevent->y();
 		event.ret = NULL;
 
-        OP::g_operators.InvokeAction(ev_mouse, event, OP::Operators::InvokationMode::DROP_WHEN_BUSY);
+        OP::g_operators.InvokeAction(ev_mouse.Tag(event), OP::Operators::InvokationMode::DROP_WHEN_BUSY);
         if(CAMERA == _inputMode) W::world.HandleMouseEvent(event);
         else if(_isPenDown) {
             assert(PEN == _inputMode);
@@ -210,14 +210,14 @@ namespace UI {
         event.mods = qevent->modifiers();
 
 
-        OP::g_operators.InvokeAction(ev_key, event, OP::Operators::InvokationMode::DROP_WHEN_BUSY);
+        OP::g_operators.InvokeAction(ev_key.Tag(event), OP::Operators::InvokationMode::DROP_WHEN_BUSY);
     }
 
     void RenderView::keyReleaseEvent(QKeyEvent* qevent) {
         EV::KeyEvent event;
         event.type = EV::KeyEvent::KEY_UP;
         event.keyCode = qevent->key();
-        if(!qevent->isAutoRepeat()) W::world.Send(ev_key, event);
+        if(!qevent->isAutoRepeat()) W::world.Send(ev_key.Tag(event));
     }
 
     void RenderView::OnSetBackgroundColor(float r, float g, float b) {

@@ -69,7 +69,6 @@ public:
         };
     };
 
-    void InvokeAction(const EV::EventDef& def, const EV::Event& event, InvokationMode::Enum mode = InvokationMode::DROP_WHEN_BUSY);
     void InvokeAction(const EV::Event& event, InvokationMode::Enum mode = InvokationMode::DROP_WHEN_BUSY);
 
     void SetInitOp(unsigned id);

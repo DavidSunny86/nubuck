@@ -16,7 +16,7 @@ static EV::ConcreteEventDef<EV::Event> ev_loopStart;
 namespace OP {
 
 void LoopPanel::OnButtonClicked() {
-    OP::SendToOperator(ev_loopStart, EV::Event());
+    OP::SendToOperator(ev_loopStart.Tag());
 }
 
 void Loop::Event_OP_Loop_Start(const EV::Event& event) {

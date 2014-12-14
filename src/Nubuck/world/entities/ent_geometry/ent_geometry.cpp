@@ -26,7 +26,7 @@ static R::Color selectedVertexColor     = R::Color::Yellow;
 static R::Color unselectedVertexColor   = R::Color::Black;
 
 void ENT_Geometry::ForceRebuild() {
-    OP::g_operators.InvokeAction(ev_w_rebuildAll, EV::Event(), OP::Operators::InvokationMode::ALWAYS);
+    OP::g_operators.InvokeAction(ev_w_rebuildAll.Tag(), OP::Operators::InvokationMode::ALWAYS);
     _forceRebuild = true;
 }
 
@@ -427,7 +427,7 @@ void ENT_Geometry::SetVertexScale(float vertexScale) {
     _nodeRenderer->Rebuild(_ratPolyMesh, _fpos, _vertexScale);
 
     g_ui.GetOutliner().SendToView(_outlinerItem,
-        ev_geom_vertexScaleChanged, EV::Arg<float>(_vertexScale));
+        ev_geom_vertexScaleChanged.Tag(EV::Arg<float>(_vertexScale)));
 }
 
 void ENT_Geometry::SetEdgeScale(float edgeScale) {
@@ -436,7 +436,7 @@ void ENT_Geometry::SetEdgeScale(float edgeScale) {
     RebuildRenderEdges();
 
     g_ui.GetOutliner().SendToView(_outlinerItem,
-        ev_geom_edgeScaleChanged, EV::Arg<float>(_edgeScale));
+        ev_geom_edgeScaleChanged.Tag(EV::Arg<float>(_edgeScale)));
 }
 
 void ENT_Geometry::SetEdgeColor(const R::Color& color) {
@@ -445,7 +445,7 @@ void ENT_Geometry::SetEdgeColor(const R::Color& color) {
     RebuildRenderEdges();
 
     g_ui.GetOutliner().SendToView(_outlinerItem,
-        ev_geom_edgeColorChanged, EV::Arg<R::Color>(_edgeColor));
+        ev_geom_edgeColorChanged.Tag(EV::Arg<R::Color>(_edgeColor)));
 }
 
 M::Vector3 ENT_Geometry::GetPosition() const {
@@ -525,7 +525,7 @@ void ENT_Geometry::SetRenderMode(int flags) {
     // TODO: wireframe, normals
     RenderModeEvent event;
     event.renderMode = _renderMode;
-    g_ui.GetOutliner().SendToView(_outlinerItem, ev_geom_renderModeChanged, event);
+    g_ui.GetOutliner().SendToView(_outlinerItem, ev_geom_renderModeChanged.Tag(event));
 }
 
 void ENT_Geometry::SetRenderLayer(unsigned layer) {
@@ -562,7 +562,7 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
         EdgeShadingEvent event;
         event.shadingMode = _shadingMode;
         event.showHiddenLines = _stylizedHiddenLines;
-        g_ui.GetOutliner().SendToView(_outlinerItem, ev_geom_edgeShadingChanged, event);
+        g_ui.GetOutliner().SendToView(_outlinerItem, ev_geom_edgeShadingChanged.Tag(event));
     }
     _mtx.Unlock();
 }

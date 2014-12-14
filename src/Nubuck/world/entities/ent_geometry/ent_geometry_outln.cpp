@@ -15,20 +15,20 @@
 namespace W {
 
 void ENT_GeometryOutln::OnVertexScaleChanged(leda::rational value) {
-    _subject.Send(ev_geom_vertexScaleChanged, EV::Arg<float>(value.to_float()));
+    _subject.Send(ev_geom_vertexScaleChanged.Tag(EV::Arg<float>(value.to_float())));
 }
 
 void ENT_GeometryOutln::OnEdgeScaleChanged(leda::rational value) {
-    _subject.Send(ev_geom_edgeScaleChanged, EV::Arg<float>(value.to_float()));
+    _subject.Send(ev_geom_edgeScaleChanged.Tag(EV::Arg<float>(value.to_float())));
 }
 
 void ENT_GeometryOutln::OnEdgeColorChanged(float r, float g, float b) {
 	R::Color edgeColor = R::Color(r, g, b);
-    _subject.Send(ev_geom_edgeColorChanged, EV::Arg<R::Color>(edgeColor));
+    _subject.Send(ev_geom_edgeColorChanged.Tag(EV::Arg<R::Color>(edgeColor)));
 }
 
 void ENT_GeometryOutln::OnTransparencyChanged(leda::rational value) {
-    _subject.Send(ev_geom_transparencyChanged, EV::Arg<float>(value.to_float()));
+    _subject.Send(ev_geom_transparencyChanged.Tag(EV::Arg<float>(value.to_float())));
 }
 
 void ENT_GeometryOutln::OnRenderModeChanged(bool) {
@@ -44,7 +44,7 @@ void ENT_GeometryOutln::OnRenderModeChanged(bool) {
     _cbWireframe->setEnabled(_btnRenderFaces->isChecked());
     _cbNormals->setEnabled(_btnRenderFaces->isChecked());
 
-    _subject.Send(ev_geom_renderModeChanged, event);
+    _subject.Send(ev_geom_renderModeChanged.Tag(event));
 }
 
 void ENT_GeometryOutln::OnEdgeShadingChanged(int) {
@@ -169,7 +169,7 @@ void ENT_GeometryOutln::SendEdgeShading() {
     assert(0 <= idx && idx < Nubuck::ShadingMode::NUM_MODES);
     event.shadingMode = Nubuck::ShadingMode::Enum(idx);
     event.showHiddenLines = _cbHiddenLines->isChecked();
-    _subject.Send(ev_geom_edgeShadingChanged, event);
+    _subject.Send(ev_geom_edgeShadingChanged.Tag(event));
 }
 
 void ENT_GeometryOutln::Event_VertexScaleChanged(const EV::Arg<float>& event) {

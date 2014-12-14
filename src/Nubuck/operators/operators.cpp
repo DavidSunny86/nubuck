@@ -49,7 +49,7 @@ void Operators::OnInvokeOperator(unsigned id) {
 	}
 
     Operator* op = _ops[id].op;
-    InvokeAction(ev_op_setOperator, EV::Arg<Operator*>(op));
+    InvokeAction(ev_op_setOperator.Tag(EV::Arg<Operator*>(op)));
 }
 
 Operators::Operators() : _actionsPending(0), _panel(0) {
@@ -101,19 +101,6 @@ unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module)
     return id;
 }
 
-void Operators::InvokeAction(const EV::EventDef& def, const EV::Event& event, InvokationMode::Enum mode) {
-    A::g_animator.Filter(event);
-
-    if(InvokationMode::DROP_WHEN_BUSY == mode && BUSY_THRESHOLD < _actionsPending) {
-	    printf("INFO - Operators::InvokeAction: wait for driver, %d actions pending\n", _actionsPending);
-        return;
-    }
-
-    _actionsPending++;
-    _driver->Send(def, event);
-}
-
-// TODO: duplicate of InvokeAction(def, event, ...)
 void Operators::InvokeAction(const EV::Event& event, InvokationMode::Enum mode) {
     A::g_animator.Filter(event);
 
@@ -135,8 +122,8 @@ void Operators::GetMeshJobs(std::vector<R::MeshJob>& meshJobs) {
     // ...
 }
 
-NUBUCK_API void SendToOperator(const EV::EventDef& def, const EV::Event& event) {
-    g_operators.InvokeAction(def, event);
+NUBUCK_API void SendToOperator(const EV::Event& event) {
+    g_operators.InvokeAction(event);
 }
 
 } // namespace OP

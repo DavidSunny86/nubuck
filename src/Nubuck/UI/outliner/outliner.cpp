@@ -119,7 +119,7 @@ Outliner::itemHandle_t Outliner::AddItem(const QString& name, W::Entity* entity)
 	if(item->next) item->next->prev = item;
     _items = item;
 
-    baseHandler_t::Send(ev_outl_createView, EV::Arg<LinkedItem*>(item));
+    baseHandler_t::Send(ev_outl_createView.Tag(EV::Arg<LinkedItem*>(item)));
 
     return item;
 }
@@ -131,16 +131,16 @@ void Outliner::DeleteItem(itemHandle_t item) {
 }
 
 void Outliner::HideItem(itemHandle_t item) {
-    baseHandler_t::Send(ev_outl_hide, EV::Arg<LinkedItem*>(item));
+    baseHandler_t::Send(ev_outl_hide.Tag(EV::Arg<LinkedItem*>(item)));
 }
 
 void Outliner::SetItemName(itemHandle_t item, const QString& name) {
     EV::Args2<LinkedItem*, QString*> event(item, new QString(name));
-    baseHandler_t::Send(ev_outl_setName, event);
+    baseHandler_t::Send(ev_outl_setName.Tag(event));
 }
 
-void Outliner::SendToView(itemHandle_t item, const EV::EventDef& def, const EV::Event& event) {
-    if(item->view) item->view->Send(def, event);
+void Outliner::SendToView(itemHandle_t item, const EV::Event& event) {
+    if(item->view) item->view->Send(event);
 }
 
 Outliner::Outliner(QWidget* parent) : QWidget(parent), _items(NULL) {

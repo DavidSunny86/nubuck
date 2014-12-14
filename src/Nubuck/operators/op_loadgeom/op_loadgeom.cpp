@@ -23,7 +23,7 @@ void LoadGeomPanel::OnChooseFilename() {
 		_leFilename->setText(filename);
 
         EV::Arg<std::string*> event(new std::string(filename.toStdString()));
-		SendToOperator(ev_load, event);
+		SendToOperator(ev_load.Tag(event));
 	}
 }
 
