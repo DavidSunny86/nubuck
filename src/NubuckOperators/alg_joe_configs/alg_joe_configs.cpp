@@ -22,10 +22,14 @@ enum JoeConfig {
     NUM_CONFIGS
 };
 
-BEGIN_EVENT_DEF_CS(SetConfigScale)
+struct SetConfigScale : EV::Event {
+    EVENT_TYPE(SetConfigScale)
+
     int     config;
     double  scale;
-END_EVENT_DEF_CS
+};
+
+static EV::ConcreteEventDef<SetConfigScale> ev_setConfigScale;
 
 class NBW_SpinBox;
 
@@ -42,10 +46,10 @@ public:
 };
 
 void JoeConfigsPanel::OnConfigScaleChanged(int which) {
-    Params_SetConfigScale args;
-    args.config = which;
-    args.scale = _sbScales[which]->value().to_double();
-    OP::SendToOperator(def_SetConfigScale.Create(args));
+    SetConfigScale event;
+    event.config = which;
+    event.scale = _sbScales[which]->value().to_double();
+    OP::SendToOperator(ev_setConfigScale.Tag(event));
 }
 
 JoeConfigsPanel::JoeConfigsPanel() {
@@ -115,7 +119,7 @@ private:
     void AddSimplex(int i0, int i1, int i2, int i3);
     void EndSimplices();
 
-    void Event_SetConfigScale(const EV::Event& event);
+    void Event_SetConfigScale(const SetConfigScale& event);
 public:
     JoeConfigs();
 
@@ -124,13 +128,12 @@ public:
     void Finish() override { }
 };
 
-void JoeConfigs::Event_SetConfigScale(const EV::Event& event) {
-    const Params_SetConfigScale& args = def_SetConfigScale.GetArgs(event);
-    SetScale(_configs[args.config], args.scale);
+void JoeConfigs::Event_SetConfigScale(const SetConfigScale& event) {
+    SetScale(_configs[event.config], event.scale);
 }
 
 JoeConfigs::JoeConfigs() : _cs_simp_cnt(0) {
-    AddEventHandler(def_SetConfigScale, this, &JoeConfigs::Event_SetConfigScale);
+    AddEventHandler(ev_setConfigScale, this, &JoeConfigs::Event_SetConfigScale);
 }
 
 namespace {
