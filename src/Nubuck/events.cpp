@@ -8,7 +8,6 @@
 eventID_t eventID_Cnt = 0;
 
 eventID_t EV_GetNextID() {
-    printf("eventID_Cnt = %d\n", eventID_Cnt);
     return ++eventID_Cnt;
 }
 
