@@ -6,13 +6,8 @@
 #include "globals.h"
 #include "phase_init.h"
 
-BEGIN_EVENT_DEF(FlipClip_DistanceChanged)
-    float dist;
-END_EVENT_DEF
-
-BEGIN_EVENT_DEF(FlipClip_RunConfChanged)
-    bool haltBeforeStitching;
-END_EVENT_DEF
+extern EV::ConcreteEventDef<EV::Arg<float> > ev_distanceChanged;
+extern EV::ConcreteEventDef<EV::Arg<bool> > ev_runConfChanged; // arg = haltBeforeStitching
 
 class FlipClipPanel : public OP::ALG::StandardAlgorithmPanel {
     Q_OBJECT
@@ -34,8 +29,8 @@ class FlipClip : public OP::ALG::StandardAlgorithm {
 private:
     Globals _g;
 
-    void Event_DistanceChanged(const EV::Event& event);
-    void Event_RunConfChanged(const EV::Event& event);
+    void Event_DistanceChanged(const EV::Arg<float>& event);
+    void Event_RunConfChanged(const EV::Arg<bool>& event);
 protected:
     const char* GetName() const;
 
