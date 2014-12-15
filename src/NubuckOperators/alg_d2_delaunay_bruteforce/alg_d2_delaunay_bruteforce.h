@@ -9,15 +9,9 @@
 
 class NBW_SpinBox;
 
-BEGIN_EVENT_DEF_CS(ToggleParaboloid)
-END_EVENT_DEF_CS
-
-BEGIN_EVENT_DEF_CS(ToggleConvexHull)
-END_EVENT_DEF_CS
-
-BEGIN_EVENT_DEF_CS(SetConvexHullScale)
-    float scale;
-END_EVENT_DEF_CS
+extern EV::ConcreteEventDef<EV::Event> ev_toggleParaboloid;
+extern EV::ConcreteEventDef<EV::Event> ev_toggleConvexHull;
+extern EV::ConcreteEventDef<EV::Arg<float> > ev_setConvexHullScale;
 
 class D2_Delaunay_BruteForce_Panel : public OP::ALG::StandardAlgorithmPanel {
     Q_OBJECT
@@ -44,7 +38,7 @@ private:
 
     void Event_ToggleParaboloid(const EV::Event& event);
     void Event_ToggleConvexHull(const EV::Event& event);
-    void Event_SetConvexHullScale(const EV::Event& event);
+    void Event_SetConvexHullScale(const EV::Arg<float>& event);
 protected:
     const char*     GetName() const override;
     OP::ALG::Phase* Init() override;

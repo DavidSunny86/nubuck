@@ -8,24 +8,26 @@
 #include "alg_d2_delaunay_bruteforce.h"
 #include "phase0.h"
 
+EV::ConcreteEventDef<EV::Event> ev_toggleParaboloid;
+EV::ConcreteEventDef<EV::Event> ev_toggleConvexHull;
+EV::ConcreteEventDef<EV::Arg<float> > ev_setConvexHullScale;
+
 // ================================================================================
 // Panel Impl
 // ================================================================================
 
 void D2_Delaunay_BruteForce_Panel::OnToggleParaboloid() {
-    OP::SendToOperator(def_ToggleParaboloid.Create(Params_ToggleParaboloid()));
+    OP::SendToOperator(ev_toggleParaboloid.Tag());
 }
 
 void D2_Delaunay_BruteForce_Panel::OnToggleConvexHull() {
-    OP::SendToOperator(def_ToggleConvexHull.Create(Params_ToggleConvexHull()));
+    OP::SendToOperator(ev_toggleConvexHull.Tag());
 }
 
 void D2_Delaunay_BruteForce_Panel::OnConvexHullScaleChanged(leda::rational) {
     float scale = _sbConvexHullScale->value().to_float() / _sbConvexHullScale->maximum().to_float();
 
-    Params_SetConvexHullScale args;
-    args.scale = scale;
-    OP::SendToOperator(def_SetConvexHullScale.Create(args));
+    OP::SendToOperator(ev_setConvexHullScale.Tag(scale));
 }
 
 D2_Delaunay_BruteForce_Panel::D2_Delaunay_BruteForce_Panel() {
@@ -161,10 +163,10 @@ void D2_Delaunay_BruteForce::Event_ToggleConvexHull(const EV::Event&) {
     _isConvexHullVisible = !_isConvexHullVisible;
 }
 
-void D2_Delaunay_BruteForce::Event_SetConvexHullScale(const EV::Event& event) {
-    const Params_SetConvexHullScale& args = def_SetConvexHullScale.GetArgs(event);
-    nubuck().set_geometry_scale(_g.chull, M::Vector3(1.0f, 1.0f, args.scale));
-    nubuck().set_geometry_scale(_g.paraboloid, M::Vector3(1.0f, 1.0f, args.scale));
+void D2_Delaunay_BruteForce::Event_SetConvexHullScale(const EV::Arg<float>& event) {
+    float scale = event.value;
+    nubuck().set_geometry_scale(_g.chull, M::Vector3(1.0f, 1.0f, scale));
+    nubuck().set_geometry_scale(_g.paraboloid, M::Vector3(1.0f, 1.0f, scale));
 }
 
 const char* D2_Delaunay_BruteForce::GetName() const {
@@ -189,9 +191,9 @@ OP::ALG::Phase* D2_Delaunay_BruteForce::Init() {
 }
 
 D2_Delaunay_BruteForce::D2_Delaunay_BruteForce() {
-    AddEventHandler(def_ToggleParaboloid, this, &D2_Delaunay_BruteForce::Event_ToggleParaboloid);
-    AddEventHandler(def_ToggleConvexHull, this, &D2_Delaunay_BruteForce::Event_ToggleConvexHull);
-    AddEventHandler(def_SetConvexHullScale, this, &D2_Delaunay_BruteForce::Event_SetConvexHullScale);
+    AddEventHandler(ev_toggleParaboloid, this, &D2_Delaunay_BruteForce::Event_ToggleParaboloid);
+    AddEventHandler(ev_toggleConvexHull, this, &D2_Delaunay_BruteForce::Event_ToggleConvexHull);
+    AddEventHandler(ev_setConvexHullScale, this, &D2_Delaunay_BruteForce::Event_SetConvexHullScale);
 }
 
 NUBUCK_OPERATOR OP::OperatorPanel* CreateOperatorPanel() {
