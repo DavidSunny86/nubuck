@@ -7,14 +7,14 @@ class QComboBox;
 namespace OP {
 // namespace GEN {
 
-class PlatonicSolidsPanel : public OperatorPanel {
+class PlatonicSolidsPanel : public QObject, public OperatorPanel {
     Q_OBJECT
 private:
     QComboBox* _names;
 private slots:
     void OnNameChanged(int idx);
 public:
-    PlatonicSolidsPanel(QWidget* parent = NULL);
+    PlatonicSolidsPanel();
 
     void Invoke() override;
 };

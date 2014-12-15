@@ -47,21 +47,21 @@ RandomPointsPanel::RandomPointsPanel(QWidget* parent) : SimplePanel(parent) {
     domains.push_back("in disc");
 
     _cbDomain = AddComboBox("Domain", domains);
-    connect(_cbDomain, SIGNAL(currentIndexChanged(int)), this, SLOT(OnArgsChanged(int)));
+    QObject::connect(_cbDomain, SIGNAL(currentIndexChanged(int)), this, SLOT(OnArgsChanged(int)));
 
     _sbRadius = AddSpinBox("radius", 1, 1000);
     _sbRadius->setValue(radius);
-    connect(_sbRadius, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnArgsChanged(leda::rational)));
+    QObject::connect(_sbRadius, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnArgsChanged(leda::rational)));
 
     _sbSize = AddSpinBox("size", 1, 100000);
     _sbSize->setValue(size);
-    connect(_sbSize, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnArgsChanged(leda::rational)));
+    QObject::connect(_sbSize, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnArgsChanged(leda::rational)));
 
     AddVerticalSpace(20);
 
     _cbSave = AddCheckBox("save as last_cloud.geom");
     _cbSave->setChecked(true);
-    connect(_cbSave, SIGNAL(toggled(bool)), this, SLOT(OnArgsChanged(bool)));
+    QObject::connect(_cbSave, SIGNAL(toggled(bool)), this, SLOT(OnArgsChanged(bool)));
 }
 
 // --- RandomPointsPanel

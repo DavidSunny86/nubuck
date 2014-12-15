@@ -7,7 +7,7 @@ namespace GEN {
 
 class MergePanel : public OperatorPanel {
 public:
-    MergePanel(QWidget* parent = NULL);
+    MergePanel();
 };
 
 class Merge : public Operator {

@@ -9,7 +9,7 @@ namespace OP {
 
 class ConvexHullPanel : public OperatorPanel {
 public:
-	ConvexHullPanel(QWidget* parent = NULL) : OperatorPanel(parent) { }
+	ConvexHullPanel() { }
 };
 
 class ConvexHull : public Operator {

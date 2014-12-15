@@ -9,7 +9,7 @@ namespace OP {
 
 class FlipClipPanel : public OperatorPanel {
 public:
-    FlipClipPanel(QWidget* parent = NULL) : OperatorPanel(parent) { }
+    FlipClipPanel() { }
 };
 
 class FlipClip : public Operator {

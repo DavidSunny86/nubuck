@@ -12,18 +12,18 @@
 
 namespace OP {
 
-struct LoopPanel : OperatorPanel {
+struct LoopPanel : QObject, OperatorPanel {
     Q_OBJECT
 public slots:
     void OnButtonClicked();
 public:
-    LoopPanel(QWidget* parent = NULL) : OperatorPanel(parent) {
+    LoopPanel() {
         QPushButton* button = new QPushButton("Start Loop");
         QVBoxLayout* layout = new QVBoxLayout;
         layout->addWidget(button);
         layout->addStretch();
-        setLayout(layout);
-        connect(button, SIGNAL(clicked()), this, SLOT(OnButtonClicked()));
+        GetWidget()->setLayout(layout);
+        QObject::connect(button, SIGNAL(clicked()), this, SLOT(OnButtonClicked()));
     }
 };
 

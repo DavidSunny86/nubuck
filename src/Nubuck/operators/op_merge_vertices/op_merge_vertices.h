@@ -7,7 +7,7 @@ namespace OP {
 
 class MergeVerticesPanel : public OperatorPanel {
 public:
-    MergeVerticesPanel(QWidget* parent = NULL) : OperatorPanel(parent) { }
+    MergeVerticesPanel() { }
 };
 
 class MergeVertices : public Operator {

@@ -22,7 +22,7 @@ namespace OP {
 
 void LoadOBJPanel::OnChooseFilename() {
 	QString filename = QFileDialog::getOpenFileName(
-        this,
+        GetWidget(),
         "Choose a .obj file",
 		QDir::currentPath(),
         tr("Models (*.obj)"));
@@ -38,8 +38,8 @@ void LoadOBJPanel::OnLoadScene() {
     OP::SendToOperator(ev_loadScene.Tag());
 }
 
-LoadOBJPanel::LoadOBJPanel(QWidget* parent) : OperatorPanel(parent) {
-	_ui.setupUi(this);
+LoadOBJPanel::LoadOBJPanel() {
+	_ui.setupUi(GetWidget());
 	QObject::connect(_ui.btnChooseFile, SIGNAL(clicked()), this, SLOT(OnChooseFilename()));
 	QObject::connect(_ui.btnLoadScene, SIGNAL(clicked()), this, SLOT(OnLoadScene()));
 }

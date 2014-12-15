@@ -62,7 +62,7 @@ D2_Delaunay_BruteForce_Panel::D2_Delaunay_BruteForce_Panel() {
     QWidget* dummy = new QWidget;
     dummy->setLayout(vboxLayout);
 
-    layout()->addWidget(dummy);
+    GetWidget()->layout()->addWidget(dummy);
 }
 
 void D2_Delaunay_BruteForce_Panel::Invoke() {

@@ -15,7 +15,7 @@ private:
 
     void Event_Save(const EV::Arg<std::string*>& event);
 public:
-    SaveGeomPanel(QWidget* parent = NULL);
+    SaveGeomPanel();
 
     void Invoke() override;
 };

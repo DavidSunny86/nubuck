@@ -41,15 +41,15 @@ void StandardAlgorithmPanel::OnRun() {
     OP::SendToOperator(ev_run.Tag());
 }
 
-StandardAlgorithmPanel::StandardAlgorithmPanel(QWidget* parent) : OperatorPanel(parent) {
+StandardAlgorithmPanel::StandardAlgorithmPanel() {
     QPushButton* btnStep = new QPushButton("Step");
-    connect(btnStep, SIGNAL(clicked()), this, SLOT(OnStep()));
+    QObject::connect(btnStep, SIGNAL(clicked()), this, SLOT(OnStep()));
 
     QPushButton* btnNext = new QPushButton("Next");
-    connect(btnNext, SIGNAL(clicked()), this, SLOT(OnNext()));
+    QObject::connect(btnNext, SIGNAL(clicked()), this, SLOT(OnNext()));
 
     QPushButton* btnRun = new QPushButton("Run");
-    connect(btnRun, SIGNAL(clicked()), this, SLOT(OnRun()));
+    QObject::connect(btnRun, SIGNAL(clicked()), this, SLOT(OnRun()));
 
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(btnStep);
@@ -57,7 +57,7 @@ StandardAlgorithmPanel::StandardAlgorithmPanel(QWidget* parent) : OperatorPanel(
     layout->addSpacing(20);
     layout->addWidget(btnRun);
     layout->addSpacing(20);
-    setLayout(layout);
+    GetWidget()->setLayout(layout);
 }
 
 Phase::StepRet::Enum Phase::Step() {

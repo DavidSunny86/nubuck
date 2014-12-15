@@ -25,7 +25,7 @@ void Operators::Event_SetOperator(const EV::Arg<Operator*>& event) {
 
     panel->Invoke();
     g_ui.GetOperatorPanel().Clear();
-    g_nubuck.set_operator_panel(panel);
+    g_nubuck.set_operator_panel(panel->GetWidget());
 
     _panel = panel;
 

@@ -13,7 +13,7 @@
 namespace OP {
 namespace GEN {
 
-MergePanel::MergePanel(QWidget* parent) : OperatorPanel(parent) { }
+MergePanel::MergePanel() { }
 
 void Merge::Register(Invoker& invoker) {
     QAction* action = nubuck().scene_menu()->addAction("Create Merge Scene");

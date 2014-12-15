@@ -8,14 +8,14 @@
 
 namespace OP {
 
-class Delaunay3DPanel : public OperatorPanel {
+class Delaunay3DPanel : public QObject, public OperatorPanel {
     Q_OBJECT
 private:
     Ui::Delaunay3D _ui;
 private slots:
     void OnScaleChanged(leda::rational value);
 public:
-    Delaunay3DPanel(QWidget* parent = NULL);
+    Delaunay3DPanel();
 
     void Invoke() override;
 };

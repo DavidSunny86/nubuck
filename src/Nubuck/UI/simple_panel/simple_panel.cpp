@@ -6,13 +6,13 @@
 
 namespace UI {
 
-SimplePanel::SimplePanel(QWidget* parent) : OperatorPanel(parent) {
+SimplePanel::SimplePanel(QWidget* parent) {
     _grid = new QGridLayout();
 
     QVBoxLayout* vbox = new QVBoxLayout();
     vbox->addLayout(_grid);
     vbox->addStretch();
-    setLayout(vbox);
+    GetWidget()->setLayout(vbox);
 }
 
 void SimplePanel::AddLabel(const QString& str) {

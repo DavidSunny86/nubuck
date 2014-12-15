@@ -16,7 +16,7 @@ namespace OP {
 
 void SaveGeomPanel::Event_Save(const EV::Arg<std::string*>& event) {
     QString filename = QFileDialog::getSaveFileName(
-        this,
+        GetWidget(),
         "Save as...",
         "", // dir,
         "Geometry (*.geom)");
@@ -28,7 +28,7 @@ void SaveGeomPanel::Event_Save(const EV::Arg<std::string*>& event) {
     }
 }
 
-SaveGeomPanel::SaveGeomPanel(QWidget* parent) : OperatorPanel(parent) {
+SaveGeomPanel::SaveGeomPanel() {
     AddEventHandler(ev_save, this, &SaveGeomPanel::Event_Save);
 
     QHBoxLayout* layout = new QHBoxLayout;
@@ -39,7 +39,7 @@ SaveGeomPanel::SaveGeomPanel(QWidget* parent) : OperatorPanel(parent) {
     _leFilename->setReadOnly(true);
     layout->addWidget(_leFilename);
 
-    setLayout(layout);
+    GetWidget()->setLayout(layout);
 }
 
 void SaveGeomPanel::Invoke() {

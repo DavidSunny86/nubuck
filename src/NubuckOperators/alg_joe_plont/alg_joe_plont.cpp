@@ -10,7 +10,7 @@
 
 static EV::ConcreteEventDef<EV::Arg<double> > ev_setScale;
 
-class JoePlontPanel : public OP::OperatorPanel {
+class JoePlontPanel : public QObject, public OP::OperatorPanel {
     Q_OBJECT
 private:
     NBW_SpinBox* _sbScale;
@@ -36,9 +36,9 @@ JoePlontPanel::JoePlontPanel() {
 
     QVBoxLayout* vboxLayout = new QVBoxLayout;
     vboxLayout->addWidget(_sbScale);
-    setLayout(vboxLayout);
+    GetWidget()->setLayout(vboxLayout);
 
-    connect(_sbScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnScaleChanged(leda::rational)));
+    QObject::connect(_sbScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnScaleChanged(leda::rational)));
 }
 
 struct Simplex {

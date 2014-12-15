@@ -34,7 +34,7 @@ FlipClipPanel::FlipClipPanel() {
     QWidget* dummy = new QWidget;
     dummy->setLayout(gridLayout);
 
-    layout()->addWidget(dummy);
+    GetWidget()->layout()->addWidget(dummy);
 }
 
 void FlipClipPanel::Invoke() {

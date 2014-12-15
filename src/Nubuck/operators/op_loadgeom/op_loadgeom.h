@@ -9,14 +9,14 @@ class QLineEdit;
 
 namespace OP {
 
-class LoadGeomPanel : public OperatorPanel {
+class LoadGeomPanel : public QObject, public OperatorPanel {
     Q_OBJECT
 private:
     QLineEdit* _leFilename;
 private slots:
     void OnChooseFilename();
 public:
-    LoadGeomPanel(QWidget* parent = NULL);
+    LoadGeomPanel();
 };
 
 class LoadGeom : public Operator {

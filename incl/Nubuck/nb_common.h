@@ -20,4 +20,10 @@ by most Nubuck clients
 #include <Nubuck\animation\animation.h>
 
 #include <Nubuck\operators\operator.h>
-#include <Nubuck\operators\operator_invoker.h>
+
+/*
+NOTE:
+the client typically just passes a reference to the invoker
+to the system, so a forward decl suffices.
+*/
+// #include <Nubuck\operators\operator_invoker.h>

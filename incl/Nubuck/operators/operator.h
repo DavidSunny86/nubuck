@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <QWidget>
 
 #include <Nubuck\math\vector2.h>
 
@@ -9,7 +8,8 @@
 #include <Nubuck\events\events.h>
 #include <Nubuck\world\editmode.h>
 
-struct Nubuck;
+class   QWidget;
+struct  Nubuck;
 
 namespace R {
 
@@ -21,14 +21,19 @@ namespace OP {
 
 class Invoker;
 
-class OperatorPanel : public QWidget, public EV::EventHandler<> {
+class NUBUCK_API OperatorPanel : public EV::EventHandler<> {
+private:
+    QWidget* _widget;
 public:
     DECL_HANDLE_EVENTS(OperatorPanel);
 
-    OperatorPanel(QWidget* parent = 0) : QWidget(parent) { }
+    OperatorPanel();
+
     virtual ~OperatorPanel() { }
 
     virtual void Invoke() { }
+
+    virtual QWidget* GetWidget() { return _widget; }
 };
 
 class Operator : public EV::EventHandler<> {

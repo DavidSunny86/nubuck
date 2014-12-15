@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <QObject>
+
 #include <Nubuck\generic\pointer.h>
 #include <Nubuck\operators\operator.h>
 #include <Nubuck\events\events.h>
@@ -10,14 +12,14 @@
 namespace OP {
 namespace ALG {
 
-class NUBUCK_API StandardAlgorithmPanel : public OperatorPanel {
+class NUBUCK_API StandardAlgorithmPanel : public QObject, public OperatorPanel {
     Q_OBJECT
 private slots:
     void OnStep();
     void OnNext();
     void OnRun();
 public:
-    StandardAlgorithmPanel(QWidget* parent = NULL);
+    StandardAlgorithmPanel();
 };
 
 class NUBUCK_API Phase {

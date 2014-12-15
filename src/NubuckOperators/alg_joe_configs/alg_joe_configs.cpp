@@ -33,7 +33,7 @@ static EV::ConcreteEventDef<SetConfigScale> ev_setConfigScale;
 
 class NBW_SpinBox;
 
-class JoeConfigsPanel : public OP::OperatorPanel {
+class JoeConfigsPanel : public QObject, public OP::OperatorPanel {
     Q_OBJECT
 private:
     NBW_SpinBox* _sbScales[NUM_CONFIGS];
@@ -74,16 +74,16 @@ JoeConfigsPanel::JoeConfigsPanel() {
         sb->setSingleStep(0.05);
 
         // NOTE: it's okay for the slot to discard arguments
-        connect(sb, SIGNAL(SigValueChanged(leda::rational)), &_sigMap, SLOT(map()));
+        QObject::connect(sb, SIGNAL(SigValueChanged(leda::rational)), &_sigMap, SLOT(map()));
         _sigMap.setMapping(sb, i);
         layout->addWidget(sb);
 
         _sbScales[i] = sb;
     }
 
-    setLayout(layout);
+    GetWidget()->setLayout(layout);
 
-    connect(&_sigMap, SIGNAL(mapped(int)), this, SLOT(OnConfigScaleChanged(int)));
+    QObject::connect(&_sigMap, SIGNAL(mapped(int)), this, SLOT(OnConfigScaleChanged(int)));
 }
 
 struct Config {

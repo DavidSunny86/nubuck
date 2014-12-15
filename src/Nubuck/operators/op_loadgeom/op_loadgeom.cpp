@@ -15,7 +15,7 @@ namespace OP {
 
 void LoadGeomPanel::OnChooseFilename() {
 	QString filename = QFileDialog::getOpenFileName(
-        this,
+        GetWidget(),
         "Choose a .obj file",
 		QDir::currentPath(),
         tr("Geometry (*.geom)"));
@@ -27,7 +27,7 @@ void LoadGeomPanel::OnChooseFilename() {
 	}
 }
 
-LoadGeomPanel::LoadGeomPanel(QWidget* parent) : OperatorPanel(NULL) {
+LoadGeomPanel::LoadGeomPanel() {
     QFormLayout* layout = new QFormLayout;
 
     _leFilename = new QLineEdit("[...]");
@@ -35,10 +35,10 @@ LoadGeomPanel::LoadGeomPanel(QWidget* parent) : OperatorPanel(NULL) {
     layout->addRow(new QLabel("Filename"), _leFilename);
 
     QPushButton* btnChooseFilename = new QPushButton("Choose Filename");
-    connect(btnChooseFilename, SIGNAL(clicked()), this, SLOT(OnChooseFilename()));
+    QObject::connect(btnChooseFilename, SIGNAL(clicked()), this, SLOT(OnChooseFilename()));
     layout->addRow(btnChooseFilename);
 
-    setLayout(layout);
+    GetWidget()->setLayout(layout);
 }
 
 void LoadGeom::Event_Load(const EV::Arg<std::string*>& event) {

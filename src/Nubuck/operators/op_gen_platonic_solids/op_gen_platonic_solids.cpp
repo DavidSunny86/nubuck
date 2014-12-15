@@ -22,18 +22,18 @@ void PlatonicSolidsPanel::OnNameChanged(int idx) {
     OP::SendToOperator(ev_createPlatonicSolid.Tag(idx));
 }
 
-PlatonicSolidsPanel::PlatonicSolidsPanel(QWidget* parent) : OperatorPanel(parent) {
+PlatonicSolidsPanel::PlatonicSolidsPanel() {
     _names = new QComboBox;
     _names->addItem("tetrahedron");
     _names->addItem("hexahedron (cube)");
     _names->addItem("octahedron");
     _names->addItem("dodecahedron");
     _names->addItem("icosahedron");
-    connect(_names, SIGNAL(currentIndexChanged(int)), this, SLOT(OnNameChanged(int)));
+    QObject::connect(_names, SIGNAL(currentIndexChanged(int)), this, SLOT(OnNameChanged(int)));
 
     QFormLayout* layout = new QFormLayout;
     layout->addRow("name", _names);
-    setLayout(layout);
+    GetWidget()->setLayout(layout);
 }
 
 void PlatonicSolidsPanel::Invoke() {

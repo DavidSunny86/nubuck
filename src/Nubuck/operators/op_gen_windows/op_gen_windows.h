@@ -7,7 +7,7 @@ namespace GEN {
 
 class WindowsPanel : public OperatorPanel {
 public:
-    WindowsPanel(QWidget* parent = NULL) : OperatorPanel(parent) { }
+    WindowsPanel() { }
 };
 
 class Windows : public Operator {

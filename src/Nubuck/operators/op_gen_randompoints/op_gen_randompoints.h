@@ -26,7 +26,7 @@ class NBW_SpinBox;
 namespace OP {
 namespace GEN {
 
-class RandomPointsPanel : public UI::SimplePanel {
+class RandomPointsPanel : public QObject, public UI::SimplePanel {
     Q_OBJECT
 private:
     QComboBox*      _cbDomain;

@@ -14,7 +14,7 @@ class ENT_Geometry;
 
 namespace OP {
 
-class LoadOBJPanel : public OperatorPanel {
+class LoadOBJPanel : public QObject, public OperatorPanel {
     Q_OBJECT
 private:
 	Ui::LoadOBJ _ui;
@@ -22,7 +22,7 @@ private slots:
     void OnChooseFilename();
     void OnLoadScene();
 public:
-    LoadOBJPanel(QWidget* parent = NULL);
+    LoadOBJPanel();
 
     void Invoke() override;
 };

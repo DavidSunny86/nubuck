@@ -19,8 +19,8 @@ void Delaunay3DPanel::OnScaleChanged(leda::rational value) {
     SendToOperator(ev_setScale.Tag(value.to_double()));
 }
 
-Delaunay3DPanel::Delaunay3DPanel(QWidget* parent) : OperatorPanel(parent) {
-    _ui.setupUi(this);
+Delaunay3DPanel::Delaunay3DPanel() {
+    _ui.setupUi(GetWidget());
 
     _ui.sbScale->setObjectName("nbw_spinBox"); // important for stylesheet.
     _ui.sbScale->showProgressBar(true);
@@ -29,7 +29,7 @@ Delaunay3DPanel::Delaunay3DPanel(QWidget* parent) : OperatorPanel(parent) {
     _ui.sbScale->setSingleStep(0.025);
     _ui.sbScale->setValue(0.0);
 
-    connect(_ui.sbScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnScaleChanged(leda::rational)));
+    QObject::connect(_ui.sbScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnScaleChanged(leda::rational)));
 }
 
 void Delaunay3DPanel::Invoke() {
