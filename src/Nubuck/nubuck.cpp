@@ -17,6 +17,7 @@
 #include <UI\mainwindow\mainwindow.h>
 #include <UI\logwidget\logwidget.h>
 #include <UI\userinterface.h>
+#include <UI\nb_widgets.h>
 #include <mainloop\mainloop.h>
 #include "nubuck_private.h"
 
@@ -84,6 +85,26 @@ void NubuckImpl::set_operator_name(const char* name) {
 
 void NubuckImpl::set_operator_panel(QWidget* panel) {
     return g_ui.GetMainWindow().SetOperatorPanel(panel);
+}
+
+nb::Widget NubuckImpl::to_widget(nb::Button button) {
+    return button;
+}
+
+nb::BoxLayout NubuckImpl::create_horizontal_box_layout() {
+    return new QHBoxLayout;
+}
+
+nb::BoxLayout NubuckImpl::create_vertical_box_layout() {
+    return new QVBoxLayout;
+}
+
+nb::Button NubuckImpl::create_button(unsigned id, const char* name) {
+    return new NBW_Button(id, name);
+}
+
+void NubuckImpl::add_widget_to_box(nb::BoxLayout layout, nb::Widget widget) {
+    layout->addWidget(widget);
 }
 
 void NubuckImpl::destroy(const nb::entity obj) {

@@ -6,4 +6,6 @@ add_sources(
     userinterface.cpp
     userinterface.h
     window_events.h
+    nb_widgets.h
+    nb_widgets.cpp
 )

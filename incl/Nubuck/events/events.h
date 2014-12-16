@@ -29,6 +29,9 @@ NUBUCK_API eventID_t EV_GetNextID();
         eventTypeID_t GetDynamicEventTypeID() const override {      \
             return GetEventTypeID();                                \
         }                                                           \
+        const char* Name() const override {                         \
+            return #classname;                                      \
+        }                                                           \
         Event* Clone() const override {                             \
             return new classname(*this);                            \
         }
@@ -36,6 +39,7 @@ NUBUCK_API eventID_t EV_GetNextID();
 #define EVENT_GENERIC_CLONE(classname) \
     public: Event* Clone() const override { return new classname(*this); }
 
+#define EV_MAX_EVENT_ID UINT_MAX /* invalid event id */
 
 namespace EV {
 
@@ -46,16 +50,18 @@ struct BlockingEvent {
 };
 
 struct Event {
-    eventID_t       id;
+    eventID_t       id0;
+    eventID_t       id1;
     BlockingEvent*  block;
     bool            tagged;
 
-    Event() : block(NULL), tagged(false) { }
+    Event() : block(NULL), tagged(false), id1(EV_MAX_EVENT_ID) { }
 
     static eventTypeID_t GetEventTypeID() { return 0; }
 
     virtual eventTypeID_t GetDynamicEventTypeID() const { return 0; }
     virtual bool Merge(const Event& other) { return false; }
+    virtual const char* Name() const { return "base event"; }
     virtual Event* Clone() const { return new Event(*this); }
 
     void Accept() const {
@@ -122,8 +128,9 @@ public:
 
     // NOTE: in case of default argument a referenced to a temporary object is
     // returned. this is fine, however, because the event gets cloned anyways
-    const T_Event& Tag(T_Event& event = T_Event()) const {
-        event.id = _eventID;
+    const T_Event& Tag(T_Event& event = T_Event(), const eventID_t id1 = EV_MAX_EVENT_ID) const {
+        event.id0 = _eventID;
+        event.id1 = id1;
         event.tagged = true;
         return event;
     }
@@ -150,15 +157,16 @@ public:
 
     // NOTE: in case of default argument a referenced to a temporary object is
     // returned. this is fine, however, because the event gets cloned anyways
-    const Arg<T>& Tag(Arg<T>& event = Arg<T>()) const {
-        event.id = _eventID;
+    const Arg<T>& Tag(Arg<T>& event = Arg<T>(), const eventID_t id1 = EV_MAX_EVENT_ID) const {
+        event.id0 = _eventID;
+        event.id1 = id1;
         event.tagged = true;
         return event;
     }
 
-    Arg<T> Tag(const T& value) const {
+    Arg<T> Tag(const T& value, const eventID_t id1 = EV_MAX_EVENT_ID) const {
         Arg<T> event(value);
-        return Tag(event);
+        return Tag(event, id1);
     }
 };
 
@@ -191,7 +199,8 @@ private:
     std::vector<GEN::Pointer<AbstractHandler> >     _ev_handlers;
 protected:
     struct AbstractHandler {
-        eventID_t    eventID;
+        eventID_t    id0;
+        eventID_t    id1;
         virtual void Call(const Event& event) = 0;
     };
 
@@ -208,12 +217,18 @@ protected:
     };
 public:
     template<typename T_Instance, typename T_Event>
-    void AddEventHandler(const ConcreteEventDef<T_Event>& eventDef, T_Instance* instance, typename ConcreteHandler<T_Instance, T_Event>::memfunc_t memfunc) {
+    void AddEventHandler(
+        const ConcreteEventDef<T_Event>& eventDef,
+        T_Instance* instance,
+        typename ConcreteHandler<T_Instance, T_Event>::memfunc_t memfunc,
+        const eventID_t id1 = EV_MAX_EVENT_ID)
+    {
         assert(instance);
         assert(memfunc);
         assert(eventDef.GetEventTypeID() == T_Event::GetEventTypeID()); // type compatibility
         GEN::Pointer<ConcreteHandler<T_Instance, T_Event> > item(new ConcreteHandler<T_Instance, T_Event>);
-        item->eventID = eventDef.GetEventID();
+        item->id0 = eventDef.GetEventID();
+        item->id1 = id1;
         item->instance = instance;
         item->memfunc = memfunc;
         _ev_handlers.push_back(item);
@@ -235,21 +250,27 @@ protected:
             }
             _ev_eventsMtx.Unlock();
             if(done) break;
-            bool called = false;
+            AbstractHandler *match = NULL, *h = NULL;
             for(unsigned i = 0; i < _ev_handlers.size(); ++i) {
-                if(_ev_handlers[i]->eventID == event->id) {
-                    _ev_handlers[i]->Call(*event);
-                    called = true;
+                h = _ev_handlers[i].Raw();
+                if(event->id0 == h->id0) {
+                    if(
+                        event->id1 == h->id1 ||                 // specialized handler
+                        (!match && EV_MAX_EVENT_ID == h->id1))  // general handler
+                    {
+                        match = h;
+                    }
                 }
-            }
-            if(!called) Event_Default(*event, className);
+            } // forall handlers
+            if(match) match->Call(*event);
+            else Event_Default(*event, className);
+            delete event;
         } /* while(!done) */
     }
 
     virtual void Event_Default(const Event& event, const char* className) {
-        const char* name = "<unnamed event>";
         COM_printf("WARNING - unhandled event '%s' (id = '%d') in class '%s'.\n",
-            name, event.id, className);
+            event.Name(), event.id0, className);
     }
 public:
     virtual ~EventHandler() { }

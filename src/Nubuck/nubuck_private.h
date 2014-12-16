@@ -19,6 +19,12 @@ struct NubuckImpl : Nubuck {
     void    set_operator_name(const char* name);
     void    set_operator_panel(QWidget* panel);
 
+    nb::Widget      to_widget(nb::Button button);
+    nb::BoxLayout   create_horizontal_box_layout();
+    nb::BoxLayout   create_vertical_box_layout();
+    nb::Button      create_button(unsigned id, const char* name);
+    void            add_widget_to_box(nb::BoxLayout layout, nb::Widget widget);
+
     // world
     void                destroy(const nb::entity obj);
 #pragma region DEPRECATED

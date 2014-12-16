@@ -13,6 +13,10 @@ bool IsAnimatorIdle() { return A::g_animator.IsIdle(); }
 
 namespace OP {
 
+void OperatorPanel::SetLayout(nb::BoxLayout layout) {
+    _widget->setLayout(layout);
+}
+
 OperatorPanel::OperatorPanel() : _widget(NULL) {
     _widget = new QWidget;
 }

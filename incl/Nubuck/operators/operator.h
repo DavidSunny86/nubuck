@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include <Nubuck\nubuck.h>
 #include <Nubuck\math\vector2.h>
 
 #include <Nubuck\operators\operator_events.h>
@@ -30,6 +31,8 @@ public:
     OperatorPanel();
 
     virtual ~OperatorPanel() { }
+
+    void SetLayout(nb::BoxLayout layout);
 
     virtual void Invoke() { }
 

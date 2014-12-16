@@ -13,6 +13,7 @@
 
 class QMenu;
 class QWidget;
+class QBoxLayout;
 
 namespace M {
 
@@ -44,6 +45,8 @@ struct MouseEvent;
 
 } // namespace OP
 
+class NBW_Button;
+
 namespace nb {
 
 typedef W::Entity*              entity;
@@ -59,6 +62,10 @@ struct EntityType {
     };
 };
 
+typedef QBoxLayout* BoxLayout;
+typedef QWidget*    Widget;
+typedef NBW_Button* Button;
+
 } // namespace nb
 
 struct Nubuck {
@@ -73,6 +80,12 @@ struct Nubuck {
     virtual void    add_menu_item(QMenu* menu, const char* name, OP::Invoker& invoker) = 0;
     virtual void    set_operator_name(const char* name) = 0;
     virtual void    set_operator_panel(QWidget* panel) = 0;
+
+    virtual nb::Widget      to_widget(nb::Button button) = 0;
+    virtual nb::BoxLayout   create_horizontal_box_layout() = 0;
+    virtual nb::BoxLayout   create_vertical_box_layout() = 0;
+    virtual nb::Button      create_button(unsigned id, const char* text) = 0;
+    virtual void            add_widget_to_box(nb::BoxLayout box, nb::Widget widget) = 0;
 
     // world
     virtual void                destroy(const nb::entity obj) = 0;

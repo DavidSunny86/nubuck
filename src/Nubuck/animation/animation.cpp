@@ -78,10 +78,10 @@ void Animation::PlayUntilIsDone() {
 // stock event filters
 
 bool IsWidgetEvent(const EV::Event& event) {
-    if(ev_key.GetEventID() == event.id) return false;
-    if(ev_mouse.GetEventID() == event.id) return false;
-    if(ev_resize.GetEventID() == event.id) return false;
-    if(ev_w_selectionChanged.GetEventID() == event.id) return false;
+    if(ev_key.GetEventID() == event.id0) return false;
+    if(ev_mouse.GetEventID() == event.id0) return false;
+    if(ev_resize.GetEventID() == event.id0) return false;
+    if(ev_w_selectionChanged.GetEventID() == event.id0) return false;
     // TODO ... event tags would be nice
 
     return true;

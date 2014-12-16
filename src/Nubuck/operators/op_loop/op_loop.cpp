@@ -35,8 +35,23 @@ void Loop::Event_OP_Loop_Start(const EV::Event& event) {
     }
 }
 
+void Loop::Event_ButtonClicked(const EV::Event& event) {
+    printf("Ola, button clicked!\n");
+}
+
+void Loop::Event_Button0(const EV::Event& event) {
+    printf("specialized handler for id = 0\n");
+}
+
+void Loop::Event_Button1(const EV::Event& event) {
+    printf("specialized handler for id = 1\n");
+}
+
 Loop::Loop() : _geom(NULL) {
     AddEventHandler(ev_loopStart, this, &Loop::Event_OP_Loop_Start);
+    AddEventHandler(ev_buttonClicked, this, &Loop::Event_ButtonClicked);
+    AddEventHandler(ev_buttonClicked, this, &Loop::Event_Button0, 0);
+    AddEventHandler(ev_buttonClicked, this, &Loop::Event_Button1, 1);
 }
 
 void Loop::Register(Invoker& invoker) {

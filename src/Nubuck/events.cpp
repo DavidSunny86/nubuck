@@ -15,6 +15,7 @@ eventID_t EV_GetNextID() {
 NUBUCK_API EV::ConcreteEventDef<EV::ResizeEvent> ev_resize;
 NUBUCK_API EV::ConcreteEventDef<EV::MouseEvent>  ev_mouse;
 NUBUCK_API EV::ConcreteEventDef<EV::KeyEvent>    ev_key;
+NUBUCK_API EV::ConcreteEventDef<EV::Event>       ev_buttonClicked;
 
  // world events
 EV::ConcreteEventDef<EV::Event>              ev_w_apocalypse;

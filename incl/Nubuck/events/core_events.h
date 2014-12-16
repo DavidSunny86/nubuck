@@ -48,3 +48,4 @@ struct KeyEvent : Event {
 NUBUCK_API extern EV::ConcreteEventDef<EV::ResizeEvent> ev_resize;
 NUBUCK_API extern EV::ConcreteEventDef<EV::MouseEvent>  ev_mouse;
 NUBUCK_API extern EV::ConcreteEventDef<EV::KeyEvent>    ev_key;
+NUBUCK_API extern EV::ConcreteEventDef<EV::Event>       ev_buttonClicked;

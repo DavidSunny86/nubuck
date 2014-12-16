@@ -21,6 +21,12 @@ public:
         QPushButton* button = new QPushButton("Start Loop");
         QVBoxLayout* layout = new QVBoxLayout;
         layout->addWidget(button);
+
+        for(int i = 0; i < 3; ++i) {
+            nb::Button otherButton = nubuck().create_button(i, "Hello, World!");
+            nubuck().add_widget_to_box(layout, nubuck().to_widget(otherButton));
+        }
+
         layout->addStretch();
         GetWidget()->setLayout(layout);
         QObject::connect(button, SIGNAL(clicked()), this, SLOT(OnButtonClicked()));
@@ -32,6 +38,9 @@ private:
     W::ENT_Geometry* _geom;
 
     void Event_OP_Loop_Start(const EV::Event& event);
+    void Event_ButtonClicked(const EV::Event& event);
+    void Event_Button0(const EV::Event& event);
+    void Event_Button1(const EV::Event& event);
 public:
     Loop();
 
