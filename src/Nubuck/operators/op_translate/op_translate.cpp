@@ -31,6 +31,7 @@ void Translate::Register(Invoker& invoker) {
 
 bool Translate::Invoke() {
     nubuck().set_operator_name("Translate");
+    _editMode = W::world.GetEditMode().GetMode();
     OnGeometrySelected();
     return true;
 }
