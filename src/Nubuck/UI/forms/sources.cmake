@@ -7,6 +7,5 @@ add_sources(
     op_loadobj.ui
     operatorpanelheader.ui
     randompoints.ui
-    renderconfig.ui
     rendermetrics.ui
 )

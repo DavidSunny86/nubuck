@@ -11,10 +11,10 @@ class RenderView;
 class RenderConfig : public QDockWidget {
     Q_OBJECT
 private:
-    Ui::RenderConfig _ui;
+    QWidget* CreateBackgroundItem(RenderView* renderView);
+    QWidget* CreateTransparencyItem();
+    QWidget* CreateLightingItem();
 public slots:
-    void OnNodeSizeChanged(double value);
-    void OnEdgeRadiusChanged(double value);
     void OnTransparencyModeChanged(int index);
     void OnNumDepthPeelsChanged(int value);
 public:

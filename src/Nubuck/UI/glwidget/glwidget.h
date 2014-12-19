@@ -22,8 +22,6 @@ namespace UI {
 
         bool        _resizing;
         SYS::Timer  _resizeTimer;
-
-        void Initialize(void);
     protected:
         SYS::RenderingContext& GetRenderingContext();
 
@@ -44,6 +42,7 @@ namespace UI {
     public:
         GLWidget(QWidget* parent = NULL);
 
+        void Use(void);
         void updateGL(void);
     };
 

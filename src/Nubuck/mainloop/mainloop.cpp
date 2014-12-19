@@ -13,7 +13,10 @@ void MainLoop::Update() {
     g_ui.HandleEvents();
 	W::world.Update(); 
 
-    g_ui.GetMainWindow().GetRenderView()->Render();
+    UI::RenderView* renderView = g_ui.GetMainWindow().GetRenderView();
+    renderView->Use();
+    renderView->Render();
+
     UI::LogWidget::Instance()->Flush();
 }
 

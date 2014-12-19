@@ -7,31 +7,12 @@
 
 namespace UI {
 
-    void GLWidget::Initialize(void) {
-        if(!_isInitialized) {
-            _winId = winId();
-            _rc = GEN::Pointer<SYS::RenderingContext>(new SYS::RenderingContext(_winId));
-            _rc->Use();
-
-            initializeGL();
-            _isInitialized = true;
-        }
-
-        if(winId() != _winId) {
-            const char* msg =
-                "ERROR - GLWidget: the window handle became invalid. the most likely reason "
-                "for this is reparenting of the widget. don't do this.\n";
-            common.printf(msg);
-            Crash();
-        }
-    }
-
     SYS::RenderingContext& GLWidget::GetRenderingContext() {
         return *_rc;
     }
 
     void GLWidget::resizeEvent(QResizeEvent* event) {
-        Initialize();
+        Use();
         resizeGL(event->size().width(), event->size().height());
         _resizing = true;
         _resizeTimer.Start();
@@ -50,8 +31,29 @@ namespace UI {
         setAttribute(Qt::WA_PaintOnScreen, true); // avoids flimmering
     }
 
+    void GLWidget::Use(void) {
+        if(!_isInitialized) {
+            _winId = winId();
+            _rc = GEN::Pointer<SYS::RenderingContext>(new SYS::RenderingContext(_winId));
+            _rc->Use();
+
+            initializeGL();
+            _isInitialized = true;
+        }
+
+        if(winId() != _winId) {
+            const char* msg =
+                "ERROR - GLWidget: the window handle became invalid. the most likely reason "
+                "for this is reparenting of the widget. don't do this.\n";
+            common.printf(msg);
+            Crash();
+        }
+
+        _rc->Use();
+    }
+
     void GLWidget::updateGL(void) {
-        Initialize();
+        Use();
         paintGL();
         _rc->Flip();
 
