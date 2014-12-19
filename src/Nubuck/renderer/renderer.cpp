@@ -100,8 +100,6 @@ COM::Config::Variable<int>      cvar_r_forceState("r_forceState", 0);
 
 namespace R {
 
-static meshPtr_t nodeMesh;
-
 static State curState;
 
 enum UniformBindingIndices {
