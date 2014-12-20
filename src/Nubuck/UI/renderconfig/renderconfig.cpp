@@ -75,8 +75,13 @@ QWidget* RenderConfig::CreateTransparencyItem() {
 }
 
 QWidget* RenderConfig::CreateLightingItem() {
-    DirLight* dirLight = new DirLight;
-    return dirLight;
+    QVBoxLayout* vbox = new QVBoxLayout;
+    vbox->addWidget(new DirLightControls(0));
+    vbox->addWidget(new DirLightControls(1));
+    vbox->addWidget(new DirLightControls(2));
+    QWidget* dummy = new QWidget;
+    dummy->setLayout(vbox);
+    return dummy;
 }
 
 RenderConfig::RenderConfig(RenderView* renderView, QWidget* parent) : QDockWidget(parent) {

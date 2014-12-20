@@ -85,6 +85,9 @@ namespace W {
         float       _secsPassed;
         float       _timePassed;
 
+        R::DirectionalLight _dirLights[3];
+
+        void SetDefaultLights();
         void SetupLights(R::RenderList& renderList);
 
         ArcballCamera _camArcball;
@@ -135,6 +138,9 @@ namespace W {
 		World(void);
 
         void Init();
+
+        const R::DirectionalLight&  GetDirectionalLight(const int idx) const;
+        void                        SetDirectionalLight(const int idx, const R::DirectionalLight& dirLight);
 
         const EditMode& GetEditMode() const { return _editMode; }
         EditMode&       GetEditMode() { return _editMode; };

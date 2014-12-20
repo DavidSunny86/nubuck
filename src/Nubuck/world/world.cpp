@@ -245,28 +245,24 @@ static M::Vector3 UnprojectPoint(
     return Transform(normalMat, t);
 }
 
-void World::SetupLights(R::RenderList& renderList) {
-    /*
-    renderList.dirLights[0].direction      = M::Vector3(-1.0f,  1.0f,  0.0f);
-    renderList.dirLights[0].diffuseColor   = R::Color(0.6f, 0.85f, 0.91f);
-
-    renderList.dirLights[1].direction      = M::Vector3( 1.0f,  1.0f,  0.0f);
-    renderList.dirLights[1].diffuseColor   = R::Color(1.0f, 0.5f, 0.15f);
-
-    renderList.dirLights[2].direction      = M::Vector3( 0.0f, -0.5f, -1.5f);
-    renderList.dirLights[2].diffuseColor   = R::Color(1.0f, 1.0f, 1.0f);
-    */
-
+void World::SetDefaultLights() {
     const R::Color gray = R::Color(0.5f, 0.5f, 0.5f);
 
-    renderList.dirLights[0].direction      = M::Vector3(-1.0f,  1.0f,  0.0f);
-    renderList.dirLights[0].diffuseColor   = gray;
+    _dirLights[0].direction      = M::Vector3(-1.0f,  1.0f,  0.0f);
+    _dirLights[0].diffuseColor   = gray;
 
-    renderList.dirLights[1].direction      = M::Vector3( 1.0f,  1.0f,  0.0f);
-    renderList.dirLights[1].diffuseColor   = gray;
+    _dirLights[1].direction      = M::Vector3( 1.0f,  1.0f,  0.0f);
+    _dirLights[1].diffuseColor   = gray;
 
-    renderList.dirLights[2].direction      = M::Vector3( 0.0f, -0.5f, -1.5f);
-    renderList.dirLights[2].diffuseColor   = R::Color::White;
+    _dirLights[2].direction      = M::Vector3( 0.0f, -0.5f, -1.5f);
+    _dirLights[2].diffuseColor   = R::Color::White;
+}
+
+void World::SetupLights(R::RenderList& renderList) {
+    for(int i = 0; i < 3; ++i) {
+        renderList.dirLights[i].direction = _dirLights[i].direction;
+        renderList.dirLights[i].diffuseColor = _dirLights[i].diffuseColor;
+    }
 }
 
 static float mouseX, mouseY;
@@ -464,7 +460,9 @@ void World::BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
 }
 
 World::World(void) : _camArcball(800, 400) /* init values arbitrary */
-{ }
+{
+    SetDefaultLights();
+}
 
 void World::Init() {
     AddEventHandler(ev_w_apocalypse,           this, &World::Event_Apocalypse);
@@ -480,6 +478,16 @@ void World::Init() {
     Grid_Build();
 
     _globalTransformGizmo = CreateTransformGizmo();
+}
+
+const R::DirectionalLight& World::GetDirectionalLight(const int idx) const {
+    COM_assert(0 <= idx && idx < 3);
+    return _dirLights[idx];
+}
+
+void World::SetDirectionalLight(const int idx, const R::DirectionalLight& dirLight) {
+    COM_assert(0 <= idx && idx < 3);
+    _dirLights[idx] = dirLight;
 }
 
 M::Ray World::PickingRay(const M::Vector2& mouseCoords) {
