@@ -66,7 +66,6 @@ namespace UI {
     }
 
     void RenderView::initializeGL(void) {
-        _renderer.Init();
         _debugText.Init(GetDeviceContext());
 
         BuildBackgroundGradient();
@@ -78,13 +77,13 @@ namespace UI {
         event.height = height;
         W::world.Send(ev_resize.Tag(event));
 
-        _renderer.Resize(width, height);
+        R::theRenderer.Resize(width, height);
         _debugText.Resize(width, height);
         Render();
     }
 
     void RenderView::finishResizeGL() {
-        _renderer.FinishResize();
+        R::theRenderer.FinishResize();
     }
 
     bool RenderView::focusNextPrevChild(bool) {
@@ -170,7 +169,7 @@ namespace UI {
     void RenderView::keyPressEvent(QKeyEvent* qevent) {
         // screenshot
         if(Qt::Key_F12 == qevent->key() && !qevent->isAutoRepeat()) {
-            _renderer.Screenshot();
+            R::theRenderer.Screenshot();
             return;
         }
 
@@ -222,7 +221,7 @@ namespace UI {
 
     void RenderView::OnSetBackgroundColor(float r, float g, float b) {
         _bgColor = R::Color(r, g, b);
-        _renderer.SetClearColor(_bgColor);
+        R::theRenderer.SetClearColor(_bgColor);
         BuildBackgroundGradient();
     }
 
@@ -263,7 +262,7 @@ namespace UI {
     }
 
     const R::Renderer& RenderView::GetRenderer() const {
-        return _renderer;
+        return R::theRenderer;
     }
 
     const R::Color& RenderView::GetBackgroundColor() const {
@@ -292,14 +291,15 @@ namespace UI {
         OP::g_operators.GetMeshJobs(_renderList.meshJobs);
 
         if(_largeScreenshotRequested) {
-            _renderer.LargeScreenshot(10000, 10000, _renderList);
+            R::theRenderer.LargeScreenshot(10000, 10000, _renderList);
             _largeScreenshotRequested = false;
         }
 
-        _renderer.BeginFrame();
-        _renderer.Render(_renderList);
-        _renderer.RenderPen(_pen);
-        _renderer.EndFrame();
+        R::theRenderer.Resize(width(), height());
+        R::theRenderer.BeginFrame();
+        R::theRenderer.Render(_renderList);
+        R::theRenderer.RenderPen(_pen);
+        R::theRenderer.EndFrame();
 
         _debugText.BeginFrame();
         _debugText.Printf("frame time: %f\n", R::metrics.frame.time);

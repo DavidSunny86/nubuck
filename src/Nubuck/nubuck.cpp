@@ -15,6 +15,7 @@
 #include <world\entities\ent_transform_gizmo\ent_transform_gizmo.h>
 #include <renderer\effects\effect.h>
 #include <renderer\effects\statedesc_gen\statedesc_gen.h>
+#include <UI\glwidget\glwidget.h>
 #include <UI\mainwindow\mainwindow.h>
 #include <UI\logwidget\logwidget.h>
 #include <UI\userinterface.h>
@@ -468,6 +469,14 @@ QGLFormat FmtAlphaMultisampling(int numSamples) {
 	return fmt;
 }
 
+static void InitializeRenderer() {
+    // somewhat HACKY. create dummy glwidget and rc to init renderer
+    UI::GLWidget* dummyGL = new UI::GLWidget;
+    dummyGL->Use();
+    R::theRenderer.Init();
+    delete dummyGL;
+}
+
 void TestPageAlloc();
 
 int RunNubuck(
@@ -523,6 +532,7 @@ int RunNubuck(
     common.printf("INFO - Nubuck compiled with Qt version '%s'\n", QT_VERSION_STR);
 
     SYS::InitializeGLExtensions();
+    InitializeRenderer();
 
     OP::g_operators.Init();
     W::world.Init();
@@ -571,5 +581,10 @@ int RunNubuck(
     }
 
     g_ui.GetMainWindow().show();
-    return app.exec();
+    const int ret = app.exec();
+
+    // cleanup
+    R::theRenderer.Destroy();
+
+    return ret;
 }

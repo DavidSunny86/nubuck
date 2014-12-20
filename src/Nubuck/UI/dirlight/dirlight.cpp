@@ -6,8 +6,6 @@
 namespace UI {
 
 void DirLight::initializeGL() {
-    _renderer.Init();
-
     // create sphere mesh
     R::Sphere sphere(5, true);
     _sphereMesh = R::meshMgr.Create(sphere.GetDesc());
@@ -17,7 +15,7 @@ void DirLight::initializeGL() {
 }
 
 void DirLight::resizeGL(int width, int height) {
-    _renderer.Resize(width, height);
+    R::theRenderer.Resize(width, height);
 }
 
 static void SetupLights(R::RenderList& renderList) {
@@ -38,7 +36,7 @@ void DirLight::paintGL() {
 
     renderList.Clear();
     SetupLights(renderList);
-    renderList.worldMat = M::Mat4::Identity();
+    renderList.worldMat = M::Mat4::Translate(0.0f, 0.0f, -4.0f);
     renderList.projWeight = 0.0f;
 
     R::MeshJob meshJob;
@@ -49,11 +47,10 @@ void DirLight::paintGL() {
     meshJob.tfmesh = _sphereTFMesh;
     renderList.meshJobs.push_back(meshJob);
 
-    /*
-    _renderer.BeginFrame();
-    _renderer.Render(renderList);
-    _renderer.EndFrame();
-    */
+    R::theRenderer.Resize(width(), height());
+    R::theRenderer.BeginFrame();
+    R::theRenderer.Render(renderList);
+    R::theRenderer.EndFrame();
 }
 
 QSize DirLight::sizeHint() const {

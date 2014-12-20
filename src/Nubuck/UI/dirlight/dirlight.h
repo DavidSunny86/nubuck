@@ -7,8 +7,6 @@ namespace UI {
 
 class DirLight : public GLWidget {
 private:
-    R::Renderer _renderer;
-
     R::meshPtr_t    _sphereMesh;
     R::tfmeshPtr_t  _sphereTFMesh;
 protected:

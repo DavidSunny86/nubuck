@@ -40,7 +40,6 @@ namespace UI {
         void BuildBackgroundGradient();
         void RenderBackgroundGradient(R::RenderList& renderList);
 
-        R::Renderer                 _renderer;
         R::RenderList               _renderList;
         std::vector<R::PenVertex>   _pen;
         R::DebugText                _debugText;

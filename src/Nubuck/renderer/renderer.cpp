@@ -100,6 +100,8 @@ COM::Config::Variable<int>      cvar_r_forceState("r_forceState", 0);
 
 namespace R {
 
+Renderer theRenderer;
+
 static State curState;
 
 enum UniformBindingIndices {
@@ -493,9 +495,7 @@ static void ClearPipelineTextureBindings() {
 Renderer::Renderer(void) : _time(0.0f), _screenshotRequested(false), _clearColor(Color::Black) {
 }
 
-Renderer::~Renderer() {
-    Framebuffers_DestroyBuffers();
-}
+Renderer::~Renderer() { }
 
 static void PrintGLInfo(void) {
     common.printf("INFO - GL strings {\n");
@@ -522,7 +522,7 @@ static void CheckRequiredExtensions() {
     REQUIRE_EXT(EXT_framebuffer_object);
 }
 
-void Renderer::Init(void) {
+void Renderer::Init() {
     GL_CHECK_ERROR;
 
     PrintGLInfo();
@@ -569,6 +569,10 @@ void Renderer::Init(void) {
     _timer.Start();
 }
 
+void Renderer::Destroy() {
+    Framebuffers_DestroyBuffers();
+}
+
 const Color& Renderer::GetClearColor() const {
     return _clearColor;
 }
@@ -577,7 +581,13 @@ void Renderer::SetClearColor(const Color& color) {
     _clearColor = color;
 }
 
+/*
+NOTE: you typically want to resize at the beginning of each frame, because
+the renderer draws to multiple widgets of different sizes
+*/
 void Renderer::Resize(int width, int height) {
+    if(width == _width && height == _height) return;
+
     _width = width;
     _height = height;
 

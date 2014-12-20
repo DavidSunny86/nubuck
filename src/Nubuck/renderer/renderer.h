@@ -131,7 +131,9 @@ public:
     Renderer(void);
     ~Renderer();
 
-    void Init(void); // requires gl context
+    // requires gl context
+    void Init();
+    void Destroy();
 
     const Color&    GetClearColor() const;
     void            SetClearColor(const Color& color);
@@ -149,5 +151,7 @@ public:
 
     void LargeScreenshot(const int imgWidth, const int imgHeight, RenderList& renderList);
 };
+
+extern Renderer theRenderer;
 
 } // namespace R
