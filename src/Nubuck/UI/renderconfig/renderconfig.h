@@ -1,7 +1,6 @@
 #pragma once
 
 #include <qdockwidget>
-#include "ui_renderconfig.h"
 
 namespace UI {
 

@@ -1,5 +1,8 @@
 #include <QToolBox>
 #include <QFormLayout>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QSpinBox>
 
 #include <Nubuck\math\math.h>
 #include <renderer\renderer.h>
@@ -7,6 +10,7 @@
 #include <UI\mainwindow\mainwindow.h>
 #include <UI\userinterface.h>
 #include <UI\dirlight\dirlight.h>
+#include <UI\colorbutton\colorbutton.h>
 #include "renderconfig.h"
 
 namespace UI {
