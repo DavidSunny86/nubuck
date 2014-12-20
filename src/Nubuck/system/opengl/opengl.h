@@ -7,48 +7,42 @@
 
 namespace SYS {
 
-	class Window;
+struct PixelFormatException : std::exception {
+    const char* what() const {
+        return "setting pixel format failed";
+    }
+};
 
-	struct PixelFormatException : std::exception {
-		const char* what(void) const {
-			return "setting pixel format failed";
-		}
-	};
+class DeviceContext : private GEN::Uncopyable {
+protected:
+    HWND    _hwnd;
+    HDC     _hdc;
+public:
+    explicit DeviceContext(const HWND hwnd);
+    virtual ~DeviceContext();
 
-	class DeviceContext : private GEN::Uncopyable {
-	protected:
-		HWND _windowHandle;
-		HDC _contextHandle;
-	public:
-		DeviceContext(Window& window);
-        explicit DeviceContext(HWND windowHandle);
-		virtual ~DeviceContext(void);
+    HDC GetNativeHandle() { return _hdc; }
 
-		HDC GetNativeHandle(void) { return _contextHandle; }
-	};
+    void SetPixelFormat();
+    void Flip();
+};
 
-	class RenderingContext : private GEN::Uncopyable {
-	private:
-		DeviceContext _deviceContext;
-		HGLRC _contextHandle;
-		bool _initialized;
+class RenderingContext : private GEN::Uncopyable {
+private:
+    HGLRC   _hrc;
+    bool    _initialized;
 
-		static bool _extensionsInitialized;
-        static int _major, _minor;
-		static void InitExtensions(void);
+    static bool _extensionsInitialized;
+    static int _major, _minor;
+    static void InitExtensions();
+public:
+    explicit RenderingContext(const HDC hdc);
+    ~RenderingContext();
 
-        void Init(void);
-	public:
-		RenderingContext(Window& window);
-        explicit RenderingContext(HWND windowHandle);
-		~RenderingContext(void);
+    void MakeCurrent(const HDC hdc);
+};
 
-        DeviceContext& GetDeviceContext();
-
-		void Use(void);
-		void Flip(void);
-	};
-
-	bool IsRenderingContextActive(void);
+bool IsRenderingContextActive();
+void InitializeGLExtensions();
 
 } // namespace SYS

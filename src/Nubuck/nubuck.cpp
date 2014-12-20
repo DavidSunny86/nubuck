@@ -9,6 +9,7 @@
 #include <Nubuck\animation\animator.h>
 #include <common\config\config.h>
 #include <common\commands.h>
+#include <system\opengl\opengl.h>
 #include <world\world.h>
 #include <world\entities\ent_text\ent_text.h>
 #include <world\entities\ent_transform_gizmo\ent_transform_gizmo.h>
@@ -520,6 +521,8 @@ int RunNubuck(
     }
 
     common.printf("INFO - Nubuck compiled with Qt version '%s'\n", QT_VERSION_STR);
+
+    SYS::InitializeGLExtensions();
 
     OP::g_operators.Init();
     W::world.Init();

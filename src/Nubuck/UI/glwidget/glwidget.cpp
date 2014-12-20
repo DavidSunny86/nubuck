@@ -7,61 +7,76 @@
 
 namespace UI {
 
-    SYS::RenderingContext& GLWidget::GetRenderingContext() {
-        return *_rc;
-    }
+GEN::Pointer<SYS::RenderingContext> GLWidget::shared_rc;
 
-    void GLWidget::resizeEvent(QResizeEvent* event) {
-        Use();
-        resizeGL(event->size().width(), event->size().height());
-        _resizing = true;
-        _resizeTimer.Start();
-    }
+SYS::DeviceContext& GLWidget::GetDeviceContext() {
+    COM_assert(_dc.IsValid());
+    return *_dc;
+}
 
-    void GLWidget::paintEvent(QPaintEvent*) {
-        updateGL();
-    }
+SYS::RenderingContext& GLWidget::GetRenderingContext() {
+    COM_assert(shared_rc.IsValid());
+    return *shared_rc;
+}
 
-    GLWidget::GLWidget(QWidget* parent) 
-        : QWidget(parent)
-        , _winId(NULL)
-        , _isInitialized(false)
-        , _resizing(false)
-    {
-        setAttribute(Qt::WA_PaintOnScreen, true); // avoids flimmering
-    }
+void GLWidget::resizeEvent(QResizeEvent* event) {
+    Use();
+    resizeGL(event->size().width(), event->size().height());
+    _resizing = true;
+    _resizeTimer.Start();
+}
 
-    void GLWidget::Use(void) {
-        if(!_isInitialized) {
-            _winId = winId();
-            _rc = GEN::Pointer<SYS::RenderingContext>(new SYS::RenderingContext(_winId));
-            _rc->Use();
+void GLWidget::paintEvent(QPaintEvent*) {
+    updateGL();
+}
 
-            initializeGL();
-            _isInitialized = true;
+GLWidget::GLWidget(QWidget* parent) 
+    : QWidget(parent)
+    , _winId(NULL)
+    , _isInitialized(false)
+    , _resizing(false)
+{
+    setAttribute(Qt::WA_PaintOnScreen, true); // avoids flimmering
+}
+
+void GLWidget::Use() {
+    if(!_isInitialized) {
+        _winId = winId();
+
+        assert(!_dc.IsValid());
+        _dc = GEN::MakePtr(new SYS::DeviceContext(_winId));
+        _dc->SetPixelFormat();
+
+        if(!shared_rc.IsValid()) {
+            shared_rc = GEN::Pointer<SYS::RenderingContext>(new SYS::RenderingContext(_dc->GetNativeHandle()));
         }
+        shared_rc->MakeCurrent(_dc->GetNativeHandle());
 
-        if(winId() != _winId) {
-            const char* msg =
-                "ERROR - GLWidget: the window handle became invalid. the most likely reason "
-                "for this is reparenting of the widget. don't do this.\n";
-            common.printf(msg);
-            Crash();
-        }
-
-        _rc->Use();
+        initializeGL();
+        _isInitialized = true;
     }
 
-    void GLWidget::updateGL(void) {
-        Use();
-        paintGL();
-        _rc->Flip();
-
-        const float resizeTimeout = 4.0f;
-        if(_resizing && resizeTimeout < _resizeTimer.Stop()) { // Timer::Stop doesn't actually stop the timer!
-            finishResizeGL();
-            _resizing = false;
-        }
+    if(winId() != _winId) {
+        const char* msg =
+            "ERROR - GLWidget: the window handle became invalid. the most likely reason "
+            "for this is reparenting of the widget. don't do this.\n";
+        common.printf(msg);
+        Crash();
     }
+
+    shared_rc->MakeCurrent(_dc->GetNativeHandle());
+}
+
+void GLWidget::updateGL() {
+    Use();
+    paintGL();
+    _dc->Flip();
+
+    const float resizeTimeout = 4.0f;
+    if(_resizing && resizeTimeout < _resizeTimer.Stop()) { // Timer::Stop doesn't actually stop the timer!
+        finishResizeGL();
+        _resizing = false;
+    }
+}
 
 } // namespace UI

@@ -67,7 +67,7 @@ namespace UI {
 
     void RenderView::initializeGL(void) {
         _renderer.Init();
-        _debugText.Init(GetRenderingContext().GetDeviceContext());
+        _debugText.Init(GetDeviceContext());
 
         BuildBackgroundGradient();
     }
