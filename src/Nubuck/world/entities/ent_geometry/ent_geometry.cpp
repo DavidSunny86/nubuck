@@ -383,6 +383,8 @@ void ENT_Geometry::Rebuild() {
         _edgeRenderer->Update(_ratPolyMesh, _fpos);
 
         UpdateRenderMesh();
+
+        _ratPolyMesh.cache_all();
     }
 
     ComputeBoundingBox();
