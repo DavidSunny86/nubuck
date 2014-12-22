@@ -83,6 +83,7 @@ QWidget* RenderConfig::CreateLightingItem() {
     vbox->addWidget(new DirLightControls(0));
     vbox->addWidget(new DirLightControls(1));
     vbox->addWidget(new DirLightControls(2));
+    vbox->addStretch();
     QWidget* dummy = new QWidget;
     dummy->setLayout(vbox);
     return dummy;
