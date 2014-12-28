@@ -94,8 +94,8 @@ bool SPP_StartParsing(std::string& out, std::vector<AttributeLocation>& attribLo
             AttributeLocation loc;
             if(!ParseAttributeDecl(out, loc)) return false;
             attribLocs.push_back(loc);
-        } else if(Tokens::TOK_EOF == g_nextToken && !YYSPP_PopFile()) {
-            break;
+        } else if(Tokens::TOK_EOF == g_nextToken) {
+            if(!YYSPP_PopFile()) break;
         } else {
             out += yyspptext;
         }
