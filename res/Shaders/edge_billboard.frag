@@ -6,19 +6,22 @@ layout(std140) uniform UniformsHot {
 };
 
 layout(std140) uniform UniformsLights {
-    vec3    uLightVec0;
-    vec3    uLightVec1;
-    vec3    uLightVec2;
-    vec4    uLightDiffuseColor0;
-    vec4    uLightDiffuseColor1;
-    vec4    uLightDiffuseColor2;
+    vec3    uLightVec[3];
+    vec4    uLightDiffuseColor[3];
+    float   uLambertFactor;
     float   uShininess;
+    float   uRoughness;
+    float   uFresnel;
+    float   uDiffuseReflectance;
+    int     uLightingModel;
 };
 
 layout(std140) uniform UniformsSkeleton {
     vec4    uColor;
     float   uNodeSize;
 };
+
+#include <Shaders\lighting.glsl>
 
 // in edge's local space
 varying vec4     vColor;
@@ -40,21 +43,11 @@ void main() {
         if(p.z * p.z > vHalfHeightSq) p = s + ( d - f) * v;
         if(p.z * p.z > vHalfHeightSq) discard;
         
-        vec3 normal = normalize(vObjectToEye * vec4(p.x, p.y, 0.0, 0.0)).xyz;
-        float d0 = clamp(dot(normal, normalize(uLightVec0)), 0.0, 1.0);
-        float d1 = clamp(dot(normal, normalize(uLightVec1)), 0.0, 1.0);
-        float d2 = clamp(dot(normal, normalize(uLightVec2)), 0.0, 1.0);
-		vec4 diff = d0 * uLightDiffuseColor0 + d1 * uLightDiffuseColor1 + d2 * uLightDiffuseColor2;
-
         vec4 tp = vObjectToEye * p;
         vec3 view = -normalize(tp.xyz);
+        vec3 normal = normalize(vObjectToEye * vec4(p.x, p.y, 0.0, 0.0)).xyz;
 
-        float h0 = pow(clamp(dot(normal, normalize(view + uLightVec0)), 0.0, 1.0), uShininess);
-        float h1 = pow(clamp(dot(normal, normalize(view + uLightVec1)), 0.0, 1.0), uShininess);
-        float h2 = pow(clamp(dot(normal, normalize(view + uLightVec2)), 0.0, 1.0), uShininess);
-		vec4 spec = h0 * uLightDiffuseColor0 + h1 * uLightDiffuseColor1 + h2 * uLightDiffuseColor2;
-
-        gl_FragColor = vColor * (diff + spec);
+        gl_FragColor = vec4(lighting(normal, view, vColor.rgb), 1.0);
 
 		vec4 proj = uProjection * tp;
 		gl_FragDepth = 0.5 * (1.0 + proj.z / proj.w);

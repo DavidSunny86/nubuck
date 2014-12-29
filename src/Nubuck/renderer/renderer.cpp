@@ -97,6 +97,12 @@ COM::Config::Variable<int>      cvar_r_smoothEdges("r_smoothEdges", 0);
 COM::Config::Variable<int>      cvar_r_transparencyMode("r_transparencyMode", R::TransparencyMode::BACKFACES_FRONTFACES);
 COM::Config::Variable<int>      cvar_r_numDepthPeels("r_numDepthPeels", 5);
 COM::Config::Variable<int>      cvar_r_forceState("r_forceState", 0);
+COM::Config::Variable<float>    cvar_r_lambertFactor("r_lambertFactor", 1.2f);
+COM::Config::Variable<float>    cvar_r_shininess("r_shininess", 200.0f);
+COM::Config::Variable<float>    cvar_r_roughness("r_roughness", 0.3f);
+COM::Config::Variable<float>    cvar_r_fresnel("r_fresnel", 0.3f);
+COM::Config::Variable<float>    cvar_r_diffuseReflectance("r_diffuseReflectance", 0.0f);
+COM::Config::Variable<float>    cvar_r_lightingModel("r_lightingModel", 0);
 
 namespace R {
 
@@ -128,7 +134,19 @@ struct UniformsLights {
     Color       uLightDiffuseColor0;
     Color 		uLightDiffuseColor1;
     Color 		uLightDiffuseColor2;
+
+    // diffuse
+    float       uLambertFactor;
+
+    // blinn-phong
     float       uShininess;
+
+    // cook-torrance
+    float       uRoughness;
+    float       uFresnel;               // fresnel reflectance at normal incidence
+    float       uDiffuseReflectance;    // fraction of diffuse reflectance
+
+    int         uLightingModel; // 0 = none, 1 = blinn-phong, 2 = cook-torrance
 };
 
 struct UniformsSkeleton {
@@ -198,7 +216,12 @@ static void Uniforms_Update(
     uniformsLights.uLightDiffuseColor0 = dirLights[0].diffuseColor;
     uniformsLights.uLightDiffuseColor1 = dirLights[1].diffuseColor;
     uniformsLights.uLightDiffuseColor2 = dirLights[2].diffuseColor;
-    uniformsLights.uShininess = 200.0f;
+    uniformsLights.uLambertFactor = cvar_r_lambertFactor;
+    uniformsLights.uShininess = cvar_r_shininess;
+    uniformsLights.uRoughness = cvar_r_roughness;
+    uniformsLights.uFresnel = cvar_r_fresnel;
+    uniformsLights.uDiffuseReflectance = cvar_r_diffuseReflectance;
+    uniformsLights.uLightingModel = cvar_r_lightingModel;
     uniformsLightsBuffer->Update_Mapped(0, sizeof(UniformsLights), &uniformsLights);
 
     uniformsSkeleton.uColor = Color(0.4f, 0.4f, 0.4f, 1.0f);

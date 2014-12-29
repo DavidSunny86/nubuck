@@ -8,13 +8,14 @@ PERFORM_DEPTH_TEST
 */
 
 layout(std140) uniform UniformsLights {
-    vec3 uLightVec0;
-    vec3 uLightVec1;
-    vec3 uLightVec2;
-    vec4 uLightDiffuseColor0;
-    vec4 uLightDiffuseColor1;
-    vec4 uLightDiffuseColor2;
+    vec3 uLightVec[3];
+    vec4 uLightDiffuseColor[3];
+    float uLambertFactor;
     float uShininess;
+    float uRoughness;
+    float uFresnel;
+    float uDiffuseReflectance;
+    int   uLightingModel;
 };
 
 layout(std140) uniform UniformsRenderTarget {
@@ -28,6 +29,8 @@ uniform sampler2D solidDepth;
 // pattern is enabled if patternColor.a > 0.0
 uniform vec4        patternColor;
 uniform sampler2D   patternTex;
+
+#include <Shaders\lighting.glsl>
 
 varying vec4 vPosition;
 varying vec3 vNormal;
@@ -62,17 +65,7 @@ void main() {
             }
         }
 
-        float d0 = clamp(dot(normal, normalize(uLightVec0)), 0.0, 1.0);
-        float d1 = clamp(dot(normal, normalize(uLightVec1)), 0.0, 1.0);
-        float d2 = clamp(dot(normal, normalize(uLightVec2)), 0.0, 1.0);
-        float h0 = pow(clamp(dot(normal, normalize(view + uLightVec0)), 0.0, 1.0), uShininess);
-        float h1 = pow(clamp(dot(normal, normalize(view + uLightVec1)), 0.0, 1.0), uShininess);
-        float h2 = pow(clamp(dot(normal, normalize(view + uLightVec2)), 0.0, 1.0), uShininess);
-        vec4 diff = d0 * uLightDiffuseColor0 + d1 * uLightDiffuseColor1 + d2 * uLightDiffuseColor2;
-        // vec4 spec = h0 * uLightDiffuseColor0 + h1 * uLightDiffuseColor1 + h2 * uLightDiffuseColor2;
-        vec4 spec = vec4(0.0, 0.0, 0.0, 0.0);
-
-        color.rgb *= (diff + spec).rgb;
+        color.rgb = lighting(normal, view, color.rgb);
     }
 
     if(0.0 < patternColor.a) {

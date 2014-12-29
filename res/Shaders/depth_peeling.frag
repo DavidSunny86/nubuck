@@ -5,7 +5,12 @@ layout(std140) uniform UniformsLights {
     vec4 uLightDiffuseColor0;
     vec4 uLightDiffuseColor1;
     vec4 uLightDiffuseColor2;
+    float uLambertFactor;
     float uShininess;
+    float uRoughness;
+    float uFresnel;
+    float uDiffuseReflectance;
+    int   uLightingModel;
 };
 
 layout(std140) uniform UniformsRenderTarget {
