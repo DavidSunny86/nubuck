@@ -226,6 +226,9 @@ void Common::Init(int argc, char* argv[]) {
     unsigned i = 0;
 
     _logfile = fopen("logfile.txt", "w");
+    if(!_logfile) {
+        MessageBox(NULL, TEXT("unable to create logfile"), TEXT("Error"), MB_OK);
+    }
 
     char delim = 0;
 #ifdef _WIN32
@@ -278,12 +281,17 @@ const char* Common::GetEnvVar(const std::string& name) const {
 }
 
 void Common::printf(const char* format, ...) {
-    static char buffer[2048];
+    const int BUFFER_SIZE = 2048;
+    static char buffer[BUFFER_SIZE];
 
     memset(buffer, 0, sizeof(buffer));
     va_list args;
     va_start(args, format);
-    vsprintf(buffer, format, args);
+    if(0 > vsnprintf_s(buffer, sizeof(buffer), _TRUNCATE, format, args)) {
+        strcpy(&buffer[BUFFER_SIZE - 5], "...\n");
+        buffer[BUFFER_SIZE - 1] = '\0';
+        ::printf("INFO: logfile output truncated to %s", buffer);
+    }
     va_end(args);
 
     if(_logfile) {

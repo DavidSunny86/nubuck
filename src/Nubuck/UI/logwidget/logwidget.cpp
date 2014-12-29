@@ -24,10 +24,15 @@ namespace UI {
     }
 
     void LogWidget::printf(int blockType, const char* format, va_list args) {
-        static char buffer[1024];
+        const int BUFFER_SIZE = 2048;
+        static char buffer[BUFFER_SIZE];
         if(_enabled) {
             memset(buffer, 0, sizeof(buffer));
-            vsprintf(buffer, format, args);
+            if(0 > vsnprintf_s(buffer, sizeof(buffer), _TRUNCATE, format, args)) {
+                strcpy(&buffer[BUFFER_SIZE - 5], "...\n");
+                buffer[BUFFER_SIZE - 1] = '\0';
+                ::printf("INFO: logwidget output truncated to %s", buffer);
+            }
 
             if(g_ui.UI_ThreadID() != SYS::Thread::CallerID())
                 _bufferMtx.Lock();
