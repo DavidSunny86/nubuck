@@ -29,31 +29,30 @@ private:
     typedef GRAPH<VEC3, int> base_t;
 
     // vertex attributes
-    leda::node_map<char>    _vatt_state;
-    leda::node_map<float>   _vatt_colorR;
-    leda::node_map<float>   _vatt_colorG;
-    leda::node_map<float>   _vatt_colorB;
-    leda::node_map<float>   _vatt_radius;
+    struct VertexAttribs {
+        float       radius;
+        R::Color    color;
+        char        state;
+    };
+    leda::node_map<VertexAttribs> _vatt;
 
     // edge attributes
-    leda::edge_map<char>    _eatt_state;
-    leda::edge_map<int>     _eatt_mask;
-    leda::edge_map<float>   _eatt_colorR;
-    leda::edge_map<float>   _eatt_colorG;
-    leda::edge_map<float>   _eatt_colorB;
-    leda::edge_map<float>   _eatt_radius;
+    struct EdgeAttribs {
+        int         mask;
+        float       radius;
+        R::Color    color;
+        char        state;
+    };
+    leda::edge_map<EdgeAttribs> _eatt;
 
     // face attributes
-    leda::face_map<char>    _fatt_state;
-    leda::face_map<int>     _fatt_visible;
-    leda::face_map<float>   _fatt_colorR;
-    leda::face_map<float>   _fatt_colorG;
-    leda::face_map<float>   _fatt_colorB;
-    leda::face_map<float>   _fatt_colorA;
-    leda::face_map<float>   _fatt_patternR;
-    leda::face_map<float>   _fatt_patternG;
-    leda::face_map<float>   _fatt_patternB;
-    leda::face_map<float>   _fatt_patternA;
+    struct FaceAttribs {
+        int         visible;
+        R::Color    color;
+        R::Color    pattern;
+        char        state;
+    };
+    leda::face_map<FaceAttribs> _fatt;
 
     void InitVertexAttributes();
     void InitEdgeAttributes();
@@ -130,35 +129,31 @@ void set_color(PolyMesh<VEC3>& mesh, const R::Color& color) {
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::InitVertexAttributes() {
-    _vatt_state.init(*this, State::TOPOLOGY_CHANGED);
-    _vatt_colorR.init(*this, defaultVertexColor.r);
-    _vatt_colorG.init(*this, defaultVertexColor.g);
-    _vatt_colorB.init(*this, defaultVertexColor.b);
-    _vatt_radius.init(*this, defaultVertexRadius);
+    VertexAttribs defaultAttribs;
+    defaultAttribs.radius = defaultVertexRadius;
+    defaultAttribs.color = defaultVertexColor;
+    defaultAttribs.state = State::TOPOLOGY_CHANGED;
+    _vatt.init(*this, defaultAttribs);
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::InitEdgeAttributes() {
-    _eatt_state.init(*this, State::TOPOLOGY_CHANGED);
-    _eatt_mask.init(*this, 0);
-    _eatt_colorR.init(*this, defaultEdgeColor.r);
-    _eatt_colorG.init(*this, defaultEdgeColor.g);
-    _eatt_colorB.init(*this, defaultEdgeColor.b);
-    _eatt_radius.init(*this, defaultEdgeRadius);
+    EdgeAttribs defaultEdgeAttribs;
+    defaultEdgeAttribs.mask = 0;
+    defaultEdgeAttribs.radius = defaultEdgeRadius;
+    defaultEdgeAttribs.color = defaultEdgeColor;
+    defaultEdgeAttribs.state = State::TOPOLOGY_CHANGED;
+    _eatt.init(*this, defaultEdgeAttribs);
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::InitFaceAttributes() {
-    _fatt_state.init(*this, State::TOPOLOGY_CHANGED);
-    _fatt_visible.init(*this, 1);
-    _fatt_colorR.init(*this, 1.0f);
-    _fatt_colorG.init(*this, 1.0f);
-    _fatt_colorB.init(*this, 1.0f);
-    _fatt_colorA.init(*this, 1.0f);
-    _fatt_patternR.init(*this, 0.0f);
-    _fatt_patternG.init(*this, 0.0f);
-    _fatt_patternB.init(*this, 0.0f);
-    _fatt_patternA.init(*this, 0.0f);
+    FaceAttribs defaultFaceAttribs;
+    defaultFaceAttribs.visible = 1;
+    defaultFaceAttribs.color = R::Color::White;
+    defaultFaceAttribs.pattern = R::Color(0.0f, 0.0f, 0.0f, 0.0f);
+    defaultFaceAttribs.state = State::TOPOLOGY_CHANGED;
+    _fatt.init(*this, defaultFaceAttribs);
 }
 
 template<typename VEC3>
@@ -170,17 +165,17 @@ inline PolyMesh<VEC3>::PolyMesh() {
 
 template<typename VEC3>
 inline int PolyMesh<VEC3>::state_of(node v) const {
-    return _vatt_state[v];
+    return _vatt[v].state;
 }
 
 template<typename VEC3>
 inline int PolyMesh<VEC3>::state_of(edge e) const {
-    return _eatt_state[e];
+    return _eatt[e].state;
 }
 
 template<typename VEC3>
 inline int PolyMesh<VEC3>::state_of(face f) const {
-    return _fatt_state[f];
+    return _fatt[f].state;
 }
 
 template<typename VEC3>
@@ -188,9 +183,9 @@ inline void PolyMesh<VEC3>::cache_all() {
     node v;
     edge e;
     face f;
-    forall_nodes(v, *this) _vatt_state[v] = State::CACHED;
-    forall_edges(e, *this) _eatt_state[e] = State::CACHED;
-    forall_faces(f, *this) _fatt_state[f] = State::CACHED;
+    forall_nodes(v, *this) _vatt[v].state = State::CACHED;
+    forall_edges(e, *this) _eatt[e].state = State::CACHED;
+    forall_faces(f, *this) _fatt[f].state = State::CACHED;
 }
 
 template<typename VEC3>
@@ -210,9 +205,9 @@ inline void PolyMesh<VEC3>::force_rebuild() {
     node v;
     edge e;
     face f;
-    forall_nodes(v, *this) _vatt_state[v] = State::TOPOLOGY_CHANGED;
-    forall_edges(e, *this) _eatt_state[e] = State::TOPOLOGY_CHANGED;
-    forall_faces(f, *this) _fatt_state[f] = State::TOPOLOGY_CHANGED;
+    forall_nodes(v, *this) _vatt[v].state = State::TOPOLOGY_CHANGED;
+    forall_edges(e, *this) _eatt[e].state = State::TOPOLOGY_CHANGED;
+    forall_faces(f, *this) _fatt[f].state = State::TOPOLOGY_CHANGED;
 }
 
 template<typename VEC3>
@@ -243,124 +238,108 @@ inline const VEC3& PolyMesh<VEC3>::position_of(const node v) const {
 
 template<typename VEC3>
 inline const float PolyMesh<VEC3>::radius_of(const node v) const {
-    return _vatt_radius[v];
+    return _vatt[v].radius;
 }
 
 template<typename VEC3>
 inline R::Color PolyMesh<VEC3>::color_of(const node v) const {
-    return R::Color(_vatt_colorR[v], _vatt_colorG[v], _vatt_colorB[v]);
+    return R::Color(_vatt[v].color);
 }
 
 template<typename VEC3>
 inline const float PolyMesh<VEC3>::radius_of(const edge e) const {
-    return _eatt_radius[e];
+    return _eatt[e].radius;
 }
 
 template<typename VEC3>
 inline R::Color PolyMesh<VEC3>::color_of(const edge e) const {
-    return R::Color(_eatt_colorR[e], _eatt_colorG[e], _eatt_colorB[e]);
+    return _eatt[e].color;
 }
 
 template<typename VEC3>
 int PolyMesh<VEC3>::is_masked(const edge e) const {
-    return _eatt_mask[e];
+    return _eatt[e].mask;
 }
 
 template<typename VEC3>
 inline bool PolyMesh<VEC3>::is_visible(const face f) const {
-    return _fatt_visible[f];
+    return _fatt[f].visible;
 }
 
 template<typename VEC3>
 inline R::Color PolyMesh<VEC3>::color_of(const face f) const {
-    return R::Color(_fatt_colorR[f], _fatt_colorG[f], _fatt_colorB[f], _fatt_colorA[f]);
+    return _fatt[f].color;
 }
 
 template<typename VEC3>
 inline R::Color PolyMesh<VEC3>::pattern_of(const face f) const {
-    return R::Color(_fatt_patternR[f], _fatt_patternG[f], _fatt_patternB[f], _fatt_patternA[f]);
+    return _fatt[f].pattern;
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_position(const node v, const VEC3& p) {
-    _vatt_state[v] = M::Max(_vatt_state[v], static_cast<char>(State::GEOMETRY_CHANGED));
+    _vatt[v].state = M::Max(_vatt[v].state, static_cast<char>(State::GEOMETRY_CHANGED));
 
     leda::face f;
-    forall_adj_faces(f, v) _fatt_state[f] = M::Max(_fatt_state[f], static_cast<char>(State::GEOMETRY_CHANGED));
+    forall_adj_faces(f, v) _fatt[f].state = M::Max(_fatt[f].state, static_cast<char>(State::GEOMETRY_CHANGED));
 
     LEDA_ACCESS(VEC3, entry(v)) = p;
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_radius(const node v, const float radius) {
-    _vatt_state[v] = M::Max(_vatt_state[v], static_cast<char>(State::GEOMETRY_CHANGED));
-    _vatt_radius[v] = radius;
+    _vatt[v].state = M::Max(_vatt[v].state, static_cast<char>(State::GEOMETRY_CHANGED));
+    _vatt[v].radius = radius;
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_color(const node v, const R::Color& color) {
-    _vatt_state[v] = M::Max(_vatt_state[v], static_cast<char>(State::GEOMETRY_CHANGED));
-
-    _vatt_colorR[v] = color.r;
-    _vatt_colorG[v] = color.g;
-    _vatt_colorB[v] = color.b;
+    _vatt[v].state = M::Max(_vatt[v].state, static_cast<char>(State::GEOMETRY_CHANGED));
+    _vatt[v].color = color;
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_radius(const edge e, const float radius) {
     const edge r = reversal(e);
-    _eatt_radius[e] = _eatt_radius[r] = radius;
+    _eatt[e].radius = _eatt[r].radius = radius;
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_color(const edge e, const R::Color& color) {
     const edge r = reversal(e);
 
-    _eatt_state[e] = M::Max(_eatt_state[e], static_cast<char>(State::GEOMETRY_CHANGED));
-    _eatt_state[r] = M::Max(_eatt_state[r], static_cast<char>(State::GEOMETRY_CHANGED));
+    _eatt[e].state = M::Max(_eatt[e].state, static_cast<char>(State::GEOMETRY_CHANGED));
+    _eatt[r].state = M::Max(_eatt[r].state, static_cast<char>(State::GEOMETRY_CHANGED));
 
-    _eatt_colorR[e] = color.r;
-    _eatt_colorG[e] = color.g;
-    _eatt_colorB[e] = color.b;
-
-    _eatt_colorR[r] = color.r;
-    _eatt_colorG[r] = color.g;
-    _eatt_colorB[r] = color.b;
+    _eatt[e].color = color;
+    _eatt[r].color = color;
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_masked(const edge e) {
-    _eatt_mask[e] = _eatt_mask[reversal(e)] = 1;
+    _eatt[e].mask = _eatt[reversal(e)] = 1;
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_unmasked(const edge e) {
-    _eatt_mask[e] = _eatt_mask[reversal(e)] = 0;
+    _eatt[e].mask = _eatt[reversal(e)] = 0;
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_visible(const face f, bool visible) {
-    _fatt_visible[f] = visible;
+    _fatt[f].visible = visible;
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_color(const face f, const R::Color& color) {
-    _fatt_state[f] = M::Max(_fatt_state[f], static_cast<char>(State::GEOMETRY_CHANGED));
-
-    _fatt_colorR[f] = color.r;
-    _fatt_colorG[f] = color.g;
-    _fatt_colorB[f] = color.b;
-    _fatt_colorA[f] = color.a;
+    _fatt[f].state = M::Max(_fatt[f].state, static_cast<char>(State::GEOMETRY_CHANGED));
+    _fatt[f].color = color;
 }
 
 template<typename VEC3>
-inline void PolyMesh<VEC3>::set_pattern(const face f, const R::Color& color) {
-    _fatt_state[f] = M::Max(_fatt_state[f], static_cast<char>(State::GEOMETRY_CHANGED));
-
-    _fatt_patternR[f] = color.r;
-    _fatt_patternG[f] = color.g;
-    _fatt_patternB[f] = color.b;
-    _fatt_patternA[f] = color.a;
+inline void PolyMesh<VEC3>::set_pattern(const face f, const R::Color& pattern) {
+    _fatt[f].state = M::Max(_fatt[f].state, static_cast<char>(State::GEOMETRY_CHANGED));
+    _fatt[f].pattern = pattern;
 }
 
 template<typename VEC3>
@@ -394,8 +373,8 @@ edge PolyMesh<VEC3>::make_triangle(const VEC3& p0, const VEC3& p1, const VEC3& p
 
     compute_faces();
 
-    _fatt_visible[face_of(f[0])] = true;
-    _fatt_visible[face_of(b[0])] = false;
+    _fatt[face_of(f[0])].visible = true;
+    _fatt[face_of(b[0])].visible = false;
 
     return f[0];
 }
