@@ -36,10 +36,6 @@ void Operators::Event_ActionFinished(const EV::Event& event) {
     _actionsPending--;
 }
 
-void Operators::Event_ForwardToDriver(const EV::Event& event) {
-    InvokeAction(event, InvokationMode::ALWAYS);
-}
-
 void Operators::OnInvokeOperator(unsigned id) {
     UI::LogWidget::Instance()->sys_printf("INFO - invoking operator with id = %d\n", id);
 
@@ -64,8 +60,8 @@ void Operators::Init() {
     AddEventHandler(ev_op_actionFinished, this, &Operators::Event_ActionFinished);
 
     // forward other known events
-    // AddEventHandler(ev_w_editModeChanged, this, &Operators::Event_ForwardToDriver); // URGENT
-    AddEventHandler(ev_w_selectionChanged, this, &Operators::Event_ForwardToDriver);
+    AddEventHandler(ev_w_editModeChanged, this, &Operators::Event_ForwardToDriver<EV::Arg<int> >);
+    AddEventHandler(ev_w_selectionChanged, this, &Operators::Event_ForwardToDriver<EV::Event>);
 }
 
 unsigned Operators::GetDriverQueueSize() const {

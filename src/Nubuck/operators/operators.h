@@ -41,7 +41,10 @@ private:
 
     void Event_SetOperator(const EV::Arg<Operator*>& event);
     void Event_ActionFinished(const EV::Event& event);
-    void Event_ForwardToDriver(const EV::Event& event);
+
+    template<typename T> void Event_ForwardToDriver(const T& event) {
+        InvokeAction(event, InvokationMode::ALWAYS);
+    }
 public slots:
     void OnInvokeOperator(unsigned id);
 public:

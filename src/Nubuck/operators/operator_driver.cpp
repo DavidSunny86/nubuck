@@ -61,7 +61,7 @@ static KeyEvent ConvertKeyEvent(const EV::KeyEvent& from) {
 void Driver::Event_EditModeChanged(const EV::Arg<int>& event) {
     const W::editMode_t::Enum editMode = W::editMode_t::Enum(event.value);
     if(_activeOp) _activeOp->OnEditModeChanged(editMode);
-    _defaultOp->OnEditModeChanged(editMode);
+    if(_activeOp != _defaultOp) _defaultOp->OnEditModeChanged(editMode);
     SignalCompletion();
 }
 
