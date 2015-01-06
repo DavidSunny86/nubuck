@@ -45,10 +45,19 @@ void CylinderEdges::RebuildVertices(unsigned edgeIdx, const M::Matrix4& transfor
         M::Vector3(-r, -r,  h),
         M::Vector3( r, -r,  h)
     };
+    R::Color bboxVertexColors[] = {
+        edge.color0,
+        edge.color0,
+        edge.color1,
+        edge.color1,
+        edge.color0,
+        edge.color0,
+        edge.color1,
+        edge.color1
+    };
     const unsigned numVertices = 8;
     Mesh::Vertex vertex;
     // vertex.color = ColorTo4ub(edge.color);
-    vertex.color = edge.color;
     vertex.A[0] = M::Vector3(objectToWorld.m00, objectToWorld.m10, objectToWorld.m20);
     vertex.A[1] = M::Vector3(objectToWorld.m01, objectToWorld.m11, objectToWorld.m21);
     vertex.A[2] = M::Vector3(objectToWorld.m02, objectToWorld.m12, objectToWorld.m22);
@@ -61,6 +70,7 @@ void CylinderEdges::RebuildVertices(unsigned edgeIdx, const M::Matrix4& transfor
     vertex.texCoords.y = edge.radius * edge.radius;
     for(unsigned i = 0; i < numVertices; ++i) {
         vertex.position = M::Transform(objectToWorld, bboxVertexPositions[i]);
+        vertex.color = bboxVertexColors[i];
         _edgeBBoxVertices[edgeIdx * numVertices + i] = vertex;
     }
 }
@@ -154,7 +164,8 @@ void CylinderEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<
         if(state_t::GEOMETRY_CHANGED == state) {
             edge.p0 = fpos[edge.v0->id()];
             edge.p1 = fpos[edge.v1->id()];
-            edge.color = mesh.color_of(edge.pe);
+            edge.color0 = mesh.color_of(edge.pe);
+            edge.color1 = mesh.color_of(mesh.reversal(edge.pe));
             M::Matrix4 R = AlignZ(edge.p1 - edge.p0);
             edge.Rt = M::Transpose(R);
             RebuildVertices(i, M::Mat4::Identity());

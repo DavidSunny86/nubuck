@@ -18,7 +18,7 @@ public:
         leda::edge  pe; // corresponding edge of polymesh
         leda::node  v0, v1;
         M::Vector3  p0, p1;
-        R::Color    color;
+        R::Color    color0, color1;
         float       radius;
     };
 protected:

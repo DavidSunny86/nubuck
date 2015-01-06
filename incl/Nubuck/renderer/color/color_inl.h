@@ -12,4 +12,10 @@ namespace R {
 		return Color(f * color.r, f * color.g, f * color.b, f * color.a);
 	}
 
+    inline void CopyRGB(Color& dst, const Color& src) {
+        dst.r = src.r;
+        dst.g = src.g;
+        dst.b = src.b;
+    }
+
 } // namespace R

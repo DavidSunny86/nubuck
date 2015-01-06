@@ -27,6 +27,8 @@ namespace R {
 	Color operator+(const Color& lhp, const Color& rhp);
 	Color operator*(float f, const Color& color);
 
+    void  CopyRGB(Color& dst, const Color& src);
+
     Color BlendAddRGB(const Color& lhp, const Color& rhp);
     Color BlendMulRGB(const Color& lhp, const Color& rhp);
     Color BlendMulRGBA(const Color& lhp, const Color& rhp);

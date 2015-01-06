@@ -318,7 +318,8 @@ void ENT_Geometry::RebuildRenderEdges() {
         if(!visited[e] && !_ratPolyMesh.is_masked(e)) {
             re.pe = e;
             re.radius = 2 * _ratPolyMesh.radius_of(e) * _edgeScale; // !!!
-            re.color = _ratPolyMesh.color_of(e);
+            re.color0 = _ratPolyMesh.color_of(e);
+            re.color1 = _ratPolyMesh.color_of(_ratPolyMesh.reversal(e));
             re.v0 = leda::source(e);
             re.v1 = leda::target(e);
             re.p0 = ToVector(_ratPolyMesh.position_of(leda::source(e)));
@@ -721,14 +722,20 @@ void SetColorsFromVertexSelection(ENT_Geometry& geom) {
     static R::Color col_selected = R::Color::Yellow;
 
     leda::nb::RatPolyMesh& mesh = geom.GetRatPolyMesh();
+
     leda::node v;
-    forall_nodes(v, mesh) {
-        mesh.set_color(v, col_unselected);
-    }
+    leda::edge e;
+
+    forall_nodes(v, mesh) mesh.set_color(v, col_unselected);
+    forall_edges(e, mesh) mesh.set_color(e, col_unselected);
 
     std::vector<leda::node> sel = geom.GetVertexSelection();
     for(unsigned i = 0; i < sel.size(); ++i) {
-        mesh.set_color(sel[i], col_selected);
+        v = sel[i];
+        mesh.set_color(v, col_selected);
+        forall_out_edges(e, v) {
+            mesh.set_source_color(e, col_selected);
+        }
     }
 }
 

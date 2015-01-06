@@ -38,8 +38,8 @@ void GL_LineEdges::Rebuild(const std::vector<Edge>& edges) {
         const unsigned v1 = v0 + 1;
         _meshVertices[v0].position  = edge.p0;
         _meshVertices[v1].position  = edge.p1;
-        _meshVertices[v0].color     = edge.color;
-        _meshVertices[v1].color     = edge.color;
+        _meshVertices[v0].color     = edge.color0;
+        _meshVertices[v1].color     = edge.color1;
 
         // since line edges are opaque we can use the
         // alpha channel to store the edge radius
@@ -75,7 +75,8 @@ void GL_LineEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M
         Edge& edge = _edges[i];
         edge.p0 = fpos[edge.v0->id()];
         edge.p1 = fpos[edge.v1->id()];
-        edge.color = mesh.color_of(edge.pe);
+        edge.color0 = mesh.color_of(edge.pe);
+        edge.color1 = mesh.color_of(mesh.reversal(edge.pe));
     }
     Rebuild(_edges);
 }

@@ -267,19 +267,28 @@ void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {
         leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
 
         if(W::editMode_t::OBJECTS == _editMode) {
-            // restore old vertex colors
+            // restore vertex, edge colors
             leda::node v;
             forall_nodes(v, mesh) {
                 mesh.set_color(v, _oldVertCol[v]);
             }
+            leda::edge e;
+            forall_edges(e, mesh) {
+                mesh.set_color(e, _oldEdgeCol[e]);
+            }
         } else {
             assert(W::editMode_t::VERTICES == _editMode);
 
-            // save old vertex colors
+            // save current vertex, edge colors
             _oldVertCol.init(mesh);
             leda::node v;
             forall_nodes(v, mesh) {
                 _oldVertCol[v] = mesh.color_of(v);
+            }
+            _oldEdgeCol.init(mesh);
+            leda::edge e;
+            forall_edges(e, mesh) {
+                _oldEdgeCol[e] = mesh.color_of(e);
             }
 
             W::SetColorsFromVertexSelection(*geom);

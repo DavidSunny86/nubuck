@@ -95,6 +95,7 @@ public:
 
     void set_radius(const edge e, const float radius);
     void set_color(const edge e, const R::Color& color);
+    void set_source_color(const edge e, const R::Color& color);
     void set_masked(const edge e);
     void set_unmasked(const edge e);
 
@@ -313,6 +314,12 @@ inline void PolyMesh<VEC3>::set_color(const edge e, const R::Color& color) {
 
     _eatt[e].color = color;
     _eatt[r].color = color;
+}
+
+template<typename VEC3>
+inline void PolyMesh<VEC3>::set_source_color(const edge e, const R::Color& color) {
+    _eatt[e].state = M::Max(_eatt[e].state, static_cast<char>(State::GEOMETRY_CHANGED));
+    _eatt[e].color = color;
 }
 
 template<typename VEC3>

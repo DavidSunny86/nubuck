@@ -56,12 +56,18 @@ void LineEdges::Rebuild(const std::vector<Edge>& edges) {
             _edgeBBoards[i].verts[j].texCoords  = texCoords[j];
 
             // edgeBBoards[i].verts[j].color    = ColorTo3ub(edge.color);
-            _edgeBBoards[i].verts[j].color      = edge.color;
+            // _edgeBBoards[i].verts[j].color      = edge.color;
 
             // since line edges are opaque we can use the
             // alpha channel to store the edge radius
             _edgeBBoards[i].verts[j].color.a    = edge.radius;
         }
+
+        // set vertex colors
+        R::CopyRGB(_edgeBBoards[i].verts[0].color, edge.color1);
+        R::CopyRGB(_edgeBBoards[i].verts[1].color, edge.color0);
+        R::CopyRGB(_edgeBBoards[i].verts[2].color, edge.color0);
+        R::CopyRGB(_edgeBBoards[i].verts[3].color, edge.color1);
     }
 
     _edgeBBoardIndices.clear();
@@ -96,7 +102,8 @@ void LineEdges::Update(const leda::nb::RatPolyMesh& mesh, const std::vector<M::V
         Edge& edge = _edges[i];
         edge.p0 = fpos[edge.v0->id()];
         edge.p1 = fpos[edge.v1->id()];
-        edge.color = mesh.color_of(edge.pe);
+        edge.color0 = mesh.color_of(edge.pe);
+        edge.color1 = mesh.color_of(mesh.reversal(edge.pe));
     }
     Rebuild(_edges);
 }
