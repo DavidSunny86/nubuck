@@ -8,9 +8,9 @@
 #include <operators\operators.h>
 
 #include <Nubuck\operators\operator.h>
+#include <Nubuck\vertex_editor.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <world\entities\ent_transform_gizmo\ent_transform_gizmo.h>
-#include <world\entities\ent_geometry\vertex_editor.h>
 
 namespace OP {
 
@@ -38,7 +38,7 @@ public:
 class Loop : public Operator {
 private:
     W::ENT_Geometry*        _geom;
-    VertexEditor            _vertexEditor;
+    NB::VertexEditor        _vertexEditor;
 
     void Event_OP_Loop_Start(const EV::Event& event);
     void Event_ButtonClicked(const EV::Event& event);

@@ -66,6 +66,14 @@ typedef QBoxLayout* BoxLayout;
 typedef QWidget*    Widget;
 typedef NBW_Button* Button;
 
+enum AxisFlags {
+    AF_X = 1,
+    AF_Y = 2,
+    AF_Z = 4,
+
+    AF_XYZ = AF_X | AF_Y | AF_Z
+};
+
 } // namespace nb
 
 struct Nubuck {

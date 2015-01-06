@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Nubuck\nubuck.h>
+#include <Nubuck\nubuck_api.h>
 #include <Nubuck\operators\operator_events.h>
 
 namespace W {
@@ -8,16 +9,9 @@ namespace W {
     class ENT_TransformGizmo;
 };
 
-// TODO: put this somewhere else
-enum {
-    AXIS_X = 1,
-    AXIS_Y = 2,
-    AXIS_Z = 4,
+namespace NB {
 
-    AXIS_XYZ = AXIS_X | AXIS_Y | AXIS_Z
-};
-
-class VertexEditor {
+class NUBUCK_API VertexEditor {
 private:
     int                                 _axis;
 
@@ -33,7 +27,9 @@ private:
 public:
     VertexEditor();
 
-    void SetAxis(int axisFlags);
+    void SetAxisFlags(int axisFlags);
 
-    bool HandleMouseEvent(const OP::MouseEvent& event, W::ENT_Geometry& geom);
+    bool HandleMouseEvent(const OP::MouseEvent& event, W::ENT_Geometry* geom);
 };
+
+} // namespace NB

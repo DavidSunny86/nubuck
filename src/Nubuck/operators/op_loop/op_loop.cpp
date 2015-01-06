@@ -53,7 +53,7 @@ Loop::Loop() : _geom(NULL) {
     AddEventHandler(ev_buttonClicked, this, &Loop::Event_Button0, 0);
     AddEventHandler(ev_buttonClicked, this, &Loop::Event_Button1, 1);
 
-    _vertexEditor.SetAxis(3);
+    _vertexEditor.SetAxisFlags(3);
 }
 
 void Loop::Register(Invoker& invoker) {
@@ -92,7 +92,9 @@ bool Loop::Invoke() {
 
 bool Loop::OnMouse(const MouseEvent& event) {
     assert(_geom);
-    _vertexEditor.HandleMouseEvent(event, *_geom);
+    if(_vertexEditor.HandleMouseEvent(event, _geom)) {
+        W::SetColorsFromVertexSelection(*_geom);
+    }
     return true;
 }
 

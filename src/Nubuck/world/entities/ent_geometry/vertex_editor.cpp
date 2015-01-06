@@ -1,6 +1,6 @@
+#include <Nubuck\vertex_editor.h>
 #include <world\entities\ent_transform_gizmo\ent_transform_gizmo.h>
 #include "ent_geometry.h"
-#include "vertex_editor.h"
 
 static M::Vector3 ToVector(const leda::d3_rat_point& p) { // TODO: duplicate of ent_geometry.cpp:ToVector
     const leda::d3_point fp = p.to_float();
@@ -25,6 +25,8 @@ static M::Vector3 CenterOfVertexSelection(const W::ENT_Geometry& geom) {
     float d = 1.0f / verts.size();
     return d * pos;
 }
+
+namespace NB {
 
 bool VertexEditor::DoPicking(const OP::MouseEvent& event, W::ENT_Geometry& geom) {
     if(OP::MouseEvent::MOUSE_DOWN == event.type && OP::MouseEvent::BUTTON_RIGHT == event.button) {
@@ -87,40 +89,44 @@ void VertexEditor::OnDragging(const Nubuck::transform_gizmo_mouse_info& info, W:
     }
 }
 
-VertexEditor::VertexEditor() : _axis(AXIS_XYZ), _gizmo(NULL) {
+VertexEditor::VertexEditor() : _axis(nb::AF_XYZ), _gizmo(NULL) {
     _gizmo = W::world.CreateTransformGizmo();
     _gizmo->HideCursor();
 }
 
-void VertexEditor::SetAxis(int axisFlags) {
+void VertexEditor::SetAxisFlags(int axisFlags) {
     _axis = axisFlags;
     _gizmo->SetAxis(_axis);
 }
 
-bool VertexEditor::HandleMouseEvent(const OP::MouseEvent& event, W::ENT_Geometry& geom) {
+bool VertexEditor::HandleMouseEvent(const OP::MouseEvent& event, W::ENT_Geometry* geom) {
+    COM_assert(geom);
+
     bool retval = false;
 
     Nubuck::transform_gizmo_mouse_info mouseInfo;
     if(_gizmo->HandleMouseEvent(event, mouseInfo)) {
         if(Nubuck::transform_gizmo_action::BEGIN_DRAGGING == mouseInfo.action) {
-            OnBeginDragging(geom);
+            OnBeginDragging(*geom);
         }
         if(Nubuck::transform_gizmo_action::DRAGGING == mouseInfo.action) {
-            OnDragging(mouseInfo, geom);
+            OnDragging(mouseInfo, *geom);
         }
 
         retval = true;
     } else {
-        retval = DoPicking(event, geom);
+        retval = DoPicking(event, *geom);
     }
 
     // _gizmo->SetAxis(_axis);
-    if(geom.GetVertexSelection().empty()) {
+    if(geom->GetVertexSelection().empty()) {
         _gizmo->HideCursor();
     } else {
         _gizmo->ShowCursor();
-        _gizmo->SetCursorPosition(CenterOfVertexSelection(geom));
+        _gizmo->SetCursorPosition(CenterOfVertexSelection(*geom));
     }
 
     return retval;
 }
+
+} // namespace NB
