@@ -170,14 +170,14 @@ public:
 
     int GetRenderMode() const { return _renderMode; }
 
-    void SetEditMode(editMode_t::Enum mode);
-
     void FrameUpdate();
     void BuildRenderList();
     const R::RenderList& GetRenderList() const { return _renderList; }
 
     void AttachAnimation(A::Animation* animation);
 };
+
+void SetColorsFromVertexSelection(ENT_Geometry& geom);
 
 void SaveGeometryToFile(const std::string& filename, ENT_Geometry* geom);
 void LoadGeometryFromFile(const std::string& filename, ENT_Geometry* geom);

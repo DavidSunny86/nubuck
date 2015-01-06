@@ -131,6 +131,8 @@ bool Translate::DoPicking(const MouseEvent& event) {
             if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = Nubuck::SELECT_MODE_NEW;
             nubuck().select_vertex(selectMode, geom, hits[nidx].vert);
             nubuck().set_transform_gizmo_position(_gizmo, FindCursorPosition());
+
+            W::SetColorsFromVertexSelection(*geom);
         }
     }
 
@@ -257,6 +259,32 @@ void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {
 
     _editMode = mode;
     UpdateCursor();
+
+    // set colors of first selected geometry
+    nb::entity ent = nubuck().first_selected_entity();
+    if(ent && nb::EntityType::GEOMETRY == nubuck().type_of(ent)) {
+        nb::geometry geom = nubuck().to_geometry(ent);
+        leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
+
+        if(W::editMode_t::OBJECTS == _editMode) {
+            // restore old vertex colors
+            leda::node v;
+            forall_nodes(v, mesh) {
+                mesh.set_color(v, _oldVertCol[v]);
+            }
+        } else {
+            assert(W::editMode_t::VERTICES == _editMode);
+
+            // save old vertex colors
+            _oldVertCol.init(mesh);
+            leda::node v;
+            forall_nodes(v, mesh) {
+                _oldVertCol[v] = mesh.color_of(v);
+            }
+
+            W::SetColorsFromVertexSelection(*geom);
+        }
+    }
 }
 
 bool Translate::OnMouse(const MouseEvent& event) {

@@ -36,6 +36,7 @@ private:
 
     std::vector<M::Vector3> 		_oldEntityPos;
     leda::node_array<M::Vector3>    _oldVertPos;
+    leda::node_array<R::Color>      _oldVertCol;
     M::Vector3                      _center;
     W::editMode_t::Enum             _editMode;
 

@@ -313,15 +313,6 @@ void World::Event_RebuildAll(const EV::Event& event) {
     event.Accept();
 }
 
-void World::Event_EditModeChanged(const EV::Arg<int>& event) {
-    int editMode = event.value;
-    std::vector<ENT_Geometry*> geomSel = _selection.GetGeometryList();
-    if(!geomSel.empty()) {
-        ENT_Geometry* ent = (ENT_Geometry*)geomSel.front();
-        ent->SetEditMode(editMode_t::Enum(editMode));
-    }
-}
-
 void World::Event_Resize(const EV::ResizeEvent& event) {
     _camArcball.SetScreenSize(event.width, event.height);
     aspect = (float)event.width / event.height;
@@ -470,7 +461,6 @@ void World::Init() {
     AddEventHandler(ev_w_destroyEntity,        this, &World::Event_DestroyEntity);
     AddEventHandler(ev_w_selectionChanged,     this, &World::Event_SelectionChanged);
     AddEventHandler(ev_w_rebuildAll,           this, &World::Event_RebuildAll);
-    AddEventHandler(ev_w_editModeChanged,      this, &World::Event_EditModeChanged);
     AddEventHandler(ev_resize,               this, &World::Event_Resize);
     AddEventHandler(ev_mouse,                this, &World::Event_Mouse);
     AddEventHandler(ev_key,                  this, &World::Event_Key);

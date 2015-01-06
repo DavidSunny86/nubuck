@@ -128,7 +128,6 @@ namespace W {
         void Event_DestroyEntity(const EV::Arg<unsigned>& event);
         void Event_SelectionChanged(const EV::Event& event);
         void Event_RebuildAll(const EV::Event& event);
-        void Event_EditModeChanged(const EV::Arg<int>& event);
         void Event_Resize(const EV::ResizeEvent& event);
         void Event_Mouse(const EV::MouseEvent& event);
         void Event_Key(const EV::KeyEvent& event);
