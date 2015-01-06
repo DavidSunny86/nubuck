@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Nubuck\nubuck.h>
 #include <Nubuck\math\plane.h>
 #include <Nubuck\math\intersections.h>
 #include <Nubuck\operators\operator_events.h>
@@ -17,7 +18,8 @@ private:
     typedef Nubuck::transform_gizmo_mouse_info  MouseInfo;
     typedef OP::MouseEvent                      MouseEvent;
 
-    Mode::Enum _mode;
+    int         _axis;
+    Mode::Enum  _mode;
 
     R::meshPtr_t    _axisMesh;
     R::tfmeshPtr_t  _axisTFMesh;
@@ -63,6 +65,7 @@ public:
 
     Mode::Enum GetTransformMode() const { return _mode; }
 
+    void SetAxis(int axisFlags);
     void SetTransformMode(Mode::Enum mode);
 
     void SetCursorPosition(const M::Vector3& pos);

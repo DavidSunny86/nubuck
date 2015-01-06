@@ -52,6 +52,8 @@ Loop::Loop() : _geom(NULL) {
     AddEventHandler(ev_buttonClicked, this, &Loop::Event_ButtonClicked);
     AddEventHandler(ev_buttonClicked, this, &Loop::Event_Button0, 0);
     AddEventHandler(ev_buttonClicked, this, &Loop::Event_Button1, 1);
+
+    _vertexEditor.SetAxis(3);
 }
 
 void Loop::Register(Invoker& invoker) {
@@ -85,6 +87,12 @@ bool Loop::Invoke() {
 
     W::ENT_Text* text = W::world.CreateText();
 
+    return true;
+}
+
+bool Loop::OnMouse(const MouseEvent& event) {
+    assert(_geom);
+    _vertexEditor.HandleMouseEvent(event, *_geom);
     return true;
 }
 

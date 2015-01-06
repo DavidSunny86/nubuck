@@ -3,6 +3,15 @@
 #include <nubuck_private.h>
 #include "ent_transform_gizmo.h"
 
+// TODO: put this somewhere else
+enum Axis {
+    AXIS_X = 1,
+    AXIS_Y = 2,
+    AXIS_Z = 4,
+
+    AXIS_XYZ = AXIS_X | AXIS_Y | AXIS_Z
+};
+
 namespace W {
 
 struct AxisMesh {
@@ -105,7 +114,8 @@ void ENT_TransformGizmo::BuildBoxHeads() {
 }
 
 ENT_TransformGizmo::ENT_TransformGizmo()
-    : _mode(Mode::TRANSLATE)
+    : _axis(AXIS_XYZ)
+    , _mode(Mode::TRANSLATE)
     , _dragging(false)
 {
     SetType(EntityType::ENT_TRANSFORM_GIZMO);
@@ -180,6 +190,11 @@ static M::Vector3 AlignWithCamera(const M::Matrix4& worldToEye, const M::Vector3
     M::Vector3 d = v - eye;
     M::Matrix4 M = M::Mat4::Translate(-(d.Length() - c) * M::Normalize(d));
     return M::Transform(M, v);
+}
+
+void ENT_TransformGizmo::SetAxis(int axisFlags) {
+    _axis = axisFlags;
+    _dragging = false;
 }
 
 void ENT_TransformGizmo::SetTransformMode(Mode::Enum mode) {
@@ -351,15 +366,17 @@ void ENT_TransformGizmo::GetRenderJobs(R::RenderList& renderList) {
     meshJob.material = R::Material::White;
     meshJob.primType = 0;
     for(int i = 0; i < 3; ++i) {
-        switch(_mode) {
-        case Mode::TRANSLATE:
-            meshJob.tfmesh = _arrowHeadTFMeshes[i];
-            break;
-        case Mode::SCALE:
-            meshJob.tfmesh = _boxHeadTFMeshes[i];
-            break;
+        if(_axis & (1 << i)) {
+            switch(_mode) {
+            case Mode::TRANSLATE:
+                meshJob.tfmesh = _arrowHeadTFMeshes[i];
+                break;
+            case Mode::SCALE:
+                meshJob.tfmesh = _boxHeadTFMeshes[i];
+                break;
+            }
+            renderList.meshJobs.push_back(meshJob);
         }
-        renderList.meshJobs.push_back(meshJob);
     }
 }
 
