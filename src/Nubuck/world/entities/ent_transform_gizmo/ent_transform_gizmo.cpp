@@ -119,6 +119,7 @@ ENT_TransformGizmo::ENT_TransformGizmo()
     , _dragging(false)
 {
     SetType(EntityType::ENT_TRANSFORM_GIZMO);
+    SetSolid(false);
 
     _cursorPos = M::Vector3::Zero;
     // _hidden = true;
