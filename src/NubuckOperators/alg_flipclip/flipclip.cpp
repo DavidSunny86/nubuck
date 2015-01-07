@@ -45,8 +45,8 @@ void FlipClipPanel::Invoke() {
 void FlipClip::Event_DistanceChanged(const EV::Arg<float>& event) {
     float hdist = 0.5f * event.value;
 
-    nubuck().set_geometry_position(_g.geom[Side::FRONT], M::Vector3(0.0f, 0.0f, hdist));
-    nubuck().set_geometry_position(_g.geom[Side::BACK], M::Vector3(0.0f, 0.0f, -hdist));
+    NB::SetMeshPosition(_g.meshes[Side::FRONT], M::Vector3(0.0f, 0.0f, hdist));
+    NB::SetMeshPosition(_g.meshes[Side::BACK], M::Vector3(0.0f, 0.0f, -hdist));
 }
 
 void FlipClip::Event_RunConfChanged(const EV::Arg<bool>& event) {
@@ -58,35 +58,33 @@ const char* FlipClip::GetName() const { return "Flip & Clip"; }
 
 OP::ALG::Phase* FlipClip::Init() {
     // choose first selected geometry as input
-    std::vector<nb::geometry> geomSel = nubuck().selected_geometry();
-    if(geomSel.empty()) {
-        nubuck().log_printf("ERROR - no input object selected.\n");
+    if(!NB::FirstSelectedMesh()) {
+        NB::LogPrintf("ERROR - no input object selected.\n");
         return NULL;
     }
-    _g.geom[Side::FRONT] = geomSel[0];
+    _g.meshes[Side::FRONT] = NB::FirstSelectedMesh();
 
-    const unsigned renderAll = Nubuck::RenderMode::NODES | Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES;
-    nubuck().set_geometry_render_mode(_g.geom[Side::FRONT], renderAll);
-    nubuck().set_geometry_name(_g.geom[Side::FRONT], "Front Hull");
+    NB::SetMeshRenderMode(_g.meshes[Side::FRONT], NB::RM_ALL);
+    NB::SetMeshName(_g.meshes[Side::FRONT], "Front Hull");
 
-    leda::nb::RatPolyMesh& frontMesh = nubuck().poly_mesh(_g.geom[Side::FRONT]);
+    leda::nb::RatPolyMesh& frontGraph = NB::GetGraph(_g.meshes[Side::FRONT]);
 
-    if(0 < frontMesh.number_of_edges()) {
-        nubuck().log_printf("deleting edges and faces of input mesh.\n");
-        frontMesh.del_all_edges();
-        frontMesh.del_all_faces(); // this is necessary!
+    if(0 < frontGraph.number_of_edges()) {
+        NB::LogPrintf("deleting edges and faces of input mesh.\n");
+        frontGraph.del_all_edges();
+        frontGraph.del_all_faces(); // this is necessary!
     }
 
-    _g.L[Side::FRONT] = frontMesh.all_nodes();
+    _g.L[Side::FRONT] = frontGraph.all_nodes();
 
-    _g.geom[Side::BACK] = nubuck().create_geometry();
-    nubuck().set_geometry_render_mode(_g.geom[Side::BACK], renderAll);
-    nubuck().set_geometry_name(_g.geom[Side::BACK], "Back Hull");
+    _g.meshes[Side::BACK] = NB::CreateMesh();
+    NB::SetMeshRenderMode(_g.meshes[Side::BACK], NB::RM_ALL);
+    NB::SetMeshName(_g.meshes[Side::BACK], "Back Hull");
 
-    leda::nb::RatPolyMesh& backMesh = nubuck().poly_mesh(_g.geom[Side::BACK]);
-    backMesh = frontMesh;
+    leda::nb::RatPolyMesh& backGraph = NB::GetGraph(_g.meshes[Side::BACK]);
+    backGraph = frontGraph;
 
-    _g.L[Side::BACK] = backMesh.all_nodes();
+    _g.L[Side::BACK] = backGraph.all_nodes();
 
     _g.side = Side::FRONT;
 

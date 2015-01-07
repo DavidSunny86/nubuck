@@ -1,11 +1,11 @@
 #include "phase1_level0.h"
 #include "phase0.h"
 
-nb::geometry Phase0::CreateHighlightedEdgeGeometry(const point_t& p0, const point_t& p1) {
-    nb::geometry geom = nubuck().create_geometry();
-    nubuck().set_geometry_render_mode(geom, Nubuck::RenderMode::EDGES);
-    nubuck().hide_geometry_outline(geom);
-    mesh_t& mesh = nubuck().poly_mesh(geom);
+NB::Mesh Phase0::CreateHighlightedEdgeGeometry(const point_t& p0, const point_t& p1) {
+    NB::Mesh geom = NB::CreateMesh();
+    NB::SetMeshRenderMode(geom, NB::RM_EDGES);
+    NB::HideMeshOutline(geom);
+    mesh_t& mesh = NB::GetGraph(geom);
     leda::node v0 = mesh.new_node(), v1 = mesh.new_node();
     mesh.set_position(v0, p0);
     mesh.set_position(v1, p1);
@@ -17,40 +17,35 @@ nb::geometry Phase0::CreateHighlightedEdgeGeometry(const point_t& p0, const poin
 }
 
 void Phase0::Enter() {
-    std::vector<nb::geometry> selection = nubuck().selected_geometry();
-    if(2 != selection.size()) {
+    NB::Mesh sel1, sel0 = NB::FirstSelectedMesh();
+    if(!sel0 || !(sel1 = NB::NextSelectedMesh(sel0))) {
         printf("ERROR: invalid selection...\n");
         return;
     }
-    g.geom0 = selection[0];
-    g.geom1 = selection[1];
+    g.geom0 = sel0;
+    g.geom1 = sel1;
 
-    nubuck().set_geometry_name(g.geom0, std::string("(L) " + nubuck().geometry_name(g.geom0)));
-    nubuck().set_geometry_name(g.geom1, std::string("(R) " + nubuck().geometry_name(g.geom1)));
+    NB::SetMeshName(g.geom0, std::string("(L) " + NB::GetMeshName(g.geom0)));
+    NB::SetMeshName(g.geom1, std::string("(R) " + NB::GetMeshName(g.geom1)));
 }
 
 Phase0::StepRet::Enum Phase0::Step() {
     hull2_t H0, H1;
     leda::list_item maxH0, minH1;
 
-    mesh_t& G0 = nubuck().poly_mesh(g.geom0);
-    mesh_t& G1 = nubuck().poly_mesh(g.geom1);
+    mesh_t& G0 = NB::GetGraph(g.geom0);
+    mesh_t& G1 = NB::GetGraph(g.geom1);
 
-    nubuck().apply_geometry_transformation(g.geom0);
-    nubuck().apply_geometry_transformation(g.geom1);
+    NB::ApplyMeshTransformation(g.geom0);
+    NB::ApplyMeshTransformation(g.geom1);
 
     ConvexHullXY_Graham(G0, H0, NULL, &maxH0, true);
     ConvexHullXY_Graham(G1, H1, &minH1, NULL, true);
 
-    const int renderAll =
-        Nubuck::RenderMode::NODES |
-        Nubuck::RenderMode::EDGES |
-        Nubuck::RenderMode::FACES;
-
-    g.geom = nubuck().create_geometry();
-    nubuck().set_geometry_name(g.geom, "Hull");
-    nubuck().set_geometry_render_mode(g.geom, renderAll);
-    mesh_t& G = nubuck().poly_mesh(g.geom);
+    g.geom = NB::CreateMesh();
+    NB::SetMeshName(g.geom, "Hull");
+    NB::SetMeshRenderMode(g.geom, NB::RM_ALL);
+    mesh_t& G = NB::GetGraph(g.geom);
     G.join(G0);
     G.join(G1);
 
@@ -58,9 +53,9 @@ Phase0::StepRet::Enum Phase0::Step() {
     g.nodeColors.init(G, BLUE);
     g.purpleEdges.init(G, NULL);
 
-    nubuck().clear_selection();
-    nubuck().destroy_geometry(g.geom0);
-    nubuck().destroy_geometry(g.geom1);
+    NB::ClearSelection();
+    NB::DestroyMesh(g.geom0);
+    NB::DestroyMesh(g.geom1);
 
     SuppEdgeXY(G, H0, H1,
         maxH0, minH1, g.P0.term, g.P1.term);

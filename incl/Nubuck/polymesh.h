@@ -324,12 +324,12 @@ inline void PolyMesh<VEC3>::set_source_color(const edge e, const R::Color& color
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_masked(const edge e) {
-    _eatt[e].mask = _eatt[reversal(e)] = 1;
+    _eatt[e].mask = _eatt[reversal(e)].mask = 1;
 }
 
 template<typename VEC3>
 inline void PolyMesh<VEC3>::set_unmasked(const edge e) {
-    _eatt[e].mask = _eatt[reversal(e)] = 0;
+    _eatt[e].mask = _eatt[reversal(e)].mask = 0;
 }
 
 template<typename VEC3>

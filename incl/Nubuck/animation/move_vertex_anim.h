@@ -25,11 +25,11 @@ protected:
 public:
     MoveVertexAnimation();
 
-    void Init(const nb::geometry subject, leda::node vertex, const point3_t& position, float duration);
+    void Init(const NB::Mesh subject, leda::node vertex, const point3_t& position, float duration);
 };
 
 // supplementary convenience function
 
-NUBUCK_API void SetVertexPosition(const nb::geometry subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration);
+NUBUCK_API void SetVertexPosition(const NB::Mesh subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration);
 
 } // namespace A

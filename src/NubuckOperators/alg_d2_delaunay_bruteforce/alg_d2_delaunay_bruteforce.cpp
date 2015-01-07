@@ -115,10 +115,10 @@ leda::edge BackFaceEdgeXY(const leda::nb::RatPolyMesh& mesh) {
     return mesh.reversal(hullEdge);
 }
 
-nb::geometry CreateCircle() {
-    nb::geometry geom = nubuck().create_geometry();
+NB::Mesh CreateCircle() {
+    NB::Mesh geom = NB::CreateMesh();
 
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
+    leda::nb::RatPolyMesh& mesh = NB::GetGraph(geom);
 
     leda::list<leda::d3_rat_point> L;
     leda::random_d3_rat_points_on_circle(500, 1000, L);
@@ -134,9 +134,9 @@ nb::geometry CreateCircle() {
 
     leda::nb::set_color(mesh, R::Color::Red);
 
-    nubuck().set_geometry_render_mode(geom, Nubuck::RenderMode::FACES);
-    nubuck().set_geometry_name(geom, "circle");
-    nubuck().hide_geometry(geom);
+    NB::SetMeshRenderMode(geom, NB::RM_FACES);
+    NB::SetMeshName(geom, "circle");
+    NB::HideMesh(geom);
 
     return geom;
 }
@@ -145,28 +145,28 @@ nb::geometry CreateCircle() {
 
 void D2_Delaunay_BruteForce::Event_ToggleParaboloid(const EV::Event&) {
     if(_isParaboloidVisible) {
-        nubuck().hide_geometry(_g.paraboloid);
+        NB::HideMesh(_g.paraboloid);
     }
     else {
-        nubuck().show_geometry(_g.paraboloid);
+        NB::ShowMesh(_g.paraboloid);
     }
     _isParaboloidVisible = !_isParaboloidVisible;
 }
 
 void D2_Delaunay_BruteForce::Event_ToggleConvexHull(const EV::Event&) {
     if(_isConvexHullVisible) {
-        nubuck().hide_geometry(_g.chull);
+        NB::HideMesh(_g.chull);
     }
     else {
-        nubuck().show_geometry(_g.chull);
+        NB::ShowMesh(_g.chull);
     }
     _isConvexHullVisible = !_isConvexHullVisible;
 }
 
 void D2_Delaunay_BruteForce::Event_SetConvexHullScale(const EV::Arg<float>& event) {
     float scale = event.value;
-    nubuck().set_geometry_scale(_g.chull, M::Vector3(1.0f, 1.0f, scale));
-    nubuck().set_geometry_scale(_g.paraboloid, M::Vector3(1.0f, 1.0f, scale));
+    NB::SetMeshScale(_g.chull, M::Vector3(1.0f, 1.0f, scale));
+    NB::SetMeshScale(_g.paraboloid, M::Vector3(1.0f, 1.0f, scale));
 }
 
 const char* D2_Delaunay_BruteForce::GetName() const {
@@ -177,13 +177,12 @@ OP::ALG::Phase* D2_Delaunay_BruteForce::Init() {
     _isParaboloidVisible = false;
     _isConvexHullVisible = false;
 
-    std::vector<nb::geometry> geomSel = nubuck().selected_geometry();
-    if(geomSel.empty()) {
-        nubuck().log_printf("ERROR - no input mesh selected.\n");
+    if(!NB::FirstSelectedMesh()) {
+        NB::LogPrintf("ERROR - no input mesh selected.\n");
         return NULL;
     }
 
-    _g.delaunay = geomSel[0];
+    _g.delaunay = NB::FirstSelectedMesh();
 
     _g.circle = CreateCircle();
 

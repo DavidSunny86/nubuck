@@ -49,7 +49,7 @@ struct Simplex {
 
 class JoePlont : public OP::Operator {
 private:
-    nb::geometry            _geom;
+    NB::Mesh _mesh;
     std::vector<Simplex>    _simplices;
 
     void Event_SetScale(const EV::Arg<double>& event);
@@ -66,7 +66,7 @@ JoePlont::JoePlont() {
 }
 
 void JoePlont::Register(OP::Invoker& invoker) {
-    QAction* action = nubuck().algorithm_menu()->addAction("Joe PLONT");
+    QAction* action = NB::AlgorithmMenu()->addAction("Joe PLONT");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
@@ -134,25 +134,25 @@ static void BuildTetrahedron(
 }
 
 static void AddTetrahedron(
-    leda::nb::RatPolyMesh& mesh,
+    leda::nb::RatPolyMesh& graph,
     const leda::d3_rat_point p0,
     const leda::d3_rat_point p1,
     const leda::d3_rat_point p2,
     const leda::d3_rat_point p3,
     leda::node verts[] /* out */)
 {
-    const leda::node v0 = mesh.new_node();
-    const leda::node v1 = mesh.new_node();
-    const leda::node v2 = mesh.new_node();
-    const leda::node v3 = mesh.new_node();
+    const leda::node v0 = graph.new_node();
+    const leda::node v1 = graph.new_node();
+    const leda::node v2 = graph.new_node();
+    const leda::node v3 = graph.new_node();
 
-    mesh.set_position(v0, p0);
-    mesh.set_position(v1, p1);
-    mesh.set_position(v2, p2);
-    mesh.set_position(v3, p3);
+    graph.set_position(v0, p0);
+    graph.set_position(v1, p1);
+    graph.set_position(v2, p2);
+    graph.set_position(v3, p3);
 
     leda::edge dontCare = 0;
-    BuildTetrahedron(mesh, v0, v1, v2, v3,
+    BuildTetrahedron(graph, v0, v1, v2, v3,
         dontCare, dontCare, dontCare, dontCare);
 
     verts[0] = v0;
@@ -179,11 +179,11 @@ void JoePlont::Event_SetScale(const EV::Arg<double>& event) {
         leda::rational scale = 1 + 5 * event.value;
         leda::rat_vector center = scale * simplex.center;
 
-        leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_geom);
+        leda::nb::RatPolyMesh& graph = NB::GetGraph(_mesh);
         for(int i = 0; i < 4; ++i) {
             // NOTE: carrying out this addition with rat_vectors yields NaNs when converted to float.
             // i have absolutely NO IDEA why. maybe corrupted leda install?
-            mesh.set_position(simplex.verts[i], ToRatPoint(ToVector(simplex.localPos[i]) + ToVector(center)));
+            graph.set_position(simplex.verts[i], ToRatPoint(ToVector(simplex.localPos[i]) + ToVector(center)));
         }
     }
 }
@@ -199,18 +199,15 @@ static void ScaleAndCenter(M::Vector3 points[], unsigned numPoints, float scale)
 }
 
 bool JoePlont::Invoke() {
-    nubuck().set_operator_name("Joe PLONT example");
+    NB::SetOperatorName("Joe PLONT example");
 
     _simplices.clear();
 
-    _geom = nubuck().create_geometry();
-    nubuck().set_geometry_name(_geom, "Joe PLONT");
-    nubuck().set_geometry_render_mode(_geom,
-        Nubuck::RenderMode::NODES |
-        Nubuck::RenderMode::EDGES |
-        Nubuck::RenderMode::FACES);
+    _mesh = NB::CreateMesh();
+    NB::SetMeshName(_mesh, "Joe PLONT");
+    NB::SetMeshRenderMode(_mesh, NB::RM_ALL);
 
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_geom);
+    leda::nb::RatPolyMesh& graph = NB::GetGraph(_mesh);
 
     M::Vector3 fpos[] = {
         M::Vector3(0.054f, 0.099f, 0.993f),
@@ -253,7 +250,7 @@ bool JoePlont::Invoke() {
     for(unsigned i = 0; i < numSimplices; ++i) {
         Simplex s;
         SimpIndices& si = simplices[i];
-        AddTetrahedron(mesh,
+        AddTetrahedron(graph,
             pos[si.a - 1],
             pos[si.b - 1],
             pos[si.c - 1],
@@ -262,14 +259,14 @@ bool JoePlont::Invoke() {
         s.center = leda::rat_vector::zero(3);
         leda::rat_vector pos[4];
         for(int i = 0; i < 4; ++i) {
-            pos[i] = mesh.position_of(s.verts[i]).to_vector();
+            pos[i] = graph.position_of(s.verts[i]).to_vector();
             s.center += pos[i];
         }
         s.center /= 4;
         for(int i = 0; i < 4; ++i) s.localPos[i] = pos[i] - s.center;
         _simplices.push_back(s);
     }
-    mesh.compute_faces();
+    graph.compute_faces();
 
     return true;
 }

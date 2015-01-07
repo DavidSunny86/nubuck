@@ -30,7 +30,7 @@ private:
     typedef leda::rational      scalar_t;
     typedef leda::d3_rat_point  point3_t;
 
-    nb::transform_gizmo _gizmo;
+    NB::TransformGizmo _gizmo;
 
     void UpdateCursor();
 
@@ -43,7 +43,7 @@ private:
 
     bool DoPicking(const MouseEvent& event);
     void OnBeginDragging();
-    void OnDragging(const Nubuck::transform_gizmo_mouse_info& info);
+    void OnDragging(const NB::TransformGizmoMouseInfo& info);
 
     void Event_SelectionChanged(const EV::Event& event) {
         OnGeometrySelected();

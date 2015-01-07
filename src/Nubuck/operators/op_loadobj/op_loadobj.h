@@ -29,7 +29,7 @@ public:
 
 class LoadOBJ : public Operator {
 private:
-	W::ENT_Geometry*    _geom;
+	NB::Mesh _mesh;
 
     void Event_Load(const EV::Arg<QString*>& event);
     void Event_LoadScene(const EV::Event& event);

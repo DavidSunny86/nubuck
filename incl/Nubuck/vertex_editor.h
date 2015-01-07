@@ -23,7 +23,7 @@ private:
 
     bool VertexEditor::DoPicking(const OP::MouseEvent& event, W::ENT_Geometry& geom);
     void OnBeginDragging(W::ENT_Geometry& geom);
-    void OnDragging(const Nubuck::transform_gizmo_mouse_info& info, W::ENT_Geometry& geom);
+    void OnDragging(const NB::TransformGizmoMouseInfo& info, W::ENT_Geometry& geom);
 public:
     VertexEditor();
 

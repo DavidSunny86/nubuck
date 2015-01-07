@@ -16,7 +16,7 @@ namespace OP {
 Translate::Translate() : _gizmo(0) {
 	AddEventHandler(ev_w_selectionChanged, this, &Translate::Event_SelectionChanged);
 
-    _gizmo = nubuck().global_transform_gizmo();
+    _gizmo = NB::GlobalTransformGizmo();
 }
 
 void Translate::Register(Invoker& invoker) {
@@ -26,11 +26,11 @@ void Translate::Register(Invoker& invoker) {
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
     */
 
-    if(!nubuck().first_selected_entity()) nubuck().hide_transform_gizmo(_gizmo);
+    if(!NB::FirstSelectedEntity()) NB::HideTransformGizmo(_gizmo);
 }
 
 bool Translate::Invoke() {
-    nubuck().set_operator_name("Translate");
+    NB::SetOperatorName("Translate");
     _editMode = W::world.GetEditMode().GetMode();
     OnGeometrySelected();
     return true;
@@ -55,15 +55,15 @@ static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
 static M::Vector3 FindCursorPosition() {
     const W::editMode_t::Enum editMode = W::world.GetEditMode().GetMode();
 
-    if(W::editMode_t::OBJECTS == editMode) return g_nubuck.global_center_of_selection();
+    if(W::editMode_t::OBJECTS == editMode) return NB::GlobalCenterOfSelection();
 
     if(W::editMode_t::VERTICES == editMode) {
-        nb::geometry geom = nubuck().first_selected_geometry();
-        std::vector<leda::node> verts = geom->GetVertexSelection();
+        NB::Mesh mesh = NB::FirstSelectedMesh();
+        std::vector<leda::node> verts = mesh->GetVertexSelection();
         M::Vector3 pos = M::Vector3::Zero;
-        M::Matrix4 objToWorld = geom->GetObjectToWorldMatrix();
+        M::Matrix4 objToWorld = mesh->GetObjectToWorldMatrix();
         for(unsigned i = 0; i < verts.size(); ++i) {
-            pos += M::Transform(objToWorld, ToVector(nubuck().poly_mesh(geom).position_of(verts[i])));
+            pos += M::Transform(objToWorld, ToVector(NB::GetGraph(mesh).position_of(verts[i])));
         }
         float d = 1.0f / verts.size();
         return d * pos;
@@ -81,24 +81,24 @@ Translate::UpdateCursor
 */
 void Translate::UpdateCursor() {
     bool isValidObjSelection = false, isValidVertSelection = false;
-    nb::entity ent = nubuck().first_selected_entity();
+    NB::Entity ent = NB::FirstSelectedEntity();
     if(ent) {
         if(W::editMode_t::OBJECTS == _editMode) {
             isValidObjSelection = true;
         } else {
             assert(W::editMode_t::VERTICES == _editMode);
-            if(nb::EntityType::GEOMETRY == nubuck().type_of(ent)) {
-                nb::geometry geom = nubuck().to_geometry(ent);
-                isValidVertSelection = !geom->GetVertexSelection().empty();
+            if(NB::ET_GEOMETRY == NB::GetType(ent)) {
+                NB::Mesh mesh = NB::CastToMesh(ent);
+                isValidVertSelection = !mesh->GetVertexSelection().empty();
             }
         }
     }
     if(isValidObjSelection || isValidVertSelection) {
-        nubuck().set_transform_gizmo_position(_gizmo, FindCursorPosition());
-        nubuck().show_transform_gizmo(_gizmo);
+        NB::SetTransformGizmoPosition(_gizmo, FindCursorPosition());
+        NB::ShowTransformGizmo(_gizmo);
     }
     else {
-        nubuck().hide_transform_gizmo(_gizmo);
+        NB::HideTransformGizmo(_gizmo);
     }
 }
 
@@ -108,18 +108,18 @@ bool Translate::DoPicking(const MouseEvent& event) {
     M::Ray ray = W::world.PickingRay(event.coords);
 
     if(W::editMode_t::OBJECTS == _editMode) {
-        nb::entity ent = NULL;
+        NB::Entity ent = NULL;
         if(W::world.TraceEntity(ray, &ent)) {
-            if(MouseEvent::MODIFIER_SHIFT & event.mods) nubuck().select(Nubuck::SELECT_MODE_ADD, ent);
-            else nubuck().select(Nubuck::SELECT_MODE_NEW, ent);
+            if(MouseEvent::MODIFIER_SHIFT & event.mods) NB::SelectEntity(NB::SM_ADD, ent);
+            else NB::SelectEntity(NB::SM_NEW, ent);
             return true;
         }
     }
 
-    if(W::editMode_t::VERTICES == _editMode && nubuck().first_selected_geometry()) {
-        W::ENT_Geometry* geom = nubuck().first_selected_geometry();
+    if(W::editMode_t::VERTICES == _editMode && NB::FirstSelectedMesh()) {
+        NB::Mesh mesh = NB::FirstSelectedMesh();
         std::vector<W::ENT_Geometry::VertexHit> hits;
-        if(geom->TraceVertices(ray, 0.2f, hits)) {
+        if(mesh->TraceVertices(ray, 0.2f, hits)) {
             // find nearest hit
             unsigned nidx = 0;
             for(unsigned i = 1; i < hits.size(); ++i) {
@@ -127,12 +127,12 @@ bool Translate::DoPicking(const MouseEvent& event) {
                     nidx = i;
             }
 
-            Nubuck::SelectMode selectMode = Nubuck::SELECT_MODE_ADD;
-            if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = Nubuck::SELECT_MODE_NEW;
-            nubuck().select_vertex(selectMode, geom, hits[nidx].vert);
-            nubuck().set_transform_gizmo_position(_gizmo, FindCursorPosition());
+            NB::SelectMode selectMode = NB::SM_ADD;
+            if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = NB::SM_NEW;
+            NB::SelectVertex(selectMode, mesh, hits[nidx].vert);
+            NB::SetTransformGizmoPosition(_gizmo, FindCursorPosition());
 
-            W::SetColorsFromVertexSelection(*geom);
+            W::SetColorsFromVertexSelection(*mesh);
         }
     }
 
@@ -141,13 +141,13 @@ bool Translate::DoPicking(const MouseEvent& event) {
 }
 
 void Translate::OnBeginDragging() {
-    assert(nubuck().first_selected_entity());
+    assert(NB::FirstSelectedEntity());
 
     unsigned selectionSize = 0;
-    nb::entity ent = nubuck().first_selected_entity();
+    NB::Entity ent = NB::FirstSelectedEntity();
     while(ent) {
         selectionSize++;
-        ent = nubuck().next_selected_entity(ent);
+        ent = NB::NextSelectedEntity(ent);
     }
 
     _center = M::Vector3::Zero;
@@ -156,29 +156,29 @@ void Translate::OnBeginDragging() {
     if(W::editMode_t::OBJECTS == _editMode) {
         _oldEntityPos.resize(selectionSize);
         unsigned i = 0;
-        nb::entity ent = nubuck().first_selected_entity();
+        NB::Entity ent = NB::FirstSelectedEntity();
         while(ent) {
-            _oldEntityPos[i] = nubuck().position(ent);
+            _oldEntityPos[i] = NB::GetEntityPosition(ent);
             _center += _oldEntityPos[i];
             i++;
-            ent = nubuck().next_selected_entity(ent);
+            ent = NB::NextSelectedEntity(ent);
         }
         _center /= _oldEntityPos.size();
     }
 
     // save vertex positions
-    nb::geometry geom = nubuck().first_selected_geometry();
-    if(geom) {
-        const leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
-        _oldVertPos.init(mesh);
+    NB::Mesh mesh = NB::FirstSelectedMesh();
+    if(mesh) {
+        const leda::nb::RatPolyMesh& graph = NB::GetGraph(mesh);
+        _oldVertPos.init(graph);
         leda::node v;
-        forall_nodes(v, mesh) {
-            const M::Vector3 pos = ToVector(mesh.position_of(v));
+        forall_nodes(v, graph) {
+            const M::Vector3 pos = ToVector(graph.position_of(v));
             _oldVertPos[v] = pos;
         }
 
         if(W::editMode_t::VERTICES == _editMode) {
-            std::vector<leda::node> verts = geom->GetVertexSelection();
+            std::vector<leda::node> verts = mesh->GetVertexSelection();
             for(unsigned i = 0; i < verts.size(); ++i)
                 _center += _oldVertPos[verts[i]];
             _center /= verts.size();
@@ -188,57 +188,57 @@ void Translate::OnBeginDragging() {
     }
 }
 
-void Translate::OnDragging(const Nubuck::transform_gizmo_mouse_info& info) {
-    Nubuck::TransformGizmoMode::Enum mode = nubuck().transform_gizmo_mode(_gizmo);
+void Translate::OnDragging(const NB::TransformGizmoMouseInfo& info) {
+    NB::TransformGizmoMode mode = NB::GetTransformGizmoMode(_gizmo);
 
-    if(Nubuck::TransformGizmoMode::TRANSLATE == mode) {
+    if(NB::TGM_TRANSLATE == mode) {
         if(W::editMode_t::OBJECTS == _editMode) {
             unsigned i = 0;
-            nb::entity ent = nubuck().first_selected_entity();
+            NB::Entity ent = NB::FirstSelectedEntity();
             while(ent) {
                 M::Vector3 pos = _oldEntityPos[i];
                 pos.vec[info.axis] = _oldEntityPos[i].vec[info.axis] + info.value;
-                nubuck().set_position(ent, pos);
+                NB::SetEntityPosition(ent, pos);
                 i++;
-                ent = nubuck().next_selected_entity(ent);
+                ent = NB::NextSelectedEntity(ent);
             }
         }
 
         if(W::editMode_t::VERTICES == _editMode) {
-            nb::geometry geom = nubuck().first_selected_geometry();
-            leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
+            NB::Mesh mesh = NB::FirstSelectedMesh();
+            leda::nb::RatPolyMesh& graph = NB::GetGraph(mesh);
 
-            std::vector<leda::node> verts = geom->GetVertexSelection();
+            std::vector<leda::node> verts = mesh->GetVertexSelection();
             assert(!verts.empty());
 
             for(unsigned i = 0; i < verts.size(); ++i) {
                 const leda::node v = verts[i];
                 M::Vector3 pos = _oldVertPos[v];
                 pos.vec[info.axis] = _oldVertPos[v].vec[info.axis] + info.value;
-                mesh.set_position(v, ToRatPoint(pos));
+                graph.set_position(v, ToRatPoint(pos));
             }
         }
     }
-    if(Nubuck::TransformGizmoMode::SCALE == mode) {
+    if(NB::TGM_SCALE == mode) {
         if(W::editMode_t::OBJECTS == _editMode) {
             // TODO: this is broken, does not work for multiple selected geometry objects
-            nb::geometry geom = nubuck().first_selected_geometry();
-            if(geom) {
-                leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
+            NB::Mesh mesh = NB::FirstSelectedMesh();
+            if(mesh) {
+                leda::nb::RatPolyMesh& graph = NB::GetGraph(mesh);
                 leda::node v;
-                forall_nodes(v, mesh) {
+                forall_nodes(v, graph) {
                     M::Vector3 pos = _oldVertPos[v];
                     pos.vec[info.axis] *= info.value;
-                    mesh.set_position(v, ToRatPoint(pos));
+                    graph.set_position(v, ToRatPoint(pos));
                 }
             }
         }
 
         if(W::editMode_t::VERTICES == _editMode) {
-            nb::geometry geom = nubuck().first_selected_geometry();
-            leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
+            NB::Mesh mesh = NB::FirstSelectedMesh();
+            leda::nb::RatPolyMesh& graph = NB::GetGraph(mesh);
 
-            std::vector<leda::node> verts = geom->GetVertexSelection();
+            std::vector<leda::node> verts = mesh->GetVertexSelection();
             assert(!verts.empty());
 
             for(unsigned i = 0; i < verts.size(); ++i) {
@@ -246,7 +246,7 @@ void Translate::OnDragging(const Nubuck::transform_gizmo_mouse_info& info) {
                 M::Vector3 pos = _oldVertPos[v] - _center;
                 pos.vec[info.axis] *= info.value;
                 pos += _center;
-                mesh.set_position(v, ToRatPoint(pos));
+                graph.set_position(v, ToRatPoint(pos));
             }
         }
     }
@@ -254,44 +254,44 @@ void Translate::OnDragging(const Nubuck::transform_gizmo_mouse_info& info) {
 
 void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {
     // stop dragging by resetting mode
-    Nubuck::TransformGizmoMode::Enum tfMode = nubuck().transform_gizmo_mode(_gizmo);
-    nubuck().set_transform_gizmo_mode(_gizmo, tfMode);
+    NB::TransformGizmoMode tfMode = NB::GetTransformGizmoMode(_gizmo);
+    NB::SetTransformGizmoMode(_gizmo, tfMode);
 
     _editMode = mode;
     UpdateCursor();
 
     // set colors of first selected geometry
-    nb::entity ent = nubuck().first_selected_entity();
-    if(ent && nb::EntityType::GEOMETRY == nubuck().type_of(ent)) {
-        nb::geometry geom = nubuck().to_geometry(ent);
-        leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
+    NB::Entity ent = NB::FirstSelectedEntity();
+    if(ent && NB::ET_GEOMETRY == NB::GetType(ent)) {
+        NB::Mesh mesh = NB::CastToMesh(ent);
+        leda::nb::RatPolyMesh& graph = NB::GetGraph(mesh);
 
         if(W::editMode_t::OBJECTS == _editMode) {
             // restore vertex, edge colors
             leda::node v;
-            forall_nodes(v, mesh) {
-                mesh.set_color(v, _oldVertCol[v]);
+            forall_nodes(v, graph) {
+                graph.set_color(v, _oldVertCol[v]);
             }
             leda::edge e;
-            forall_edges(e, mesh) {
-                mesh.set_color(e, _oldEdgeCol[e]);
+            forall_edges(e, graph) {
+                graph.set_color(e, _oldEdgeCol[e]);
             }
         } else {
             assert(W::editMode_t::VERTICES == _editMode);
 
             // save current vertex, edge colors
-            _oldVertCol.init(mesh);
+            _oldVertCol.init(graph);
             leda::node v;
-            forall_nodes(v, mesh) {
-                _oldVertCol[v] = mesh.color_of(v);
+            forall_nodes(v, graph) {
+                _oldVertCol[v] = graph.color_of(v);
             }
-            _oldEdgeCol.init(mesh);
+            _oldEdgeCol.init(graph);
             leda::edge e;
-            forall_edges(e, mesh) {
-                _oldEdgeCol[e] = mesh.color_of(e);
+            forall_edges(e, graph) {
+                _oldEdgeCol[e] = graph.color_of(e);
             }
 
-            W::SetColorsFromVertexSelection(*geom);
+            W::SetColorsFromVertexSelection(*mesh);
         }
     }
 }
@@ -299,12 +299,12 @@ void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {
 bool Translate::OnMouse(const MouseEvent& event) {
     _editMode = W::world.GetEditMode().GetMode();
 
-    Nubuck::transform_gizmo_mouse_info mouseInfo;
-    if(nubuck().transform_gizmo_handle_mouse_event(_gizmo, event, mouseInfo)) {
-        if(Nubuck::transform_gizmo_action::BEGIN_DRAGGING == mouseInfo.action) {
+    NB::TransformGizmoMouseInfo mouseInfo;
+    if(NB::TransformGizmoHandleMouseEvent(_gizmo, event, mouseInfo)) {
+        if(NB::TGA_BEGIN_DRAGGING == mouseInfo.action) {
             OnBeginDragging();
         }
-        if(Nubuck::transform_gizmo_action::DRAGGING == mouseInfo.action) {
+        if(NB::TGA_DRAGGING == mouseInfo.action) {
             OnDragging(mouseInfo);
         }
         return true;
@@ -320,10 +320,10 @@ bool Translate::OnKey(const KeyEvent& event) {
     static const unsigned numrow[3] = { 11, 2, 3 };
 
     if(numrow[1] == event.nativeScanCode) {
-        nubuck().set_transform_gizmo_mode(_gizmo, Nubuck::TransformGizmoMode::TRANSLATE);
+        NB::SetTransformGizmoMode(_gizmo, NB::TGM_TRANSLATE);
     }
     if(numrow[2] == event.nativeScanCode) {
-        nubuck().set_transform_gizmo_mode(_gizmo, Nubuck::TransformGizmoMode::SCALE);
+        NB::SetTransformGizmoMode(_gizmo, NB::TGM_SCALE);
     }
 
     // do not become active when only mode changes

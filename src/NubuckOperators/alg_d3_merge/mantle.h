@@ -6,7 +6,7 @@
 class Mantle {
 private:
     const mesh_t&               _subj; // mesh to be wrapped by mantle
-    nb::geometry                _geom;
+    NB::Mesh                    _geom;
     leda::node_map<leda::node>  _nmap; // subj nodes -> mantle nodes
     leda::edge                  _cand[2];
     leda::node                  _last;

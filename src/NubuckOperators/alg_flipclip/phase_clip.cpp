@@ -6,39 +6,39 @@
 
 namespace {
 
-void SimplifyFace(leda::nb::RatPolyMesh& mesh, leda::node v) {
-    if(mesh.outdeg(v) <= 3) return; // nothing to do
+void SimplifyFace(leda::nb::RatPolyMesh& graph, leda::node v) {
+    if(graph.outdeg(v) <= 3) return; // nothing to do
 
-    leda::edge e1 = mesh.first_adj_edge(v);
-    leda::edge e2 = mesh.cyclic_adj_succ(e1);
-    leda::edge e3 = mesh.cyclic_adj_succ(e2);
+    leda::edge e1 = graph.first_adj_edge(v);
+    leda::edge e2 = graph.cyclic_adj_succ(e1);
+    leda::edge e3 = graph.cyclic_adj_succ(e2);
 
     // count: number of traversed edges since last flip
     int count = 0;
-    while(count++ < mesh.outdeg(v) && mesh.outdeg(v) > 3) {
-        leda::d3_rat_point p0 = mesh.position_of(v);
-        leda::d3_rat_point p1 = mesh.position_of(leda::target(e1));
-        leda::d3_rat_point p2 = mesh.position_of(leda::target(e2));
-        leda::d3_rat_point p3 = mesh.position_of(leda::target(e3));
+    while(count++ < graph.outdeg(v) && graph.outdeg(v) > 3) {
+        leda::d3_rat_point p0 = graph.position_of(v);
+        leda::d3_rat_point p1 = graph.position_of(leda::target(e1));
+        leda::d3_rat_point p2 = graph.position_of(leda::target(e2));
+        leda::d3_rat_point p3 = graph.position_of(leda::target(e3));
 
         int orient_130 = leda::orientation_xy(p1, p3, p0);
         int orient_132 = leda::orientation_xy(p1, p3, p2);
 
         if(orient_130 != orient_132 && orient_132 != 0) {
-            leda::edge r2 = mesh.reversal(e2);
-            mesh.move_edge(e2, mesh.reversal(e1), leda::target(e3), leda::before);
-            mesh.move_edge(r2, mesh.reversal(e3), leda::target(e1));
-            InvalidateU(mesh, e2);
+            leda::edge r2 = graph.reversal(e2);
+            graph.move_edge(e2, graph.reversal(e1), leda::target(e3), leda::before);
+            graph.move_edge(r2, graph.reversal(e3), leda::target(e1));
+            InvalidateU(graph, e2);
             count = 0;
         } else {
             e1 = e2;
         }
 
         e2 = e3;
-        e3 = mesh.cyclic_adj_succ(e2);
+        e3 = graph.cyclic_adj_succ(e2);
     }
 
-    assert(mesh.outdeg(v) <= 3);
+    assert(graph.outdeg(v) <= 3);
 }
 
 } // unnamed namespace
@@ -49,17 +49,17 @@ Phase_Clip::Phase_Clip(Globals& g, bool forceFlips)
 { }
 
 void Phase_Clip::Enter() {
-    nubuck().log_printf("entering phase 'clip'\n");
+    NB::LogPrintf("entering phase 'clip'\n");
 
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
+    leda::nb::RatPolyMesh& graph = NB::GetGraph(_g.meshes[_g.side]);
 
     _L.clear();
-    _rdeg.init(mesh, 0);
-    _cdeg.init(mesh, 0);
+    _rdeg.init(graph, 0);
+    _cdeg.init(graph, 0);
     leda::edge e;
-    forall_edges(e, mesh) {
+    forall_edges(e, graph) {
         leda::node v = leda::source(e);
-        if(Color::RED == GetColor(mesh, e)) {
+        if(Color::RED == GetColor(graph, e)) {
             if(3 == ++_rdeg[v]) _L.push(v);
         } else {
             _cdeg[v]++;
@@ -71,7 +71,7 @@ void Phase_Clip::Enter() {
 }
 
 Phase_Clip::StepRet::Enum Phase_Clip::StepSearch() {
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
+    leda::nb::RatPolyMesh& graph = NB::GetGraph(_g.meshes[_g.side]);
 
     while(!_L.empty()) {
         _clipV = _L.pop();
@@ -80,12 +80,12 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepSearch() {
 
         if(RunMode::STEP == GetRunConf().mode) {
             // highlight neighbourhood of vertex v
-            leda::nb::set_color(mesh, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
+            leda::nb::set_color(graph, R::Color(1.0f, 1.0f, 1.0f, 0.2f));
             leda::edge e;
             forall_out_edges(e, _clipV) {
-                mesh.set_color(mesh.face_of(e), R::Color::Red);
+                graph.set_color(graph.face_of(e), R::Color::Red);
             }
-            mesh.set_color(_clipV, R::Color::Yellow);
+            graph.set_color(_clipV, R::Color::Yellow);
         }
 
         _stepMode = StepMode::PERFORM_CLIP;
@@ -93,37 +93,37 @@ Phase_Clip::StepRet::Enum Phase_Clip::StepSearch() {
     }
 
     if(RunMode::NEXT == GetRunConf().mode) {
-        mesh.compute_faces();
-        if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
-        if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
-        ApplyEdgeColors(mesh);
+        graph.compute_faces();
+        if(_g.hullEdges[Side::FRONT]) graph.set_visible(graph.face_of(_g.hullEdges[Side::FRONT]), false);
+        if(_g.hullEdges[Side::BACK]) graph.set_visible(graph.face_of(_g.hullEdges[Side::BACK]), false);
+        ApplyEdgeColors(graph);
     }
 
-    nubuck().log_printf("number of clips: %d\n", _numClips);
+    NB::LogPrintf("number of clips: %d\n", _numClips);
     return StepRet::DONE;
 }
 
 Phase_Clip::StepRet::Enum Phase_Clip::StepPerformClip() {
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_g.geom[_g.side]);
+    leda::nb::RatPolyMesh& graph = NB::GetGraph(_g.meshes[_g.side]);
 
     leda::edge e;
     forall_out_edges(e, _clipV) {
-        leda::edge b = mesh.face_cycle_succ(e); // boundary edge
-        if(Color::BLACK == GetColor(mesh, b)) {
-            InvalidateU(mesh, b);
+        leda::edge b = graph.face_cycle_succ(e); // boundary edge
+        if(Color::BLACK == GetColor(graph, b)) {
+            InvalidateU(graph, b);
         }
     }
 
-    if(3 < mesh.outdeg(_clipV)) SimplifyFace(mesh, _clipV);
+    if(3 < graph.outdeg(_clipV)) SimplifyFace(graph, _clipV);
 
-    mesh.del_node(_clipV);
+    graph.del_node(_clipV);
     _numClips++;
 
     if(RunMode::STEP == GetRunConf().mode) {
-        mesh.compute_faces();
-        if(_g.hullEdges[Side::FRONT]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::FRONT]), false);
-        if(_g.hullEdges[Side::BACK]) mesh.set_visible(mesh.face_of(_g.hullEdges[Side::BACK]), false);
-        ApplyEdgeColors(mesh);
+        graph.compute_faces();
+        if(_g.hullEdges[Side::FRONT]) graph.set_visible(graph.face_of(_g.hullEdges[Side::FRONT]), false);
+        if(_g.hullEdges[Side::BACK]) graph.set_visible(graph.face_of(_g.hullEdges[Side::BACK]), false);
+        ApplyEdgeColors(graph);
     }
 
     _stepMode = StepMode::SEARCH;

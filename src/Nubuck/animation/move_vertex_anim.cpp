@@ -14,7 +14,7 @@ MoveVertexAnimation::MoveVertexAnimation()
     , _time(0.0f)
 { }
 
-void MoveVertexAnimation::Init(const nb::geometry subject, leda::node vert, const point3_t& position, float duration) {
+void MoveVertexAnimation::Init(const NB::Mesh subject, leda::node vert, const point3_t& position, float duration) {
     _subject = subject;
     _vert = vert;
     _duration = duration;
@@ -44,7 +44,7 @@ bool MoveVertexAnimation::Animate() {
     return _duration <= _time;
 }
 
-NUBUCK_API void SetVertexPosition(const nb::geometry subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration) {
+NUBUCK_API void SetVertexPosition(const NB::Mesh subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration) {
     MoveVertexAnimation anim;
     anim.Init(subject, vertex, position, duration);
     anim.PlayFor(duration);

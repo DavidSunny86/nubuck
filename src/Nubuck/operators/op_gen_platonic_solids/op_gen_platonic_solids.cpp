@@ -1,3 +1,5 @@
+#include <maxint.h>
+
 #include <QAction>
 #include <QMenu>
 #include <QComboBox>
@@ -144,35 +146,35 @@ void PlatonicSolids::CreateMesh(int type) {
     leda::list<point_t> L;
     createFunc_t func = createFuncs[type];
     func(L);
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_geom);
-    mesh.clear();
-    leda::D3_HULL(L, mesh);
+    leda::nb::RatPolyMesh& graph = NB::GetGraph(_mesh);
+    graph.clear();
+    leda::D3_HULL(L, graph);
 
     if(3 == type) {
         // postprocessing of dodecahedron due to precision errors:
         // remove edges shared by nearly-coplanar faces
         leda::edge e;
         leda::list<leda::edge> deathList;
-        leda::edge_array<bool> sentencedToDeath(mesh, false);
-        forall_edges(e, mesh) {
+        leda::edge_array<bool> sentencedToDeath(graph, false);
+        forall_edges(e, graph) {
             if(sentencedToDeath[e]) continue;
-            leda::edge r = mesh.reversal(e);
-            M::Vector3 n0 = ComputeFaceNormal(mesh, e);
-            M::Vector3 n1 = ComputeFaceNormal(mesh, r);
+            leda::edge r = graph.reversal(e);
+            M::Vector3 n0 = ComputeFaceNormal(graph, e);
+            M::Vector3 n1 = ComputeFaceNormal(graph, r);
             if(AlmostEqual(1.0f, M::Dot(n0, n1), 0.1f)) {
-                mesh.set_color(e, R::Color::Red);
+                graph.set_color(e, R::Color::Red);
                 deathList.push(e);
                 sentencedToDeath[e] = true;
                 sentencedToDeath[r] = true;
             }
         }
         forall(e, deathList) {
-            mesh.del_edge(mesh.reversal(e));
-            mesh.del_edge(e);
+            graph.del_edge(graph.reversal(e));
+            graph.del_edge(e);
         }
     }
 
-    mesh.compute_faces();
+    graph.compute_faces();
 }
 
 void PlatonicSolids::Event_CreatePlatonicSolid(const EV::Arg<int>& event) {
@@ -184,19 +186,16 @@ PlatonicSolids::PlatonicSolids() {
 }
 
 void PlatonicSolids::Register(Invoker& invoker) {
-    QAction* action = nubuck().scene_menu()->addAction("Platonic Solids");
+    QAction* action = NB::SceneMenu()->addAction("Platonic Solids");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool PlatonicSolids::Invoke() {
-    nubuck().set_operator_name("Create Platonic Solid");
+    NB::SetOperatorName("Create Platonic Solid");
 
-    _geom = nubuck().create_geometry();
-    nubuck().set_geometry_name(_geom, "platonic solid");
-    nubuck().set_geometry_render_mode(_geom,
-        Nubuck::RenderMode::NODES |
-        Nubuck::RenderMode::EDGES |
-        Nubuck::RenderMode::FACES);
+    _mesh = NB::CreateMesh();
+    NB::SetMeshName(_mesh, "platonic solid");
+    NB::SetMeshRenderMode(_mesh, NB::RM_ALL);
     CreateMesh(0 /* tetrahedron */);
 
     return true;

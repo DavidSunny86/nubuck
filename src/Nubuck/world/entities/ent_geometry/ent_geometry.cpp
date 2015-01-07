@@ -210,7 +210,7 @@ void ENT_Geometry::Event_RenderModeChanged(const RenderModeEvent& event) {
 
 void ENT_Geometry::Event_EdgeShadingChanged(const EdgeShadingEvent& event) {
     _stylizedHiddenLines = event.showHiddenLines;
-    SetShadingMode(Nubuck::ShadingMode::Enum(event.shadingMode));
+    SetShadingMode(ShadingMode(event.shadingMode));
 }
 
 ENT_Geometry::ENT_Geometry()
@@ -223,8 +223,8 @@ ENT_Geometry::ENT_Geometry()
     , _isHidden(false)
     , _renderMode(0)
     , _renderLayer(0)
-    , _shadingMode(ShadingMode::NICE)
-    , _pattern(Pattern::NONE)
+    , _shadingMode(NB::SM_NICE)
+    , _pattern(NB::PATTERN_NONE)
     , _patternColor(R::Color::White)
     , _stylizedHiddenLines(false)
     , _showWireframe(false)
@@ -473,7 +473,7 @@ void ENT_Geometry::OnDestroy() {
 	_nodeRenderer->DestroyRenderMesh();
 	_edgeRenderer->DestroyRenderMesh();
     DestroyRenderMesh();
-	_renderMode &= ~(Nubuck::RenderMode::EDGES | Nubuck::RenderMode::NODES); // !!!
+	_renderMode &= ~(NB::RM_EDGES | NB::RM_NODES); // !!!
 
     g_ui.GetOutliner().DeleteItem(_outlinerItem);
     _outlinerItem = NULL;
@@ -498,7 +498,7 @@ void ENT_Geometry::Hide() {
 	_isHidden = true;
 }
 
-Nubuck::ShadingMode::Enum ENT_Geometry::GetShadingMode() const {
+NB::ShadingMode ENT_Geometry::GetShadingMode() const {
     return _shadingMode;
 }
 
@@ -521,23 +521,23 @@ void ENT_Geometry::SetRenderLayer(unsigned layer) {
 	_renderLayer = layer;
 }
 
-void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
+void ENT_Geometry::SetShadingMode(ShadingMode mode) {
     _mtx.Lock();
     if(_shadingMode != mode) {
         switch(mode) {
-        case ShadingMode::FAST:
+        case NB::SM_FAST:
             _nodeRenderer = &_billboardNodes;
             _edgeRenderer = &_lineEdges;
             break;
-        case ShadingMode::NICE:
+        case NB::SM_NICE:
             _nodeRenderer = &_billboardNodes;
             _edgeRenderer = &_cylinderEdges;
             break;
-        case ShadingMode::LINES:
+        case NB::SM_LINES:
             _nodeRenderer = &_pointNodes;
             _edgeRenderer = &_glLineEdges;
             break;
-        case ShadingMode::NICE_BILLBOARDS:
+        case NB::SM_NICE_BILLBOARDS:
             _nodeRenderer = &_pointNodes;
             _edgeRenderer = &_glLineEdges;
             break;
@@ -555,7 +555,7 @@ void ENT_Geometry::SetShadingMode(ShadingMode::Enum mode) {
     _mtx.Unlock();
 }
 
-void ENT_Geometry::SetPattern(Pattern::Enum pattern) {
+void ENT_Geometry::SetPattern(Pattern pattern) {
     _pattern = pattern;
 }
 
@@ -585,7 +585,7 @@ void ENT_Geometry::BuildRenderList() {
 
     const int transparencyMode = cvar_r_transparencyMode;
 
-    if(Nubuck::RenderMode::FACES & _renderMode && NULL != _mesh) {
+    if(NB::RM_FACES & _renderMode && NULL != _mesh) {
         R::meshMgr.GetMesh(_tfmesh).SetTransform(GetObjectToWorldMatrix());
 
         R::MeshJob rjob;
@@ -608,7 +608,7 @@ void ENT_Geometry::BuildRenderList() {
             _renderList.meshJobs.push_back(rjob);
         }
 
-        if(Pattern::NONE != _pattern) {
+        if(NB::PATTERN_NONE != _pattern) {
             const char* patternTextures[] = {
                 "", /* none */
                 "pattern_checker.tga",
@@ -653,14 +653,14 @@ void ENT_Geometry::BuildRenderList() {
         }
     }
 
-    if(Nubuck::RenderMode::NODES & _renderMode && !_nodeRenderer->IsEmpty()) {
+    if(NB::RM_NODES & _renderMode && !_nodeRenderer->IsEmpty()) {
 	    _nodeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _nodeRenderer->GetRenderJob();
         rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
-        if(ShadingMode::FAST == _shadingMode) {
+        if(NB::SM_FAST == _shadingMode) {
             rjob.fx = "FastNodeBillboard";
         }
-        if(ShadingMode::NICE_BILLBOARDS == _shadingMode) {
+        if(NB::SM_NICE_BILLBOARDS == _shadingMode) {
             if(R::TransparencyMode::DEPTH_PEELING == transparencyMode) {
                 rjob.fx     = "NodeBillboardGSDP";
                 rjob.layer  = R::Renderer::Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH;
@@ -678,17 +678,17 @@ void ENT_Geometry::BuildRenderList() {
         _renderList.meshJobs.push_back(rjob);
     }
 
-    if(Nubuck::RenderMode::EDGES & _renderMode && !_edgeRenderer->IsEmpty()) {
+    if(NB::RM_EDGES & _renderMode && !_edgeRenderer->IsEmpty()) {
 		_edgeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _edgeRenderer->GetRenderJob();
         rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
-        if(ShadingMode::LINES == _shadingMode) {
+        if(NB::SM_LINES == _shadingMode) {
             if(_stylizedHiddenLines) {
                 rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
                 rjob.fx = "UnlitThickLinesStippled";
             }
         }
-        if(ShadingMode::NICE_BILLBOARDS == _shadingMode) {
+        if(NB::SM_NICE_BILLBOARDS == _shadingMode) {
             if(R::TransparencyMode::DEPTH_PEELING == transparencyMode) {
                 rjob.fx     = "EdgeLineBillboardGSDP";
                 rjob.layer  = R::Renderer::Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH;

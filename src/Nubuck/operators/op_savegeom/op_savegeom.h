@@ -22,7 +22,7 @@ public:
 
 class SaveGeom : public Operator {
 private:
-    nb::geometry _geom;
+    NB::Mesh _mesh;
 
     void Event_Save(const EV::Arg<std::string*>& event);
 public:

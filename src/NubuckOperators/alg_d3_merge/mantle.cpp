@@ -1,10 +1,10 @@
 #include "mantle.h"
 
 void Mantle::Init(const leda::node v0, const leda::node v1, const leda::node v2) {
-    _geom = nubuck().create_geometry();
-    nubuck().set_geometry_name(_geom, "Mantle");
-    nubuck().set_geometry_render_mode(_geom, Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES);
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_geom);
+    _geom = NB::CreateMesh();
+    NB::SetMeshName(_geom, "Mantle");
+    NB::SetMeshRenderMode(_geom, NB::RM_EDGES | NB::RM_FACES);
+    leda::nb::RatPolyMesh& mesh = NB::GetGraph(_geom);
     leda::edge e = mesh.make_triangle(_subj[v0], _subj[v1], _subj[v2]);
     _cand[0] = mesh.face_cycle_pred(e);
     _cand[1] = mesh.face_cycle_succ(e);
@@ -25,7 +25,7 @@ void Mantle::AddTriangle(const leda::node v0, const leda::node v1, const leda::n
     if(v0 == _last) e = _cand[1];
     else e = _cand[0];
 
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_geom);
+    leda::nb::RatPolyMesh& mesh = NB::GetGraph(_geom);
 
     leda::edge u = mesh.split(e);
     mesh.set_position(leda::source(u), _subj[v2]);
@@ -36,5 +36,5 @@ void Mantle::AddTriangle(const leda::node v0, const leda::node v1, const leda::n
     _last = v2;
 }
 
-void Mantle::Destroy() { nubuck().destroy_geometry(_geom); }
+void Mantle::Destroy() { NB::DestroyMesh(_geom); }
 

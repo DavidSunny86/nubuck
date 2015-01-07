@@ -12,14 +12,14 @@ namespace W {
 
 class ENT_TransformGizmo : public Entity {
 private:
-    typedef Nubuck::TransformGizmoMode          Mode;
-    typedef Nubuck::transform_gizmo_action      Action;
-    typedef Nubuck::transform_gizmo_axis        Axis;
-    typedef Nubuck::transform_gizmo_mouse_info  MouseInfo;
-    typedef OP::MouseEvent                      MouseEvent;
+    typedef NB::TransformGizmoMode      Mode;
+    typedef NB::TransformGizmoAction    Action;
+    typedef NB::Axis                    Axis;
+    typedef NB::TransformGizmoMouseInfo MouseInfo;
+    typedef OP::MouseEvent              MouseEvent;
 
-    int         _axis;
-    Mode::Enum  _mode;
+    int     _axis;
+    Mode    _mode;
 
     R::meshPtr_t    _axisMesh;
     R::tfmeshPtr_t  _axisTFMesh;
@@ -63,10 +63,10 @@ private:
 public:
     ENT_TransformGizmo();
 
-    Mode::Enum GetTransformMode() const { return _mode; }
+    Mode GetTransformMode() const { return _mode; }
 
     void SetAxis(int axisFlags);
-    void SetTransformMode(Mode::Enum mode);
+    void SetTransformMode(Mode mode);
 
     void SetCursorPosition(const M::Vector3& pos);
 

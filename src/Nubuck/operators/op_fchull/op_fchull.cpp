@@ -12,36 +12,35 @@
 namespace OP {
 
 void FlipClip::Register(Invoker& invoker) {
-    QAction* action = nubuck().object_menu()->addAction("FlipClip Hull");
+    QAction* action = NB::ObjectMenu()->addAction("FlipClip Hull");
     action->setShortcut(QKeySequence("Shift+C"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool FlipClip::Invoke() {
-    std::vector<nb::geometry> geomSel = nubuck().selected_geometry();
-    if(geomSel.empty()) {
-        nubuck().log_printf("no geometry selected.\n");
+    if(!NB::FirstSelectedMesh()) {
+        NB::LogPrintf("no mesh selected.\n");
         return false;
     }
 
-    nubuck().set_operator_name("FlipClip Hull");
+    NB::SetOperatorName("FlipClip Hull");
 
-    nubuck().log_printf("FlipClip Hull:\n");
+    NB::LogPrintf("FlipClip Hull:\n");
 
-	nb::geometry cloud = geomSel[0];
+    NB::Mesh cloud = NB::FirstSelectedMesh();
     assert(cloud);
 
-    leda::nb::RatPolyMesh& cloudMesh = nubuck().poly_mesh(cloud);
+    leda::nb::RatPolyMesh& cloudGraph = NB::GetGraph(cloud);
     leda::list<leda::d3_rat_point> L0, L1, L2;
     leda::node v;
-    forall_nodes(v, cloudMesh) L0.push_back(cloudMesh.position_of(v));
+    forall_nodes(v, cloudGraph) L0.push_back(cloudGraph.position_of(v));
     L1 = L0;
     L2 = L0;
 
-    nb::geometry chull = nubuck().create_geometry();
-    nubuck().set_geometry_render_mode(chull, Nubuck::RenderMode::NODES | Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES);
-    nubuck().set_geometry_name(chull, std::string("CH(") + nubuck().geometry_name(cloud) + ")");
-    leda::nb::RatPolyMesh& chullMesh = nubuck().poly_mesh(chull);
+    NB::Mesh chull = NB::CreateMesh();
+    NB::SetMeshRenderMode(chull, NB::RM_ALL);
+    NB::SetMeshName(chull, std::string("CH(") + NB::GetMeshName(cloud) + ")");
+    leda::nb::RatPolyMesh& chullGraph = NB::GetGraph(chull);
 
     SYS::Timer  timer;
     float       secsPassed;
@@ -51,35 +50,35 @@ bool FlipClip::Invoke() {
     timer.Start();
     leda::CONVEX_HULL(L0, H);
     secsPassed = timer.Stop();
-    nubuck().log_printf("... CONVEX_HULL: %fs\n", secsPassed);
+    NB::LogPrintf("... CONVEX_HULL: %fs\n", secsPassed);
 
     H.clear();
 
     timer.Start();
     FlipClipHull(L1, H);
     secsPassed = timer.Stop();
-    nubuck().log_printf("... FlipClip: %fs\n", secsPassed);
+    NB::LogPrintf("... FlipClip: %fs\n", secsPassed);
 
     FlipClipHull_WriteProfilerReport();
-    nubuck().log_printf("... wrote profiler report to file\n");
+    NB::LogPrintf("... wrote profiler report to file\n");
 
-    nubuck().log_printf("... CHECK_HULL: ");
+    NB::LogPrintf("... CHECK_HULL: ");
     bool isConvex = leda::CHECK_HULL(H);
-    nubuck().log_printf(isConvex ? "true" : "false");
-    nubuck().log_printf("\n");
+    NB::LogPrintf(isConvex ? "true" : "false");
+    NB::LogPrintf("\n");
 
-    leda::CONVEX_HULL(L2, chullMesh);
-    chullMesh.compute_faces();
+    leda::CONVEX_HULL(L2, chullGraph);
+    chullGraph.compute_faces();
 
-    nubuck().set_geometry_position(chull, nubuck().geometry_position(cloud));
+    NB::SetMeshPosition(chull, NB::GetMeshPosition(cloud));
 
-    nubuck().destroy_geometry(cloud);
-    nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, chull);
+    NB::DestroyMesh(cloud);
+    NB::SelectMesh(NB::SM_NEW, chull);
 
-    nubuck().log_printf("convex hull:\n");
-    nubuck().log_printf("... |V| = %d\n", chullMesh.number_of_nodes());
-    nubuck().log_printf("... |E| = %d\n", chullMesh.number_of_edges());
-    nubuck().log_printf("... |F| = %d\n", chullMesh.number_of_faces());
+    NB::LogPrintf("convex hull:\n");
+    NB::LogPrintf("... |V| = %d\n", chullGraph.number_of_nodes());
+    NB::LogPrintf("... |E| = %d\n", chullGraph.number_of_edges());
+    NB::LogPrintf("... |F| = %d\n", chullGraph.number_of_faces());
 
     return true;
 }

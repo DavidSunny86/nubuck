@@ -13,8 +13,9 @@ const char* D3_Merge::GetName() const {
 }
 
 OP::ALG::Phase* D3_Merge::Init() {
-    if(2 > nubuck().selected_geometry().size()) {
-        nubuck().log_printf("select two objects as input.");
+    NB::Mesh sel0 = NB::FirstSelectedMesh();
+    if(!sel0 || !NB::NextSelectedMesh(sel0)) {
+        NB::LogPrintf("select two objects as input.");
         return NULL;
     }
 

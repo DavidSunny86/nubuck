@@ -21,7 +21,7 @@ public:
 
 class PlatonicSolids : public Operator {
 private:
-    nb::geometry _geom;
+    NB::Mesh _mesh;
 
     void CreateMesh(int type);
 

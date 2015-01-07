@@ -63,9 +63,9 @@ private:
     leda::nb::RatPolyMesh   _hemispherePrefab;
     leda::nb::RatPolyMesh   _discPrefab;
 
-    nb::geometry _hull;
-    nb::geometry _cloud;
-    nb::geometry _cloudCopy;
+    NB::Mesh _hull;
+    NB::Mesh _cloud;
+    NB::Mesh _cloudCopy;
 
     Domain::Enum    _lastDomain;
     int             _lastSize;

@@ -64,14 +64,14 @@ private:
     float       _edgeScale;
     R::Color    _edgeColor;
 
-    typedef Nubuck::ShadingMode ShadingMode;
-    typedef Nubuck::Pattern     Pattern;
+    typedef NB::ShadingMode ShadingMode;
+    typedef NB::Pattern     Pattern;
 
     bool                _isHidden;
     int                 _renderMode;
     unsigned            _renderLayer;
-    ShadingMode::Enum   _shadingMode;
-    Pattern::Enum       _pattern;
+    ShadingMode         _shadingMode;
+    Pattern             _pattern;
     R::Color            _patternColor;
     bool                _stylizedHiddenLines;
     bool                _showWireframe;
@@ -159,13 +159,13 @@ public:
     void Show();
     void Hide();
 
-    ShadingMode::Enum   GetShadingMode() const;
+    ShadingMode         GetShadingMode() const;
     bool                StylizedHiddenLinesEnabled() const;
 
     void SetRenderMode(int flags);
     void SetRenderLayer(unsigned layer);
-    void SetShadingMode(ShadingMode::Enum mode);
-    void SetPattern(Pattern::Enum pattern);
+    void SetShadingMode(ShadingMode mode);
+    void SetPattern(Pattern pattern);
     void SetPatternColor(const R::Color& color);
 
     int GetRenderMode() const { return _renderMode; }

@@ -191,7 +191,7 @@ void RandomPoints::UpdateCloud(Domain::Enum domain, int size, int radius) {
     forall_items(it, L) {
         mesh.set_position(mesh.new_node(), L[it]);
     }
-    nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, _cloud);
+    NB::SelectMesh(NB::SM_NEW, _cloud);
 }
 
 void RandomPoints::Event_Update(const RandomPointsUpdate& event) {
@@ -244,31 +244,31 @@ RandomPoints::RandomPoints()
 }
 
 void RandomPoints::Register(Invoker& invoker) {
-    QMenu* sceneMenu = nubuck().scene_menu();
+    QMenu* sceneMenu = NB::SceneMenu();
     QAction* action = sceneMenu->addAction("Random Points");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool RandomPoints::Invoke() {
-    nubuck().set_operator_name("Random Points");
+    NB::SetOperatorName("Random Points");
 
-    _hull = nubuck().create_geometry();
-    nubuck().set_geometry_solid(_hull, false);
-    nubuck().hide_geometry_outline(_hull);
-    nubuck().set_geometry_render_mode(_hull, Nubuck::RenderMode::FACES);
-    _cloud = nubuck().create_geometry();
-    nubuck().set_geometry_name(_cloud, "point cloud");
-    nubuck().set_geometry_render_mode(_cloud, Nubuck::RenderMode::NODES);
+    _hull = NB::CreateMesh();
+    NB::SetMeshSolid(_hull, false);
+    NB::HideMeshOutline(_hull);
+    NB::SetMeshRenderMode(_hull, NB::RM_FACES);
+    _cloud = NB::CreateMesh();
+    NB::SetMeshName(_cloud, "point cloud");
+    NB::SetMeshRenderMode(_cloud, NB::RM_NODES);
 
-    _cloudCopy = nubuck().create_geometry();
-    nubuck().set_geometry_name(_cloudCopy, "point cloud");
-    nubuck().hide_geometry_outline(_cloudCopy);
+    _cloudCopy = NB::CreateMesh();
+    NB::SetMeshName(_cloudCopy, "point cloud");
+    NB::HideMeshOutline(_cloudCopy);
 
     UpdateHull(_lastDomain, _lastRadius);
     UpdateCloud(Domain::Enum(_lastDomain), _lastSize, _lastRadius);
     _cloudCopy->GetRatPolyMesh() = _cloud->GetRatPolyMesh();
 
-    nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, _cloud);
+    NB::SelectMesh(NB::SM_NEW, _cloud);
 
     return true;
 }

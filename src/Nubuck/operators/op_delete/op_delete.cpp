@@ -7,25 +7,25 @@
 namespace OP {
 
 void Delete::Register(Invoker& invoker) {
-    QAction* action = nubuck().object_menu()->addAction("Delete");
+    QAction* action = NB::ObjectMenu()->addAction("Delete");
     action->setShortcut(QKeySequence("D"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool Delete::Invoke() {
-    nubuck().set_operator_name("Delete");
+    NB::SetOperatorName("Delete");
 
-    std::vector<nb::entity> del;
-    nb::entity ent = nubuck().first_selected_entity();
+    std::vector<NB::Entity> del;
+    NB::Entity ent = NB::FirstSelectedEntity();
     while(ent) {
         del.push_back(ent);
-        ent = nubuck().next_selected_entity(ent);
+        ent = NB::NextSelectedEntity(ent);
     }
 
-    nubuck().clear_selection();
+    NB::ClearSelection();
 
     for(unsigned i = 0; i < del.size(); ++i) {
-        nubuck().destroy(del[i]);
+        NB::DestroyEntity(del[i]);
     }
 
     return true;

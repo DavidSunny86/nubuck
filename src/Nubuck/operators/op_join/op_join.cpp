@@ -10,29 +10,32 @@
 namespace OP {
 
 void Join::Register(Invoker& invoker) {
-    QAction* action = nubuck().object_menu()->addAction("Join");
+    QAction* action = NB::ObjectMenu()->addAction("Join");
     action->setShortcut(QKeySequence("J"));
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool Join::Invoke() {
-    nubuck().set_operator_name("Join");
+    NB::SetOperatorName("Join");
 
-    std::vector<nb::geometry> geomList = nubuck().selected_geometry();
-    if(geomList.size() < 2) return true; // nothing to join
+    NB::Mesh mesh0 = NB::FirstSelectedMesh();
+    if(!mesh0) return true;
 
-    W::ENT_Geometry* geom0 = (W::ENT_Geometry*)geomList[0];
-    geom0->ApplyTransformation();
-    leda::nb::RatPolyMesh& mesh0 = geom0->GetRatPolyMesh();
-    for(unsigned i = 1; i < geomList.size(); ++i) {
-        W::ENT_Geometry* geom = (W::ENT_Geometry*)geomList[i];
-        geom->ApplyTransformation();
-        leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
-        mesh0.join(mesh);
-        geom->Destroy();
+    NB::ApplyMeshTransformation(mesh0);
+    leda::nb::RatPolyMesh& graph0 = NB::GetGraph(mesh0);
+
+    NB::Mesh tmp, mesh1 = NB::NextSelectedMesh(mesh0);
+    while(mesh1) {
+        NB::ApplyMeshTransformation(mesh1);
+        leda::nb::RatPolyMesh& graph1 = NB::GetGraph(mesh1);
+        graph0.join(graph1);
+
+        tmp = NB::NextSelectedMesh(mesh1);
+        NB::DestroyMesh(mesh1);
+        mesh1 = tmp;
     }
 
-    nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, geom0);
+    NB::SelectMesh(NB::SM_NEW, mesh0);
 
     printf(">>>>>>>>>> OP::Join finished\n");
 

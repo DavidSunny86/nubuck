@@ -32,7 +32,7 @@ public:
 
     virtual ~OperatorPanel() { }
 
-    void SetLayout(nb::BoxLayout layout);
+    void SetLayout(NB::BoxLayout layout);
 
     virtual void Invoke() { }
 

@@ -40,7 +40,7 @@ bool VertexEditor::DoPicking(const OP::MouseEvent& event, W::ENT_Geometry& geom)
                     nidx = i;
             }
 
-            Nubuck::SelectMode selectMode = Nubuck::SELECT_MODE_ADD;
+            NB::SelectMode selectMode = NB::SM_ADD;
             if(0 == (OP::MouseEvent::MODIFIER_SHIFT & event.mods)) {
                 W::world.SelectVertex_New(&geom, hits[nidx].vert);
             } else {
@@ -75,7 +75,7 @@ void VertexEditor::OnBeginDragging(W::ENT_Geometry& geom) {
     _center /= verts.size();
 }
 
-void VertexEditor::OnDragging(const Nubuck::transform_gizmo_mouse_info& info, W::ENT_Geometry& geom) {
+void VertexEditor::OnDragging(const NB::TransformGizmoMouseInfo& info, W::ENT_Geometry& geom) {
     leda::nb::RatPolyMesh& mesh = geom.GetRatPolyMesh();
 
     const std::vector<leda::node> verts = geom.GetVertexSelection();
@@ -89,7 +89,7 @@ void VertexEditor::OnDragging(const Nubuck::transform_gizmo_mouse_info& info, W:
     }
 }
 
-VertexEditor::VertexEditor() : _axis(nb::AF_XYZ), _gizmo(NULL) {
+VertexEditor::VertexEditor() : _axis(NB::AF_XYZ), _gizmo(NULL) {
     _gizmo = W::world.CreateTransformGizmo();
     _gizmo->HideCursor();
 }
@@ -104,12 +104,12 @@ bool VertexEditor::HandleMouseEvent(const OP::MouseEvent& event, W::ENT_Geometry
 
     bool retval = false;
 
-    Nubuck::transform_gizmo_mouse_info mouseInfo;
+    NB::TransformGizmoMouseInfo mouseInfo;
     if(_gizmo->HandleMouseEvent(event, mouseInfo)) {
-        if(Nubuck::transform_gizmo_action::BEGIN_DRAGGING == mouseInfo.action) {
+        if(NB::TGA_BEGIN_DRAGGING == mouseInfo.action) {
             OnBeginDragging(*geom);
         }
-        if(Nubuck::transform_gizmo_action::DRAGGING == mouseInfo.action) {
+        if(NB::TGA_DRAGGING == mouseInfo.action) {
             OnDragging(mouseInfo, *geom);
         }
 

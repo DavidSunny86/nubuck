@@ -60,11 +60,11 @@ void Delaunay3D::Event_SetScale(const EV::Arg<double>& event) {
         leda::rational scale = 1 + 5 * event.value;
         leda::rat_vector center = scale * simplex.center;
 
-        leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
+        leda::nb::RatPolyMesh& graph = NB::GetGraph(_mesh);
         for(int i = 0; i < 4; ++i) {
             // NOTE: carrying out this addition with rat_vectors yields NaNs when converted to float.
             // i have absolutely NO IDEA why. maybe corrupted leda install?
-            mesh.set_position(simplex.verts[i], ToRatPoint(ToVector(simplex.localPos[i]) + ToVector(center)));
+            graph.set_position(simplex.verts[i], ToRatPoint(ToVector(simplex.localPos[i]) + ToVector(center)));
         }
     }
     std::cout << "DONE" << std::endl;
@@ -75,26 +75,26 @@ Delaunay3D::Delaunay3D() {
 }
 
 void Delaunay3D::Register(Invoker& invoker) {
-    QAction* action = nubuck().object_menu()->addAction("Delaunay 3D");
+    QAction* action = NB::ObjectMenu()->addAction("Delaunay 3D");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
-void AddFace(leda::nb::RatPolyMesh& mesh, leda::node v0, leda::node v1, leda::node v2, leda::node v3) {
-    mesh.new_edge(v0, v1);
-    mesh.new_edge(v0, v3);
-    mesh.new_edge(v0, v2);
+void AddFace(leda::nb::RatPolyMesh& graph, leda::node v0, leda::node v1, leda::node v2, leda::node v3) {
+    graph.new_edge(v0, v1);
+    graph.new_edge(v0, v3);
+    graph.new_edge(v0, v2);
 
-    mesh.new_edge(v1, v2);
-    mesh.new_edge(v1, v3);
-    mesh.new_edge(v1, v0);
+    graph.new_edge(v1, v2);
+    graph.new_edge(v1, v3);
+    graph.new_edge(v1, v0);
 
-    mesh.new_edge(v2, v0);
-    mesh.new_edge(v2, v3);
-    mesh.new_edge(v2, v1);
+    graph.new_edge(v2, v0);
+    graph.new_edge(v2, v3);
+    graph.new_edge(v2, v1);
 
-    mesh.new_edge(v3, v0);
-    mesh.new_edge(v3, v1);
-    mesh.new_edge(v3, v2);
+    graph.new_edge(v3, v0);
+    graph.new_edge(v3, v1);
+    graph.new_edge(v3, v2);
 }
 
 bool Delaunay3D::Invoke() {
@@ -102,20 +102,20 @@ bool Delaunay3D::Invoke() {
 
     _simplices.clear();
 
-    std::vector<nb::geometry> geomSel = nubuck().selected_geometry();
-    if(geomSel.empty()) {
-        nubuck().log_printf("no geometry selected.\n");
+    if(!NB::FirstSelectedMesh()) {
+        NB::LogPrintf("no geometry selected.\n");
         return false;
     }
 
-    nubuck().set_operator_name("Delaunay 3D");
+    NB::SetOperatorName("Delaunay 3D");
 
-    nb::geometry cloud = geomSel.front();
+    NB::Mesh cloud = NB::FirstSelectedMesh();
+    COM_assert(cloud);
 
-    leda::nb::RatPolyMesh& cloudMesh = nubuck().poly_mesh(cloud);
+    leda::nb::RatPolyMesh& cloudGraph = NB::GetGraph(cloud);
     leda::list<point3_t> L;
     leda::node v;
-    forall_nodes(v, cloudMesh) L.push_back(cloudMesh.position_of(v));
+    forall_nodes(v, cloudGraph) L.push_back(cloudGraph.position_of(v));
 
     leda::list<leda::fork::simplex_t> S;
 
@@ -124,10 +124,10 @@ bool Delaunay3D::Invoke() {
     leda::fork::D3_DELAUNAY(L, S);
     std::cout << "DONE" << std::endl;
 
-    geom = nubuck().create_geometry();
-    nubuck().set_geometry_render_mode(geom, Nubuck::RenderMode::NODES | Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES);
-    nubuck().set_geometry_position(geom, nubuck().geometry_position(cloud));
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(geom);
+    _mesh = NB::CreateMesh();
+    NB::SetMeshRenderMode(_mesh, NB::RM_ALL);
+    NB::SetMeshPosition(_mesh, NB::GetMeshPosition(cloud));
+    leda::nb::RatPolyMesh& graph = NB::GetGraph(_mesh);
 
     std::cout << "Delaunay3D: creating simplex geometries ... " << std::flush;
     leda::list_item it;
@@ -140,21 +140,21 @@ bool Delaunay3D::Invoke() {
             pos[i] = S[it].verts[i].to_vector();
             simplex.center += pos[i];
 
-            simplex.verts[i] = mesh.new_node();
-            mesh.set_position(simplex.verts[i], pos[i]);
+            simplex.verts[i] = graph.new_node();
+            graph.set_position(simplex.verts[i], pos[i]);
         }
         simplex.center /= 4;
         for(int i = 0; i < 4; ++i) simplex.localPos[i] = pos[i] - simplex.center;
-        AddFace(mesh, simplex.verts[0], simplex.verts[1], simplex.verts[2], simplex.verts[3]);
+        AddFace(graph, simplex.verts[0], simplex.verts[1], simplex.verts[2], simplex.verts[3]);
 
         _simplices.push_back(simplex);
     }
 
-    mesh.make_map();
-    mesh.compute_faces();
+    graph.make_map();
+    graph.compute_faces();
 
-    nubuck().destroy_geometry(cloud);
-    nubuck().clear_selection();
+    NB::DestroyMesh(cloud);
+    NB::ClearSelection();
 
     std::cout << "DONE" << std::endl;
 

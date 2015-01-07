@@ -44,14 +44,10 @@ LoadGeomPanel::LoadGeomPanel() {
 void LoadGeom::Event_Load(const EV::Arg<std::string*>& event) {
     const std::string& filename(*event.value);
 
-    nb::geometry geom = nubuck().create_geometry();
-    const int renderAll =
-        Nubuck::RenderMode::NODES |
-        Nubuck::RenderMode::EDGES |
-        Nubuck::RenderMode::FACES;
-    nubuck().set_geometry_render_mode(geom, renderAll);
-    W::LoadGeometryFromFile(filename, geom);
-    nubuck().poly_mesh(geom).compute_faces();
+    NB::Mesh mesh = NB::CreateMesh();
+    NB::SetMeshRenderMode(mesh, NB::RM_ALL);
+    W::LoadGeometryFromFile(filename, mesh);
+    NB::GetGraph(mesh).compute_faces();
 
     delete event.value;
 }
@@ -61,12 +57,12 @@ LoadGeom::LoadGeom() {
 }
 
 void LoadGeom::Register(Invoker& invoker) {
-    QAction* action = nubuck().scene_menu()->addAction("Load .geom file");
+    QAction* action = NB::SceneMenu()->addAction("Load .geom file");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool LoadGeom::Invoke() {
-    nubuck().set_operator_name("Load (.geom)");
+    NB::SetOperatorName("Load (.geom)");
     return true;
 }
 

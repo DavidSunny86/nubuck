@@ -69,14 +69,14 @@ struct Globals {
 
     leda::edge activeEdge;
 
-    nb::geometry geom0;
-    nb::geometry geom1;
-    nb::geometry geom; // union of geom0, geom1
+    NB::Mesh geom0;
+    NB::Mesh geom1;
+    NB::Mesh geom; // union of geom0, geom1
 
-    nb::geometry geom_suppEdge;
-    nb::geometry geom_activeEdge0;
-    nb::geometry geom_activeEdge1;
-    nb::geometry geom_activeEdge;
+    NB::Mesh geom_suppEdge;
+    NB::Mesh geom_activeEdge0;
+    NB::Mesh geom_activeEdge1;
+    NB::Mesh geom_activeEdge;
 
 	GEN::Pointer<Mantle> mantle;
 
@@ -92,7 +92,7 @@ struct Globals {
 
 extern Globals g;
 
-inline mesh_t& GetG() { return nubuck().poly_mesh(g.geom); }
+inline mesh_t& GetG() { return NB::GetGraph(g.geom); }
 
 void InitPhases();
 void UpdateActiveEdge();

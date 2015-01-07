@@ -27,7 +27,7 @@ private:
         leda::rat_vector    localPos[4];
         leda::rat_vector    center;
     };
-    nb::geometry              geom;
+    NB::Mesh _mesh;
     std::vector<Simplex> _simplices;
 
     void Event_SetScale(const EV::Arg<double>& event);

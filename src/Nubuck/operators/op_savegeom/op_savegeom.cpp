@@ -49,7 +49,7 @@ void SaveGeomPanel::Invoke() {
 void SaveGeom::Event_Save(const EV::Arg<std::string*>& event) {
     const std::string& filename(*event.value);
 
-    W::SaveGeometryToFile(filename, _geom);
+    W::SaveGeometryToFile(filename, _mesh);
 
     delete event.value;
 }
@@ -59,20 +59,19 @@ SaveGeom::SaveGeom() {
 }
 
 void SaveGeom::Register(Invoker& invoker) {
-    QAction* action = nubuck().object_menu()->addAction("Save as .geom file");
+    QAction* action = NB::ObjectMenu()->addAction("Save as .geom file");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool SaveGeom::Invoke() {
-    nubuck().set_operator_name("Save (.geom)");
+    NB::SetOperatorName("Save (.geom)");
 
-    std::vector<nb::geometry> geomSel = nubuck().selected_geometry();
-    if(geomSel.empty()) {
-        nubuck().log_printf("no geometry selected.\n");
+    if(!NB::FirstSelectedMesh()) {
+        NB::LogPrintf("no mesh selected.\n");
         return false;
     }
 
-    _geom = geomSel[0];
+    _mesh = NB::FirstSelectedMesh();
 
     SendToPanel(ev_save.Tag(NULL));
 

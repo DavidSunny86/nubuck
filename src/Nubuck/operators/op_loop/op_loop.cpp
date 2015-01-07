@@ -26,7 +26,7 @@ void Loop::Event_OP_Loop_Start(const EV::Event& event) {
         _geom->SetEdgeColor(R::Color::Red);
         */
 
-        nubuck().select_geometry(Nubuck::SELECT_MODE_NEW, _geom);
+        NB::SelectMesh(NB::SM_NEW, _geom);
 	}
 
     for(unsigned i = 0; i < 50; ++i) {
@@ -57,13 +57,13 @@ Loop::Loop() : _geom(NULL) {
 }
 
 void Loop::Register(Invoker& invoker) {
-    QAction* action = nubuck().object_menu()->addAction("Loop");
+    QAction* action = NB::ObjectMenu()->addAction("Loop");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
 bool Loop::Invoke() {
     printf("OP::Loop::Invoke\n");
-    nubuck().set_operator_name("Loop");
+    NB::SetOperatorName("Loop");
 
 	leda::list<leda::d3_rat_point> L;
 	L.push_back(leda::d3_rat_point(-1, -1, -1));
@@ -75,13 +75,13 @@ bool Loop::Invoke() {
 	L.push_back(leda::d3_rat_point( 1,  1, -1));
 	L.push_back(leda::d3_rat_point( 1,  1,  1));
 
-    _geom = (W::ENT_Geometry*)nubuck().create_geometry();
-	_geom->SetRenderMode(Nubuck::RenderMode::NODES | Nubuck::RenderMode::EDGES | Nubuck::RenderMode::FACES);
+    _geom = (W::ENT_Geometry*)NB::CreateMesh();
+    _geom->SetRenderMode(NB::RM_ALL);
 	leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
 	leda::CONVEX_HULL(L, mesh);
 	mesh.compute_faces();
 
-    nubuck().set_geometry_pattern(_geom, Nubuck::Pattern::DOTS);
+    NB::SetMeshPattern(_geom, NB::PATTERN_DOTS);
     leda::face f = mesh.first_face();
     mesh.set_pattern(f, R::Color::Red);
 

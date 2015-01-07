@@ -25,8 +25,8 @@ public:
         layout->addWidget(button);
 
         for(int i = 0; i < 3; ++i) {
-            nb::Button otherButton = nubuck().create_button(i, "Hello, World!");
-            nubuck().add_widget_to_box(layout, nubuck().to_widget(otherButton));
+            NB::Button otherButton = NB::CreateButton(i, "Hello, World!");
+            NB::AddWidgetToBox(layout, NB::CastToWidget(otherButton));
         }
 
         layout->addStretch();

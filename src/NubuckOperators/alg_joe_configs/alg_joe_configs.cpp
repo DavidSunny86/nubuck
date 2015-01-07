@@ -87,7 +87,7 @@ JoeConfigsPanel::JoeConfigsPanel() {
 }
 
 struct Config {
-    nb::geometry    geom;
+    NB::Mesh        mesh;
     int             simp_first;
     int             simp_last; // exclusive
 };
@@ -150,7 +150,7 @@ leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
 } // unnamed namespace
 
 void JoeConfigs::SetScale(Config& config, const leda::rational scale) {
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(config.geom);
+    leda::nb::RatPolyMesh& graph = NB::GetGraph(config.mesh);
 
     for(int i = config.simp_first; i < config.simp_last; ++i) {
         Simplex& simplex = _simplices[i];
@@ -160,13 +160,13 @@ void JoeConfigs::SetScale(Config& config, const leda::rational scale) {
         for(int i = 0; i < 4; ++i) {
             // NOTE: carrying out this addition with rat_vectors yields NaNs when converted to float.
             // i have absolutely NO IDEA why. maybe corrupted leda install?
-            mesh.set_position(simplex.verts[i], ToRatPoint(ToVector(simplex.localPos[i]) + ToVector(center)));
+            graph.set_position(simplex.verts[i], ToRatPoint(ToVector(simplex.localPos[i]) + ToVector(center)));
         }
     }
 }
 
 void JoeConfigs::Register(OP::Invoker& invoker) {
-    QAction* action = nubuck().algorithm_menu()->addAction("Joe Configs");
+    QAction* action = NB::AlgorithmMenu()->addAction("Joe Configs");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 
@@ -212,20 +212,20 @@ void AddSimplex(
     const leda::d3_rat_point&   p1,
     const leda::d3_rat_point&   p2,
     const leda::d3_rat_point&   p3,
-    leda::nb::RatPolyMesh&      mesh,
+    leda::nb::RatPolyMesh&      graph,
     Simplex&                    simplex)
 {
-    for(int i = 0; i < 4; ++i) simplex.verts[i] = mesh.new_node();
+    for(int i = 0; i < 4; ++i) simplex.verts[i] = graph.new_node();
 
-    mesh.set_position(simplex.verts[0], p0);
-    mesh.set_position(simplex.verts[1], p1);
-    mesh.set_position(simplex.verts[2], p2);
-    mesh.set_position(simplex.verts[3], p3);
+    graph.set_position(simplex.verts[0], p0);
+    graph.set_position(simplex.verts[1], p1);
+    graph.set_position(simplex.verts[2], p2);
+    graph.set_position(simplex.verts[3], p3);
 
     simplex.center = leda::rat_vector::zero(3);
     leda::rat_vector pos[4];
     for(int i = 0; i < 4; ++i) {
-        pos[i] = mesh.position_of(simplex.verts[i]).to_vector();
+        pos[i] = graph.position_of(simplex.verts[i]).to_vector();
         simplex.center += pos[i];
     }
     simplex.center /= 4;
@@ -233,7 +233,7 @@ void AddSimplex(
     for(int i = 0; i < 4; ++i) simplex.localPos[i] = pos[i] - simplex.center;
 
     BuildTetrahedron(
-        mesh,
+        graph,
         simplex.verts[0],
         simplex.verts[1],
         simplex.verts[2],
@@ -257,23 +257,18 @@ void JoeConfigs::EndSimplices() {
 }
 
 void JoeConfigs::AddSimplex(int i0, int i1, int i2, int i3) {
-    leda::nb::RatPolyMesh& mesh = nubuck().poly_mesh(_configs[_cs_config].geom);
+    leda::nb::RatPolyMesh& graph = NB::GetGraph(_configs[_cs_config].mesh);
     ::AddSimplex(
         _cs_positions[i0],
         _cs_positions[i1],
         _cs_positions[i2],
         _cs_positions[i3],
-        mesh,
+        graph,
         _simplices[_cs_simp_cnt++]);
 }
 
 bool JoeConfigs::Invoke() {
-    nubuck().set_operator_name("Joe's Configurations");
-
-    const int renderAll =
-        Nubuck::RenderMode::NODES |
-        Nubuck::RenderMode::EDGES |
-        Nubuck::RenderMode::FACES;
+    NB::SetOperatorName("Joe's Configurations");
 
     enum { VA = 0, VB, VC, VD, VE };
 
@@ -341,16 +336,16 @@ bool JoeConfigs::Invoke() {
     for(int i = 0; i < NUM_CONFIGS; ++i) {
         Config& config = _configs[i];
 
-        config.geom = nubuck().create_geometry();
-        nubuck().set_geometry_name(config.geom, std::string("Config ") + configNames[i]);
-        nubuck().set_geometry_render_mode(config.geom, renderAll);
-        nubuck().set_geometry_position(config.geom, configPos[i]);
+        config.mesh = NB::CreateMesh();
+        NB::SetMeshName(config.mesh, std::string("Config ") + configNames[i]);
+        NB::SetMeshRenderMode(config.mesh, NB::RM_ALL);
+        NB::SetMeshPosition(config.mesh, configPos[i]);
 
-        nb::text text = nubuck().create_text();
-        nubuck().set_text_content_scale(text, 'A', 1.0f);
-        nubuck().set_text_content(text, configNames[i]);
-        M::Vector3 pos = configPos[i] + M::Vector3(-0.5f * nubuck().text_content_size(text).x, -1.0f, -1.0f);
-        nubuck().set_text_position(text, pos);
+        NB::Text text = NB::CreateText();
+        NB::SetTextContentScale(text, 'A', 1.0f);
+        NB::SetTextContent(text, configNames[i]);
+        M::Vector3 pos = configPos[i] + M::Vector3(-0.5f * NB::GetTextContentSize(text).x, -1.0f, -1.0f);
+        NB::SetTextPosition(text, pos);
     }
 
     // configuration 1a

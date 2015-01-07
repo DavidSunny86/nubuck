@@ -115,7 +115,7 @@ void ENT_TransformGizmo::BuildBoxHeads() {
 
 ENT_TransformGizmo::ENT_TransformGizmo()
     : _axis(AXIS_XYZ)
-    , _mode(Mode::TRANSLATE)
+    , _mode(NB::TGM_TRANSLATE)
     , _dragging(false)
 {
     SetType(EntityType::ENT_TRANSFORM_GIZMO);
@@ -197,7 +197,7 @@ void ENT_TransformGizmo::SetAxis(int axisFlags) {
     _dragging = false;
 }
 
-void ENT_TransformGizmo::SetTransformMode(Mode::Enum mode) {
+void ENT_TransformGizmo::SetTransformMode(Mode mode) {
     _mode = mode;
     _dragging = false;
 }
@@ -256,17 +256,17 @@ bool ENT_TransformGizmo::OnMouseDown(const MouseEvent& event, MouseInfo& info) {
         _dragOrig = inf.where;
 
         unsigned selectionSize = 0;
-        nb::entity ent = nubuck().first_selected_entity();
+        W::Entity* ent = W::world.FirstSelectedEntity();
         while(ent) {
             selectionSize++;
-            ent = nubuck().next_selected_entity(ent);
+            ent = W::world.NextSelectedEntity(ent);
         }
 
         _oldCursorPos = _cursorPos;
         _dragging = true;
 
-        info.action = static_cast<Action::Enum>(Action::BEGIN_DRAGGING);
-        info.axis = static_cast<Axis::Enum>(axis);
+        info.action = static_cast<Action>(NB::TGA_BEGIN_DRAGGING);
+        info.axis = static_cast<Axis>(axis);
 
         return true;
     }
@@ -277,7 +277,7 @@ bool ENT_TransformGizmo::OnMouseDown(const MouseEvent& event, MouseInfo& info) {
 bool ENT_TransformGizmo::OnMouseUp(const MouseEvent& event, MouseInfo& info) {
     if(_dragging) {
         _dragging = false;
-        info.action = Action::END_DRAGGING;
+        info.action = NB::TGA_END_DRAGGING;
         return true;
     }
     return false;
@@ -288,7 +288,7 @@ static bool lastDrag = false;
 bool ENT_TransformGizmo::OnMouseMove(const MouseEvent& event, MouseInfo& info) {
     lastDrag = _dragging;
 
-    if(_dragging && Mode::TRANSLATE == _mode) {
+    if(_dragging && NB::TGM_TRANSLATE == _mode) {
         M::Ray ray = W::world.PickingRay(event.coords);
         M::IS::Info inf;
         bool is = M::IS::Intersects(ray, _dragPlane, &inf);
@@ -299,13 +299,13 @@ bool ENT_TransformGizmo::OnMouseMove(const MouseEvent& event, MouseInfo& info) {
         pos.vec[_dragAxis] = _oldCursorPos.vec[_dragAxis] + translation;
         SetCursorPosition(pos);
 
-        info.action = Action::DRAGGING;
-        info.axis   = Axis::Enum(_dragAxis);
+        info.action = NB::TGA_DRAGGING;
+        info.axis   = Axis(_dragAxis);
         info.value  = translation;
 
         return true;
     }
-    if(_dragging && Mode::SCALE == _mode) {
+    if(_dragging && NB::TGM_SCALE == _mode) {
         M::Vector2 mousePos = event.coords;
         float base = M::Length(_dragOrig - _oldCursorPos);
 
@@ -317,8 +317,8 @@ bool ENT_TransformGizmo::OnMouseMove(const MouseEvent& event, MouseInfo& info) {
 
         const float scale = M::Length(p - _oldCursorPos) / base;
 
-        info.action = Action::DRAGGING;
-        info.axis   = Axis::Enum(_dragAxis);
+        info.action = NB::TGA_DRAGGING;
+        info.axis   = Axis(_dragAxis);
         info.value  = scale;
 
         return true;
@@ -327,8 +327,8 @@ bool ENT_TransformGizmo::OnMouseMove(const MouseEvent& event, MouseInfo& info) {
 }
 
 bool ENT_TransformGizmo::HandleMouseEvent(const MouseEvent& event, MouseInfo& info) {
-    info.action = Action::NO_ACTION;
-    info.axis   = Axis::INVALID_AXIS;
+    info.action = NB::TGA_NO_ACTION;
+    info.axis   = NB::INVALID_AXIS;
     info.value  = 0.0f;
 
     if(IsHidden()) return false;
@@ -368,10 +368,10 @@ void ENT_TransformGizmo::GetRenderJobs(R::RenderList& renderList) {
     for(int i = 0; i < 3; ++i) {
         if(_axis & (1 << i)) {
             switch(_mode) {
-            case Mode::TRANSLATE:
+            case NB::TGM_TRANSLATE:
                 meshJob.tfmesh = _arrowHeadTFMeshes[i];
                 break;
-            case Mode::SCALE:
+            case NB::TGM_SCALE:
                 meshJob.tfmesh = _boxHeadTFMeshes[i];
                 break;
             }

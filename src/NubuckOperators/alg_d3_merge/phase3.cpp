@@ -44,10 +44,10 @@ Phase3::StepRet::Enum Phase3::Step() {
     forall_edges(e, G) G.set_unmasked(e);
     G.compute_faces();
 
-    nubuck().destroy_geometry(g.geom_activeEdge);
-    nubuck().destroy_geometry(g.geom_activeEdge0);
-    nubuck().destroy_geometry(g.geom_activeEdge1);
-    nubuck().destroy_geometry(g.geom_suppEdge);
+    NB::DestroyMesh(g.geom_activeEdge);
+    NB::DestroyMesh(g.geom_activeEdge0);
+    NB::DestroyMesh(g.geom_activeEdge1);
+    NB::DestroyMesh(g.geom_suppEdge);
     g.mantle->Destroy();
 
     return StepRet::DONE;

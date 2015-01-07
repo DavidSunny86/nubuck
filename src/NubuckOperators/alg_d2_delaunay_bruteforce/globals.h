@@ -10,10 +10,10 @@ struct Color {
 };
 
 struct Globals {
-    nb::geometry delaunay;
-    nb::geometry chull;
-    nb::geometry paraboloid;
-    nb::geometry circle;
+    NB::Mesh delaunay;
+    NB::Mesh chull;
+    NB::Mesh paraboloid;
+    NB::Mesh circle;
 
     leda::edge hullEdge; // of delaunay mesh
 

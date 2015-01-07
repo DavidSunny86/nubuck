@@ -34,9 +34,9 @@ void ENT_GeometryOutln::OnTransparencyChanged(leda::rational value) {
 void ENT_GeometryOutln::OnRenderModeChanged(bool) {
     RenderModeEvent event;
     int renderMode = 0;
-    if(_btnRenderVertices->isChecked()) renderMode |= Nubuck::RenderMode::NODES;
-    if(_btnRenderEdges->isChecked()) renderMode |= Nubuck::RenderMode::EDGES;
-    if(_btnRenderFaces->isChecked()) renderMode |= Nubuck::RenderMode::FACES;
+    if(_btnRenderVertices->isChecked()) renderMode |= NB::RM_NODES;
+    if(_btnRenderEdges->isChecked()) renderMode |= NB::RM_EDGES;
+    if(_btnRenderFaces->isChecked()) renderMode |= NB::RM_FACES;
     event.renderMode = renderMode;
     event.showWireframe = _cbWireframe->isChecked();
     event.showNormals = _cbNormals->isChecked();
@@ -113,18 +113,18 @@ void ENT_GeometryOutln::InitOutline() {
     _btnRenderVertices->setCheckable(true);
     _btnRenderEdges->setCheckable(true);
     _btnRenderFaces->setCheckable(true);
-    _btnRenderVertices->setChecked(_subject.GetRenderMode() & Nubuck::RenderMode::NODES);
-    _btnRenderEdges->setChecked(_subject.GetRenderMode() & Nubuck::RenderMode::EDGES);
-    _btnRenderFaces->setChecked(_subject.GetRenderMode() & Nubuck::RenderMode::FACES);
+    _btnRenderVertices->setChecked(_subject.GetRenderMode() & NB::RM_NODES);
+    _btnRenderEdges->setChecked(_subject.GetRenderMode() & NB::RM_EDGES);
+    _btnRenderFaces->setChecked(_subject.GetRenderMode() & NB::RM_FACES);
     QHBoxLayout* hboxLayout =  new QHBoxLayout;
     hboxLayout->addWidget(_btnRenderVertices);
     hboxLayout->addWidget(_btnRenderEdges);
     hboxLayout->addWidget(_btnRenderFaces);
 
     _cbWireframe = new QCheckBox("Wireframe");
-    _cbWireframe->setEnabled(_subject.GetRenderMode() & Nubuck::RenderMode::FACES);
+    _cbWireframe->setEnabled(_subject.GetRenderMode() & NB::RM_FACES);
     _cbNormals = new QCheckBox("Normals");
-    _cbWireframe->setEnabled(_subject.GetRenderMode() & Nubuck::RenderMode::FACES);
+    _cbWireframe->setEnabled(_subject.GetRenderMode() & NB::RM_FACES);
 
     layout->addWidget(_sbVertexScale, 0, 0, 1, 2);
 
@@ -166,8 +166,8 @@ void ENT_GeometryOutln::InitOutline() {
 void ENT_GeometryOutln::SendEdgeShading() {
     EdgeShadingEvent event;
     int idx = _cbEdgeShading->currentIndex();
-    assert(0 <= idx && idx < Nubuck::ShadingMode::NUM_MODES);
-    event.shadingMode = Nubuck::ShadingMode::Enum(idx);
+    assert(0 <= idx && idx < NB::NUM_SHADING_MODES);
+    event.shadingMode = NB::ShadingMode(idx);
     event.showHiddenLines = _cbHiddenLines->isChecked();
     _subject.Send(ev_geom_edgeShadingChanged.Tag(event));
 }
@@ -199,9 +199,9 @@ void ENT_GeometryOutln::Event_EdgeShadingChanged(const EdgeShadingEvent& event) 
 
 void ENT_GeometryOutln::Event_RenderModeChanged(const RenderModeEvent& event) {
     UI::BlockSignals blockSignals(_btnRenderVertices, _btnRenderEdges, _btnRenderFaces);
-    _btnRenderVertices->setChecked(Nubuck::RenderMode::NODES & event.renderMode);
-    _btnRenderEdges->setChecked(Nubuck::RenderMode::EDGES & event.renderMode);
-    _btnRenderFaces->setChecked(Nubuck::RenderMode::FACES & event.renderMode);
+    _btnRenderVertices->setChecked(NB::RM_NODES & event.renderMode);
+    _btnRenderEdges->setChecked(NB::RM_EDGES & event.renderMode);
+    _btnRenderFaces->setChecked(NB::RM_FACES & event.renderMode);
 }
 
 void ENT_GeometryOutln::ExecEvents(const std::vector<EV::Event>& events) {

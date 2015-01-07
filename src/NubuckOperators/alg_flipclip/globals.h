@@ -22,7 +22,7 @@ struct Side {
 struct Globals {
     leda::list<leda::node>  L[2];
     Side::Enum              side;
-    nb::geometry            geom[2];
+    NB::Mesh                meshes[2];
     leda::edge              hullEdges[2];
     leda::node              stitchVerts[2];
 
