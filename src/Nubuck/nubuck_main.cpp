@@ -158,6 +158,7 @@ int RunNubuck(
     // register commands
     COM::CMD::RegisterCommand("lsvars", "list config variables", COM::CMD_ListVariables);
     COM::CMD::RegisterCommand("set", "set config variable", COM::CMD_SetVariable);
+    COM::CMD::RegisterCommand("printWorldInfo", "lists all entities", W::CMD_PrintInfo);
 
     // REMOVEME
 	OP::g_operators.Register(new OP::TranslatePanel, new OP::Translate);

@@ -1,6 +1,8 @@
 #include <functional>
 #include <algorithm>
 
+#include <QTextStream>
+
 #include <Nubuck\common\common.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <Nubuck\math\intersections.h>
@@ -455,6 +457,24 @@ World::World(void) : _camArcball(800, 400) /* init values arbitrary */
     SetDefaultLights();
 }
 
+void World::PrintInfo(QTextStream& stream) {
+    const char* typeToString[] = {
+        "ENT_GEOMETRY",
+        "ENT_TEXT",
+        "ENT_TRANSFORM_GIZMO"
+    };
+    stream << "World::PrintInfo <<<\n";
+    SYS::ScopedLock lockEntities(_entitiesMtx);
+    for(unsigned i = 0; i < _entities.size(); ++i) {
+        GEN::Pointer<Entity> entity = _entities[i];
+        stream << "id = " << entity->GetID() << ", ";
+        stream << "type = " << typeToString[entity->GetType()] << ", ";
+        stream << "selected = " << entity->IsSelected();
+        stream << "\n";
+    }
+    stream << ">>>\n";
+}
+
 void World::Init() {
     AddEventHandler(ev_w_apocalypse,           this, &World::Event_Apocalypse);
     AddEventHandler(ev_w_linkEntity,           this, &World::Event_LinkEntity);
@@ -771,6 +791,10 @@ DWORD World::Thread_Func(void) {
         Update();
         // Sleep(10);
     }
+}
+
+void CMD_PrintInfo(QTextStream& stream, const char* args) {
+    world.PrintInfo(stream);
 }
 
 } // namespace W

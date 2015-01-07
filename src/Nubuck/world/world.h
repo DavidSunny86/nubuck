@@ -136,6 +136,8 @@ namespace W {
     public:
 		World(void);
 
+        void PrintInfo(QTextStream& stream);
+
         void Init();
 
         const R::DirectionalLight&  GetDirectionalLight(const int idx) const;
@@ -185,6 +187,8 @@ namespace W {
     };
 
     extern World world;
+
+    void CMD_PrintInfo(QTextStream& stream, const char* args);
 
 } // namespace W
 
