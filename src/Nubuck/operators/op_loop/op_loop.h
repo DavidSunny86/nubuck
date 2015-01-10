@@ -51,7 +51,7 @@ public:
     bool Invoke() override;
     void Finish() override { }
 
-    bool OnMouse(const MouseEvent& event) override;
+    bool OnMouse(const EV::MouseEvent& event) override;
 };
 
 } // namespace OP

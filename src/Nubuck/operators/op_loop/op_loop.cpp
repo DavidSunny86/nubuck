@@ -90,7 +90,7 @@ bool Loop::Invoke() {
     return true;
 }
 
-bool Loop::OnMouse(const MouseEvent& event) {
+bool Loop::OnMouse(const EV::MouseEvent& event) {
     assert(_geom);
     if(_vertexEditor.HandleMouseEvent(event, _geom)) {
         W::SetColorsFromVertexSelection(*_geom);

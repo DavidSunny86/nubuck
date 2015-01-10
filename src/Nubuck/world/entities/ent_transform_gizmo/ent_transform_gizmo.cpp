@@ -242,7 +242,7 @@ bool ENT_TransformGizmo::OnMouseDown(const MouseEvent& event, MouseInfo& info) {
 
 	if(MouseEvent::BUTTON_RIGHT != event.button) return false;
 
-    M::Ray ray = W::world.PickingRay(event.coords);
+    M::Ray ray = W::world.PickingRay(M::Vector2(event.x, event.y));
 
     int         axis;
     M::IS::Info inf;
@@ -290,7 +290,7 @@ bool ENT_TransformGizmo::OnMouseMove(const MouseEvent& event, MouseInfo& info) {
     lastDrag = _dragging;
 
     if(_dragging && NB::TGM_TRANSLATE == _mode) {
-        M::Ray ray = W::world.PickingRay(event.coords);
+        M::Ray ray = W::world.PickingRay(M::Vector2(event.x, event.y));
         M::IS::Info inf;
         bool is = M::IS::Intersects(ray, _dragPlane, &inf);
         assert(is);
@@ -307,10 +307,10 @@ bool ENT_TransformGizmo::OnMouseMove(const MouseEvent& event, MouseInfo& info) {
         return true;
     }
     if(_dragging && NB::TGM_SCALE == _mode) {
-        M::Vector2 mousePos = event.coords;
+        M::Vector2 mousePos = M::Vector2(event.x, event.y);
         float base = M::Length(_dragOrig - _oldCursorPos);
 
-        M::Ray ray = W::world.PickingRay(event.coords);
+        M::Ray ray = W::world.PickingRay(M::Vector2(event.x, event.y));
         M::IS::Info inf;
         bool is = M::IS::Intersects(ray, _dragPlane, &inf);
         assert(is);

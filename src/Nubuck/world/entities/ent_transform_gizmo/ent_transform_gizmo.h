@@ -3,7 +3,6 @@
 #include <Nubuck\nubuck.h>
 #include <Nubuck\math\plane.h>
 #include <Nubuck\math\intersections.h>
-#include <Nubuck\operators\operator_events.h>
 #include <world\world.h>
 #include <world\entity.h>
 #include <renderer\mesh\meshmgr.h>
@@ -16,7 +15,7 @@ private:
     typedef NB::TransformGizmoAction    Action;
     typedef NB::Axis                    Axis;
     typedef NB::TransformGizmoMouseInfo MouseInfo;
-    typedef OP::MouseEvent              MouseEvent;
+    typedef EV::MouseEvent              MouseEvent;
 
     int     _axis;
     Mode    _mode;

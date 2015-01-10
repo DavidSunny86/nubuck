@@ -1,9 +1,9 @@
+#include <operators\operator_events.h>
 #include <Nubuck\operators\operator.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <world\world_events.h>
 #include <world\world.h>
 #include <UI\window_events.h>
-#include "operator_events.h"
 #include "operators.h"
 #include "operator_driver.h"
 
@@ -39,25 +39,6 @@ void Driver::Event_SelectionChanged(const EV::Event& event) {
     SignalCompletion();
 }
 
-static MouseEvent ConvertMouseEvent(const EV::MouseEvent& from) {
-    MouseEvent to;
-	to.type     = MouseEvent::Type(from.type);
-	to.button   = MouseEvent::Button(from.button);
-	to.mods     = from.mods;
-	to.delta    = from.delta;
-	to.coords   = M::Vector2(from.x, from.y);
-    return to;
-}
-
-static KeyEvent ConvertKeyEvent(const EV::KeyEvent& from) {
-    KeyEvent to;
-    to.type             = from.type;
-    to.keyCode          = from.keyCode;
-    to.nativeScanCode   = from.nativeScanCode;
-    to.autoRepeat       = from.autoRepeat;
-    return to;
-}
-
 void Driver::Event_EditModeChanged(const EV::Arg<int>& event) {
     const W::editMode_t::Enum editMode = W::editMode_t::Enum(event.value);
     if(_activeOp) _activeOp->OnEditModeChanged(editMode);
@@ -66,9 +47,8 @@ void Driver::Event_EditModeChanged(const EV::Arg<int>& event) {
 }
 
 void Driver::Event_Mouse(const EV::MouseEvent& event) {
-    const MouseEvent mouseEvent = ConvertMouseEvent(event);
-	if(_activeOp && _activeOp->OnMouse(mouseEvent)) {
-    } else if(_defaultOp->OnMouse(mouseEvent)) {
+	if(_activeOp && _activeOp->OnMouse(event)) {
+    } else if(_defaultOp->OnMouse(event)) {
         // default operator becomes active, implicit rebuild
         SetOperator(_defaultOp);
     }
@@ -78,9 +58,8 @@ void Driver::Event_Mouse(const EV::MouseEvent& event) {
 }
 
 void Driver::Event_Key(const EV::KeyEvent& event) {
-    const KeyEvent keyEvent = ConvertKeyEvent(event);
-    if(_activeOp && _activeOp->OnKey(keyEvent)) {
-    } else if(_defaultOp->OnKey(keyEvent)) {
+    if(_activeOp && _activeOp->OnKey(event)) {
+    } else if(_defaultOp->OnKey(event)) {
         // default operator becomes active, implicit rebuild
         SetOperator(_defaultOp);
     } else {

@@ -280,7 +280,7 @@ NUBUCK_API TransformGizmo GlobalTransformGizmo() {
 
 NUBUCK_API bool TransformGizmoHandleMouseEvent(
     TransformGizmo obj,
-    const OP::MouseEvent& event,
+    const EV::MouseEvent& event,
     TransformGizmoMouseInfo& info)
 {
     return obj->HandleMouseEvent(event, info);

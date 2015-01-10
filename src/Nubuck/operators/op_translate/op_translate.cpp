@@ -102,15 +102,15 @@ void Translate::UpdateCursor() {
     }
 }
 
-bool Translate::DoPicking(const MouseEvent& event) {
-	if(MouseEvent::BUTTON_RIGHT != event.button) return false;
+bool Translate::DoPicking(const EV::MouseEvent& event) {
+	if(EV::MouseEvent::BUTTON_RIGHT != event.button) return false;
 
-    M::Ray ray = W::world.PickingRay(event.coords);
+    M::Ray ray = W::world.PickingRay(M::Vector2(event.x, event.y));
 
     if(W::editMode_t::OBJECTS == _editMode) {
         NB::Entity ent = NULL;
         if(W::world.TraceEntity(ray, &ent)) {
-            if(MouseEvent::MODIFIER_SHIFT & event.mods) NB::SelectEntity(NB::SM_ADD, ent);
+            if(EV::MouseEvent::MODIFIER_SHIFT & event.mods) NB::SelectEntity(NB::SM_ADD, ent);
             else NB::SelectEntity(NB::SM_NEW, ent);
             return true;
         }
@@ -128,7 +128,7 @@ bool Translate::DoPicking(const MouseEvent& event) {
             }
 
             NB::SelectMode selectMode = NB::SM_ADD;
-            if(0 == (MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = NB::SM_NEW;
+            if(0 == (EV::MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = NB::SM_NEW;
             NB::SelectVertex(selectMode, mesh, hits[nidx].vert);
             NB::SetTransformGizmoPosition(_gizmo, FindCursorPosition());
 
@@ -296,7 +296,7 @@ void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {
     }
 }
 
-bool Translate::OnMouse(const MouseEvent& event) {
+bool Translate::OnMouse(const EV::MouseEvent& event) {
     _editMode = W::world.GetEditMode().GetMode();
 
     NB::TransformGizmoMouseInfo mouseInfo;
@@ -309,13 +309,13 @@ bool Translate::OnMouse(const MouseEvent& event) {
         }
         return true;
     } else { // event not handled by gizmo
-        if(MouseEvent::MOUSE_DOWN == event.type) return DoPicking(event);
+        if(EV::MouseEvent::MOUSE_DOWN == event.type) return DoPicking(event);
     }
 
     return false;
 }
 
-bool Translate::OnKey(const KeyEvent& event) {
+bool Translate::OnKey(const EV::KeyEvent& event) {
     // scancodes for number row of generic usb keyboard
     static const unsigned numrow[3] = { 11, 2, 3 };
 

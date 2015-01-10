@@ -28,9 +28,9 @@ static M::Vector3 CenterOfVertexSelection(const W::ENT_Geometry& geom) {
 
 namespace NB {
 
-bool VertexEditor::DoPicking(const OP::MouseEvent& event, W::ENT_Geometry& geom) {
-    if(OP::MouseEvent::MOUSE_DOWN == event.type && OP::MouseEvent::BUTTON_RIGHT == event.button) {
-        M::Ray ray = W::world.PickingRay(event.coords);
+bool VertexEditor::DoPicking(const EV::MouseEvent& event, W::ENT_Geometry& geom) {
+    if(EV::MouseEvent::MOUSE_DOWN == event.type && EV::MouseEvent::BUTTON_RIGHT == event.button) {
+        M::Ray ray = W::world.PickingRay(M::Vector2(event.x, event.y));
         std::vector<W::ENT_Geometry::VertexHit> hits;
         if(geom.TraceVertices(ray, 0.2f, hits)) {
             // find nearest hit
@@ -41,7 +41,7 @@ bool VertexEditor::DoPicking(const OP::MouseEvent& event, W::ENT_Geometry& geom)
             }
 
             NB::SelectMode selectMode = NB::SM_ADD;
-            if(0 == (OP::MouseEvent::MODIFIER_SHIFT & event.mods)) {
+            if(0 == (EV::MouseEvent::MODIFIER_SHIFT & event.mods)) {
                 W::world.SelectVertex_New(&geom, hits[nidx].vert);
             } else {
                 W::world.SelectVertex_Add(&geom, hits[nidx].vert);
@@ -99,7 +99,7 @@ void VertexEditor::SetAxisFlags(int axisFlags) {
     _gizmo->SetAxis(_axis);
 }
 
-bool VertexEditor::HandleMouseEvent(const OP::MouseEvent& event, W::ENT_Geometry* geom) {
+bool VertexEditor::HandleMouseEvent(const EV::MouseEvent& event, W::ENT_Geometry* geom) {
     COM_assert(geom);
 
     bool retval = false;

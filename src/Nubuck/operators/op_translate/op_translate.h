@@ -41,7 +41,7 @@ private:
     M::Vector3                      _center;
     W::editMode_t::Enum             _editMode;
 
-    bool DoPicking(const MouseEvent& event);
+    bool DoPicking(const EV::MouseEvent& event);
     void OnBeginDragging();
     void OnDragging(const NB::TransformGizmoMouseInfo& info);
 
@@ -57,8 +57,8 @@ public:
 
     void OnGeometrySelected() override;
     void OnEditModeChanged(const W::editMode_t::Enum mode) override;
-    bool OnMouse(const MouseEvent& event) override;
-    bool OnKey(const KeyEvent& event) override;
+    bool OnMouse(const EV::MouseEvent& event) override;
+    bool OnKey(const EV::KeyEvent& event) override;
 };
 
 } // namespace OP

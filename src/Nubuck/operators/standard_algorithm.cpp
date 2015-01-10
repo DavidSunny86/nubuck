@@ -6,6 +6,7 @@
 #include <QMenu>
 
 #include <Nubuck\nubuck.h>
+#include <Nubuck\events\core_events.h>
 #include <Nubuck\operators\operator_invoker.h>
 #include <Nubuck\operators\standard_algorithm.h>
 #include <operators\operators.h>
@@ -128,13 +129,13 @@ bool StandardAlgorithm::Invoke() {
 void StandardAlgorithm::Finish() {
 }
 
-bool StandardAlgorithm::OnMouse(const MouseEvent&) {
+bool StandardAlgorithm::OnMouse(const EV::MouseEvent&) {
     // algorithms accepts all mouse events, so default operator
     // op_translate can't become active
     return true;
 }
 
-bool StandardAlgorithm::OnKey(const KeyEvent& event) {
+bool StandardAlgorithm::OnKey(const EV::KeyEvent& event) {
     // algorithms accepts all key events, so default operator
     // op_translate can't become active
 

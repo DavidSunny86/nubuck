@@ -69,8 +69,8 @@ public:
     bool Invoke() override;
     void Finish() override;
 
-	bool OnMouse(const MouseEvent& mouseEvent) override;
-    bool OnKey(const KeyEvent& keyEvent) override;
+	bool OnMouse(const EV::MouseEvent& mouseEvent) override;
+    bool OnKey(const EV::KeyEvent& keyEvent) override;
 };
 
 } // namespace ALG

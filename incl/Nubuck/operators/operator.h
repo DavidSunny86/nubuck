@@ -5,12 +5,18 @@
 #include <Nubuck\nubuck.h>
 #include <Nubuck\math\vector2.h>
 
-#include <Nubuck\operators\operator_events.h>
 #include <Nubuck\events\events.h>
 #include <Nubuck\world\editmode.h>
 
 class   QWidget;
 struct  Nubuck;
+
+namespace EV {
+
+struct MouseEvent;
+struct KeyEvent;
+
+} // namespace EV
 
 namespace R {
 
@@ -61,8 +67,8 @@ public:
     virtual void OnGeometrySelected() { }
     virtual void OnCameraChanged() { }
     virtual void OnEditModeChanged(const W::editMode_t::Enum mode) { }
-	virtual bool OnMouse(const MouseEvent& mouseEvent) { return false; }
-    virtual bool OnKey(const KeyEvent& keyEvent) { return false; }
+	virtual bool OnMouse(const EV::MouseEvent& mouseEvent) { return false; }
+    virtual bool OnKey(const EV::KeyEvent& keyEvent) { return false; }
 };
 
 NUBUCK_API void SendToOperator(const EV::Event& event);

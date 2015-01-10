@@ -2,7 +2,6 @@
 
 #include <Nubuck\nubuck.h>
 #include <Nubuck\nubuck_api.h>
-#include <Nubuck\operators\operator_events.h>
 
 namespace W {
     class ENT_Geometry;
@@ -21,7 +20,7 @@ private:
 
     W::ENT_TransformGizmo*              _gizmo;
 
-    bool VertexEditor::DoPicking(const OP::MouseEvent& event, W::ENT_Geometry& geom);
+    bool VertexEditor::DoPicking(const EV::MouseEvent& event, W::ENT_Geometry& geom);
     void OnBeginDragging(W::ENT_Geometry& geom);
     void OnDragging(const NB::TransformGizmoMouseInfo& info, W::ENT_Geometry& geom);
 public:
@@ -29,7 +28,7 @@ public:
 
     void SetAxisFlags(int axisFlags);
 
-    bool HandleMouseEvent(const OP::MouseEvent& event, W::ENT_Geometry* geom);
+    bool HandleMouseEvent(const EV::MouseEvent& event, W::ENT_Geometry* geom);
 };
 
 } // namespace NB

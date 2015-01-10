@@ -36,6 +36,12 @@ struct Color;
 
 } // namespace R
 
+namespace EV {
+
+struct MouseEvent;
+
+} // namespace EV
+
 namespace W {
 
 class Entity;
@@ -50,7 +56,6 @@ namespace OP {
 class Operator;
 class OperatorPanel;
 class Invoker;
-struct MouseEvent;
 
 } // namespace OP
 
@@ -228,7 +233,7 @@ NUBUCK_API TransformGizmo GlobalTransformGizmo();
 
 NUBUCK_API bool TransformGizmoHandleMouseEvent(
     TransformGizmo tfgizmo,
-    const OP::MouseEvent& event,
+    const EV::MouseEvent& event,
     TransformGizmoMouseInfo& info);
 
 // animation
