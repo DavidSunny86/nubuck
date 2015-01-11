@@ -54,6 +54,8 @@ void ENT_Geometry::RebuildRenderMesh() {
 
     _isTransparent = false;
 
+    _meshCompiled = false;
+
     if(0 == _ratPolyMesh.number_of_faces()) return;
 
     unsigned idxCnt = 0;
@@ -105,8 +107,6 @@ void ENT_Geometry::RebuildRenderMesh() {
     _meshDesc.indices = &_indices[0];
     _meshDesc.numIndices = _indices.size();
     _meshDesc.primType = GL_TRIANGLE_FAN;
-
-    _meshCompiled = false;
 }
 
 void ENT_Geometry::UpdateRenderMesh() {
@@ -453,12 +453,13 @@ void ENT_Geometry::CompileMesh() {
 
     if(_meshCompiled) return;
 
-    if(NULL != _mesh) R::meshMgr.Destroy(_mesh);
-    _mesh = R::meshMgr.Create(_meshDesc);
+    DestroyRenderMesh();
 
-    if(NULL != _tfmesh) R::meshMgr.Destroy(_tfmesh);
-    _tfmesh = R::meshMgr.Create(_mesh);
-    R::meshMgr.GetMesh(_tfmesh).SetTransform(GetObjectToWorldMatrix());
+    if(_faces.size()) {
+        _mesh = R::meshMgr.Create(_meshDesc);
+        _tfmesh = R::meshMgr.Create(_mesh);
+        R::meshMgr.GetMesh(_tfmesh).SetTransform(GetObjectToWorldMatrix());
+    }
 
     _meshCompiled = true;
 }
