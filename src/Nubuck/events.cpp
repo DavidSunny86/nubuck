@@ -33,8 +33,9 @@ EV::ConcreteEventDef<EV::Args2<outlinerItem_t, QString*> >   ev_outl_setName;
 EV::ConcreteEventDef<EV::Arg<outlinerItem_t> >               ev_outl_delete;
 
 // operator events
-EV::ConcreteEventDef<EV::Event>                  ev_op_actionFinished;
-EV::ConcreteEventDef<EV::Arg<OP::Operator*> >    ev_op_setOperator;
+EV::ConcreteEventDef<EV::Event>                         ev_op_actionFinished;
+EV::ConcreteEventDef<EV::Args2<OP::Operator*, bool> >   ev_op_setOperator;
+EV::ConcreteEventDef<EV::Event>                         ev_op_showConfirmationDialog;
 
 // geometry events
 EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_vertexScaleChanged;

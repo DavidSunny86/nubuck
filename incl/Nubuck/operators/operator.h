@@ -62,6 +62,7 @@ public:
     virtual void Register(Invoker& invoker) = 0;
     virtual bool Invoke() = 0; // return false to decline invocation
     virtual void Finish() = 0;
+    virtual bool IsDone() const { return false; }
 
     virtual void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) { }
     virtual void OnGeometrySelected() { }

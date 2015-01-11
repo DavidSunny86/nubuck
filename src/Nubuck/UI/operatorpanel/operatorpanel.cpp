@@ -16,8 +16,9 @@ protected:
                 this, "Pop operator", "Do you want to pop this operator?",
                 QMessageBox::Yes | QMessageBox::No);
             if(QMessageBox::Yes == btn) {
-                EV::Arg<OP::Operator*> event;
-                event.value = OP::g_operators.GetDefaultOperator();
+                EV::Args2<OP::Operator*, bool> event;
+                event.value0 = OP::g_operators.GetDefaultOperator();
+                event.value1 = true;
                 OP::g_operators.InvokeAction(ev_op_setOperator.Tag(event));
             }
         }

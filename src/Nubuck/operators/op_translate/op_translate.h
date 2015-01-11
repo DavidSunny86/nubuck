@@ -54,6 +54,7 @@ public:
     void Register(Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }
+    bool IsDone() const override { return true; }
 
     void OnGeometrySelected() override;
     void OnEditModeChanged(const W::editMode_t::Enum mode) override;

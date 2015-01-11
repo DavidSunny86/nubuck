@@ -31,6 +31,7 @@ public:
     void Register(Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }
+    bool IsDone() const override { return true; }
 };
 
 } // namespace OP

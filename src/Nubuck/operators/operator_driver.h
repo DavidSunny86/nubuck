@@ -18,9 +18,9 @@ private:
     Operator* _defaultOp;
     Operator* _activeOp;
 
-    void SetOperator(Operator* op);
+    void SetOperator(Operator* op, bool force);
 
-    void Event_SetOperator(const EV::Arg<Operator*>& event);
+    void Event_SetOperator(const EV::Args2<Operator*, bool>& event);
 
     void Event_SelectionChanged(const EV::Event& event);
     void Event_EditModeChanged(const EV::Arg<int>& event);

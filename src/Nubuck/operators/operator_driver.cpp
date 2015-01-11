@@ -14,8 +14,16 @@ inline void SignalCompletion() {
     g_operators.Send(ev_op_actionFinished.Tag());
 }
 
-void Driver::SetOperator(Operator* op) {
+void Driver::SetOperator(Operator* op, bool force) {
     if(_activeOp == op) return;
+
+    if(!force && _activeOp && !_activeOp->IsDone()) {
+        int retval = 0;
+        EV::Event event;
+        event.SetReturnPointer(&retval);
+        g_operators.SendAndWait(ev_op_showConfirmationDialog.Tag(event));
+        if(!retval) return; // confimration dialog cancelled, abort
+    }
 
 	if(op->Invoke()) {
         if(_activeOp) _activeOp->Finish();
@@ -23,13 +31,13 @@ void Driver::SetOperator(Operator* op) {
 
         W::world.SendAndWait(ev_w_rebuildAll.Tag());
 
-        EV::Arg<Operator*> event(op);
+        EV::Args2<Operator*, bool> event(op, force);
         g_operators.SendAndWait(ev_op_setOperator.Tag(event));
     }
 }
 
-void Driver::Event_SetOperator(const EV::Arg<Operator*>& event) {
-    SetOperator(event.value);
+void Driver::Event_SetOperator(const EV::Args2<Operator*, bool>& event) {
+    SetOperator(event.value0, event.value1);
     SignalCompletion();
 }
 
@@ -68,7 +76,7 @@ void Driver::Event_Fallthrough(const EV::Event& event) {
 	if(!(_activeOp && DispatchSingleEvent(_activeOp, event))) {
         if((_activeOp != _defaultOp) && DispatchSingleEvent(_defaultOp, event)) {
             // default operator becomes active, implicit rebuild
-            SetOperator(_defaultOp);
+            SetOperator(_defaultOp, false);
         } else {
             // forward event
             W::world.Send(event);

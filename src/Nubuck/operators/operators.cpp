@@ -1,3 +1,5 @@
+#include <QMessageBox>
+
 #include <nubuck_private.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <Nubuck\operators\operator_invoker.h>
@@ -15,11 +17,11 @@ namespace OP {
 
 Operators g_operators;
 
-void Operators::Event_SetOperator(const EV::Arg<Operator*>& event) {
+void Operators::Event_SetOperator(const EV::Args2<Operator*, bool>& event) {
     // find panel of active operator
     OperatorPanel* panel = NULL;
     for(unsigned i = 0; !panel && i < _ops.size(); ++i) {
-        if(_ops[i].op == event.value) panel = _ops[i].panel;
+        if(_ops[i].op == event.value0) panel = _ops[i].panel;
     }
     assert(panel);
 
@@ -29,6 +31,20 @@ void Operators::Event_SetOperator(const EV::Arg<Operator*>& event) {
 
     _panel = panel;
 
+    event.Signal();
+}
+
+void Operators::Event_ShowConfirmationDialog(const EV::Event& event) {
+    QMessageBox mb;
+    mb.setText("Switch operators.");
+    mb.setInformativeText(
+        "This operation ends the currently active operator.\n"
+        "Do you want to continue?");
+    mb.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    mb.setIcon(QMessageBox::Question);
+    int retval = mb.exec();
+    if(QMessageBox::Ok == retval) event.SetReturnValue(1);
+    else event.SetReturnValue(0);
     event.Signal();
 }
 
@@ -45,7 +61,8 @@ void Operators::OnInvokeOperator(unsigned id) {
 	}
 
     Operator* op = _ops[id].op;
-    InvokeAction(ev_op_setOperator.Tag(op));
+    EV::Args2<Operator*, bool> event(op, false);
+    InvokeAction(ev_op_setOperator.Tag(event));
 }
 
 Operators::Operators() : _actionsPending(0), _panel(0) {
@@ -57,6 +74,7 @@ Operators::~Operators() {
 
 void Operators::Init() {
     AddEventHandler(ev_op_setOperator, this, &Operators::Event_SetOperator);
+    AddEventHandler(ev_op_showConfirmationDialog, this, &Operators::Event_ShowConfirmationDialog);
     AddEventHandler(ev_op_actionFinished, this, &Operators::Event_ActionFinished);
 
     // forward other known events
