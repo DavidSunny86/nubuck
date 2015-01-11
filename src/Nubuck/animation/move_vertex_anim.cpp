@@ -44,6 +44,46 @@ bool MoveVertexAnimation::Animate() {
     return _duration <= _time;
 }
 
+MoveVerticesAnimation::MoveVerticesAnimation()
+    : _subject(NULL)
+    , _time(0.0f)
+{ }
+
+void MoveVerticesAnimation::Init(NB::Mesh subject, float duration) {
+    _subject = subject;
+    _duration = duration;
+
+    leda::NbGraph& graph = NB::GetGraph(subject);
+
+    _p0.init(graph);
+    _p1.init(graph);
+
+    leda::node v;
+    forall_nodes(v, graph) {
+        _p0[v] = _p1[v] = graph.position_of(v);
+    }
+}
+
+void MoveVerticesAnimation::SetStopPosition(leda::node v, const point3_t& p) {
+    _p1[v] = p;
+}
+
+bool MoveVerticesAnimation::Animate() {
+    float l = _time / _duration;
+
+    leda::NbGraph& graph = _subject->GetRatPolyMesh();
+
+    leda::node v;
+    forall_nodes(v, graph) {
+        const M::Vector3 p = (1.0f - l) * ToVector(_p0[v]) + l * ToVector(_p1[v]);
+        graph.set_position(v, ToRatPoint(p));
+    }
+
+    _time += GetSecsPassed();
+
+    return _duration <= _time;
+}
+
 NUBUCK_API void SetVertexPosition(const NB::Mesh subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration) {
     MoveVertexAnimation anim;
     anim.Init(subject, vertex, position, duration);

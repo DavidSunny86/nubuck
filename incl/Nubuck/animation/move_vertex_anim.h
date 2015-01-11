@@ -28,6 +28,26 @@ public:
     void Init(const NB::Mesh subject, leda::node vertex, const point3_t& position, float duration);
 };
 
+class NUBUCK_API MoveVerticesAnimation : public Animation {
+private:
+    typedef leda::d3_rat_point point3_t;
+
+    NB::Mesh _subject;
+
+    leda::node_array<point3_t> _p0;
+    leda::node_array<point3_t> _p1;
+
+    float _time;
+    float _duration;
+protected:
+    bool Animate() override;
+public:
+    MoveVerticesAnimation();
+
+    void Init(const NB::Mesh subject, float duration);
+    void SetStopPosition(leda::node v, const point3_t& p);
+};
+
 // supplementary convenience function
 
 NUBUCK_API void SetVertexPosition(const NB::Mesh subject, const leda::node vertex, const leda::d3_rat_point& position, const float duration);
