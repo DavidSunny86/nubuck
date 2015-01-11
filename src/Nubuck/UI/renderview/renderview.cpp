@@ -180,7 +180,10 @@ namespace UI {
         }
 
         if(Qt::Key_Tab == qevent->key() && !qevent->isAutoRepeat()) {
-            W::world.GetEditMode().CycleModes();
+            int nextMode = W::world.GetEditMode().GetNextMode();
+            OP::g_operators.InvokeAction(
+                ev_usr_changeEditMode.Tag(nextMode),
+                OP::Operators::InvokationMode::ALWAYS);
             return;
         }
 

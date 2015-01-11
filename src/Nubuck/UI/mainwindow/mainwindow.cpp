@@ -64,6 +64,14 @@ namespace UI {
         ToolBar_UpdateEditMode(W::editMode_t::DEFAULT);
     }
 
+    void MainWindow::UpdateEditModeButtons() {
+        for(int i = 0; i < W::editMode_t::NUM_MODES; ++i) {
+            _editModeActs[i]->blockSignals(true);
+            _editModeActs[i]->setChecked(W::world.GetEditMode().GetMode() == i);
+            _editModeActs[i]->blockSignals(false);
+        }
+    }
+
     void MainWindow::ToolBar_UpdateEditMode(const W::editMode_t::Enum mode) {
         for(int i = 0; i < W::editMode_t::NUM_MODES; ++i) {
             bool isEnabled = mode == W::editMode_t::Enum(i);
@@ -77,11 +85,21 @@ namespace UI {
     }
 
     void MainWindow::OnEditModeToObjects() {
-        W::world.GetEditMode().SetMode(W::editMode_t::OBJECTS);
+        if(W::editMode_t::OBJECTS != W::world.GetEditMode().GetMode()) {
+            OP::g_operators.InvokeAction(
+                ev_usr_changeEditMode.Tag(W::editMode_t::OBJECTS),
+                OP::Operators::InvokationMode::ALWAYS);
+        }
+        UpdateEditModeButtons();
     }
 
     void MainWindow::OnEditModeToVertices() {
-        W::world.GetEditMode().SetMode(W::editMode_t::VERTICES);
+        if(W::editMode_t::VERTICES != W::world.GetEditMode().GetMode()) {
+            OP::g_operators.InvokeAction(
+                ev_usr_changeEditMode.Tag(W::editMode_t::VERTICES),
+                OP::Operators::InvokationMode::ALWAYS);
+        }
+        UpdateEditModeButtons();
     }
 
     void MainWindow::closeEvent(QCloseEvent*) {

@@ -53,9 +53,6 @@ struct Usr_SelectEntity : Event {
     bool        shiftModifier;
 };
 
-struct Usr_ChangeEditMode {
-};
-
 } // namespace EV
 
 NUBUCK_API extern EV::ConcreteEventDef<EV::ResizeEvent> ev_resize;
@@ -63,4 +60,5 @@ NUBUCK_API extern EV::ConcreteEventDef<EV::MouseEvent>  ev_mouse;
 NUBUCK_API extern EV::ConcreteEventDef<EV::KeyEvent>    ev_key;
 NUBUCK_API extern EV::ConcreteEventDef<EV::Event>       ev_buttonClicked;
 
-NUBUCK_API extern EV::ConcreteEventDef<EV::Usr_SelectEntity> ev_usr_selectEntity;
+NUBUCK_API extern EV::ConcreteEventDef<EV::Usr_SelectEntity>    ev_usr_selectEntity;
+NUBUCK_API extern EV::ConcreteEventDef<EV::Arg<int> >           ev_usr_changeEditMode;

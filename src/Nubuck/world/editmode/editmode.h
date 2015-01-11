@@ -24,6 +24,7 @@ public:
     void AddObserver(EV::EventHandler<>* const obs);
 
     Enum GetMode() const;
+    Enum GetNextMode() const;
     void SetMode(Enum mode);
     void CycleModes();
 };

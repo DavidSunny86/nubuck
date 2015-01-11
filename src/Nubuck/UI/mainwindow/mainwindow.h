@@ -43,6 +43,7 @@ namespace UI {
         // toolbar
         QAction*    _editModeActs[W::editMode_t::NUM_MODES];
         void        ToolBar_Build();
+        void        UpdateEditModeButtons();
     private slots:
         void        OnEditModeToObjects();
         void        OnEditModeToVertices();

@@ -15,6 +15,7 @@ namespace OP {
 
 Translate::Translate() : _gizmo(0) {
     AddEventHandler(ev_usr_selectEntity, this, &Translate::Event_UsrSelectEntity);
+    AddEventHandler(ev_usr_changeEditMode, this, &Translate::Event_UsrChangeEditMode);
 	AddEventHandler(ev_w_selectionChanged, this, &Translate::Event_SelectionChanged);
 
     _gizmo = NB::GlobalTransformGizmo();
@@ -266,6 +267,15 @@ void Translate::Event_UsrSelectEntity(const EV::Usr_SelectEntity& event) {
         } else {
             W::world.Select_New(event.entity);
         }
+    }
+    event.Accept();
+}
+
+void Translate::Event_UsrChangeEditMode(const EV::Arg<int>& event) {
+    COM_assert(event.value != W::world.GetEditMode().GetMode());
+    if(!event.IsFallthrough()) {
+        W::world.GetEditMode().SetMode(W::editMode_t::Enum(event.value));
+        printf("changing mode!\n");
     }
     event.Accept();
 }

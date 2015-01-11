@@ -46,6 +46,7 @@ private:
     void OnDragging(const NB::TransformGizmoMouseInfo& info);
 
     void Event_UsrSelectEntity(const EV::Usr_SelectEntity& event);
+    void Event_UsrChangeEditMode(const EV::Arg<int>& event);
 
     void Event_SelectionChanged(const EV::Event& event) {
         OnGeometrySelected();

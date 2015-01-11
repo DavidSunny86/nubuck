@@ -17,7 +17,8 @@ NUBUCK_API EV::ConcreteEventDef<EV::MouseEvent>  ev_mouse;
 NUBUCK_API EV::ConcreteEventDef<EV::KeyEvent>    ev_key;
 NUBUCK_API EV::ConcreteEventDef<EV::Event>       ev_buttonClicked;
 
-NUBUCK_API EV::ConcreteEventDef<EV::Usr_SelectEntity> ev_usr_selectEntity;
+NUBUCK_API EV::ConcreteEventDef<EV::Usr_SelectEntity>   ev_usr_selectEntity;
+NUBUCK_API EV::ConcreteEventDef<EV::Arg<int> >          ev_usr_changeEditMode;
 
  // world events
 EV::ConcreteEventDef<EV::Event>              ev_w_apocalypse;
