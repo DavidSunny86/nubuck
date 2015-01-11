@@ -74,9 +74,16 @@ void Driver::Event_Fallthrough(const EV::Event& event) {
     int accepted = 0;
     event.SetReturnPointer(&accepted);
 	if(!(_activeOp && DispatchSingleEvent(_activeOp, event))) {
-        if((_activeOp != _defaultOp) && DispatchSingleEvent(_defaultOp, event)) {
-            // default operator becomes active, implicit rebuild
-            SetOperator(_defaultOp, false);
+        if(_activeOp != _defaultOp) {
+            GEN::Pointer<EV::Event> ftevent(event.Clone());
+            ftevent->SetFallthrough(true);
+            if(DispatchSingleEvent(_defaultOp, *ftevent)) {
+                // default operator becomes active, implicit rebuild
+                SetOperator(_defaultOp, false);
+                // next, we have to resend the event without fallthrough flag
+                accepted = 0;
+                DispatchSingleEvent(_activeOp, event);
+            }
         } else {
             // forward event
             W::world.Send(event);

@@ -54,12 +54,14 @@ struct Event {
     eventID_t       id1;
     BlockingEvent*  block;
     bool            tagged;
+    bool            fallthrough;
     mutable int*    ret;
 
     Event()
         : block(NULL)
         , tagged(false)
         , ret(NULL)
+        , fallthrough(false)
         , id1(EV_MAX_EVENT_ID)
     { }
 
@@ -74,6 +76,10 @@ struct Event {
     void SetReturnValue(int rval) const { if(ret) *ret = rval; }
 
     void Accept() const { SetReturnValue(1); }
+
+    void SetFallthrough(bool fallthrough) { this->fallthrough = fallthrough; }
+
+    bool IsFallthrough() const { return fallthrough; }
 
     void Signal() const {
         if(block) {

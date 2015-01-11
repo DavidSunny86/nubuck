@@ -110,8 +110,10 @@ bool Translate::DoPicking(const EV::MouseEvent& event) {
     if(W::editMode_t::OBJECTS == _editMode) {
         NB::Entity ent = NULL;
         if(W::world.TraceEntity(ray, &ent)) {
-            if(EV::MouseEvent::MODIFIER_SHIFT & event.mods) NB::SelectEntity(NB::SM_ADD, ent);
-            else NB::SelectEntity(NB::SM_NEW, ent);
+            if(!event.IsFallthrough()) {
+                if(EV::MouseEvent::MODIFIER_SHIFT & event.mods) NB::SelectEntity(NB::SM_ADD, ent);
+                else NB::SelectEntity(NB::SM_NEW, ent);
+            }
             return true;
         }
     }
@@ -120,24 +122,27 @@ bool Translate::DoPicking(const EV::MouseEvent& event) {
         NB::Mesh mesh = NB::FirstSelectedMesh();
         std::vector<W::ENT_Geometry::VertexHit> hits;
         if(mesh->TraceVertices(ray, 0.2f, hits)) {
-            // find nearest hit
-            unsigned nidx = 0;
-            for(unsigned i = 1; i < hits.size(); ++i) {
-                if(hits[nidx].dist > hits[i].dist)
-                    nidx = i;
+            if(!event.IsFallthrough()) {
+                // find nearest hit
+                unsigned nidx = 0;
+                for(unsigned i = 1; i < hits.size(); ++i) {
+                    if(hits[nidx].dist > hits[i].dist)
+                        nidx = i;
+                }
+
+                NB::SelectMode selectMode = NB::SM_ADD;
+                if(0 == (EV::MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = NB::SM_NEW;
+                NB::SelectVertex(selectMode, mesh, hits[nidx].vert);
+                NB::SetTransformGizmoPosition(_gizmo, FindCursorPosition());
+
+                W::SetColorsFromVertexSelection(*mesh);
             }
 
-            NB::SelectMode selectMode = NB::SM_ADD;
-            if(0 == (EV::MouseEvent::MODIFIER_SHIFT & event.mods)) selectMode = NB::SM_NEW;
-            NB::SelectVertex(selectMode, mesh, hits[nidx].vert);
-            NB::SetTransformGizmoPosition(_gizmo, FindCursorPosition());
-
-            W::SetColorsFromVertexSelection(*mesh);
+            return true;
         }
     }
 
-    return true;
-
+    return false;
 }
 
 void Translate::OnBeginDragging() {
@@ -301,11 +306,13 @@ void Translate::OnMouse(const EV::MouseEvent& event) {
 
     NB::TransformGizmoMouseInfo mouseInfo;
     if(NB::TransformGizmoHandleMouseEvent(_gizmo, event, mouseInfo)) {
-        if(NB::TGA_BEGIN_DRAGGING == mouseInfo.action) {
-            OnBeginDragging();
-        }
-        if(NB::TGA_DRAGGING == mouseInfo.action) {
-            OnDragging(mouseInfo);
+        if(!event.IsFallthrough()) {
+            if(NB::TGA_BEGIN_DRAGGING == mouseInfo.action) {
+                OnBeginDragging();
+            }
+            if(NB::TGA_DRAGGING == mouseInfo.action) {
+                OnDragging(mouseInfo);
+            }
         }
         event.Accept();
         return;
