@@ -20,8 +20,8 @@ private:
     int     _axis;
     Mode    _mode;
 
-    R::meshPtr_t    _axisMesh;
-    R::tfmeshPtr_t  _axisTFMesh;
+    R::meshPtr_t    _axisMeshes[3];
+    R::tfmeshPtr_t  _axisTFMeshes[3];
 
     enum { X = 0, Y, Z, DIM };
     R::meshPtr_t    _arrowHeadMeshes[3];

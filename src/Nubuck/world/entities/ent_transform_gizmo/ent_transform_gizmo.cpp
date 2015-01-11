@@ -19,35 +19,33 @@ struct AxisMesh {
     std::vector<R::Mesh::Index>     indices;
 
     AxisMesh(
+        int axis,
         float size,
         int subdiv,
         float spacing,
-        const R::Color& colX,
-        const R::Color& colY,
-        const R::Color& colZ)
+        const R::Color& col)
     {
+        COM_assert(0 <= axis && axis < 3);
+
         unsigned idxCnt = 0;
-        R::Color colors[] = { colX, colY, colZ };
 
         unsigned N = (1 << subdiv);
         float f = size / N;
-        for(int i = 0; i < 3; ++i) {
-            M::Vector3 d = M::Vector3::Zero;
-            d.vec[i] = 1.0f;
+        M::Vector3 d = M::Vector3::Zero;
+        d.vec[axis] = 1.0f;
 
-            for(int j = 0; j < N; ++j) {
-                R::Mesh::Vertex vert;
-                vert.position = f * d * j;
-                vert.color = colors[i];
-                vertices.push_back(vert);
-                indices.push_back(idxCnt++);
+        for(int j = 0; j < N; ++j) {
+            R::Mesh::Vertex vert;
+            vert.position = f * d * j;
+            vert.color = col;
+            vertices.push_back(vert);
+            indices.push_back(idxCnt++);
 
-                M::Vector3 p = f * d * (j + 1) - spacing * f * d;
-                vert.position = p;
-                vert.color = colors[i];
-                vertices.push_back(vert);
-                indices.push_back(idxCnt++);
-            }
+            M::Vector3 p = f * d * (j + 1) - spacing * f * d;
+            vert.position = p;
+            vert.color = col;
+            vertices.push_back(vert);
+            indices.push_back(idxCnt++);
         }
     }
 
@@ -63,9 +61,12 @@ struct AxisMesh {
 };
 
 void ENT_TransformGizmo::BuildAxis() {
-    AxisMesh axisDesc(1.0f, 4, 0.4f, R::Color::Red, R::Color::Blue, R::Color::Green);
-    _axisMesh = R::meshMgr.Create(axisDesc.GetDesc());
-    _axisTFMesh = R::meshMgr.Create(_axisMesh);
+    R::Color colors[] = { R::Color::Red, R::Color::Blue, R::Color::Green };
+    for(int i = 0; i < 3; ++i) {
+        AxisMesh axisDesc(i, 1.0f, 4, 0.4f, colors[i]);
+        _axisMeshes[i] = R::meshMgr.Create(axisDesc.GetDesc());
+        _axisTFMeshes[i] = R::meshMgr.Create(_axisMeshes[i]);
+    }
 }
 
 void ENT_TransformGizmo::BuildArrowHeads() {
@@ -159,8 +160,8 @@ static void SetCenterPosition(M::Box& box, const M::Vector3& center) {
 
 void ENT_TransformGizmo::SetRenderPosition(const M::Vector3& pos) {
     M::Matrix4 T = M::Mat4::Translate(pos);
-    R::meshMgr.GetMesh(_axisTFMesh).SetTransform(T);
     for(int i = 0; i < DIM; ++i) {
+        R::meshMgr.GetMesh(_axisTFMeshes[i]).SetTransform(T);
         R::meshMgr.GetMesh(_arrowHeadTFMeshes[i]).SetTransform(T * _arrowHeadTF[i]);
         R::meshMgr.GetMesh(_boxHeadTFMeshes[i]).SetTransform(T * _boxHeadTF[i]);
     }
@@ -359,8 +360,12 @@ void ENT_TransformGizmo::GetRenderJobs(R::RenderList& renderList) {
     meshJob.layer = R::Renderer::Layers::GEOMETRY_1;
     meshJob.material = R::Material::White;
     meshJob.primType = 0;
-    meshJob.tfmesh = _axisTFMesh;
-    renderList.meshJobs.push_back(meshJob);
+    for(int i = 0; i < 3; ++i) {
+        if(_axis & (1 << i)) {
+            meshJob.tfmesh = _axisTFMeshes[i];
+            renderList.meshJobs.push_back(meshJob);
+        }
+    }
 
     meshJob.fx = "LitDirectional";
     meshJob.layer = R::Renderer::Layers::GEOMETRY_1;
