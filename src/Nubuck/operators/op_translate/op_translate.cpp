@@ -14,6 +14,7 @@
 namespace OP {
 
 Translate::Translate() : _gizmo(0) {
+    AddEventHandler(ev_usr_selectEntity, this, &Translate::Event_UsrSelectEntity);
 	AddEventHandler(ev_w_selectionChanged, this, &Translate::Event_SelectionChanged);
 
     _gizmo = NB::GlobalTransformGizmo();
@@ -255,6 +256,18 @@ void Translate::OnDragging(const NB::TransformGizmoMouseInfo& info) {
             }
         }
     }
+}
+
+void Translate::Event_UsrSelectEntity(const EV::Usr_SelectEntity& event) {
+    COM_assert(event.entity);
+    if(!event.IsFallthrough()) {
+        if(event.shiftModifier) {
+            W::world.Select_Add(event.entity);
+        } else {
+            W::world.Select_New(event.entity);
+        }
+    }
+    event.Accept();
 }
 
 void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {

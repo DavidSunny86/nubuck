@@ -3,6 +3,9 @@
 #include <Nubuck\nubuck_api.h>
 #include <Nubuck\events\events.h>
 
+namespace W { class Entity; }
+namespace NB { typedef W::Entity* Entity; }
+
 namespace EV {
 
 struct ResizeEvent : Event {
@@ -43,9 +46,21 @@ struct KeyEvent : Event {
     int mods;
 };
 
+struct Usr_SelectEntity : Event {
+    EVENT_TYPE(Usr_SelectEntity)
+
+    NB::Entity  entity;
+    bool        shiftModifier;
+};
+
+struct Usr_ChangeEditMode {
+};
+
 } // namespace EV
 
 NUBUCK_API extern EV::ConcreteEventDef<EV::ResizeEvent> ev_resize;
 NUBUCK_API extern EV::ConcreteEventDef<EV::MouseEvent>  ev_mouse;
 NUBUCK_API extern EV::ConcreteEventDef<EV::KeyEvent>    ev_key;
 NUBUCK_API extern EV::ConcreteEventDef<EV::Event>       ev_buttonClicked;
+
+NUBUCK_API extern EV::ConcreteEventDef<EV::Usr_SelectEntity> ev_usr_selectEntity;

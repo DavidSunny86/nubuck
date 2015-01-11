@@ -41,6 +41,10 @@ void Driver::Event_SetOperator(const EV::Args2<Operator*, bool>& event) {
     SignalCompletion();
 }
 
+void Driver::Event_UsrSelectEntity(const EV::Usr_SelectEntity& event) {
+    Event_Fallthrough(event);
+}
+
 void Driver::Event_SelectionChanged(const EV::Event& event) {
     if(_activeOp) _activeOp->OnGeometrySelected();
     _defaultOp->OnGeometrySelected();
@@ -118,6 +122,7 @@ Driver::Driver(Operator* defaultOp)
     assert(_defaultOp);
 
 	AddEventHandler(ev_op_setOperator, this, &Driver::Event_SetOperator);
+    AddEventHandler(ev_usr_selectEntity, this, &Driver::Event_UsrSelectEntity);
 	AddEventHandler(ev_w_selectionChanged, this, &Driver::Event_SelectionChanged);
     AddEventHandler(ev_w_editModeChanged, this, &Driver::Event_EditModeChanged);
 	AddEventHandler(ev_mouse, this, &Driver::Event_Mouse);

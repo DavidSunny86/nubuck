@@ -6,17 +6,17 @@
 #include <world\world_events.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <world\world.h>
+#include <operators\operators.h>
 #include "outliner.h"
 
 namespace UI {
 
-void SelectEntityButton::mousePressEvent(QMouseEvent* event) {
+void SelectEntityButton::mousePressEvent(QMouseEvent* mouseEvent) {
     if(_entity) {
-        if(Qt::ShiftModifier & event->modifiers()) {
-            W::world.Select_Add(_entity);
-        } else {
-            W::world.Select_New(_entity);
-        }
+        EV::Usr_SelectEntity event;
+        event.entity = _entity;
+        event.shiftModifier = Qt::ShiftModifier & mouseEvent->modifiers();
+        OP::g_operators.InvokeAction(ev_usr_selectEntity.Tag(event), OP::Operators::InvokationMode::ALWAYS);
     }
 }
 

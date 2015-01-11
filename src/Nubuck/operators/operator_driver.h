@@ -22,6 +22,7 @@ private:
 
     void Event_SetOperator(const EV::Args2<Operator*, bool>& event);
 
+    void Event_UsrSelectEntity(const EV::Usr_SelectEntity& event);
     void Event_SelectionChanged(const EV::Event& event);
     void Event_EditModeChanged(const EV::Arg<int>& event);
     void Event_Mouse(const EV::MouseEvent& event);

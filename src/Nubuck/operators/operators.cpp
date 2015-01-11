@@ -80,6 +80,7 @@ void Operators::Init() {
     // forward other known events
     AddEventHandler(ev_w_editModeChanged, this, &Operators::Event_ForwardToDriver<EV::Arg<int> >);
     AddEventHandler(ev_w_selectionChanged, this, &Operators::Event_ForwardToDriver<EV::Event>);
+    AddEventHandler(ev_usr_selectEntity, this, &Operators::Event_ForwardToDriver<EV::Usr_SelectEntity>);
 }
 
 unsigned Operators::GetDriverQueueSize() const {
