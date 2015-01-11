@@ -44,6 +44,7 @@ private:
     void Event_ButtonClicked(const EV::Event& event);
     void Event_Button0(const EV::Event& event);
     void Event_Button1(const EV::Event& event);
+    void Event_Mouse(const EV::MouseEvent& event);
 public:
     Loop();
 
@@ -51,7 +52,7 @@ public:
     bool Invoke() override;
     void Finish() override { }
 
-    bool OnMouse(const EV::MouseEvent& event) override;
+    void OnMouse(const EV::MouseEvent& event) override;
 };
 
 } // namespace OP

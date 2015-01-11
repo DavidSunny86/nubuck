@@ -303,7 +303,7 @@ void World::Event_DestroyEntity(const EV::Arg<unsigned>& event) {
             _entities.erase(_entities.end() - 1);
         }
     }
-	event.Accept();
+	event.Signal();
 }
 
 void World::Event_SelectionChanged(const EV::Event&) {
@@ -312,7 +312,7 @@ void World::Event_SelectionChanged(const EV::Event&) {
 
 void World::Event_RebuildAll(const EV::Event& event) {
     RebuildAll();
-    event.Accept();
+    event.Signal();
 }
 
 void World::Event_Resize(const EV::ResizeEvent& event) {

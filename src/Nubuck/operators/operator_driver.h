@@ -27,6 +27,8 @@ private:
     void Event_Mouse(const EV::MouseEvent& event);
     void Event_Key(const EV::KeyEvent& event);
     void Event_RebuildAll(const EV::Event& event);
+
+    void Event_Fallthrough(const EV::Event& event);
 protected:
     void Event_Default(const EV::Event& event, const char* className) override;
 public:

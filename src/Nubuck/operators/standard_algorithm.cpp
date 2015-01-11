@@ -129,17 +129,19 @@ bool StandardAlgorithm::Invoke() {
 void StandardAlgorithm::Finish() {
 }
 
-bool StandardAlgorithm::OnMouse(const EV::MouseEvent&) {
+void StandardAlgorithm::OnMouse(const EV::MouseEvent& event) {
     // algorithms accepts all mouse events, so default operator
     // op_translate can't become active
-    return true;
+    event.Accept();
 }
 
-bool StandardAlgorithm::OnKey(const EV::KeyEvent& event) {
+void StandardAlgorithm::OnKey(const EV::KeyEvent& event) {
     // algorithms accepts all key events, so default operator
     // op_translate can't become active
 
     // hacky HACK: pass through numpad keys to control camera
+
+    bool accept = true;
 
     // numpad scancodes of generic usb keyboard
     static const int numpad[] = {
@@ -150,11 +152,11 @@ bool StandardAlgorithm::OnKey(const EV::KeyEvent& event) {
     };
     for(int i = 0; i < 10; ++i) {
         if(numpad[i] == event.nativeScanCode) {
-            return false;
+            accept = false;
         }
     }
 
-    return true;
+    if(accept) event.Accept();
 }
 
 } // namespace ALG

@@ -57,8 +57,8 @@ public:
 
     void OnGeometrySelected() override;
     void OnEditModeChanged(const W::editMode_t::Enum mode) override;
-    bool OnMouse(const EV::MouseEvent& event) override;
-    bool OnKey(const EV::KeyEvent& event) override;
+    void OnMouse(const EV::MouseEvent& event) override;
+    void OnKey(const EV::KeyEvent& event) override;
 };
 
 } // namespace OP

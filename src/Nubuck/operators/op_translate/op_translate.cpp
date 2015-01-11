@@ -296,7 +296,7 @@ void Translate::OnEditModeChanged(const W::editMode_t::Enum mode) {
     }
 }
 
-bool Translate::OnMouse(const EV::MouseEvent& event) {
+void Translate::OnMouse(const EV::MouseEvent& event) {
     _editMode = W::world.GetEditMode().GetMode();
 
     NB::TransformGizmoMouseInfo mouseInfo;
@@ -307,15 +307,19 @@ bool Translate::OnMouse(const EV::MouseEvent& event) {
         if(NB::TGA_DRAGGING == mouseInfo.action) {
             OnDragging(mouseInfo);
         }
-        return true;
+        event.Accept();
+        return;
     } else { // event not handled by gizmo
-        if(EV::MouseEvent::MOUSE_DOWN == event.type) return DoPicking(event);
+        if(EV::MouseEvent::MOUSE_DOWN == event.type) {
+            if(DoPicking(event)) {
+                event.Accept();
+            }
+            return;
+        }
     }
-
-    return false;
 }
 
-bool Translate::OnKey(const EV::KeyEvent& event) {
+void Translate::OnKey(const EV::KeyEvent& event) {
     // scancodes for number row of generic usb keyboard
     static const unsigned numrow[3] = { 11, 2, 3 };
 
@@ -325,9 +329,6 @@ bool Translate::OnKey(const EV::KeyEvent& event) {
     if(numrow[2] == event.nativeScanCode) {
         NB::SetTransformGizmoMode(_gizmo, NB::TGM_SCALE);
     }
-
-    // do not become active when only mode changes
-    return false;
 }
 
 } // namespace OP

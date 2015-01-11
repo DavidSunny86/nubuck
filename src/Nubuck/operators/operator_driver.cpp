@@ -47,26 +47,33 @@ void Driver::Event_EditModeChanged(const EV::Arg<int>& event) {
 }
 
 void Driver::Event_Mouse(const EV::MouseEvent& event) {
-	if(_activeOp && _activeOp->OnMouse(event)) {
-    } else if(_defaultOp->OnMouse(event)) {
-        // default operator becomes active, implicit rebuild
-        SetOperator(_defaultOp);
-    }
-    W::world.SendAndWait(ev_w_rebuildAll.Tag());
-	event.Accept();
-    SignalCompletion();
+    Event_Fallthrough(event);
 }
 
 void Driver::Event_Key(const EV::KeyEvent& event) {
-    if(_activeOp && _activeOp->OnKey(event)) {
-    } else if(_defaultOp->OnKey(event)) {
-        // default operator becomes active, implicit rebuild
-        SetOperator(_defaultOp);
-    } else {
-        // forward event
-        W::world.Send(event);
-    }
+    Event_Fallthrough(event);
+}
 
+static int DispatchSingleEvent(Operator* op, const EV::Event& event) {
+    COM_assert(event.ret && 0 == *event.ret);
+    op->Send(event);
+    const int numDispatched = op->HandleEvents();
+    COM_assert(1 == numDispatched);
+    return *event.ret;
+}
+
+void Driver::Event_Fallthrough(const EV::Event& event) {
+    int accepted = 0;
+    event.SetReturnPointer(&accepted);
+	if(!(_activeOp && DispatchSingleEvent(_activeOp, event))) {
+        if((_activeOp != _defaultOp) && DispatchSingleEvent(_defaultOp, event)) {
+            // default operator becomes active, implicit rebuild
+            SetOperator(_defaultOp);
+        } else {
+            // forward event
+            W::world.Send(event);
+        }
+    }
     W::world.SendAndWait(ev_w_rebuildAll.Tag());
     SignalCompletion();
 }
@@ -79,7 +86,8 @@ void Driver::Event_RebuildAll(const EV::Event& event) {
 void Driver::Event_Default(const EV::Event& event, const char* className) {
     if(_activeOp) {
         _activeOp->Send(event);
-        _activeOp->HandleEvents();
+        int numDispatched = _activeOp->HandleEvents();
+        COM_assert(1 == numDispatched);
 
         W::world.SendAndWait(ev_w_rebuildAll.Tag());
 	}

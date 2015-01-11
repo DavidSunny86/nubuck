@@ -29,7 +29,7 @@ void Operators::Event_SetOperator(const EV::Arg<Operator*>& event) {
 
     _panel = panel;
 
-    event.Accept();
+    event.Signal();
 }
 
 void Operators::Event_ActionFinished(const EV::Event& event) {

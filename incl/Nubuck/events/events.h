@@ -54,8 +54,14 @@ struct Event {
     eventID_t       id1;
     BlockingEvent*  block;
     bool            tagged;
+    mutable int*    ret;
 
-    Event() : block(NULL), tagged(false), id1(EV_MAX_EVENT_ID) { }
+    Event()
+        : block(NULL)
+        , tagged(false)
+        , ret(NULL)
+        , id1(EV_MAX_EVENT_ID)
+    { }
 
     static eventTypeID_t GetEventTypeID() { return 0; }
 
@@ -64,7 +70,12 @@ struct Event {
     virtual const char* Name() const { return "base event"; }
     virtual Event* Clone() const { return new Event(*this); }
 
-    void Accept() const {
+    void SetReturnPointer(int* ret) const { this->ret = ret; }
+    void SetReturnValue(int rval) const { if(ret) *ret = rval; }
+
+    void Accept() const { SetReturnValue(1); }
+
+    void Signal() const {
         if(block) {
             assert(block->mtx);
             assert(block->cv);
@@ -237,7 +248,8 @@ protected:
     unsigned GetEventQueueSize() const { return _ev_events.size(); }
 
     template<typename T_Instance>
-    void _EV_HandleEvents(T_Instance* instance, const char* className) {
+    int _EV_HandleEvents(T_Instance* instance, const char* className) {
+        int numDispatched = 0;
         bool done = false;
         while(!done) {
             _ev_policy.WaitEvent();
@@ -265,7 +277,9 @@ protected:
             if(match) match->Call(*event);
             else Event_Default(*event, className);
             delete event;
+            numDispatched++;
         } /* while(!done) */
+        return numDispatched;
     }
 
     virtual void Event_Default(const Event& event, const char* className) {
@@ -310,4 +324,4 @@ public:
 
 } // namespace EV
 
-#define DECL_HANDLE_EVENTS(CLASS) void HandleEvents(void) { _EV_HandleEvents(this, #CLASS); }
+#define DECL_HANDLE_EVENTS(CLASS) int HandleEvents() { return _EV_HandleEvents(this, #CLASS); }

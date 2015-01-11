@@ -52,6 +52,7 @@ Loop::Loop() : _geom(NULL) {
     AddEventHandler(ev_buttonClicked, this, &Loop::Event_ButtonClicked);
     AddEventHandler(ev_buttonClicked, this, &Loop::Event_Button0, 0);
     AddEventHandler(ev_buttonClicked, this, &Loop::Event_Button1, 1);
+    AddEventHandler(ev_mouse, this, &Loop::Event_Mouse);
 
     _vertexEditor.SetAxisFlags(3);
 }
@@ -90,12 +91,24 @@ bool Loop::Invoke() {
     return true;
 }
 
-bool Loop::OnMouse(const EV::MouseEvent& event) {
+void Loop::Event_Mouse(const EV::MouseEvent& event) {
+    printf("Loop::Event_Mouse\n");
+
     assert(_geom);
     if(_vertexEditor.HandleMouseEvent(event, _geom)) {
         W::SetColorsFromVertexSelection(*_geom);
     }
-    return true;
+    event.Accept();
+}
+
+void Loop::OnMouse(const EV::MouseEvent& event) {
+    printf("Loop::OnMouse\n");
+
+    assert(_geom);
+    if(_vertexEditor.HandleMouseEvent(event, _geom)) {
+        W::SetColorsFromVertexSelection(*_geom);
+    }
+    event.Accept();
 }
 
 } // namespace OP

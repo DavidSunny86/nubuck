@@ -45,13 +45,13 @@ public:
     virtual QWidget* GetWidget() { return _widget; }
 };
 
-class Operator : public EV::EventHandler<> {
+class NUBUCK_API Operator : public EV::EventHandler<> {
 private:
     OperatorPanel* _panel;
 public:
     DECL_HANDLE_EVENTS(Operator);
 
-    Operator() : _panel(NULL) { }
+    Operator();
 
     virtual ~Operator() { }
 
@@ -67,8 +67,8 @@ public:
     virtual void OnGeometrySelected() { }
     virtual void OnCameraChanged() { }
     virtual void OnEditModeChanged(const W::editMode_t::Enum mode) { }
-	virtual bool OnMouse(const EV::MouseEvent& mouseEvent) { return false; }
-    virtual bool OnKey(const EV::KeyEvent& keyEvent) { return false; }
+    virtual void OnMouse(const EV::MouseEvent& mouseEvent) { }
+    virtual void OnKey(const EV::KeyEvent& keyEvent) { }
 };
 
 NUBUCK_API void SendToOperator(const EV::Event& event);
