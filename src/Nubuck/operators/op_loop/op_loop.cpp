@@ -2,6 +2,7 @@
 
 #include <LEDA\geo\d3_hull.h>
 #include <Nubuck\polymesh.h>
+#include <Nubuck\face_vertex_mesh.h>
 
 #include <QMenu>
 #include <QAction>
@@ -66,21 +67,28 @@ bool Loop::Invoke() {
     printf("OP::Loop::Invoke\n");
     NB::SetOperatorName("Loop");
 
-	leda::list<leda::d3_rat_point> L;
-	L.push_back(leda::d3_rat_point(-1, -1, -1));
-	L.push_back(leda::d3_rat_point(-1, -1,  1));
-	L.push_back(leda::d3_rat_point(-1,  1, -1));
-	L.push_back(leda::d3_rat_point(-1,  1,  1));
-	L.push_back(leda::d3_rat_point( 1, -1, -1));
-	L.push_back(leda::d3_rat_point( 1, -1,  1));
-	L.push_back(leda::d3_rat_point( 1,  1, -1));
-	L.push_back(leda::d3_rat_point( 1,  1,  1));
+	leda::list<leda::d3_rat_point> positions;
+	positions.push_back(leda::d3_rat_point(-1, -1, -1));
+	positions.push_back(leda::d3_rat_point(-1, -1,  1));
+	positions.push_back(leda::d3_rat_point(-1,  1, -1));
+	positions.push_back(leda::d3_rat_point(-1,  1,  1));
+	positions.push_back(leda::d3_rat_point( 1, -1, -1));
+	positions.push_back(leda::d3_rat_point( 1, -1,  1));
+	positions.push_back(leda::d3_rat_point( 1,  1, -1));
+	positions.push_back(leda::d3_rat_point( 1,  1,  1));
+
+    leda::list<unsigned> indices;
+    add_quad(indices, 0, 1, 3, 2);
+    add_quad(indices, 1, 5, 7, 3);
+    add_quad(indices, 5, 4, 6, 7);
+    add_quad(indices, 0, 2, 6, 4);
+    add_quad(indices, 0, 4, 5, 1);
+    add_quad(indices, 3, 7, 6, 2);
 
     _geom = (W::ENT_Geometry*)NB::CreateMesh();
     _geom->SetRenderMode(NB::RM_ALL);
 	leda::nb::RatPolyMesh& mesh = _geom->GetRatPolyMesh();
-	leda::CONVEX_HULL(L, mesh);
-	mesh.compute_faces();
+    make_from_indices(positions, indices, mesh);
 
     NB::SetMeshPattern(_geom, NB::PATTERN_DOTS);
     leda::face f = mesh.first_face();

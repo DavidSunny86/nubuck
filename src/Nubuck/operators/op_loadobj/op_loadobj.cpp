@@ -59,7 +59,7 @@ void LoadOBJ::Event_Load(const EV::Arg<QString*>& event) {
     _mesh = NB::CreateMesh();
     NB::SetMeshRenderMode(_mesh, NB::RM_ALL);
 	leda::nb::RatPolyMesh& graph = NB::GetGraph(_mesh);
-    graph.FromObj(event.value->toAscii());
+    leda::nb::make_from_obj(event.value->toAscii(), graph);
 
     NB::SelectMesh(NB::SM_NEW, _mesh);
 
@@ -96,7 +96,7 @@ LoadOBJ::LoadOBJ() : _mesh(NULL) {
 void LoadOBJ::Register(Invoker& invoker) {
     NB::LogPrintf("LoadOBJ: preloading mesh\n");
     std::string filename = common.BaseDir() + "Meshes\\laurana_hp.obj";
-    preload.FromObj(filename.c_str());
+    leda::nb::make_from_obj(filename.c_str(), preload);
 
     QAction* action = NB::SceneMenu()->addAction("Load .obj file");
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));

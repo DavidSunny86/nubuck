@@ -7,4 +7,6 @@ add_sources(
     nubuck_private.h
     page_alloc_test.cpp
     events.cpp
+    polymesh.cpp
+    face_vertex_mesh.cpp
 )
