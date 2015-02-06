@@ -122,7 +122,7 @@ ENT_TransformGizmo::ENT_TransformGizmo()
     SetType(EntityType::ENT_TRANSFORM_GIZMO);
     SetSolid(false);
 
-    _cursorPos = M::Vector3::Zero;
+    SetPosition(M::Vector3::Zero);
     // _hidden = true;
     _hidden = false;
 
@@ -204,12 +204,6 @@ void ENT_TransformGizmo::SetTransformMode(Mode mode) {
     _dragging = false;
 }
 
-void ENT_TransformGizmo::SetCursorPosition(const M::Vector3& pos) {
-    _cursorPos = pos;
-    M::Vector3 renderPos = AlignWithCamera(W::world.GetModelView(), _cursorPos);
-    SetRenderPosition(renderPos);
-}
-
 static M::Vector3 AxisVector(int i) {
     if(0 == i) return M::Vector3(1.0f, 0.0f, 0.0f);
     if(1 == i) return M::Vector3(0.0f, 1.0f, 0.0f);
@@ -252,7 +246,7 @@ bool ENT_TransformGizmo::OnMouseDown(const MouseEvent& event, MouseInfo& info) {
         M::Vector3 eyeZ = EyeZ(W::world.GetModelView());
         M::Vector3 vAxis = AxisVector(axis);
         _dragAxis = axis;
-        _dragPlane = M::Plane::FromPointSpan(_cursorPos, M::Cross(eyeZ, vAxis), vAxis);
+        _dragPlane = M::Plane::FromPointSpan(GetPosition(), M::Cross(eyeZ, vAxis), vAxis);
         bool is = M::IS::Intersects(ray, _dragPlane, &inf);
         assert(is);
         _dragOrig = inf.where;
@@ -264,7 +258,7 @@ bool ENT_TransformGizmo::OnMouseDown(const MouseEvent& event, MouseInfo& info) {
             ent = W::world.NextSelectedEntity(ent);
         }
 
-        _oldCursorPos = _cursorPos;
+        _oldCursorPos = GetPosition();
         _dragging = true;
 
         info.action = static_cast<Action>(NB::TGA_BEGIN_DRAGGING);
@@ -296,10 +290,10 @@ bool ENT_TransformGizmo::OnMouseMove(const MouseEvent& event, MouseInfo& info) {
         bool is = M::IS::Intersects(ray, _dragPlane, &inf);
         assert(is);
         M::Vector3 p = inf.where;
-        M::Vector3 pos = _cursorPos;
+        M::Vector3 pos = GetPosition();
         const float translation = (p - _dragOrig).vec[_dragAxis];
         pos.vec[_dragAxis] = _oldCursorPos.vec[_dragAxis] + translation;
-        SetCursorPosition(pos);
+        SetPosition(pos);
 
         info.action = NB::TGA_DRAGGING;
         info.axis   = Axis(_dragAxis);
@@ -352,7 +346,9 @@ UI::OutlinerView* ENT_TransformGizmo::CreateOutlinerView() {
 void ENT_TransformGizmo::GetRenderJobs(R::RenderList& renderList) {
     if(IsHidden()) return;
 
-    SetCursorPosition(_cursorPos); // updates renderpos
+    // update renderpos
+    M::Vector3 renderPos = AlignWithCamera(W::world.GetModelView(), GetPosition());
+    SetRenderPosition(renderPos);
 
     R::MeshJob meshJob;
 

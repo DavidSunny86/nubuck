@@ -123,7 +123,7 @@ bool VertexEditor::HandleMouseEvent(const EV::MouseEvent& event, W::ENT_Geometry
         _gizmo->Hide();
     } else {
         _gizmo->Show();
-        _gizmo->SetCursorPosition(CenterOfVertexSelection(*geom));
+        _gizmo->SetPosition(CenterOfVertexSelection(*geom));
     }
 
     return retval;

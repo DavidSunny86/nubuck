@@ -46,8 +46,7 @@ private:
 
     void SetRenderPosition(const M::Vector3& pos);
 
-    M::Vector3                      _cursorPos; // use cursorPos as readonly and SetCursorPosition() for writes
-    M::Vector3              		_oldCursorPos;
+    M::Vector3 _oldCursorPos;
 
     bool        _dragging;
     int         _dragAxis;
@@ -66,8 +65,6 @@ public:
 
     void SetAxis(int axisFlags);
     void SetTransformMode(Mode mode);
-
-    void SetCursorPosition(const M::Vector3& pos);
 
     void Show();
     void Hide();
