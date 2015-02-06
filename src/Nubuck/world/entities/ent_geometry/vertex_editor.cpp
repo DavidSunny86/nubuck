@@ -91,7 +91,7 @@ void VertexEditor::OnDragging(const NB::TransformGizmoMouseInfo& info, W::ENT_Ge
 
 VertexEditor::VertexEditor() : _axis(NB::AF_XYZ), _gizmo(NULL) {
     _gizmo = W::world.CreateTransformGizmo();
-    _gizmo->HideCursor();
+    _gizmo->Hide();
 }
 
 void VertexEditor::SetAxisFlags(int axisFlags) {
@@ -120,9 +120,9 @@ bool VertexEditor::HandleMouseEvent(const EV::MouseEvent& event, W::ENT_Geometry
 
     // _gizmo->SetAxis(_axis);
     if(geom->GetVertexSelection().empty()) {
-        _gizmo->HideCursor();
+        _gizmo->Hide();
     } else {
-        _gizmo->ShowCursor();
+        _gizmo->Show();
         _gizmo->SetCursorPosition(CenterOfVertexSelection(*geom));
     }
 

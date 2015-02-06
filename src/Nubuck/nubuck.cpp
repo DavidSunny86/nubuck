@@ -271,11 +271,11 @@ NUBUCK_API void SetTransformGizmoPosition(TransformGizmo obj, const M::Vector3& 
 }
 
 NUBUCK_API void HideTransformGizmo(TransformGizmo obj) {
-    obj->HideCursor();
+    obj->Hide();
 }
 
 NUBUCK_API void ShowTransformGizmo(TransformGizmo obj) {
-    obj->ShowCursor();
+    obj->Show();
 }
 
 NUBUCK_API TransformGizmo GlobalTransformGizmo() {

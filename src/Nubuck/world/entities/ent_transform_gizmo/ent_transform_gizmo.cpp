@@ -139,16 +139,16 @@ void ENT_TransformGizmo::BuildBBoxes() {
     _bboxes[Z] = M::Box::FromCenterSize(M::Vector3(0.0f, 0.0f, 0.5f), M::Vector3(w, w, l));
 }
 
-void ENT_TransformGizmo::HideCursor() {
+void ENT_TransformGizmo::Show() {
+    _hidden = false;
+}
+
+void ENT_TransformGizmo::Hide() {
     _hidden = true;
 }
 
 bool ENT_TransformGizmo::IsHidden() const {
     return _hidden || !g_showRenderViewControls;
-}
-
-void ENT_TransformGizmo::ShowCursor() {
-    _hidden = false;
 }
 
 static void SetCenterPosition(M::Box& box, const M::Vector3& center) {

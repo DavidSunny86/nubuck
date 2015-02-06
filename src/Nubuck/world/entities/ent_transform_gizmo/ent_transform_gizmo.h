@@ -69,8 +69,8 @@ public:
 
     void SetCursorPosition(const M::Vector3& pos);
 
-    void ShowCursor();
-    void HideCursor();
+    void Show();
+    void Hide();
     bool IsHidden() const;
 
     bool HandleMouseEvent(const MouseEvent& event, MouseInfo& info);
