@@ -28,6 +28,13 @@ void Framebuffer::Attach(GLenum type, const Texture& texture) {
 
 void Framebuffer::Bind() {
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _id);
+
+    GLenum status = glCheckFramebufferStatusEXT(GL_DRAW_FRAMEBUFFER);
+    if(GL_FRAMEBUFFER_COMPLETE != status) {
+        common.printf("ERROR - framebuffer id=%d is not complete, status=%x\n",
+            _id, status);
+        Crash();
+    }
 }
 
 void BindWindowSystemFramebuffer() {
