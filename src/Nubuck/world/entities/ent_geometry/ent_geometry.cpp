@@ -5,6 +5,7 @@
 #include <UI\outliner\outliner.h>
 #include <UI\userinterface.h>
 #include <renderer\metrics\metrics.h>
+#include <renderer\texfont\texfont.h>
 #include <world\world_events.h>
 #include <world\world.h>
 #include <operators\operators.h>
@@ -179,6 +180,27 @@ void ENT_Geometry::ComputeBoundingBox() {
     SetBoundingBox(bbox);
 }
 
+void ENT_Geometry::Event_ShowVertexLabels(const EV::Arg<bool>& event) {
+    _showVertexLabels = event.value;
+    ForceRebuild();
+
+    g_ui.GetOutliner().SendToView(_outlinerItem, event);
+}
+
+void ENT_Geometry::Event_XrayVertexLabels(const EV::Arg<bool>& event) {
+    _xrayVertexLabels = event.value;
+    ForceRebuild();
+
+    g_ui.GetOutliner().SendToView(_outlinerItem, event);
+}
+
+void ENT_Geometry::Event_SetVertexLabelSize(const EV::Arg<float>& event) {
+    _vertexLabelSize = event.value;
+    ForceRebuild();
+
+    g_ui.GetOutliner().SendToView(_outlinerItem, event);
+}
+
 void ENT_Geometry::Event_VertexScaleChanged(const EV::Arg<float>& event) {
     SYS::ScopedLock lock(_mtx);
     _vertexScale = event.value;
@@ -216,6 +238,9 @@ void ENT_Geometry::Event_EdgeShadingChanged(const EdgeShadingEvent& event) {
 ENT_Geometry::ENT_Geometry()
     : _outlinerItem(NULL)
     , _edgeRenderer(NULL)
+    , _showVertexLabels(false)
+    , _xrayVertexLabels(false)
+    , _vertexLabelSize(1.0f)
     , _mesh(NULL)
     , _tfmesh(NULL)
     , _meshCompiled(true)
@@ -246,6 +271,9 @@ ENT_Geometry::ENT_Geometry()
 
     SetName("Mesh");
 
+    AddEventHandler(ev_geom_showVertexLabels, this, &ENT_Geometry::Event_ShowVertexLabels);
+    AddEventHandler(ev_geom_setVertexLabelSize, this, &ENT_Geometry::Event_SetVertexLabelSize);
+    AddEventHandler(ev_geom_xrayVertexLabels, this, &ENT_Geometry::Event_XrayVertexLabels);
     AddEventHandler(ev_geom_vertexScaleChanged, this, &ENT_Geometry::Event_VertexScaleChanged);
 	AddEventHandler(ev_geom_edgeScaleChanged, this, &ENT_Geometry::Event_EdgeScaleChanged);
 	AddEventHandler(ev_geom_edgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
@@ -331,6 +359,37 @@ void ENT_Geometry::RebuildRenderEdges() {
     _edgeRenderer->Rebuild(edges);
 }
 
+static M::Vector2 FlipY(const M::Vector2& v) {
+    return M::Vector2(v.x, -v.y);
+}
+
+void ENT_Geometry::RebuildVertexLabels() {
+    if(!_showVertexLabels) return; // nothing to do
+
+    const std::string filename = common.BaseDir() + "Textures\\Fonts\\consola.ttf_sdf.txt";
+    const R::TexFont& texFont = R::FindTexFont(R::TF_Type::SDFont, filename);
+
+    _vertexLabels.Begin(texFont);
+
+    char label[100] = { '\0' };
+
+    leda::node v;
+    forall_nodes(v, _ratPolyMesh) {
+        itoa(v->id(), label, 10);
+        unsigned sidx = _vertexLabels.AddString(texFont, label, 'A', _vertexLabelSize, R::Color(1.0f, 1.0f, 1.0f, 0.85f));
+
+        const M::Vector2& lowerLeft = _vertexLabels.GetLowerLeft(sidx);
+        const M::Vector2& upperRight = _vertexLabels.GetUpperRight(sidx);
+        const M::Vector2 upperLeft(lowerLeft.x, upperRight.y);
+        const M::Vector2 off2 = upperLeft + 0.5f * FlipY(upperRight - lowerLeft);
+        const M::Vector3 off3(-off2.x, -off2.y, 0.0f);
+
+        _vertexLabels.SetOriginAndDepthProxy(sidx, _fpos[v->id()] + off3, _fpos[v->id()]);
+    }
+
+    _vertexLabels.End();
+}
+
 static int GetUpdateState(const leda::nb::RatPolyMesh& mesh) {
     leda::node v;
     leda::edge e;
@@ -372,6 +431,8 @@ void ENT_Geometry::Rebuild() {
 
         _ratPolyMesh.cache_all();
     }
+
+    RebuildVertexLabels();
 
     ComputeBoundingBox();
 }
@@ -622,8 +683,13 @@ void ENT_Geometry::BuildRenderList() {
             rjob.material.SetUniformBinding("patternTex", patternTex);
         }
 
+        rjob.fx     = "DepthOnly";
+        rjob.layer  = R::Renderer::Layers::GEOMETRY_0_SPINE_0;
+        _renderList.meshJobs.push_back(rjob);
+
         if(_isTransparent) {
             rjob.fx     = "DepthOnly";
+
             rjob.layer  = R::Renderer::Layers::GEOMETRY_0_DEPTH_ONLY;
             _renderList.meshJobs.push_back(rjob);
 
@@ -649,7 +715,6 @@ void ENT_Geometry::BuildRenderList() {
         } else {
             rjob.fx         = "LitDirectionalTwosided";
             rjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
-
             _renderList.meshJobs.push_back(rjob);
         }
     }
@@ -710,6 +775,10 @@ void ENT_Geometry::BuildRenderList() {
             rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_DEPTH_0;
         }
         _renderList.meshJobs.push_back(rjob);
+    }
+
+    if(_showVertexLabels) {
+        _vertexLabels.GetRenderJobsAlt(GetObjectToWorldMatrix(), _renderList, _xrayVertexLabels);
     }
 }
 

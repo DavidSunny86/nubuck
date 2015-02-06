@@ -33,6 +33,10 @@ private:
     QCheckBox*          _cbWireframe;
     QCheckBox*          _cbNormals;
 
+    QCheckBox*          _cbShowVertexLabels;
+    NBW_SpinBox*        _sbVertexLabelSize;
+    QCheckBox*          _cbXrayVertexLabels;
+
     void InitOutline();
 
     void SendEdgeShading();
@@ -42,6 +46,9 @@ private:
     void Event_EdgeColorChanged(const EV::Arg<R::Color>& event);
     void Event_EdgeShadingChanged(const EdgeShadingEvent& event);
     void Event_RenderModeChanged(const RenderModeEvent& event);
+    void Event_ShowVertexLabels(const EV::Arg<bool>& event);
+    void Event_XrayVertexLabels(const EV::Arg<bool>& event);
+    void Event_SetVertexLabelSize(const EV::Arg<float>& event);
 private slots:
     void OnVertexScaleChanged(leda::rational value);
     void OnEdgeScaleChanged(leda::rational value);
@@ -50,6 +57,9 @@ private slots:
     void OnRenderModeChanged(bool checked);
     void OnEdgeShadingChanged(int idx);
     void OnHiddenLinesChanged(int state);
+    void OnShowVertexLabelsChanged(bool checked);
+    void OnXrayVertexLabelsChanged(bool checked);
+    void OnVertexLabelSizeChanged(leda::rational value);
 public:
     ENT_GeometryOutln(ENT_Geometry& subject);
 

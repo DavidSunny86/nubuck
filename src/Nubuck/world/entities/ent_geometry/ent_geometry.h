@@ -14,6 +14,7 @@
 #include <renderer\edges\r_cylinder_edges.h>
 #include <renderer\edges\r_line_edges.h>
 #include <renderer\edges\r_gl_line_edges.h>
+#include <renderer\text\r_text.h>
 #include <UI\outliner\outliner.h>
 #include <world\entity.h>
 #include "ent_geometry_events.h"
@@ -36,7 +37,13 @@ private:
     R::GL_LineEdges                 _glLineEdges;
     R::EdgeRenderer*                _edgeRenderer;
 
+    R::Text                         _vertexLabels;
+    bool                            _showVertexLabels;
+    bool                            _xrayVertexLabels;
+    float                           _vertexLabelSize;
+
     void RebuildRenderEdges();
+    void RebuildVertexLabels();
 
     struct Face {
         unsigned idx;
@@ -91,6 +98,9 @@ private:
     A::Animation* _anims;
 
 #pragma region EventHandlers
+    void Event_ShowVertexLabels(const EV::Arg<bool>& event);
+    void Event_XrayVertexLabels(const EV::Arg<bool>& event);
+    void Event_SetVertexLabelSize(const EV::Arg<float>& event);
     void Event_VertexScaleChanged(const EV::Arg<float>& event);
     void Event_EdgeScaleChanged(const EV::Arg<float>& event);
     void Event_EdgeColorChanged(const EV::Arg<R::Color>& event);
@@ -169,6 +179,10 @@ public:
     void SetPatternColor(const R::Color& color);
 
     int GetRenderMode() const { return _renderMode; }
+
+    bool    GetVertexLabelsVisible() const { return _showVertexLabels; }
+    float   GetVertexLabelSize() const { return _vertexLabelSize; }
+    bool    GetXrayVertexLabels() const { return _xrayVertexLabels; }
 
     void FrameUpdate();
     void BuildRenderList();

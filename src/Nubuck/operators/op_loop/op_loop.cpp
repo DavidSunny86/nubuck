@@ -94,6 +94,8 @@ bool Loop::Invoke() {
     leda::face f = mesh.first_face();
     mesh.set_pattern(f, R::Color::Red);
 
+    NB::ShowMeshVertexLabels(_geom, true);
+
     W::ENT_Text* text = W::world.CreateText();
 
     return true;

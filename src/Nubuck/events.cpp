@@ -41,6 +41,9 @@ EV::ConcreteEventDef<EV::Args2<OP::Operator*, bool> >   ev_op_setOperator;
 EV::ConcreteEventDef<EV::Event>                         ev_op_showConfirmationDialog;
 
 // geometry events
+EV::ConcreteEventDef<EV::Arg<bool> >     ev_geom_showVertexLabels;
+EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_setVertexLabelSize;
+EV::ConcreteEventDef<EV::Arg<bool> >     ev_geom_xrayVertexLabels;
 EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_vertexScaleChanged;
 EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_edgeScaleChanged;
 EV::ConcreteEventDef<EV::Arg<R::Color> > ev_geom_edgeColorChanged;

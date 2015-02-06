@@ -1,0 +1,17 @@
+fx SDTextLabel {
+    pass Pass0 {
+        state.alphaTest {
+            enabled = GL_TRUE;
+            func    = GL_GEQUAL;
+            ref     = 0.5;
+        }
+
+        vs = "#include <Shaders\text_label.vert>";
+        fs =
+        """
+        const bool XRAY = false;
+
+        #include <Shaders\text_label.frag>
+        """;
+    }
+}

@@ -12,7 +12,9 @@ void ENT_Text::Rebuild() {
     const std::string filename = common.BaseDir() + "Textures\\Fonts\\consola.ttf_sdf.txt";
     const R::TexFont& texFont = R::FindTexFont(R::TF_Type::SDFont, filename);
 
-    _text.Rebuild(texFont, _content, _refChar, _refCharSize);
+    _text.Begin(texFont);
+    _text.AddString(texFont, _content, _refChar, _refCharSize);
+    _text.End();
 
     // recompute bbox
     const M::Vector2 contentSize = GetContentSize();
@@ -41,7 +43,14 @@ UI::OutlinerView* ENT_Text::CreateOutlinerView() {
 }
 
 const M::Vector2& ENT_Text::GetContentSize() const {
-    return _text.GetSize();
+    M::Vector2 totalSize = M::Vector2::Zero;
+    const unsigned numStrings = _text.NumStrings();
+    for(unsigned i = 0; i < numStrings; ++i) {
+        M::Vector2 size = _text.GetUpperRight(i) - _text.GetLowerLeft(i);
+        totalSize.x = M::Max(totalSize.x, size.x);
+        totalSize.y = M::Max(totalSize.y, size.y);
+    }
+    return totalSize;
 }
 
 void ENT_Text::SetContent(const std::string& content) {

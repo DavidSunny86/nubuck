@@ -87,13 +87,16 @@ public:
     struct Layers {
         enum Enum {
             GEOMETRY_0_SOLID_0 = 0,
+            GEOMETRY_0_SPINE_0, // depth-only
             GEOMETRY_0_USE_DEPTH_0,
+            GEOMETRY_0_USE_SPINE_0,
             GEOMETRY_0_SOLID_1,
             GEOMETRY_0_TRANSPARENT_SORTED,
             GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_0, // first dp pass
             GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_N, // all subsequent passes
             GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH,
             GEOMETRY_0_DEPTH_ONLY,
+            GEOMETRY_0_SPINE_1,
             GEOMETRY_0_USE_DEPTH_1,
             GEOMETRY_0_SOLID_2,
             GEOMETRY_1,

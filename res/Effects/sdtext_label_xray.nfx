@@ -1,0 +1,22 @@
+fx SDTextLabelXRay {
+    // make sure this is rendered before grid (unlit)
+    sortkey = -1;
+
+    pass Pass0 {
+        state {
+            alphaTest {
+                enabled = GL_TRUE;
+                func    = GL_GEQUAL;
+                ref     = 0.5;
+            }
+        }
+
+        vs = "#include <Shaders\text_label.vert>";
+        fs =
+        """
+        const bool XRAY = true;
+
+        #include <Shaders\text_label.frag>
+        """;
+    }
+}

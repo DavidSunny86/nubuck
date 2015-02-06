@@ -1,0 +1,29 @@
+// depth only
+fx SDTextLabelDO {
+    // make sure this is rendered before grid (unlit)
+    sortkey = -1;
+
+    pass Pass0 {
+        state {
+            alphaTest {
+                enabled = GL_TRUE;
+                func    = GL_GEQUAL;
+                ref     = 0.5;
+            }
+            color.maskEnabled {
+                red   = GL_FALSE;
+                green = GL_FALSE;
+                blue  = GL_FALSE;
+                alpha = GL_FALSE;
+            }
+        }
+
+        vs = "#include <Shaders\text_label.vert>";
+        fs =
+        """
+        const bool XRAY = false;
+
+        #include <Shaders\text_label.frag>
+        """;
+    }
+}

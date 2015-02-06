@@ -187,6 +187,7 @@ NUBUCK_API void SetMeshRenderMode(Mesh mesh, int renderModeFlags);
 NUBUCK_API void SetMeshShadingMode(Mesh mesh, ShadingMode shadingMode);
 NUBUCK_API void SetMeshPattern(Mesh mesh, Pattern pattern);
 NUBUCK_API void SetMeshPatternColor(Mesh mesh, const R::Color& color);
+NUBUCK_API void ShowMeshVertexLabels(Mesh mesh, bool show);
 
 // text
 NUBUCK_API const M::Vector2& GetTextContentSize(Text text);

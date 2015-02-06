@@ -47,6 +47,18 @@ void ENT_GeometryOutln::OnRenderModeChanged(bool) {
     _subject.Send(ev_geom_renderModeChanged.Tag(event));
 }
 
+void ENT_GeometryOutln::OnShowVertexLabelsChanged(bool checked) {
+    _subject.Send(ev_geom_showVertexLabels.Tag(checked));
+}
+
+void ENT_GeometryOutln::OnXrayVertexLabelsChanged(bool checked) {
+    _subject.Send(ev_geom_xrayVertexLabels.Tag(checked));
+}
+
+void ENT_GeometryOutln::OnVertexLabelSizeChanged(leda::rational value) {
+    _subject.Send(ev_geom_setVertexLabelSize.Tag(value.to_float()));
+}
+
 void ENT_GeometryOutln::OnEdgeShadingChanged(int) {
     SendEdgeShading();
 }
@@ -63,6 +75,9 @@ ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) 
 	AddEventHandler(ev_geom_edgeColorChanged, this, &ENT_GeometryOutln::Event_EdgeColorChanged);
 	AddEventHandler(ev_geom_edgeShadingChanged, this, &ENT_GeometryOutln::Event_EdgeShadingChanged);
     AddEventHandler(ev_geom_renderModeChanged, this, &ENT_GeometryOutln::Event_RenderModeChanged);
+    AddEventHandler(ev_geom_showVertexLabels, this, &ENT_GeometryOutln::Event_ShowVertexLabels);
+    AddEventHandler(ev_geom_xrayVertexLabels, this, &ENT_GeometryOutln::Event_XrayVertexLabels);
+    AddEventHandler(ev_geom_setVertexLabelSize, this, &ENT_GeometryOutln::Event_SetVertexLabelSize);
 }
 
 void ENT_GeometryOutln::InitOutline() {
@@ -126,6 +141,19 @@ void ENT_GeometryOutln::InitOutline() {
     _cbNormals = new QCheckBox("Normals");
     _cbWireframe->setEnabled(_subject.GetRenderMode() & NB::RM_FACES);
 
+    _cbShowVertexLabels = new QCheckBox("vertex labels");
+    _cbShowVertexLabels->setChecked(_subject.GetVertexLabelsVisible());
+
+    _sbVertexLabelSize = new NBW_SpinBox;
+    _sbVertexLabelSize->setText("vertex label size: ");
+    _sbVertexLabelSize->setMinimum(0.05f);
+    _sbVertexLabelSize->setMaximum(5.00f);
+    _sbVertexLabelSize->setSingleStep(0.1f);
+	_sbVertexLabelSize->setValue(_subject.GetVertexLabelSize());
+
+    _cbXrayVertexLabels = new QCheckBox("xray labels");
+    // ...
+
     layout->addWidget(_sbVertexScale, 0, 0, 1, 2);
 
     layout->addWidget(_sbEdgeScale, 1, 0, 1, 2);
@@ -146,6 +174,10 @@ void ENT_GeometryOutln::InitOutline() {
     layout->addWidget(_cbWireframe, 7, 0, 1, 1);
     layout->addWidget(_cbNormals, 7, 1, 1, 1);
 
+    layout->addWidget(_cbShowVertexLabels, 8, 0, 1, 2);
+    layout->addWidget(_sbVertexLabelSize, 9, 0, 1, 2);
+    layout->addWidget(_cbXrayVertexLabels, 10, 0, 1, 2);
+
 	setLayout(layout);
 
     QObject::connect(_sbVertexScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnVertexScaleChanged(leda::rational)));
@@ -161,6 +193,10 @@ void ENT_GeometryOutln::InitOutline() {
 
     QObject::connect(_cbWireframe, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
     QObject::connect(_cbNormals, SIGNAL(toggled(bool)), this, SLOT(OnRenderModeChanged(bool)));
+
+    QObject::connect(_cbShowVertexLabels, SIGNAL(toggled(bool)), this, SLOT(OnShowVertexLabelsChanged(bool)));
+    QObject::connect(_cbXrayVertexLabels, SIGNAL(toggled(bool)), this, SLOT(OnXrayVertexLabelsChanged(bool)));
+    QObject::connect(_sbVertexLabelSize, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnVertexLabelSizeChanged(leda::rational)));
 }
 
 void ENT_GeometryOutln::SendEdgeShading() {
@@ -202,6 +238,21 @@ void ENT_GeometryOutln::Event_RenderModeChanged(const RenderModeEvent& event) {
     _btnRenderVertices->setChecked(NB::RM_NODES & event.renderMode);
     _btnRenderEdges->setChecked(NB::RM_EDGES & event.renderMode);
     _btnRenderFaces->setChecked(NB::RM_FACES & event.renderMode);
+}
+
+void ENT_GeometryOutln::Event_ShowVertexLabels(const EV::Arg<bool>& event) {
+    UI::BlockSignals blockSignals(_cbShowVertexLabels);
+    _cbShowVertexLabels->setChecked(event.value);
+}
+
+void ENT_GeometryOutln::Event_XrayVertexLabels(const EV::Arg<bool>& event) {
+    UI::BlockSignals blockSignals(_cbXrayVertexLabels);
+    _cbXrayVertexLabels->setChecked(event.value);
+}
+
+void ENT_GeometryOutln::Event_SetVertexLabelSize(const EV::Arg<float>& event) {
+    UI::BlockSignals blockSignals(_sbVertexLabelSize);
+    _sbVertexLabelSize->setValue(event.value);
 }
 
 void ENT_GeometryOutln::ExecEvents(const std::vector<EV::Event>& events) {

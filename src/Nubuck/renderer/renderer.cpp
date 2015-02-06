@@ -259,7 +259,13 @@ struct {
 } fb_comp; // compositing framebuffer
 
 struct {
+    GEN::Pointer<Texture>       db;
+    GEN::Pointer<Framebuffer>   fb;
+} fb_spine0; // depth after layer GEOMETRY_0_SOLID_0
+
+struct {
     GEN::Pointer<Texture>       cb;
+    GEN::Pointer<Texture>       db;
     GEN::Pointer<Framebuffer>   fb;
 } fb_useDepth; // use-depth framebuffer
 
@@ -278,8 +284,12 @@ static void Framebuffers_DestroyBuffers() {
     fb_comp.fb.Drop();
     fb_comp.cb.Drop();
 
+    fb_spine0.fb.Drop();
+    fb_spine0.db.Drop();
+
     fb_useDepth.fb.Drop();
     fb_useDepth.cb.Drop();
+    fb_useDepth.db.Drop();
 }
 
 static void Framebuffers_CreateBuffers(int width, int height) {
@@ -295,9 +305,15 @@ static void Framebuffers_CreateBuffers(int width, int height) {
     fb_comp.fb = GEN::MakePtr(new Framebuffer);
     fb_comp.fb->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *fb_comp.cb);
 
+    fb_spine0.db = GEN::MakePtr(new Texture(width, height, GL_DEPTH_COMPONENT));
+    fb_spine0.fb = GEN::MakePtr(new Framebuffer);
+    fb_spine0.fb->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *fb_spine0.db);
+
     fb_useDepth.cb = colorbuffer;
+    fb_useDepth.db = GEN::MakePtr(new Texture(width, height, GL_DEPTH_COMPONENT));
     fb_useDepth.fb = GEN::MakePtr(new Framebuffer);
     fb_useDepth.fb->Attach(Framebuffer::Type::COLOR_ATTACHMENT_0, *fb_useDepth.cb);
+    fb_useDepth.fb->Attach(Framebuffer::Type::DEPTH_ATTACHMENT, *fb_useDepth.db);
 
     dp_cb       = GEN::MakePtr(new Texture(width, height, GL_RGBA));
     dp_db[0]    = GEN::MakePtr(new Texture(width, height, GL_DEPTH_COMPONENT));
@@ -915,9 +931,18 @@ void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, Re
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_0]);
     }
 
+    // draw spines (geometry faces)
+    fb_spine0.fb->Bind();
+    Clear(GL_DEPTH_BUFFER_BIT);
+    if(!_renderLayers[Layers::GEOMETRY_0_SPINE_0].empty()) {
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SPINE_0]);
+    }
+    framebuffer->Bind();
+
     // render use-depth pass
     if(!_renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].empty()) {
         fb_useDepth.fb->Bind();
+        Clear(GL_DEPTH_BUFFER_BIT);
 
         SetPipelineTextureBinding(0, "solidDepth", depthbuffer.Raw());
 
@@ -927,6 +952,23 @@ void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, Re
 
         framebuffer->Bind();
     }
+
+    // use spine
+    /*
+    if(!_renderLayers[Layers::GEOMETRY_0_USE_SPINE_0].empty()) {
+        fb_useDepth.fb->Bind();
+        Clear(GL_DEPTH_BUFFER_BIT);
+
+        SetPipelineTextureBinding(0, "solidDepth", fb_spine0.db.Raw());
+
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_USE_SPINE_0]);
+
+        ClearPipelineTextureBindings();
+
+        framebuffer->Bind();
+    }
+    */
+
 
     if(!_renderLayers[Layers::GEOMETRY_0_SOLID_1].empty()) {
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_1]);
@@ -1031,13 +1073,36 @@ void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, Re
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_DEPTH_ONLY]);
     }
 
+    /*
+    fb_spine0.fb->Bind();
+    if(!_renderLayers[Layers::GEOMETRY_0_SPINE_1].empty()) {
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SPINE_1]);
+    }
+    framebuffer->Bind();
+    */
+
     // render use-depth pass
     if(!_renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].empty()) {
         fb_useDepth.fb->Bind();
+        Clear(GL_DEPTH_BUFFER_BIT);
 
         SetPipelineTextureBinding(0, "solidDepth", depthbuffer.Raw());
 
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0]);
+
+        ClearPipelineTextureBindings();
+
+        framebuffer->Bind();
+    }
+
+    // use spine
+    if(!_renderLayers[Layers::GEOMETRY_0_USE_SPINE_0].empty()) {
+        fb_useDepth.fb->Bind();
+        Clear(GL_DEPTH_BUFFER_BIT);
+
+        SetPipelineTextureBinding(0, "solidDepth", fb_spine0.db.Raw());
+
+        Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_USE_SPINE_0]);
 
         ClearPipelineTextureBindings();
 
