@@ -147,6 +147,9 @@ Outliner::Outliner(QWidget* parent) : QWidget(parent), _items(NULL) {
     _treeWidget = new QTreeWidget(this);
     _treeWidget->setHeaderHidden(true);
 
+    // default is per-item
+    _treeWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+
     const QString transparentBg = QString("background-color: rgba(0, 0, 0, 0);");
     _treeWidget->verticalScrollBar()->parentWidget()->setStyleSheet(transparentBg);
     _treeWidget->horizontalScrollBar()->parentWidget()->setStyleSheet(transparentBg);
