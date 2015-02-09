@@ -17,6 +17,94 @@ static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
 namespace NB {
 
 /*
+==================================================
+TranslateImpl implementation {
+==================================================
+*/
+
+VertexEditor::TranslateImpl::TranslateImpl(VertexEditor* vertexEditor) : vertexEditor(vertexEditor) { }
+
+void VertexEditor::TranslateImpl::OnDragging() {
+    leda::nb::RatPolyMesh& mesh = vertexEditor->GetSubject()->GetRatPolyMesh();
+
+    int dragAxis = vertexEditor->GetDragAxis();
+    float translation = vertexEditor->GetTranslation();
+
+    leda::node v;
+    forall_nodes(v, mesh) {
+        if(vertexEditor->IsSelected(v)) {
+            M::Vector3 pos = vertexEditor->GetOldVertexPosition(v);
+            pos.vec[dragAxis] = vertexEditor->GetOldVertexPosition(v).vec[dragAxis] + translation;
+            mesh.set_position(v, ToRatPoint(pos));
+        }
+    }
+
+    vertexEditor->UpdateGizmo();
+}
+
+/*
+==================================================
+} TranslateImpl implementation
+==================================================
+*/
+
+/*
+==================================================
+ScaleImpl implementation {
+==================================================
+*/
+
+VertexEditor::ScaleImpl::ScaleImpl(VertexEditor* vertexEditor) : vertexEditor(vertexEditor) { }
+
+void VertexEditor::ScaleImpl::OnDragging() {
+    W::ENT_Geometry* geom = vertexEditor->GetSubject();
+    leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+
+    int dragAxis = vertexEditor->GetDragAxis();
+    float scale = vertexEditor->GetScale();
+
+    const M::Vector3& center = vertexEditor->GetCenterOfSelection();
+
+    leda::node v;
+    forall_nodes(v, mesh) {
+        if(vertexEditor->IsSelected(v)) {
+            M::Vector3 pos = vertexEditor->GetOldVertexPosition(v) - center;
+            pos.vec[dragAxis] *= scale;
+            pos += center;
+            mesh.set_position(v, ToRatPoint(pos));
+        }
+    }
+
+    vertexEditor->UpdateGizmo();
+}
+
+/*
+==================================================
+} ScaleImpl implementation
+==================================================
+*/
+
+void VertexEditor::ClearSelection() {
+    _selection.init(_subject->GetRatPolyMesh(), false);
+    _numSelected = 0;
+
+    if(_modifyGlobalSelection) {
+        _subject->ClearVertexSelection();
+    }
+}
+
+void VertexEditor::Select(leda::node v) {
+    if(!_selection[v]) {
+        _selection[v] = true;
+        _numSelected++;
+
+        if(_modifyGlobalSelection) {
+            _subject->Select(v);
+        }
+    }
+}
+
+/*
 ====================
 UpdateGizmo
 
@@ -63,9 +151,9 @@ bool VertexEditor::DoPicking(const EV::MouseEvent& event) {
             leda::nb::RatPolyMesh& mesh = _subject->GetRatPolyMesh();
 
             if(0 == (EV::MouseEvent::MODIFIER_SHIFT & event.mods)) {
-                _selection.init(mesh, false);
+                ClearSelection();
             }
-            _selection[hits[nidx].vert] = true;
+            Select(hits[nidx].vert);
 
             W::SetColorsFromVertexSelection(mesh, _selection, _col_unselected, _col_selected);
             UpdateGizmo();
@@ -86,40 +174,74 @@ void VertexEditor::OnBeginDragging() {
     _oldVertPosF.init(mesh);
     _oldVertPosR.init(mesh);
 
+    _center = M::Vector3::Zero;
     leda::node v;
     forall_nodes(v, mesh) {
         _oldVertPosR[v] = mesh.position_of(v);
         _oldVertPosF[v] = ToVector(_oldVertPosR[v]);
+
+        if(_selection[v]) _center += _oldVertPosF[v];
     }
+    
+    _center /= _numSelected;
 }
 
 void VertexEditor::OnDragging() {
-    leda::nb::RatPolyMesh& mesh = _subject->GetRatPolyMesh();
-
-    int dragAxis = GetDragAxis();
-    float translation = GetTranslation();
-
-    leda::node v;
-    forall_nodes(v, mesh) {
-        if(_selection[v]) {
-            M::Vector3 pos = _oldVertPosF[v];
-            pos.vec[dragAxis] = _oldVertPosF[v].vec[dragAxis] + translation;
-            mesh.set_position(v, ToRatPoint(pos));
-        }
-    }
-
-    UpdateGizmo();
+    _curImpl->OnDragging();
 }
 
 bool VertexEditor::OnMouseEvent(const EV::MouseEvent& event) {
     return DoPicking(event);
 }
 
+bool VertexEditor::OnKeyEvent(const EV::KeyEvent& event) {
+    // scancodes for number row of generic usb keyboard
+    static const unsigned numrow[3] = { 11, 2, 3 };
+
+    if(numrow[1] == event.nativeScanCode) {
+        SetMode(0);
+        return true;
+    }
+    if(numrow[2] == event.nativeScanCode) {
+        SetMode(1);
+        return true;
+    }
+
+    return false;
+}
+
 VertexEditor::VertexEditor()
-    : _col_unselected(R::Color::Black)
+    : _curImpl(NULL)
+    , _allowedModeFlags(TMF_ALL)
+    , _mode(0)
+    , _modifyGlobalSelection(false)
+    , _numSelected(0)
+    , _col_unselected(R::Color::Black)
     , _col_selected(R::Color::Yellow)
     , _subject(NULL)
-{ }
+{
+    _impl[0] = GEN::MakePtr(new TranslateImpl(this));
+    _impl[1] = GEN::MakePtr(new ScaleImpl(this));
+    _curImpl = _impl[0].Raw();
+}
+
+void VertexEditor::SetAllowedModeFlags(int flags) {
+    _allowedModeFlags = flags;
+}
+
+void VertexEditor::SetMode(int mode) {
+    if(!(_allowedModeFlags & 1 << mode)) {
+        COM_printf("WARNING - VertexEditor::SetMode(): required mode not allowed\n");
+        return;
+    }
+    _mode = mode;
+    SetGizmoTransformMode(NB::TransformGizmoMode(_mode));
+    _curImpl = _impl[_mode].Raw();
+}
+
+void VertexEditor::SetModifyGlobalSelection(bool modify) {
+    _modifyGlobalSelection = modify;
+}
 
 void VertexEditor::Open(W::ENT_Geometry* geom) {
     COM_assert(geom);
@@ -129,6 +251,16 @@ void VertexEditor::Open(W::ENT_Geometry* geom) {
     leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
 
     _selection.init(mesh, false);
+    _numSelected = 0;
+
+    if(_modifyGlobalSelection) {
+        std::vector<leda::node> vertSel = _subject->GetVertexSelection();
+        ClearSelection(); // note that vertex selection of geom is cleared at this point, too
+        for(unsigned i = 0; i < vertSel.size(); ++i) {
+            Select(vertSel[i]);
+        }
+    }
+
     _oldColors.init(mesh);
     _oldVertPosF.init(mesh);
     _oldVertPosR.init(mesh);

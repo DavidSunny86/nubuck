@@ -98,8 +98,8 @@ bool Loop::Invoke() {
 
     W::ENT_Text* text = W::world.CreateText();
 
-    // _vertexEditor.Open(_geom);
-    _entityEditor.Open();
+    _vertexEditor.Open(_geom);
+    // _entityEditor.Open();
 
     return true;
 }
@@ -108,7 +108,7 @@ void Loop::Event_Mouse(const EV::MouseEvent& event) {
     printf("Loop::Event_Mouse\n");
 
     assert(_geom);
-    if(_entityEditor.HandleMouseEvent(event)) {
+    if(_vertexEditor.HandleMouseEvent(event)) {
         // W::SetColorsFromVertexSelection(*_geom);
     }
     event.Accept();
@@ -125,7 +125,7 @@ void Loop::OnMouse(const EV::MouseEvent& event) {
 }
 
 void Loop::OnKey(const EV::KeyEvent& event) {
-    if(_entityEditor.HandleKeyEvent(event)) {
+    if(_vertexEditor.HandleKeyEvent(event)) {
     }
     event.Accept();
 }
