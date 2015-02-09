@@ -36,7 +36,7 @@
 #include <operators\op_chull\op_chull.h>
 #include <operators\op_fchull\op_fchull.h>
 #include <operators\op_delaunay3d\op_delaunay3d.h>
-#include <operators\op_translate\op_translate.h>
+#include <operators\op_transform\op_transform.h>
 #include <operators\op_join\op_join.h>
 #include <operators\op_delete\op_delete.h>
 #include <operators\op_savegeom\op_savegeom.h>
@@ -161,7 +161,7 @@ int RunNubuck(
     COM::CMD::RegisterCommand("printWorldInfo", "lists all entities", W::CMD_PrintInfo);
 
     // REMOVEME
-	OP::g_operators.Register(new OP::TranslatePanel, new OP::Translate);
+	OP::g_operators.Register(new OP::TransformPanel, new OP::Transform);
     OP::g_operators.Register(new OP::LoopPanel, new OP::Loop);
     OP::g_operators.Register(new OP::GEN::RandomPointsPanel, new OP::GEN::RandomPoints);
     OP::g_operators.Register(new OP::PlatonicSolidsPanel, new OP::PlatonicSolids);
@@ -176,7 +176,7 @@ int RunNubuck(
 	OP::g_operators.Register(new OP::DeletePanel, new OP::Delete);
     OP::g_operators.Register(new OP::SaveGeomPanel, new OP::SaveGeom);
     OP::g_operators.Register(new OP::MergeVerticesPanel, new OP::MergeVertices);
-	OP::g_operators.OnInvokeOperator(0); // call OP::Translate
+	OP::g_operators.OnInvokeOperator(0); // call OP::Transform
     OP::LoadOperators();
 
     // register user operator
