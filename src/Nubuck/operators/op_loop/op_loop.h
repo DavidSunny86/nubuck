@@ -9,6 +9,7 @@
 
 #include <Nubuck\operators\operator.h>
 #include <Nubuck\editors\vertex_editor.h>
+#include <Nubuck\editors\entity_editor.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <world\entities\ent_transform_gizmo\ent_transform_gizmo.h>
 
@@ -39,6 +40,7 @@ class Loop : public Operator {
 private:
     W::ENT_Geometry*        _geom;
     NB::VertexEditor        _vertexEditor;
+    NB::EntityEditor        _entityEditor;
 
     void Event_OP_Loop_Start(const EV::Event& event);
     void Event_ButtonClicked(const EV::Event& event);
@@ -54,6 +56,7 @@ public:
     bool IsDone() const override { return true; }
 
     void OnMouse(const EV::MouseEvent& event) override;
+    void OnKey(const EV::KeyEvent& event) override;
 };
 
 } // namespace OP

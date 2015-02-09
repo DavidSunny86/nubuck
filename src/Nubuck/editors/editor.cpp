@@ -85,6 +85,10 @@ void Editor::SetGizmoPosition(const M::Vector3& pos) {
     _gizmo->SetPosition(pos);
 }
 
+void Editor::SetGizmoTransformMode(const NB::TransformGizmoMode mode) {
+    _gizmo->SetTransformMode(mode);
+}
+
 void Editor::SetGizmoVisibility(bool show) {
     if(show) _gizmo->Show();
     else _gizmo->Hide();
@@ -115,6 +119,10 @@ bool Editor::HandleMouseEvent(const EV::MouseEvent& event) {
 
     // cool application of short-circuit evaluation. I'm such a good programmer...
     return retVal || OnMouseEvent(event);
+}
+
+bool Editor::HandleKeyEvent(const EV::KeyEvent& event) {
+    return OnKeyEvent(event);
 }
 
 } // namespace NB

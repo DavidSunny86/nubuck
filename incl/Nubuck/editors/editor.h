@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Nubuck\nubuck.h>
 #include <Nubuck\math\vector3.h>
 #include <Nubuck\math\plane.h>
 #include <Nubuck\events\core_events.h>
@@ -7,6 +8,13 @@
 namespace W { class ENT_TransformGizmo; }
 
 namespace NB {
+
+// maybe put this somewhere else
+enum TransformModeFlags {
+    TMF_TRANSLATE   = 1,
+    TMF_SCALE       = 2,
+    TMF_ALL         = (TMF_TRANSLATE | TMF_SCALE)
+};
 
 class Editor {
 private:
@@ -42,9 +50,12 @@ protected:
     virtual void OnEndDragging() { }
     virtual bool OnMouseEvent(const EV::MouseEvent& event) { return false; }
 
+    virtual bool OnKeyEvent(const EV::KeyEvent& event) { return false; }
+
     const W::ENT_TransformGizmo* GetGizmo() const { return _gizmo; }
 
     void SetGizmoPosition(const M::Vector3& pos);
+    void SetGizmoTransformMode(const NB::TransformGizmoMode mode);
     void SetGizmoVisibility(bool show);
 public:
     Editor();
@@ -54,6 +65,7 @@ public:
     void SetAxisFlags(int axisFlags);
 
     bool HandleMouseEvent(const EV::MouseEvent& event);
+    bool HandleKeyEvent(const EV::KeyEvent& event);
 };
 
 } // namespace NB

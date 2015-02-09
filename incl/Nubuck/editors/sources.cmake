@@ -1,6 +1,6 @@
 recurse()
 add_sources(
     editor.h
-    object_editor.h
+    entity_editor.h
     vertex_editor.h
 )
