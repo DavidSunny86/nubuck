@@ -745,10 +745,12 @@ void World::ClearSelection() {
 }
 
 void World::Select_New(Entity* ent) {
+    if(!ent->IsSolid()) COM_printf("WARNING - World::Select_New: selecting non-solid entity.\n");
     _selection.Set(ent);
 }
 
 void World::Select_Add(Entity* ent) {
+    if(!ent->IsSolid()) COM_printf("WARNING - World::Select_Add: selecting non-solid entity.\n");
     _selection.Add(ent);
 }
 
@@ -778,6 +780,26 @@ Entity* World::FirstSelectedEntity() {
 
 Entity* World::NextSelectedEntity(Entity* ent) {
     return ent->selectionLink.next;
+}
+
+Entity* World::FirstEntity() {
+    if(_entities.empty()) {
+        return NULL;
+    }
+    return _entities[0].Raw();
+}
+
+Entity* World::NextEntity(Entity* ent) {
+    // search ent in vector
+    // TODO: replace this by link and O(1) access someday
+    for(unsigned i = 0; i < _entities.size(); ++i) {
+        if(_entities[i].Raw() == ent) {
+            if(i == _entities.size() - 1) return NULL; // ent is last element
+            else return _entities[i + 1].Raw();
+        }
+    }
+    COM_assert(0 && "World::NextEntity: entity not found");
+    return NULL;
 }
 
 DWORD World::Thread_Func(void) {

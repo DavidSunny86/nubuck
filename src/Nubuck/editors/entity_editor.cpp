@@ -153,6 +153,31 @@ bool EntityEditor::OnKeyEvent(const EV::KeyEvent& event, bool simulate) {
         if(!simulate) SetMode(1);
         return true;
     }
+    
+    if('A' == event.keyCode) {
+        if(!simulate && !event.autoRepeat) {
+            W::Entity* ent = NULL;
+
+            bool isSelectionComplete = true;
+            ent = W::world.FirstEntity();
+            while(ent && isSelectionComplete) {
+                isSelectionComplete &= !ent->IsSolid() || ent->IsSelected();
+                ent = W::world.NextEntity(ent);
+            }
+
+            if(isSelectionComplete) W::world.ClearSelection();
+            else {
+                ent = W::world.FirstEntity();
+                while(ent) {
+                    if(ent->IsSolid()) W::world.Select_Add(ent);
+                    ent = W::world.NextEntity(ent);
+                }
+            }
+
+            UpdateGizmo();
+        }
+        return true;
+    }
 
     return false;
 }

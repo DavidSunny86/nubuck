@@ -178,6 +178,9 @@ namespace W {
         Entity*                     FirstSelectedEntity();
         Entity*                     NextSelectedEntity(Entity* ent);
 
+        Entity*                     FirstEntity();
+        Entity*                     NextEntity(Entity* ent);
+
         // thread interface
         DWORD Thread_Func(void);
     };
