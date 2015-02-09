@@ -125,4 +125,15 @@ bool Editor::HandleKeyEvent(const EV::KeyEvent& event) {
     return OnKeyEvent(event);
 }
 
+bool Editor::SimulateMouseEvent(const EV::MouseEvent& event) {
+    if(EV::MouseEvent::BUTTON_RIGHT != event.button) return false;
+    const M::Ray ray = W::world.PickingRay(M::Vector2(event.x, event.y));
+    int axis;
+    return _gizmo->Trace(ray, axis) || OnMouseEvent(event, true);
+}
+
+bool Editor::SimulateKeyEvent(const EV::KeyEvent& event) {
+    return OnKeyEvent(event, true);
+}
+
 } // namespace NB

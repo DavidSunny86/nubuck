@@ -486,8 +486,6 @@ void World::Init() {
     AddEventHandler(ev_key,                  this, &World::Event_Key);
 
     Grid_Build();
-
-    _globalTransformGizmo = CreateTransformGizmo();
 }
 
 const R::DirectionalLight& World::GetDirectionalLight(const int idx) const {
@@ -739,10 +737,6 @@ ENT_TransformGizmo* World::CreateTransformGizmo() {
     Send(ev_w_linkEntity.Tag(transformGizmo));
 
     return transformGizmo;
-}
-
-ENT_TransformGizmo* World::GlobalTransformGizmo() {
-    return _globalTransformGizmo;
 }
 
 void World::ClearSelection() {

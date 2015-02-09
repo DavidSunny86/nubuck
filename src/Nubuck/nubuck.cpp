@@ -278,10 +278,6 @@ NUBUCK_API void ShowTransformGizmo(TransformGizmo obj) {
     obj->Show();
 }
 
-NUBUCK_API TransformGizmo GlobalTransformGizmo() {
-    return W::world.GlobalTransformGizmo();
-}
-
 NUBUCK_API bool TransformGizmoHandleMouseEvent(
     TransformGizmo obj,
     const EV::MouseEvent& event,

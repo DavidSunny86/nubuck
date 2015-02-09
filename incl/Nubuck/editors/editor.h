@@ -48,9 +48,9 @@ protected:
     virtual void OnBeginDragging() { }
     virtual void OnDragging() { }
     virtual void OnEndDragging() { }
-    virtual bool OnMouseEvent(const EV::MouseEvent& event) { return false; }
+    virtual bool OnMouseEvent(const EV::MouseEvent& event, bool simulate = false) { return false; }
 
-    virtual bool OnKeyEvent(const EV::KeyEvent& event) { return false; }
+    virtual bool OnKeyEvent(const EV::KeyEvent& event, bool simulate = false) { return false; }
 
     const W::ENT_TransformGizmo* GetGizmo() const { return _gizmo; }
 
@@ -66,6 +66,9 @@ public:
 
     bool HandleMouseEvent(const EV::MouseEvent& event);
     bool HandleKeyEvent(const EV::KeyEvent& event);
+
+    bool SimulateMouseEvent(const EV::MouseEvent& event);
+    bool SimulateKeyEvent(const EV::KeyEvent& event);
 };
 
 } // namespace NB

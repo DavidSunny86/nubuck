@@ -134,29 +134,31 @@ void VertexEditor::UpdateGizmo() {
     SetGizmoVisibility(0 < numSelected);
 }
 
-bool VertexEditor::DoPicking(const EV::MouseEvent& event) {
+bool VertexEditor::DoPicking(const EV::MouseEvent& event, bool simulate) {
     COM_assert(_subject);
 
     if(EV::MouseEvent::MOUSE_DOWN == event.type && EV::MouseEvent::BUTTON_RIGHT == event.button) {
         M::Ray ray = W::world.PickingRay(M::Vector2(event.x, event.y));
         std::vector<W::ENT_Geometry::VertexHit> hits;
         if(_subject->TraceVertices(ray, 0.2f, hits)) {
-            // find nearest hit
-            unsigned nidx = 0;
-            for(unsigned i = 1; i < hits.size(); ++i) {
-                if(hits[nidx].dist > hits[i].dist)
-                    nidx = i;
-            }
+            if(!simulate) {
+                // find nearest hit
+                unsigned nidx = 0;
+                for(unsigned i = 1; i < hits.size(); ++i) {
+                    if(hits[nidx].dist > hits[i].dist)
+                        nidx = i;
+                }
 
-            leda::nb::RatPolyMesh& mesh = _subject->GetRatPolyMesh();
+                leda::nb::RatPolyMesh& mesh = _subject->GetRatPolyMesh();
 
-            if(0 == (EV::MouseEvent::MODIFIER_SHIFT & event.mods)) {
-                ClearSelection();
-            }
-            Select(hits[nidx].vert);
+                if(0 == (EV::MouseEvent::MODIFIER_SHIFT & event.mods)) {
+                    ClearSelection();
+                }
+                Select(hits[nidx].vert);
 
-            W::SetColorsFromVertexSelection(mesh, _selection, _col_unselected, _col_selected);
-            UpdateGizmo();
+                W::SetColorsFromVertexSelection(mesh, _selection, _col_unselected, _col_selected);
+                UpdateGizmo();
+            } // if(!simulate)
 
             return true;
         }
@@ -190,20 +192,20 @@ void VertexEditor::OnDragging() {
     _curImpl->OnDragging();
 }
 
-bool VertexEditor::OnMouseEvent(const EV::MouseEvent& event) {
-    return DoPicking(event);
+bool VertexEditor::OnMouseEvent(const EV::MouseEvent& event, bool simulate) {
+    return DoPicking(event, simulate);
 }
 
-bool VertexEditor::OnKeyEvent(const EV::KeyEvent& event) {
+bool VertexEditor::OnKeyEvent(const EV::KeyEvent& event, bool simulate) {
     // scancodes for number row of generic usb keyboard
     static const unsigned numrow[3] = { 11, 2, 3 };
 
     if(numrow[1] == event.nativeScanCode) {
-        SetMode(0);
+        if(!simulate) SetMode(0);
         return true;
     }
     if(numrow[2] == event.nativeScanCode) {
-        SetMode(1);
+        if(!simulate) SetMode(1);
         return true;
     }
 
@@ -261,14 +263,20 @@ void VertexEditor::Open(W::ENT_Geometry* geom) {
         }
     }
 
-    _oldColors.init(mesh);
+    _oldVertColors.init(mesh);
+    _oldEdgeColors.init(mesh);
     _oldVertPosF.init(mesh);
     _oldVertPosR.init(mesh);
 
     leda::node v;
     forall_nodes(v, mesh) {
-        _oldColors[v] = mesh.color_of(v);
+        _oldVertColors[v] = mesh.color_of(v);
         // vertex positions assigned later
+    }
+
+    leda::edge e;
+    forall_edges(e, mesh) {
+        _oldEdgeColors[e] = mesh.color_of(e);
     }
 
     W::SetColorsFromVertexSelection(mesh, _selection, _col_unselected, _col_selected);
@@ -276,6 +284,22 @@ void VertexEditor::Open(W::ENT_Geometry* geom) {
 }
 
 void VertexEditor::Close() {
+    SetGizmoVisibility(false);
+
+    leda::nb::RatPolyMesh& mesh = _subject->GetRatPolyMesh();
+    if(_oldVertColors.get_owner() == &mesh) { // HACK: have colors been initialized?
+        COM_assert(_oldEdgeColors.get_owner() == &mesh);
+
+        leda::node v;
+        forall_nodes(v, mesh) {
+            mesh.set_color(v, _oldVertColors[v]);
+        }
+
+        leda::edge e;
+        forall_edges(e, mesh) {
+            mesh.set_color(e, _oldEdgeColors[e]);
+        }
+    }
 }
 
 } // namespace NB

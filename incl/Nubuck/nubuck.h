@@ -230,8 +230,6 @@ NUBUCK_API void SetTransformGizmoPosition(TransformGizmo tfgizmo, const M::Vecto
 NUBUCK_API void HideTransformGizmo(TransformGizmo tfgizmo);
 NUBUCK_API void ShowTransformGizmo(TransformGizmo tfgizmo);
 
-NUBUCK_API TransformGizmo GlobalTransformGizmo();
-
 NUBUCK_API bool TransformGizmoHandleMouseEvent(
     TransformGizmo tfgizmo,
     const EV::MouseEvent& event,

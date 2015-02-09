@@ -1,22 +1,11 @@
 #pragma once
 
-#include <vector>
-
-#include <QMenu>
-
 #include <Nubuck\nubuck.h>
-#include <Nubuck\math\box.h>
-#include <Nubuck\math\plane.h>
 #include <Nubuck\operators\operator.h>
+#include <Nubuck\editors\entity_editor.h>
+#include <Nubuck\editors\vertex_editor.h>
 #include <operators\operators.h>
-#include <renderer\mesh\mesh.h>
-#include <renderer\mesh\meshmgr.h>
 #include <world\world_events.h>
-
-#include <LEDA\geo\d3_hull.h>
-
-// forward decls
-namespace M { namespace IS { struct Info; } }
 
 namespace OP {
 
@@ -27,23 +16,12 @@ public:
 
 class Translate : public Operator {
 private:
-    typedef leda::rational      scalar_t;
-    typedef leda::d3_rat_point  point3_t;
+    NB::EntityEditor _entityEditor;
+    NB::VertexEditor _vertexEditor;
 
-    NB::TransformGizmo _gizmo;
+    int _mode;
 
-    void UpdateCursor();
-
-    std::vector<M::Vector3> 		_oldEntityPos;
-    leda::node_array<M::Vector3>    _oldVertPos;
-    leda::node_array<R::Color>      _oldVertCol;
-    leda::edge_array<R::Color>      _oldEdgeCol;
-    M::Vector3                      _center;
-    W::editMode_t::Enum             _editMode;
-
-    bool DoPicking(const EV::MouseEvent& event);
-    void OnBeginDragging();
-    void OnDragging(const NB::TransformGizmoMouseInfo& info);
+    void OpenEditor();
 
     void Event_UsrSelectEntity(const EV::Usr_SelectEntity& event);
     void Event_UsrChangeEditMode(const EV::Arg<int>& event);

@@ -79,8 +79,6 @@ namespace W {
         std::vector<GEN::Pointer<Entity> > _entities;
         SYS::SpinLock _entitiesMtx;
 
-        ENT_TransformGizmo* _globalTransformGizmo;
-
         SYS::Timer  _timer;
         float       _secsPassed;
         float       _timePassed;
@@ -165,8 +163,6 @@ namespace W {
         ENT_Geometry* CreateGeometry(); // thread-safe
         ENT_Text* CreateText();
         ENT_TransformGizmo* CreateTransformGizmo();
-
-        ENT_TransformGizmo* GlobalTransformGizmo();
 
         // selection, exported to client
         // MUST be called from inside operator

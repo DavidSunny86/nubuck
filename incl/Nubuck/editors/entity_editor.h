@@ -43,12 +43,12 @@ private:
 
     void UpdateGizmo();
 
-    bool DoPicking(const EV::MouseEvent& event);
+    bool DoPicking(const EV::MouseEvent& event, bool simulate);
 protected:
     void OnBeginDragging() override;
     void OnDragging() override;
-    bool OnMouseEvent(const EV::MouseEvent& event) override;
-    bool OnKeyEvent(const EV::KeyEvent& event) override;
+    bool OnMouseEvent(const EV::MouseEvent& event, bool simulate) override;
+    bool OnKeyEvent(const EV::KeyEvent& event, bool simulate) override;
 public:
     EntityEditor();
 

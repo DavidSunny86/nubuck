@@ -49,7 +49,8 @@ private:
     R::Color                            _col_unselected;
     R::Color                            _col_selected;
 
-    leda::node_map<R::Color>            _oldColors;
+    leda::node_map<R::Color>            _oldVertColors;
+    leda::edge_map<R::Color>            _oldEdgeColors;
 
     leda::node_map<M::Vector3>          _oldVertPosF;
     leda::node_map<leda::d3_rat_point>  _oldVertPosR;
@@ -64,12 +65,12 @@ private:
     
     void UpdateGizmo();
 
-    bool DoPicking(const EV::MouseEvent& event);
+    bool DoPicking(const EV::MouseEvent& event, bool simulate);
 protected:
     void OnBeginDragging() override;
     void OnDragging() override;
-    bool OnMouseEvent(const EV::MouseEvent& event) override;
-    bool OnKeyEvent(const EV::KeyEvent& event) override;
+    bool OnMouseEvent(const EV::MouseEvent& event, bool simulate) override;
+    bool OnKeyEvent(const EV::KeyEvent& event, bool simulate) override;
 public:
     VertexEditor();
 

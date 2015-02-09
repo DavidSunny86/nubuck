@@ -113,14 +113,16 @@ void EntityEditor::UpdateGizmo() {
     SetGizmoVisibility(W::world.FirstSelectedEntity());
 }
 
-bool EntityEditor::DoPicking(const EV::MouseEvent& event) {
+bool EntityEditor::DoPicking(const EV::MouseEvent& event, bool simulate) {
     if(EV::MouseEvent::MOUSE_DOWN == event.type && EV::MouseEvent::BUTTON_RIGHT == event.button) {
         M::Ray ray = W::world.PickingRay(M::Vector2(event.x, event.y));
         W::Entity* ent = NULL;
         if(W::world.TraceEntity(ray, &ent)) {
-            if(EV::MouseEvent::MODIFIER_SHIFT & event.mods) W::world.Select_Add(ent);
-            else W::world.Select_New(ent);
-            UpdateGizmo();
+            if(!simulate) {
+                if(EV::MouseEvent::MODIFIER_SHIFT & event.mods) W::world.Select_Add(ent);
+                else W::world.Select_New(ent);
+                UpdateGizmo();
+            }
             return true;
         }
     }
@@ -135,20 +137,20 @@ void EntityEditor::OnDragging() {
     _curImpl->OnDragging();
 }
 
-bool EntityEditor::OnMouseEvent(const EV::MouseEvent& event) {
-    return DoPicking(event);
+bool EntityEditor::OnMouseEvent(const EV::MouseEvent& event, bool simulate) {
+    return DoPicking(event, simulate);
 }
 
-bool EntityEditor::OnKeyEvent(const EV::KeyEvent& event) {
+bool EntityEditor::OnKeyEvent(const EV::KeyEvent& event, bool simulate) {
     // scancodes for number row of generic usb keyboard
     static const unsigned numrow[3] = { 11, 2, 3 };
 
     if(numrow[1] == event.nativeScanCode) {
-        SetMode(0);
+        if(!simulate) SetMode(0);
         return true;
     }
     if(numrow[2] == event.nativeScanCode) {
-        SetMode(1);
+        if(!simulate) SetMode(1);
         return true;
     }
 
@@ -181,6 +183,7 @@ void EntityEditor::Open() {
 }
 
 void EntityEditor::Close() {
+    SetGizmoVisibility(false);
 }
 
 } // namespace NB
