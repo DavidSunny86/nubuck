@@ -151,6 +151,16 @@ bool ENT_TransformGizmo::IsHidden() const {
     return _hidden || !g_showRenderViewControls;
 }
 
+bool ENT_TransformGizmo::Trace(const M::Ray& ray, int& axis, M::IS::Info* inf) {
+    for(int i = 0; i < DIM; ++i) {
+        if(1 << i & _axis && M::IS::Intersects(ray, _bboxes[i], inf)) {
+            axis = i;
+            return true;
+        }
+    }
+    return false;
+}
+
 static void SetCenterPosition(M::Box& box, const M::Vector3& center) {
     const M::Vector3 oldCenter = 0.5f * (box.max - box.min) + box.min;
     const M::Vector3 d = (center - oldCenter);
@@ -212,16 +222,6 @@ static M::Vector3 AxisVector(int i) {
     return M::Vector3::Zero;
 }
 
-bool ENT_TransformGizmo::TraceCursor(const M::Ray& ray, int& axis, M::IS::Info* inf) {
-    for(int i = 0; i < DIM; ++i) {
-        if(M::IS::Intersects(ray, _bboxes[i], inf)) {
-            axis = i;
-            return true;
-        }
-    }
-    return false;
-}
-
 // returns z axis of eye space in world space
 static M::Vector3 EyeZ(const M::Matrix4& modelView) {
     M::Matrix3 M = M::RotationOf(modelView);
@@ -242,7 +242,7 @@ bool ENT_TransformGizmo::OnMouseDown(const MouseEvent& event, MouseInfo& info) {
     int         axis;
     M::IS::Info inf;
 
-    if(TraceCursor(ray, axis, &inf)) {
+    if(Trace(ray, axis, &inf)) {
         M::Vector3 eyeZ = EyeZ(W::world.GetModelView());
         M::Vector3 vAxis = AxisVector(axis);
         _dragAxis = axis;

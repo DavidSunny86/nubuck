@@ -8,7 +8,7 @@
 #include <operators\operators.h>
 
 #include <Nubuck\operators\operator.h>
-#include <Nubuck\vertex_editor.h>
+#include <Nubuck\editors\vertex_editor.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <world\entities\ent_transform_gizmo\ent_transform_gizmo.h>
 

@@ -787,26 +787,41 @@ void ENT_Geometry::AttachAnimation(A::Animation* anim) {
     _anims = anim;
 }
 
+void SetColorsFromVertexSelection(
+    leda::nb::RatPolyMesh& mesh,
+    const leda::node_map<bool>& selection,
+    const R::Color& col0,
+    const R::Color& col1)
+{
+    leda::node v;
+    leda::edge e;
+
+    forall_edges(e, mesh) mesh.set_color(e, col0);
+
+    forall_nodes(v, mesh) {
+        if(selection[v]) {
+            mesh.set_color(v, col1);
+            forall_out_edges(e, v) {
+                mesh.set_source_color(e, col1);
+            }
+        } else mesh.set_color(v, col0);
+    }
+}
+
 void SetColorsFromVertexSelection(ENT_Geometry& geom) {
     static R::Color col_unselected = R::Color::Black;
     static R::Color col_selected = R::Color::Yellow;
 
     leda::nb::RatPolyMesh& mesh = geom.GetRatPolyMesh();
 
-    leda::node v;
-    leda::edge e;
+    leda::node_map<bool> selectionMap(mesh, false);
 
-    forall_nodes(v, mesh) mesh.set_color(v, col_unselected);
-    forall_edges(e, mesh) mesh.set_color(e, col_unselected);
-
-    std::vector<leda::node> sel = geom.GetVertexSelection();
-    for(unsigned i = 0; i < sel.size(); ++i) {
-        v = sel[i];
-        mesh.set_color(v, col_selected);
-        forall_out_edges(e, v) {
-            mesh.set_source_color(e, col_selected);
-        }
+    const std::vector<leda::node>& selectionVec = geom.GetVertexSelection();
+    for(unsigned i = 0; i < selectionVec.size(); ++i) {
+        selectionMap[selectionVec[i]] = true;
     }
+
+    SetColorsFromVertexSelection(mesh, selectionMap, col_unselected, col_selected);
 }
 
 } // namespace W

@@ -53,8 +53,6 @@ private:
     M::Vector3  _dragOrig;
     M::Plane    _dragPlane;
 
-    bool TraceCursor(const M::Ray& ray, int& axis, M::IS::Info* inf = NULL);
-
     bool OnMouseDown(const MouseEvent& event, MouseInfo& info);
     bool OnMouseUp(const MouseEvent& event, MouseInfo& info);
     bool OnMouseMove(const MouseEvent& event, MouseInfo& info);
@@ -69,6 +67,8 @@ public:
     void Show();
     void Hide();
     bool IsHidden() const;
+
+    bool Trace(const M::Ray& ray, int& axis, M::IS::Info* inf = NULL);
 
     bool HandleMouseEvent(const MouseEvent& event, MouseInfo& info);
 

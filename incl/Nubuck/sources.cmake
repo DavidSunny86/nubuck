@@ -6,6 +6,5 @@ add_sources(
     nubuck_api.h
     polymesh.h
     polymesh_fwd.h
-    vertex_editor.h
     face_vertex_mesh.h
 )

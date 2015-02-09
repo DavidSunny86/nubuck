@@ -191,6 +191,11 @@ public:
     void AttachAnimation(A::Animation* animation);
 };
 
+void SetColorsFromVertexSelection(
+    leda::nb::RatPolyMesh& mesh,
+    const leda::node_map<bool>& selection,
+    const R::Color& col_unselected,
+    const R::Color& col_selected);
 void SetColorsFromVertexSelection(ENT_Geometry& geom);
 
 void SaveGeometryToFile(const std::string& filename, ENT_Geometry* geom);
