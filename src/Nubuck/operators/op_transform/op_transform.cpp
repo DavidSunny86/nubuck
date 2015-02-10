@@ -9,19 +9,24 @@ void Transform::OpenEditor() {
     // first, close all editors
     _entityEditor.Close();
     _vertexEditor.Close();
+    _isEditorOpen = false;
 
     if(W::editMode_t::OBJECTS == _mode) {
         _entityEditor.Open();
+        _isEditorOpen = true;
     }
     else if(W::editMode_t::VERTICES == _mode) {
         NB::Mesh mesh = NB::FirstSelectedMesh();
-        _vertexEditor.Open(mesh);
+        if(mesh) {
+            _vertexEditor.Open(mesh);
+            _isEditorOpen = true;
+        }
     } else {
         COM_assert(0 && "unkown editmode");
     }
 }
 
-Transform::Transform() : _mode(0) {
+Transform::Transform() : _mode(0), _isEditorOpen(false) {
     _vertexEditor.SetModifyGlobalSelection(true);
 
     AddEventHandler(ev_usr_selectEntity, this, &Transform::Event_UsrSelectEntity);
@@ -72,6 +77,8 @@ void Transform::OnEditModeChanged(const W::editMode_t::Enum mode) {
 }
 
 void Transform::OnMouse(const EV::MouseEvent& event) {
+    if(!_isEditorOpen) return;
+
     bool accept = false;
     if(W::editMode_t::OBJECTS == _mode) {
         if(event.fallthrough) {
@@ -92,6 +99,8 @@ void Transform::OnMouse(const EV::MouseEvent& event) {
 }
 
 void Transform::OnKey(const EV::KeyEvent& event) {
+    if(!_isEditorOpen) return;
+
     bool accept = false;
     if(W::editMode_t::OBJECTS == _mode) {
         if(event.fallthrough) {

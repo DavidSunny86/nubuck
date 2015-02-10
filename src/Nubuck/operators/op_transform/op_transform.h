@@ -19,7 +19,8 @@ private:
     NB::EntityEditor _entityEditor;
     NB::VertexEditor _vertexEditor;
 
-    int _mode;
+    int     _mode;
+    bool    _isEditorOpen;
 
     void OpenEditor();
 
