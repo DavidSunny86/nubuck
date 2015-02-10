@@ -41,6 +41,7 @@
 #include <operators\op_delete\op_delete.h>
 #include <operators\op_savegeom\op_savegeom.h>
 #include <operators\op_merge_vertices\op_merge_vertices.h>
+#include <operators\op_alg_vdh\op_alg_vdh.h>
 
 bool g_showRenderViewControls = true;
 
@@ -176,6 +177,7 @@ int RunNubuck(
 	OP::g_operators.Register(new OP::DeletePanel, new OP::Delete);
     OP::g_operators.Register(new OP::SaveGeomPanel, new OP::SaveGeom);
     OP::g_operators.Register(new OP::MergeVerticesPanel, new OP::MergeVertices);
+    OP::g_operators.Register(NULL, new OP::VDH_Operator);
 	OP::g_operators.OnInvokeOperator(0); // call OP::Transform
     OP::LoadOperators();
 
