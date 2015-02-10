@@ -4,6 +4,8 @@
 
 #define CASE_ENUM_STR(x) case x: return #x
 
+COM::Config::Variable<int> r_ignoreNotifications("r_ignoreNotifications", 1);
+
 namespace R {
 
     const char* SourceToStr(GLenum source) {
@@ -49,6 +51,8 @@ namespace R {
         const char* message,
         void* /* userParam */)
     {
+        if(r_ignoreNotifications && GL_DEBUG_SEVERITY_NOTIFICATION == severity) return;
+
         const char* fmt =
             "GL_DEBUG_OUTPUT {\n"
             "   source: %s\n"
