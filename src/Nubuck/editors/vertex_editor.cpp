@@ -209,6 +209,26 @@ bool VertexEditor::OnKeyEvent(const EV::KeyEvent& event, bool simulate) {
         return true;
     }
 
+    if('A' == event.keyCode) {
+        if(!simulate && !event.autoRepeat) {
+            COM_assert(_subject);
+            leda::nb::RatPolyMesh& mesh = _subject->GetRatPolyMesh();
+            if(_numSelected < mesh.number_of_nodes()) {
+                _selection.init(mesh, true);
+                _numSelected = mesh.number_of_nodes();
+
+                leda::node v;
+                forall_nodes(v, mesh) {
+                    _subject->Select(v);
+                }
+            } else ClearSelection();
+
+            W::SetColorsFromVertexSelection(mesh, _selection, _col_unselected, _col_selected);
+            UpdateGizmo();
+        }
+        return true;
+    }
+
     return false;
 }
 
