@@ -13,3 +13,14 @@ NBW_Button::NBW_Button(unsigned id, const char* name)
     // i wonder if this is the canonical way to do this...
     connect(this, SIGNAL(clicked()), this, SLOT(OnClicked()));
 }
+
+void NBW_CheckBox::OnToggled(bool isChecked) {
+    OP::SendToOperator(ev_checkBoxToggled.Tag(isChecked, _id));
+}
+
+NBW_CheckBox::NBW_CheckBox(unsigned id, const char* name)
+    : QCheckBox(QString(name))
+    , _id(id)
+{
+    connect(this, SIGNAL(toggled(bool)), this, SLOT(OnToggled(bool)));
+}

@@ -60,6 +60,7 @@ class Invoker;
 } // namespace OP
 
 class NBW_Button;
+class NBW_CheckBox;
 
 namespace NB {
 
@@ -74,9 +75,10 @@ enum EntityType {
     ET_TRANSFORM_GIZMO
 };
 
-typedef QBoxLayout* BoxLayout;
-typedef QWidget*    Widget;
-typedef NBW_Button* Button;
+typedef QBoxLayout*     BoxLayout;
+typedef QWidget*        Widget;
+typedef NBW_Button*     Button;
+typedef NBW_CheckBox*   CheckBox;
 
 enum AxisFlags {
     AF_X = 1,
@@ -99,9 +101,12 @@ NUBUCK_API void    SetOperatorName(const char* name);
 NUBUCK_API void    SetOperatorPanel(QWidget* panel);
 
 NUBUCK_API Widget      CastToWidget(Button button);
+NUBUCK_API Widget      CastToWidget(CheckBox checkBox);
 NUBUCK_API BoxLayout   CreateHorizontalBoxLayout();
 NUBUCK_API BoxLayout   CreateVerticalBoxLayout();
 NUBUCK_API Button      CreateButton(unsigned id, const char* text);
+NUBUCK_API CheckBox    CreateCheckBox(unsigned id, const char* text);
+NUBUCK_API void        SetChecked(CheckBox checkBox, bool checked, bool blockSignals = false);
 NUBUCK_API void        AddWidgetToBox(BoxLayout box, Widget widget);
 
 // world

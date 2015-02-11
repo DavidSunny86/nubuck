@@ -13,6 +13,35 @@ typedef leda::GRAPH<point2_t, int>  graph2_t;
 
 namespace OP {
 
+/*
+==================================================
+    VDH_Panel implementation
+==================================================
+*/
+
+VDH_Panel::VDH_Panel() {
+    NB::BoxLayout boxLayout = NB::CreateVerticalBoxLayout();
+
+    _cbDelaunay = NB::CreateCheckBox(ID_DELAUNAY, "Show Delaunay");
+    _cbVoronoi = NB::CreateCheckBox(ID_VORONOI, "Show Voronoi");
+
+    NB::AddWidgetToBox(boxLayout, NB::CastToWidget(_cbDelaunay));
+    NB::AddWidgetToBox(boxLayout, NB::CastToWidget(_cbVoronoi));
+
+    SetLayout(boxLayout);
+}
+
+void VDH_Panel::Invoke() {
+    NB::SetChecked(_cbDelaunay, true, true);
+    NB::SetChecked(_cbVoronoi, true, true);
+}
+
+/*
+==================================================
+    VDH_Operator implementation
+==================================================
+*/
+
 static leda::list<point2_t> ToPointList2(const NB::Graph& G) {
     leda::list<point2_t> L;
     leda::node n;
@@ -376,10 +405,27 @@ static void AssignVertexColors(NB::Graph& G, leda::node_array<R::Color>& colors)
     }
 }
 
+void VDH_Operator::Event_CheckBoxToggled(const EV::Arg<bool>& event) {
+    bool isChecked = event.value;
+
+    switch(event.id1) {
+    case ID_DELAUNAY:
+        if(isChecked) NB::ShowMesh(_delaunayMesh);
+        else NB::HideMesh(_delaunayMesh);
+        break;
+    case ID_VORONOI:
+        if(isChecked) NB::ShowMesh(_voronoiMesh);
+        else NB::HideMesh(_voronoiMesh);
+        break;
+    };
+}
+
 VDH_Operator::VDH_Operator()
     : _verticesMesh(NULL)
     , _delaunayMesh(NULL)
-{ }
+{
+    AddEventHandler(ev_checkBoxToggled, this, &VDH_Operator::Event_CheckBoxToggled);
+}
 
 static leda::node MinXY(const NB::Graph& G, const leda::list<leda::node>& L) {
     leda::node min = L.front();

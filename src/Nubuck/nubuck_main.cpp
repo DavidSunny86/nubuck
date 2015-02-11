@@ -177,7 +177,7 @@ int RunNubuck(
 	OP::g_operators.Register(new OP::DeletePanel, new OP::Delete);
     OP::g_operators.Register(new OP::SaveGeomPanel, new OP::SaveGeom);
     OP::g_operators.Register(new OP::MergeVerticesPanel, new OP::MergeVertices);
-    OP::g_operators.Register(NULL, new OP::VDH_Operator);
+    OP::g_operators.Register(new OP::VDH_Panel, new OP::VDH_Operator);
 	OP::g_operators.OnInvokeOperator(0); // call OP::Transform
     OP::LoadOperators();
 

@@ -5,6 +5,21 @@
 
 namespace OP {
 
+enum {
+    ID_DELAUNAY,
+    ID_VORONOI
+};
+
+class VDH_Panel : public OperatorPanel {
+private:
+    NB::CheckBox _cbDelaunay;
+    NB::CheckBox _cbVoronoi;
+public:
+    VDH_Panel();
+
+    void Invoke() override;
+};
+
 class VDH_Operator : public Operator {
 private:
     NB::Mesh _verticesMesh;
@@ -21,6 +36,8 @@ private:
     void ApplyVoronoiColors();
 
     void Update();
+
+    void Event_CheckBoxToggled(const EV::Arg<bool>& event);
 public:
     VDH_Operator();
 

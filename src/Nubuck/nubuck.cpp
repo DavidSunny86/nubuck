@@ -59,6 +59,10 @@ NUBUCK_API Widget CastToWidget(Button button) {
     return button;
 }
 
+NUBUCK_API Widget CastToWidget(CheckBox checkBox) {
+    return checkBox;
+}
+
 NUBUCK_API BoxLayout CreateHorizontalBoxLayout() {
     return new QHBoxLayout;
 }
@@ -69,6 +73,16 @@ NUBUCK_API BoxLayout CreateVerticalBoxLayout() {
 
 NUBUCK_API Button CreateButton(unsigned id, const char* name) {
     return new NBW_Button(id, name);
+}
+
+NUBUCK_API CheckBox CreateCheckBox(unsigned id, const char* name) {
+    return new NBW_CheckBox(id, name);
+}
+
+NUBUCK_API void SetChecked(CheckBox checkBox, bool checked, bool blockSignals) {
+    if(blockSignals) checkBox->blockSignals(true);
+    checkBox->setChecked(checked);
+    if(blockSignals) checkBox->blockSignals(false);
 }
 
 NUBUCK_API void AddWidgetToBox(BoxLayout layout, Widget widget) {
