@@ -60,7 +60,7 @@ protected:
 public:
     Editor();
 
-    virtual ~Editor() { }
+    virtual ~Editor();
 
     void SetAxisFlags(int axisFlags);
 

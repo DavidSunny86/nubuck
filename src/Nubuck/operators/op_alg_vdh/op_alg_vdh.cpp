@@ -462,6 +462,7 @@ bool VDH_Operator::Invoke() {
 }
 
 void VDH_Operator::Finish() {
+    _vertexEditor.Close();
 }
 
 void VDH_Operator::OnMouse(const EV::MouseEvent& event) {

@@ -103,6 +103,10 @@ Editor::Editor()
     _gizmo->Hide();
 }
 
+Editor::~Editor() {
+    _gizmo->Destroy();
+}
+
 void Editor::SetAxisFlags(int axisFlags) {
     _axisFlags = axisFlags;
     _gizmo->SetAxis(_axisFlags);
