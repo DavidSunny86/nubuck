@@ -307,6 +307,11 @@ static Point3 ProjectXY(const Point3& p) {
     return Point3(p.xcoord(), p.ycoord(), 0);
 }
 
+static leda::d3_rat_point ProjectOnParaboloid(const leda::d3_rat_point& p) {
+    const leda::rational z = p.xcoord() * p.xcoord() + p.ycoord() * p.ycoord();
+    return leda::d3_rat_point(p.xcoord(), p.ycoord(), z);
+}
+
 // assumes z(p0) = z(p1) = z(p2) = 0
 static bool IsFrontFace(Graph& G, face f) {
     edge e = G.first_face_edge(f);
@@ -330,6 +335,19 @@ void VDH_Operator::ApplyVoronoiColors() {
     }
 }
 
+static void ConvexHull3D(const NB::Graph& verticesGraph, NB::Graph& hullGraph) {
+    leda::list<leda::d3_rat_point> L;
+
+    leda::node v;
+    forall_nodes(v, verticesGraph) {
+        L.push(ProjectOnParaboloid(verticesGraph.position_of(v)));
+    }
+
+    hullGraph.clear();
+    leda::CONVEX_HULL(L, hullGraph);
+    hullGraph.compute_faces();
+}
+
 void VDH_Operator::Update() {
     NB::Graph& verticesGraph = NB::GetGraph(_verticesMesh);
 
@@ -346,6 +364,8 @@ void VDH_Operator::Update() {
     }
 
     ApplyVoronoiColors();
+
+    ConvexHull3D(verticesGraph, NB::GetGraph(_hullMesh));
 }
 
 static float RandFloat(float min, float max) {
@@ -452,6 +472,12 @@ bool VDH_Operator::Invoke() {
     _voronoiMesh = NB::CreateMesh();
     NB::SetMeshName(_voronoiMesh, "Voronoi Diagram");
     NB::SetMeshRenderMode(_voronoiMesh, NB::RM_ALL);
+
+    // create mesh for convex hull
+    _hullMesh = NB::CreateMesh();
+    NB::SetMeshName(_hullMesh, "Convex Hull");
+    NB::SetMeshRenderMode(_hullMesh, NB::RM_ALL);
+    NB::SetMeshPosition(_hullMesh, M::Vector3(0.0f, 0.0f, 2.0f));
 
     _vertexEditor.SetAxisFlags(NB::AF_X | NB::AF_Y);
     _vertexEditor.Open(_verticesMesh);

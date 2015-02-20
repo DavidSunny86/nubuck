@@ -10,6 +10,7 @@ private:
     NB::Mesh _verticesMesh;
     NB::Mesh _delaunayMesh;
     NB::Mesh _voronoiMesh;
+    NB::Mesh _hullMesh;
 
     leda::node_array<R::Color> _vertexColors;
 
