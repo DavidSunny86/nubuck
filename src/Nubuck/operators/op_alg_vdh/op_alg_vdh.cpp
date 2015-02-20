@@ -220,7 +220,10 @@ static void Triangulate(const leda::GRAPH<leda::rat_point, leda::rat_segment>& i
     assert(leda::Is_Triangulation(out));
 }
 
-static void F(const leda::GRAPH<leda::rat_circle, point2_t>& VD, leda::GRAPH<leda::rat_point, int>& TRI, NB::Graph& G, leda::edge_map<leda::edge>& map) {
+static void CreateBoundedSegmentation(
+    const leda::GRAPH<leda::rat_circle, point2_t>& VD, 
+    leda::GRAPH<leda::rat_point, leda::rat_segment>& G2)
+{
     leda::list<leda::rat_segment> S0;
     leda::list<leda::rat_segment> S1;
 
@@ -265,7 +268,7 @@ static void F(const leda::GRAPH<leda::rat_circle, point2_t>& VD, leda::GRAPH<led
     S1.push_back(leda::rat_segment(v2, v3));
     S1.push_back(leda::rat_segment(v3, v0));
 
-    leda::GRAPH<leda::rat_point, leda::rat_segment> G2;
+    G2.clear();
     leda::SEGMENT_INTERSECTION(S0, S1, G2, true);
 
     leda::list<leda::node> del;
@@ -275,28 +278,30 @@ static void F(const leda::GRAPH<leda::rat_circle, point2_t>& VD, leda::GRAPH<led
             del.push_back(n);
     }
     forall(n, del) G2.del_node(n);
-
-    TRI.clear();
-    Triangulate(G2, TRI, map);
-
-    // -----
-    leda::edge_array<leda::edge> emap;
-    FromProjection(G2, G, emap);
-    
-    forall_edges(e, TRI) {
-        leda::edge inf = map[e];
-        map[e] = emap[inf];
-    }
 }
 
 static void Voronoi2D(const NB::Graph& in, leda::GRAPH<leda::rat_point, int>& TRI, NB::Graph& out, leda::edge_map<leda::edge>& map) {
     leda::list<point2_t> L(ToPointList2(in));
     L.unique();
+
     leda::GRAPH<leda::rat_circle, point2_t> VD;
     leda::VORONOI(L, VD);
+
+    leda::GRAPH<leda::rat_point, leda::rat_segment> G2;
+    CreateBoundedSegmentation(VD, G2);
+
     TRI.clear();
+    Triangulate(G2, TRI, map);
+
+    leda::edge_array<leda::edge> emap;
     out.clear();
-    F(VD, TRI, out, map);
+    FromProjection(G2, out, emap);
+    
+    leda::edge e;
+    forall_edges(e, TRI) {
+        leda::edge inf = map[e];
+        map[e] = emap[inf];
+    }
 }
 
 void VDH_Operator::Register(Invoker& invoker) {
