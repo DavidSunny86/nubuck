@@ -14,9 +14,6 @@ private:
 
     leda::node_array<R::Color> _vertexColors;
 
-    leda::GRAPH<leda::rat_point, int>   _voronoiTriang;
-    leda::edge_map<leda::edge>          _voronoiMap;
-
     NB::VertexEditor _vertexEditor;
 
     void ApplyVoronoiColors();
