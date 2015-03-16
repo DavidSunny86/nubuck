@@ -27,6 +27,7 @@ void Transform::OpenEditor() {
 }
 
 Transform::Transform() : _mode(0), _isEditorOpen(false) {
+    _entityEditor.SetModifyGlobalSelection(true);
     _vertexEditor.SetModifyGlobalSelection(true);
 
     AddEventHandler(ev_usr_selectEntity, this, &Transform::Event_UsrSelectEntity);
@@ -47,8 +48,9 @@ bool Transform::Invoke() {
 }
 
 void Transform::OnGeometrySelected() {
-    // well, that's the lazy solution.
-    OpenEditor();
+    if(W::editMode_t::OBJECTS == _mode) {
+        _entityEditor.CopyGlobalSelection();
+    }
 }
 
 void Transform::Event_UsrSelectEntity(const EV::Usr_SelectEntity& event) {

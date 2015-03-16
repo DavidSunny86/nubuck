@@ -1,4 +1,6 @@
+#include <Nubuck\math_conv.h>
 #include <Nubuck\editors\entity_editor.h>
+#include <Nubuck\face_vertex_mesh.h>
 #include <world\world.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 
@@ -26,10 +28,10 @@ EntityEditor::TranslateImpl::TranslateImpl(EntityEditor* entityEditor) : entityE
 
 void EntityEditor::TranslateImpl::OnBeginDragging() {
     oldEntPos.clear();
-    W::Entity* ent = W::world.FirstSelectedEntity();
+    W::Entity* ent = entityEditor->FirstSelectedEntity();
     while(ent) {
         oldEntPos.push_back(ent->GetPosition());
-        ent = W::world.NextSelectedEntity(ent);
+        ent = entityEditor->NextSelectedEntity(ent);
     }
 }
 
@@ -37,13 +39,19 @@ void EntityEditor::TranslateImpl::OnDragging() {
     int dragAxis = entityEditor->GetDragAxis();
     float translation = entityEditor->GetTranslation();
 
-    W::Entity* ent = W::world.FirstSelectedEntity();
+    W::Entity* ent = entityEditor->FirstSelectedEntity();
     unsigned i = 0;
     while(ent) {
         M::Vector3 pos = oldEntPos[i];
         pos.vec[dragAxis] = oldEntPos[i].vec[dragAxis] + translation;
         ent->SetPosition(pos);
-        ent = W::world.NextSelectedEntity(ent);
+
+        // move bbox
+        EntityData& data = entityEditor->_entData[ent->GetID()];
+        COM_assert(data.bbox.geom);
+        data.bbox.geom->SetPosition(pos);
+
+        ent = entityEditor->NextSelectedEntity(ent);
         i++;
     }
 
@@ -100,6 +108,119 @@ void EntityEditor::ScaleImpl::OnDragging() {
 ==================================================
 */
 
+static void MakeCube(leda::nb::RatPolyMesh& polyMesh) {
+	leda::list<leda::d3_rat_point> positions;
+	positions.push_back(leda::d3_rat_point(-1, -1, -1));
+	positions.push_back(leda::d3_rat_point(-1, -1,  1));
+	positions.push_back(leda::d3_rat_point(-1,  1, -1));
+	positions.push_back(leda::d3_rat_point(-1,  1,  1));
+	positions.push_back(leda::d3_rat_point( 1, -1, -1));
+	positions.push_back(leda::d3_rat_point( 1, -1,  1));
+	positions.push_back(leda::d3_rat_point( 1,  1, -1));
+	positions.push_back(leda::d3_rat_point( 1,  1,  1));
+
+    leda::list<unsigned> indices;
+    add_quad(indices, 0, 1, 3, 2);
+    add_quad(indices, 1, 5, 7, 3);
+    add_quad(indices, 5, 4, 6, 7);
+    add_quad(indices, 0, 2, 6, 4);
+    add_quad(indices, 0, 4, 5, 1);
+    add_quad(indices, 3, 7, 6, 2);
+
+    make_from_indices(positions, indices, polyMesh);
+}
+
+// create bounding box topology, does not initialize vertex positions
+void EntityEditor::BBox::Init() {
+    geom = W::world.CreateGeometry();
+
+    geom->SetName("bbox()");
+    geom->SetRenderMode(NB::RM_EDGES);
+    geom->SetShadingMode(NB::SM_LINES);
+    geom->SetSolid(false);
+    geom->HideOutline();
+
+    leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+
+    // TODO: simplify this
+    MakeCube(mesh);
+    int vidx = 0;
+    leda::node v;
+    forall_nodes(v, mesh) {
+        verts[vidx++] = v;
+    }
+}
+
+void EntityEditor::BBox::Update(W::Entity* ent) {
+    const M::Box& mbox = ent->GetBoundingBox();
+
+    const M::Vector3& min = mbox.min;
+    const M::Vector3& max = mbox.max;
+
+    leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
+    mesh.set_position(verts[0], ToRatPoint(M::Vector3(min.x, min.y, min.z)));
+    mesh.set_position(verts[1], ToRatPoint(M::Vector3(min.x, min.y, max.z)));
+    mesh.set_position(verts[2], ToRatPoint(M::Vector3(min.x, max.y, min.z)));
+    mesh.set_position(verts[3], ToRatPoint(M::Vector3(min.x, max.y, max.z)));
+    mesh.set_position(verts[4], ToRatPoint(M::Vector3(max.x, min.y, min.z)));
+    mesh.set_position(verts[5], ToRatPoint(M::Vector3(max.x, min.y, max.z)));
+    mesh.set_position(verts[6], ToRatPoint(M::Vector3(max.x, max.y, min.z)));
+    mesh.set_position(verts[7], ToRatPoint(M::Vector3(max.x, max.y, max.z)));
+
+    geom->SetPosition(ent->GetPosition());
+
+    std::stringstream name;
+    name << "bbox(" << ent->GetID() << ")";
+    geom->SetName(name.str());
+}
+
+void EntityEditor::BBox::Destroy() {
+    if(geom) {
+        geom->Destroy();
+        geom = NULL;
+    }
+    for(int i = 0; i < 8; ++i) {
+        verts[i] = NULL;
+    }
+}
+
+bool EntityEditor::IsSelected(const W::Entity* ent) const {
+    return _entData.size() > ent->GetID() && _entData[ent->GetID()].isSelected;
+}
+
+void EntityEditor::ClearSelection() {
+    for(unsigned i = 0; i < _entData.size(); ++i) {
+        _entData[i].bbox.Destroy();
+    }
+    _entData.clear();
+    _selected = NULL;
+
+    if(_modifyGlobalSelection) W::world.ClearSelection();
+}
+
+void EntityEditor::SelectEntity_Add(W::Entity* ent) {
+    /* DEBUG */ std::cout << "EntityEditor::SelectEntity_Add(W::Entity* ent)" << std::endl;
+    if(!IsSelected(ent)) {
+        _entData.resize(M::Max(ent->GetID() + 1, _entData.size()));
+
+        EntityData& data = _entData[ent->GetID()];
+
+        data.isSelected = true;
+        data.bbox.Init();
+        data.bbox.Update(ent);
+
+        // append ent to selection list
+        W::Entity** tail = &_selected;
+        while(*tail) {
+            COM_assert(IsSelected(*tail));
+            tail = &_entData[(*tail)->GetID()].nextSelected;
+        }
+        *tail = ent;
+
+        if(_modifyGlobalSelection) W::world.Select_Add(ent);
+    }
+}
+
 /*
 ====================
 UpdateGizmo
@@ -109,8 +230,8 @@ UpdateGizmo
 ====================
 */
 void EntityEditor::UpdateGizmo() {
-    SetGizmoPosition(W::world.GlobalCenterOfSelection());
-    SetGizmoVisibility(W::world.FirstSelectedEntity());
+    SetGizmoPosition(GlobalCenterOfSelection());
+    SetGizmoVisibility(NULL != FirstSelectedEntity());
 }
 
 bool EntityEditor::DoPicking(const EV::MouseEvent& event, bool simulate) {
@@ -119,8 +240,8 @@ bool EntityEditor::DoPicking(const EV::MouseEvent& event, bool simulate) {
         W::Entity* ent = NULL;
         if(W::world.TraceEntity(ray, &ent)) {
             if(!simulate) {
-                if(EV::MouseEvent::MODIFIER_SHIFT & event.mods) W::world.Select_Add(ent);
-                else W::world.Select_New(ent);
+                if(!(EV::MouseEvent::MODIFIER_SHIFT & event.mods)) ClearSelection();
+                SelectEntity_Add(ent);
                 UpdateGizmo();
             }
             return true;
@@ -161,15 +282,15 @@ bool EntityEditor::OnKeyEvent(const EV::KeyEvent& event, bool simulate) {
             bool isSelectionComplete = true;
             ent = W::world.FirstEntity();
             while(ent && isSelectionComplete) {
-                isSelectionComplete &= !ent->IsSolid() || ent->IsSelected();
+                isSelectionComplete &= !ent->IsSolid() || IsSelected(ent);
                 ent = W::world.NextEntity(ent);
             }
 
-            if(isSelectionComplete) W::world.ClearSelection();
+            if(isSelectionComplete) ClearSelection();
             else {
                 ent = W::world.FirstEntity();
                 while(ent) {
-                    if(ent->IsSolid()) W::world.Select_Add(ent);
+                    if(ent->IsSolid()) SelectEntity_Add(ent);
                     ent = W::world.NextEntity(ent);
                 }
             }
@@ -182,7 +303,13 @@ bool EntityEditor::OnKeyEvent(const EV::KeyEvent& event, bool simulate) {
     return false;
 }
 
-EntityEditor::EntityEditor() : _curImpl(NULL), _allowedModeFlags(TMF_ALL), _mode(0) {
+EntityEditor::EntityEditor()
+    : _curImpl(NULL)
+    , _selected(NULL)
+    , _allowedModeFlags(TMF_ALL)
+    , _mode(0)
+    , _modifyGlobalSelection(false)
+{
     _impl[0] = GEN::MakePtr(new TranslateImpl(this));
     _impl[1] = GEN::MakePtr(new ScaleImpl(this));
     _curImpl = _impl[0].Raw();
@@ -203,12 +330,68 @@ void EntityEditor::SetMode(int mode) {
     _curImpl = _impl[_mode].Raw();
 }
 
+void EntityEditor::SetModifyGlobalSelection(bool modify) {
+    if(_modifyGlobalSelection = modify) {
+        W::world.ClearSelection();
+        W::Entity* ent = FirstSelectedEntity();
+        while(ent) {
+            W::world.Select_Add(ent);
+            ent = NextSelectedEntity(ent);
+        }
+    }
+}
+
 void EntityEditor::Open() {
     UpdateGizmo();
 }
 
 void EntityEditor::Close() {
     SetGizmoVisibility(false);
+}
+
+void EntityEditor::CopyGlobalSelection() {
+    // check if global selection is equal to editor selection
+    W::Entity *self = FirstSelectedEntity(), *other = W::world.FirstSelectedEntity();
+    while(self == other && self) {
+        self = NextSelectedEntity(self);
+        other = W::world.NextSelectedEntity(other);
+    }
+    if(self == other) return; // nothing to do
+
+    // mirror selection
+    _modifyGlobalSelection = false;
+    ClearSelection();
+    W::Entity* ent = W::world.FirstSelectedEntity();
+    while(ent) {
+        SelectEntity_Add(ent);
+        ent = W::world.NextSelectedEntity(ent);
+    }
+    _modifyGlobalSelection = true;
+    UpdateGizmo();
+}
+
+M::Vector3 EntityEditor::GlobalCenterOfSelection() {
+    // TODO: cache this
+    int numSelected = 0;
+    M::Vector3 center = M::Vector3::Zero;
+    W::Entity* ent = _selected;
+    while(ent) {
+        center += ent->GetGlobalCenter();
+        numSelected++;
+        ent = _entData[ent->GetID()].nextSelected;
+    }
+    center /= numSelected;
+    return center;
+}
+
+W::Entity* EntityEditor::FirstSelectedEntity() {
+    return _selected;
+}
+
+W::Entity* EntityEditor::NextSelectedEntity(const W::Entity* ent) {
+    COM_assert(ent);
+    COM_assert(IsSelected(ent));
+    return _entData[ent->GetID()].nextSelected;
 }
 
 } // namespace NB

@@ -11,3 +11,4 @@ extern EV::ConcreteEventDef<EV::Event>              ev_w_rebuildAll;
 extern EV::ConcreteEventDef<EV::Event>              ev_w_selectionChanged;
 extern EV::ConcreteEventDef<EV::Event>              ev_w_cameraChanged;
 extern EV::ConcreteEventDef<EV::Arg<int> >          ev_w_editModeChanged;
+extern EV::ConcreteEventDef<EV::Event>              ev_w_meshChanged;

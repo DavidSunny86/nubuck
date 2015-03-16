@@ -6,6 +6,11 @@
 
 namespace NB {
 
+/*
+TODO:
+- cache bounding boxes
+*/
+
 class EntityEditor : public Editor {
 private:
     struct ModeImpl {
@@ -38,8 +43,37 @@ private:
     GEN::Pointer<ModeImpl>  _impl[2];
     ModeImpl*               _curImpl;
 
+    struct BBox {
+        W::ENT_Geometry*    geom;
+        leda::node          verts[8];
+
+        BBox() : geom(NULL) { }
+
+        void Init();
+        void Update(W::Entity* ent);
+        void Destroy();
+    };
+
+    struct EntityData {
+        bool        isSelected;
+        BBox        bbox;
+        W::Entity*  nextSelected;
+
+        EntityData() : isSelected(false), nextSelected(NULL) { }
+    };
+
+    std::vector<EntityData> _entData; // indexed with entity IDs
+    W::Entity*              _selected;
+
     int _allowedModeFlags;
     int _mode;
+
+    bool _modifyGlobalSelection;
+
+    bool IsSelected(const W::Entity* ent) const;
+
+    void ClearSelection();
+    void SelectEntity_Add(W::Entity* ent);
 
     void UpdateGizmo();
 
@@ -55,8 +89,16 @@ public:
     void SetAllowedModeFlags(int flags);
     void SetMode(int mode);
 
+    void SetModifyGlobalSelection(bool modify);
+
     void Open();
     void Close();
+
+    void CopyGlobalSelection();
+
+    M::Vector3  GlobalCenterOfSelection();
+    W::Entity*  FirstSelectedEntity();
+    W::Entity*  NextSelectedEntity(const W::Entity* ent);
 };
 
 } // namespace NB

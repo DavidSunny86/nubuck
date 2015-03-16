@@ -98,22 +98,6 @@ namespace W {
         void Grid_Build();
         void Grid_GetRenderJobs(std::vector<R::MeshJob>& rjobs);
 
-        struct BoundingBox {
-            const Entity*   entity;
-            R::meshPtr_t    mesh;
-            R::tfmeshPtr_t  tfmesh;
-
-            void Destroy();
-
-            BoundingBox() : entity(NULL), mesh(NULL), tfmesh(NULL) { }
-            BoundingBox(const Entity* entity);
-            ~BoundingBox() { Destroy(); }
-            void Transform();
-        };
-        std::vector<GEN::Pointer<BoundingBox> > _bboxes;
-        void                        BBoxes_BuildFromSelection();
-        void                        BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs);
-
         EditMode _editMode;
 
         typedef bool (*entityFilter_t)(const Entity& ent);
@@ -124,7 +108,6 @@ namespace W {
         void Event_Apocalypse(const EV::Event& event);
         void Event_LinkEntity(const EV::Arg<Entity*>& event);
         void Event_DestroyEntity(const EV::Arg<unsigned>& event);
-        void Event_SelectionChanged(const EV::Event& event);
         void Event_RebuildAll(const EV::Event& event);
         void Event_Resize(const EV::ResizeEvent& event);
         void Event_Mouse(const EV::MouseEvent& event);

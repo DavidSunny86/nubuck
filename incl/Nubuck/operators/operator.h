@@ -70,6 +70,7 @@ public:
     virtual void OnEditModeChanged(const W::editMode_t::Enum mode) { }
     virtual void OnMouse(const EV::MouseEvent& mouseEvent) { }
     virtual void OnKey(const EV::KeyEvent& keyEvent) { }
+    virtual void OnMeshChanged(const EV::Event& event) { }
 };
 
 NUBUCK_API void SendToOperator(const EV::Event& event);

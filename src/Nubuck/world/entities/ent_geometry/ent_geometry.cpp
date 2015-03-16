@@ -282,6 +282,12 @@ ENT_Geometry::ENT_Geometry()
     AddEventHandler(ev_geom_edgeShadingChanged, this, &ENT_Geometry::Event_EdgeShadingChanged);
 }
 
+int GetUpdateState(const leda::nb::RatPolyMesh& mesh);
+
+bool ENT_Geometry::IsDirty() const {
+    return GetUpdateState(_ratPolyMesh);
+}
+
 bool ENT_Geometry::TraceVertices(const M::Ray& ray, float radius, std::vector<VertexHit>& hits) {
     SYS::ScopedLock lock(_mtx);
     hits.clear();

@@ -3,6 +3,7 @@
 #include <Nubuck\events\core_events.h>
 #include <Nubuck\animation\animator.h>
 #include <Nubuck\operators\operator.h>
+#include <world\world_events.h>
 #include "operator_driver.h"
 #include "operators.h"
 
@@ -25,6 +26,7 @@ OperatorPanel::OperatorPanel() : _widget(NULL) {
 Operator::Operator() : _panel(NULL) {
     AddEventHandler(ev_mouse, this, &Operator::OnMouse);
     AddEventHandler(ev_key, this, &Operator::OnKey);
+    AddEventHandler(ev_w_meshChanged, this, &Operator::OnMeshChanged);
 }
 
 NUBUCK_API void WaitForAnimations() {
