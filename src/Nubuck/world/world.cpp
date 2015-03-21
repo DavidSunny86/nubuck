@@ -103,11 +103,17 @@ void World::Selection::_Clear() {
 }
 
 void World::Selection::_Select(Entity* ent) {
-    ent->selectionLink.prev = NULL;
-    ent->selectionLink.next = head;
-    if(head) head->selectionLink.prev = ent;
-    head = ent;
-
+    // append ent to selection list
+    Entity* prev = NULL;
+    Entity** tail = &head;
+    while(*tail) {
+        COM_assert((*tail)->IsSelected());
+        prev = *tail;
+        tail = &(*tail)->selectionLink.next;
+    }
+    *tail = ent;
+    ent->selectionLink.prev = prev;
+    ent->selectionLink.next = NULL;
     ent->Select();
 }
 
@@ -306,10 +312,6 @@ void World::Event_DestroyEntity(const EV::Arg<unsigned>& event) {
 	event.Signal();
 }
 
-void World::Event_SelectionChanged(const EV::Event&) {
-    // bboxes get updated in Update()
-}
-
 void World::Event_RebuildAll(const EV::Event& event) {
     RebuildAll();
     event.Signal();
@@ -400,58 +402,6 @@ void World::Grid_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
     rjobs.push_back(meshJob);
 }
 
-void World::BoundingBox::Destroy() {
-    if(mesh) {
-        R::meshMgr.Destroy(mesh);
-        mesh = NULL;
-    }
-    if(tfmesh) {
-        R::meshMgr.Destroy(tfmesh);
-        tfmesh = NULL;
-    }
-}
-
-World::BoundingBox::BoundingBox(const Entity* entity) : entity(entity) {
-    const M::Vector3 vf = 0.5f * M::Vector3(1.0f, 1.0f, 1.0f);
-    M::Box bbox = entity->GetBoundingBox();
-    bbox.min -= vf;
-    bbox.max += vf;
-    WireframeBox meshDesc(bbox);
-    mesh = R::meshMgr.Create(meshDesc.GetDesc());
-    tfmesh = R::meshMgr.Create(mesh);
-    Transform();
-}
-
-void World::BoundingBox::Transform() {
-    R::meshMgr.GetMesh(tfmesh).SetTransform(entity->GetObjectToWorldMatrix());
-}
-
-void World::BBoxes_BuildFromSelection() {
-    _bboxes.clear();
-    Entity* ent = _selection.Head();
-    while(ent) {
-        _bboxes.push_back(GEN::MakePtr(new BoundingBox(ent)));
-        ent = ent->selectionLink.next;
-    }
-}
-
-void World::BBoxes_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
-    R::MeshJob rjob;
-    rjob.fx         = "Unlit";
-    rjob.material   = R::Material::White;
-    rjob.primType   = 0;
-    for(unsigned i = 0; i < _bboxes.size(); ++i) {
-        _bboxes[i]->Transform();
-        rjob.tfmesh = _bboxes[i]->tfmesh;
-
-        rjob.layer  = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
-        rjobs.push_back(rjob);
-
-        rjob.layer  = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
-        rjobs.push_back(rjob);
-    }
-}
-
 World::World(void) : _camArcball(800, 400) /* init values arbitrary */
 {
     SetDefaultLights();
@@ -479,7 +429,6 @@ void World::Init() {
     AddEventHandler(ev_w_apocalypse,           this, &World::Event_Apocalypse);
     AddEventHandler(ev_w_linkEntity,           this, &World::Event_LinkEntity);
     AddEventHandler(ev_w_destroyEntity,        this, &World::Event_DestroyEntity);
-    AddEventHandler(ev_w_selectionChanged,     this, &World::Event_SelectionChanged);
     AddEventHandler(ev_w_rebuildAll,           this, &World::Event_RebuildAll);
     AddEventHandler(ev_resize,               this, &World::Event_Resize);
     AddEventHandler(ev_mouse,                this, &World::Event_Mouse);
@@ -582,10 +531,6 @@ void World::Update(void) {
         } else entIdx++;
     }
 
-    // it's important to build the bboxes after dead entities have been destroyed,
-    // so that bboxes don't have dangling pointers
-    BBoxes_BuildFromSelection();
-
     for(unsigned i = 0; i < _entities.size(); ++i) {
         GEN::Pointer<Entity> entity = _entities[i];
         if(EntityType::ENT_GEOMETRY == entity->GetType()) {
@@ -623,9 +568,6 @@ void World::Render(R::RenderList& renderList) {
     renderList.zoom = _camArcball.GetZoom();
     renderList.worldMat = _camArcball.GetWorldToEyeMatrix();
 
-    if(g_showRenderViewControls) {
-        BBoxes_GetRenderJobs(renderList.meshJobs);
-    }
     if(cvar_w_showGrid) Grid_GetRenderJobs(renderList.meshJobs);
 
     SYS::ScopedLock lockEntities(_entitiesMtx);

@@ -113,6 +113,8 @@ public:
 
     DECL_HANDLE_EVENTS(ENT_Geometry);
 
+    bool IsDirty() const;
+
     struct VertexHit {
         leda::node  vert;
         float       dist;

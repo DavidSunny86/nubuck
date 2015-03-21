@@ -20,6 +20,8 @@ private:
 
     void SetOperator(Operator* op, bool force);
 
+    void RebuildMeshes();
+
     void Event_SetOperator(const EV::Args2<Operator*, bool>& event);
 
     void Event_UsrSelectEntity(const EV::Usr_SelectEntity& event);

@@ -59,7 +59,7 @@ RandomPointsPanel::RandomPointsPanel(QWidget* parent) : SimplePanel(parent) {
 
     AddVerticalSpace(20);
 
-    _cbSave = AddCheckBox("save as last_cloud.geom");
+    _cbSave = AddCheckBox("write to file");
     _cbSave->setChecked(true);
     QObject::connect(_cbSave, SIGNAL(toggled(bool)), this, SLOT(OnArgsChanged(bool)));
 }
@@ -192,6 +192,8 @@ void RandomPoints::UpdateCloud(Domain::Enum domain, int size, int radius) {
         mesh.set_position(mesh.new_node(), L[it]);
     }
     NB::SelectMesh(NB::SM_NEW, _cloud);
+
+    W::SaveGeometryToFile("last_cloud.geom", _cloudCopy);
 }
 
 void RandomPoints::Event_Update(const RandomPointsUpdate& event) {
@@ -277,7 +279,7 @@ void RandomPoints::Finish() {
     _hull->Destroy();
 
     if(_lastSave) {
-        W::SaveGeometryToFile("last_cloud.geom", _cloudCopy);
+        W::SaveGeometryToFile("last_saved_cloud.geom", _cloudCopy);
     }
 
     _cloudCopy->Destroy();

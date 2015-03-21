@@ -256,6 +256,14 @@ NUBUCK_API void ShowMeshVertexLabels(Mesh mesh, bool show) {
     mesh->Send(ev_geom_showVertexLabels.Tag(show));
 }
 
+NUBUCK_API unsigned GetMeshID(Mesh mesh) {
+    return mesh->GetID();
+}
+
+NUBUCK_API bool IsMeshDirty(Mesh mesh) {
+    return mesh->IsDirty();
+}
+
 NUBUCK_API const M::Vector2& GetTextContentSize(Text obj) {
     return obj->GetContentSize();
 }

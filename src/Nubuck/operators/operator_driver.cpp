@@ -14,6 +14,14 @@ inline void SignalCompletion() {
     g_operators.Send(ev_op_actionFinished.Tag());
 }
 
+static int DispatchSingleEvent(Operator* op, const EV::Event& event) {
+    COM_assert(event.ret && 0 == *event.ret);
+    op->Send(event);
+    const int numDispatched = op->HandleEvents();
+    COM_assert(1 == numDispatched);
+    return *event.ret;
+}
+
 void Driver::SetOperator(Operator* op, bool force) {
     if(_activeOp == op) return;
 
@@ -34,6 +42,18 @@ void Driver::SetOperator(Operator* op, bool force) {
         EV::Args2<Operator*, bool> event(op, force);
         g_operators.SendAndWait(ev_op_setOperator.Tag(event));
     }
+}
+
+void Driver::RebuildMeshes() {
+    // let non-active operators react to modified meshes
+    EV::Event event = ev_w_meshChanged.Tag();
+    int accepted = 0;
+    event.SetReturnPointer(&accepted);
+    if(_activeOp != _defaultOp) {
+        DispatchSingleEvent(_defaultOp, event);
+    }
+
+    W::world.SendAndWait(ev_w_rebuildAll.Tag());
 }
 
 void Driver::Event_SetOperator(const EV::Args2<Operator*, bool>& event) {
@@ -70,14 +90,6 @@ void Driver::Event_Key(const EV::KeyEvent& event) {
     Event_Fallthrough(event);
 }
 
-static int DispatchSingleEvent(Operator* op, const EV::Event& event) {
-    COM_assert(event.ret && 0 == *event.ret);
-    op->Send(event);
-    const int numDispatched = op->HandleEvents();
-    COM_assert(1 == numDispatched);
-    return *event.ret;
-}
-
 void Driver::Event_Fallthrough(const EV::Event& event) {
     int accepted = 0;
     event.SetReturnPointer(&accepted);
@@ -97,7 +109,7 @@ void Driver::Event_Fallthrough(const EV::Event& event) {
             W::world.Send(event);
         }
     }
-    W::world.SendAndWait(ev_w_rebuildAll.Tag());
+    RebuildMeshes();
     SignalCompletion();
 }
 

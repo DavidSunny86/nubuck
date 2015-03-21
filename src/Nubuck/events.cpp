@@ -29,6 +29,7 @@ EV::ConcreteEventDef<EV::Event>              ev_w_rebuildAll;
 EV::ConcreteEventDef<EV::Event>              ev_w_selectionChanged;
 EV::ConcreteEventDef<EV::Event>              ev_w_cameraChanged;
 EV::ConcreteEventDef<EV::Arg<int> >          ev_w_editModeChanged;
+EV::ConcreteEventDef<EV::Event>              ev_w_meshChanged;
 
 // outliner events
 EV::ConcreteEventDef<EV::Arg<outlinerItem_t> >               ev_outl_createView;

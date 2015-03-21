@@ -8,8 +8,9 @@
 using namespace leda;
 using namespace NB;
 
-typedef leda::rat_point             point2_t;
-typedef leda::GRAPH<point2_t, int>  graph2_t;
+typedef leda::rat_point                                 point2_t;
+typedef leda::GRAPH<point2_t, int>                      graph2_t;
+typedef leda::GRAPH<leda::rat_circle, leda::rat_point>  voronoiGraph_t;
 
 namespace OP {
 
@@ -49,15 +50,30 @@ static leda::list<point2_t> ToPointList2(const NB::Graph& G) {
     return L;
 }
 
-template<typename IN_ETYPE, typename OUT_ETYPE>
-static void FromProjection(const leda::GRAPH<leda::rat_point, IN_ETYPE>& in, leda::GRAPH<leda::d3_rat_point, OUT_ETYPE>& out, leda::edge_array<leda::edge>& emap) {
+template<typename IN_VDATA, typename IN_EDATA>
+static leda::d3_rat_point EmbeddedPosition(const leda::GRAPH<IN_VDATA, IN_EDATA>& in, const leda::node v) {
+    return leda::d3_rat_point(in[v].xcoord(), in[v].ycoord(), 0);
+}
+
+static leda::d3_rat_point EmbeddedPosition(const voronoiGraph_t& VD, const leda::node v) {
+    COM_assert(!VD[v].is_line());
+    const point2_t c = VD[v].center();
+    return leda::d3_rat_point(c.xcoord(), c.ycoord(), 0);
+}
+
+template<typename IN_VDATA, typename IN_EDATA>
+static void FromProjection(
+    const leda::GRAPH<IN_VDATA, IN_EDATA>& in,
+    leda::GRAPH<leda::d3_rat_point, int>& out,
+    leda::edge_array<leda::edge>& emap)
+{
     leda::node_array<leda::node>  nmap(in, NULL);
     emap.init(in, NULL);
 
     leda::node n;
     forall_nodes(n, in) {
         nmap[n] = out.new_node();
-        out[nmap[n]] = leda::d3_rat_point(in[n].xcoord(), in[n].ycoord(), 0);
+        out[nmap[n]] = EmbeddedPosition(in, n);
     }
 
     leda::edge_map<bool> visited;
@@ -249,11 +265,15 @@ static void Triangulate(const leda::GRAPH<leda::rat_point, leda::rat_segment>& i
     assert(leda::Is_Triangulation(out));
 }
 
-static void F(const leda::GRAPH<leda::rat_circle, point2_t>& VD, leda::GRAPH<leda::rat_point, int>& TRI, NB::Graph& G, leda::edge_map<leda::edge>& map) {
+static const leda::rational inf = 10;
+
+static void CreateBoundedSegmentation(
+    const leda::GRAPH<leda::rat_circle, point2_t>& VD, 
+    leda::GRAPH<leda::rat_point, leda::rat_segment>& G2)
+{
     leda::list<leda::rat_segment> S0;
     leda::list<leda::rat_segment> S1;
 
-    leda::rational inf = 500;
     leda::edge_array<bool> drawn(VD, false);
 
     leda::edge e;
@@ -294,7 +314,7 @@ static void F(const leda::GRAPH<leda::rat_circle, point2_t>& VD, leda::GRAPH<led
     S1.push_back(leda::rat_segment(v2, v3));
     S1.push_back(leda::rat_segment(v3, v0));
 
-    leda::GRAPH<leda::rat_point, leda::rat_segment> G2;
+    G2.clear();
     leda::SEGMENT_INTERSECTION(S0, S1, G2, true);
 
     leda::list<leda::node> del;
@@ -304,28 +324,239 @@ static void F(const leda::GRAPH<leda::rat_circle, point2_t>& VD, leda::GRAPH<led
             del.push_back(n);
     }
     forall(n, del) G2.del_node(n);
+}
 
-    TRI.clear();
+static void Voronoi2D(const NB::Graph& in, NB::Graph& out) {
+    leda::edge_map<leda::edge> map;
+
+    leda::list<point2_t> L(ToPointList2(in));
+    L.unique();
+
+    leda::GRAPH<leda::rat_circle, point2_t> VD;
+    leda::VORONOI(L, VD);
+
+    leda::GRAPH<leda::rat_point, leda::rat_segment> G2;
+    CreateBoundedSegmentation(VD, G2);
+
+    leda::GRAPH<leda::rat_point, int> TRI;
     Triangulate(G2, TRI, map);
 
-    // -----
     leda::edge_array<leda::edge> emap;
-    FromProjection(G2, G, emap);
+    out.clear();
+    FromProjection(G2, out, emap);
     
+    leda::edge e;
     forall_edges(e, TRI) {
         leda::edge inf = map[e];
         map[e] = emap[inf];
     }
 }
 
-static void Voronoi2D(const NB::Graph& in, leda::GRAPH<leda::rat_point, int>& TRI, NB::Graph& out, leda::edge_map<leda::edge>& map) {
+static leda::edge NextDanglingEdge(const voronoiGraph_t& VD, const leda::edge e, const leda::edge de0) {
+    leda::edge it = VD.face_cycle_succ(e);
+    while(de0 != it && 1 != VD.outdeg(VD.target(it))) {
+        it = VD.face_cycle_succ(it);
+    }
+    return it;
+}
+
+// TODO:
+// -seg-box intersection of segments with no interior endpoints
+// -special cases: interior contains no segments, no interior points
+static leda::edge Voronoi2D_BruteForce(const NB::Graph& in, NB::Graph& out) {
+    typedef leda::rat_segment   seg_t;
+    typedef leda::rat_ray       ray_t;
+    typedef leda::rat_circle    circle_t;
+
+    const point2_t boxVerts[] = {
+        point2_t(-inf, -inf),
+        point2_t(-inf,  inf),
+        point2_t( inf,  inf),
+        point2_t( inf, -inf)
+    };
+
+    const leda::rat_segment boxSegs[] = {
+        seg_t(boxVerts[0], boxVerts[1]),
+        seg_t(boxVerts[1], boxVerts[2]),
+        seg_t(boxVerts[2], boxVerts[3]),
+        seg_t(boxVerts[3], boxVerts[0])
+    };
+
+    leda::rat_rectangle box(boxVerts[0], boxVerts[2]);
+
     leda::list<point2_t> L(ToPointList2(in));
     L.unique();
-    leda::GRAPH<leda::rat_circle, point2_t> VD;
+
+    voronoiGraph_t VD;
     leda::VORONOI(L, VD);
-    TRI.clear();
+
+    leda::node_array<bool> inBox(VD, false);
+    leda::list<leda::node> outside;
+    leda::edge_array<bool> visited(VD, false);
+
+    leda::node v;
+    leda::node w;
+
+    forall_nodes(v, VD) {
+        if(!VD[v].is_line() && box.inside_or_contains(VD[v].center())) {
+            inBox[v] = true;
+        } else outside.push(v);
+    }
+
+    leda::edge de0 = NULL;
+
+    unsigned numEdges = VD.number_of_edges();
+
+    leda::edge e = VD.first_edge();
+    unsigned i = 0;
+    while(i < numEdges) {
+        v = VD.source(e);
+        w = VD.target(e);
+        if(!visited[e] && inBox[v] && !inBox[w]) {
+            // edge intersects box, clip
+
+            if(VD[w].is_line()) {
+                // w at infinity, intersect box with ray.
+                // NOTE that we cannot test 1 == outdeg(v),
+                // because we move edges.
+                // However, rat_circle::is_line() is cheap.
+
+                leda::rat_vector perp = VD[w].point3() - VD[w].point1();
+                leda::rat_ray ray(VD[v].center(), perp.rotate90());
+
+                leda::rat_point isect;
+                bool isIntersecting = false;
+                for(int i = 0; i < 4; ++i) {
+                    if(ray.intersection(boxSegs[i], isect)) {
+                        isIntersecting = true;
+                        break;
+                    }
+                }
+                assert(isIntersecting);
+
+                VD[w] = leda::rat_circle(isect);
+                inBox[w] = true;
+
+                // an unbounded edge is part of the back face
+                de0 = e;
+            } else {
+                // w is proper node, intersect box with segment
+
+                leda::rat_segment seg(VD[v].center(), VD[w].center());
+
+                leda::rat_point isect;
+                bool isIntersecting = false;
+                for(int i = 0; i < 4; ++i) {
+                    if(seg.intersection(boxSegs[i], isect)) {
+                        isIntersecting = true;
+                        break;
+                    }
+                }
+                assert(isIntersecting);
+
+                leda::node u = VD.new_node();
+                VD[u] = leda::rat_circle(isect);
+
+                leda::edge r = VD.reversal(e);
+
+                // NOTE: essentially sets target vertex,
+                // does not change order of e in edge list of v
+                VD.move_edge(e, v, u);
+
+                VD.move_edge(r, u, v);
+            }
+
+            visited[e] = visited[VD.reversal(e)] = true;
+        }
+
+        e = VD.succ_edge(e);
+        i++;
+    }
+    assert(de0);
+
+    forall(v, outside) {
+        if(!inBox[v]) VD.del_node(v);
+    }
+
+    // find start idx
+    unsigned hand = 3;
+    for(int i = 2; i >= 0; --i) {
+        if(leda::left_turn(VD[VD.target(de0)].center(), boxVerts[hand], boxVerts[i]))
+            hand = i;
+    }
+    std::cout << "starting hand = " << hand << std::endl;
+
+    // connect
+
+    leda::edge_map<int> mask(VD, 0);
+    leda::edge it = de0;
+    do {
+        mask[it] = 1;
+        it = VD.face_cycle_succ(it);
+    } while(it != de0);
+    mask[de0] = 2;
+
+    leda::edge last_de = de0;
+    it = NextDanglingEdge(VD, de0, NULL);
+    while(de0 != it) {
+        leda::edge next = NextDanglingEdge(VD, it, de0);
+
+        leda::edge last_e = last_de;
+
+        // connect box vertices
+        while(leda::left_turn(VD[VD.target(last_de)].center(), VD[VD.target(it)].center(), boxVerts[hand]))
+        {
+            leda::node u = VD.new_node();
+            VD[u] = circle_t(boxVerts[hand]);
+
+            e = VD.new_edge(u, VD.target(last_e));
+            leda::edge r = VD.new_edge(VD.reversal(last_e), u, leda::behind);
+            VD.set_reversal(e, r);
+
+            last_e = r;
+
+            hand = (hand + 1) % 4;
+        }
+
+        e = VD.new_edge(VD.reversal(it), VD.target(last_e), leda::before);
+        leda::edge r = VD.new_edge(VD.reversal(last_e), VD.target(it), leda::behind);
+        VD.set_reversal(e, r);
+
+        last_de = it;
+        it = next;
+    }
+
+    leda::edge last_e = last_de;
+
+    // connect box vertices
+    while(leda::left_turn(VD[VD.target(last_de)].center(), VD[VD.target(it)].center(), boxVerts[hand]))
+    {
+        leda::node u = VD.new_node();
+        VD[u] = circle_t(boxVerts[hand]);
+
+        e = VD.new_edge(u, VD.target(last_e));
+        leda::edge r = VD.new_edge(VD.reversal(last_e), u, leda::behind);
+        VD.set_reversal(e, r);
+
+        last_e = r;
+
+        hand = (hand + 1) % 4;
+    }
+
+    e = VD.new_edge(VD.reversal(it), VD.target(last_e), leda::before);
+    leda::edge r = VD.new_edge(VD.reversal(last_e), VD.target(it), leda::behind);
+    VD.set_reversal(e, r);
+
+    leda::edge_array<leda::edge> emap;
     out.clear();
-    F(VD, TRI, out, map);
+    FromProjection(VD, out, emap);
+
+    forall_edges(e, VD) {
+        if(1 == mask[e]) out.set_color(emap[e], R::Color::Red);
+        else if(2 == mask[e]) out.set_color(emap[e], R::Color::Blue);
+    }
+
+    return r;
 }
 
 void VDH_Operator::Register(Invoker& invoker) {
@@ -336,27 +567,41 @@ static Point3 ProjectXY(const Point3& p) {
     return Point3(p.xcoord(), p.ycoord(), 0);
 }
 
+static leda::d3_rat_point ProjectOnParaboloid(const leda::d3_rat_point& p) {
+    const leda::rational z = p.xcoord() * p.xcoord() + p.ycoord() * p.ycoord();
+    return leda::d3_rat_point(p.xcoord(), p.ycoord(), z);
+}
+
 // assumes z(p0) = z(p1) = z(p2) = 0
 static bool IsFrontFace(Graph& G, face f) {
     edge e = G.first_face_edge(f);
     Point3 p0 = G.position_of(source(e));
     Point3 p1 = G.position_of(target(e));
-    Point3 p2 = G.position_of(target(G.face_cycle_succ(e)));
+
+    edge it = G.face_cycle_succ(e);
+    while(collinear(p0, p1, G.position_of(target(it))))
+        it = G.face_cycle_succ(it);
+
+    Point3 p2 = G.position_of(target(it));
+
     return 0 < orientation(p0, p1, p2, Point3(0, 0, 1));
 }
 
 void VDH_Operator::ApplyVoronoiColors() {
-    const NB::Graph& verticesGraph = NB::GetGraph(_verticesMesh);
-    NB::Graph& voronoiGraph = NB::GetGraph(_voronoiMesh);
+    // ...
+}
+
+static void ConvexHull3D(const NB::Graph& verticesGraph, NB::Graph& hullGraph) {
+    leda::list<leda::d3_rat_point> L;
 
     leda::node v;
     forall_nodes(v, verticesGraph) {
-        point2_t p(verticesGraph.position_of(v).xcoord(), verticesGraph.position_of(v).ycoord());
-        leda::edge ft = leda::LOCATE_IN_TRIANGULATION(_voronoiTriang, p);
-        leda::face f = voronoiGraph.face_of(_voronoiMap[ft]);
-        R::Color c = _vertexColors[v];
-        voronoiGraph.set_color(f, c);
+        L.push(ProjectOnParaboloid(verticesGraph.position_of(v)));
     }
+
+    hullGraph.clear();
+    leda::CONVEX_HULL(L, hullGraph);
+    hullGraph.compute_faces();
 }
 
 void VDH_Operator::Update() {
@@ -366,15 +611,22 @@ void VDH_Operator::Update() {
 
     NB::Graph& voronoiGraph = NB::GetGraph(_voronoiMesh);
 
-    Voronoi2D(verticesGraph, _voronoiTriang, NB::GetGraph(_voronoiMesh), _voronoiMap);
+    // Voronoi2D(verticesGraph, NB::GetGraph(_voronoiMesh));
+    leda::edge r = Voronoi2D_BruteForce(verticesGraph, NB::GetGraph(_voronoiMesh));
     voronoiGraph.compute_faces();
 
     leda::face f;
     forall_faces(f, voronoiGraph) {
         if(!IsFrontFace(voronoiGraph, f)) voronoiGraph.set_visible(f, false);
     }
+    /*
+    voronoiGraph.set_visible(voronoiGraph.face_of(r), false);
+    printf("IsFrontFace = %d\n", IsFrontFace(voronoiGraph, voronoiGraph.face_of(r)));
+    */
 
     ApplyVoronoiColors();
+
+    ConvexHull3D(verticesGraph, NB::GetGraph(_hullMesh));
 }
 
 static float RandFloat(float min, float max) {
@@ -498,6 +750,12 @@ bool VDH_Operator::Invoke() {
     _voronoiMesh = NB::CreateMesh();
     NB::SetMeshName(_voronoiMesh, "Voronoi Diagram");
     NB::SetMeshRenderMode(_voronoiMesh, NB::RM_ALL);
+
+    // create mesh for convex hull
+    _hullMesh = NB::CreateMesh();
+    NB::SetMeshName(_hullMesh, "Convex Hull");
+    NB::SetMeshRenderMode(_hullMesh, NB::RM_ALL);
+    NB::SetMeshPosition(_hullMesh, M::Vector3(0.0f, 0.0f, 2.0f));
 
     _vertexEditor.SetAxisFlags(NB::AF_X | NB::AF_Y);
     _vertexEditor.Open(_verticesMesh);
