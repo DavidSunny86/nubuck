@@ -27,5 +27,11 @@ void main() {
     vPosition = aPosition;
     vNormal = aNormal;
     vColor = aColor;
-    gl_Position = vPosition;
+
+    /*
+    set z = 1 - eps, w = 1, so that z/w \approx 1 and vertex maps
+    to far clipping plane in NDC for proper depth tests.
+    note that z = 1 - eps \neq 1 to account for floating point errors.
+    */
+    gl_Position = vec4(vPosition.xy, 0.99999, 1.0);
 }

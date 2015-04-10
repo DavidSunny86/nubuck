@@ -123,7 +123,19 @@ static void Subdiv(unsigned subdiv, std::vector<Mesh::Vertex>& vertices, std::ve
     }
 }
 
-Mesh::Mesh(const Desc& desc) : _invalidate(false), _gbHandle(GB_INVALID_HANDLE) {
+void Mesh::ComputeCenter() {
+    _center = M::Vector3::Zero;
+    for(unsigned i = 0; i < _vertices.size(); ++i) {
+        _center += _vertices[i].position;
+    }
+    _center /= _vertices.size();
+}
+
+Mesh::Mesh(const Desc& desc)
+    : _center(M::Vector3::Zero)
+    , _invalidate(false)
+    , _gbHandle(GB_INVALID_HANDLE)
+{
     _vertices.resize(desc.numVertices);
     _indices.resize(desc.numIndices);
 
@@ -131,10 +143,16 @@ Mesh::Mesh(const Desc& desc) : _invalidate(false), _gbHandle(GB_INVALID_HANDLE) 
     memcpy(&_indices[0], desc.indices, sizeof(Index) * desc.numIndices);
 
     _primType = desc.primType;
+
+    ComputeCenter();
 }
 
 Mesh::~Mesh() {
     if(GB_INVALID_HANDLE != _gbHandle) GB_FreeMemItem(_gbHandle);
+}
+
+const M::Vector3 Mesh::GetLocalCenter() const {
+    return _center;
 }
 
 bool Mesh::IsCached() const {
@@ -174,6 +192,7 @@ void Mesh::Invalidate(Mesh::Vertex* const vertices) {
     SYS::ScopedLock lock(_mtx);
     memcpy(&_vertices[0], vertices, sizeof(Mesh::Vertex) * _vertices.size());
     _invalidate = true;
+    ComputeCenter();
 }
 
 void Mesh::Invalidate(Mesh::Vertex* const vertices, unsigned off, unsigned size) {
@@ -182,6 +201,7 @@ void Mesh::Invalidate(Mesh::Vertex* const vertices, unsigned off, unsigned size)
     memcpy(reinterpret_cast<char*>(&_vertices[0]) + off, reinterpret_cast<char*>(vertices) + off, size);
     if(GB_INVALID_HANDLE == _gbHandle) _invalidate = true;
     else GB_Invalidate(_gbHandle, off, size);
+    ComputeCenter();
 }
 
 void Mesh::Invalidate(Mesh::Index* const indices, unsigned numIndices) {

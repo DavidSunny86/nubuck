@@ -783,6 +783,20 @@ static bool CompareJobs(const R::MeshJob& lhp, const R::MeshJob& rhp) {
     return effectMgr.GetEffect(lhp.fx)->SortKey() < effectMgr.GetEffect(rhp.fx)->SortKey();
 }
 
+struct CompareMeshCentersFtor {
+    M::Matrix4 worldToEye;
+
+    float Dist(const TFMesh& tfmesh) const {
+        return M::Transform(worldToEye * tfmesh.GetTransform(), tfmesh.GetMesh().GetLocalCenter()).z;
+    }
+
+    bool operator()(const MeshJob& lhp, const MeshJob& rhp) {
+        return Dist(meshMgr.GetMesh(lhp.tfmesh)) < Dist(meshMgr.GetMesh(rhp.tfmesh));
+    }
+};
+
+static CompareMeshCentersFtor compareMeshCentersFtor;
+
 static void Link(std::vector<R::MeshJob>& renderJobs) {
     unsigned numJobs = renderJobs.size();
 	if(0 < numJobs) {
@@ -895,7 +909,9 @@ void Renderer::Render(
 
     if(!rjobs.empty()) {
         GB_Bind();
-        std::sort(rjobs.begin(), rjobs.end(), CompareJobs);
+        compareMeshCentersFtor.worldToEye = worldToEye;
+        std::sort(rjobs.begin(), rjobs.end(), compareMeshCentersFtor);
+        std::stable_sort(rjobs.begin(), rjobs.end(), CompareJobs);
         Link(rjobs);
         for(unsigned i = 0; i < rjobs.size(); ++i) {
             MeshJob& rjob = rjobs[i];

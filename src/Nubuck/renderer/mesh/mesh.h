@@ -65,6 +65,10 @@ private:
     std::vector<Index>  _offIndices;
     GLenum              _primType;
 
+    M::Vector3 _center;
+
+    void ComputeCenter();
+
     std::vector<TriIndices> _triangleIndices;
 
     bool     _invalidate;
@@ -72,6 +76,8 @@ private:
 public:
     Mesh(const Desc& desc); // deep copy
     ~Mesh();
+
+    const M::Vector3 GetLocalCenter() const;
 
     bool            IsCached() const;
 
