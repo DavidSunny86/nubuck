@@ -44,6 +44,7 @@ namespace UI {
         std::vector<R::PenVertex>   _pen;
         R::DebugText                _debugText;
 
+        bool _screenshotRequested;
         bool _largeScreenshotRequested;
 
         InputMode   _inputMode;

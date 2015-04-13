@@ -18,6 +18,12 @@
 
 #include <operators\operators.h> // !!!
 
+COM::Config::Variable<int> cvar_screenshot_width("screenshot_width", -1);
+COM::Config::Variable<int> cvar_screenshot_height("screenshot_height", -1);
+COM::Config::Variable<int> cvar_screenshot_keepAspect("screenshot_keepAspect", 0);
+COM::Config::Variable<int> cvar_screenshot_largeWidth("screenshot_largeWidth", 10000);
+COM::Config::Variable<int> cvar_screenshot_largeHeight("screenshot_largeHeight", 10000);
+
 namespace UI {
 
     // top-down gradient
@@ -169,7 +175,7 @@ namespace UI {
     void RenderView::keyPressEvent(QKeyEvent* qevent) {
         // screenshot
         if(Qt::Key_F12 == qevent->key() && !qevent->isAutoRepeat()) {
-            R::theRenderer.Screenshot();
+            _screenshotRequested = true;
             return;
         }
 
@@ -257,6 +263,7 @@ namespace UI {
         setFocusPolicy(Qt::StrongFocus);
         setMouseTracking(true);
 
+        _screenshotRequested = false;
         _largeScreenshotRequested = false;
     }
 
@@ -293,8 +300,37 @@ namespace UI {
         W::world.Render(_renderList);
         OP::g_operators.GetMeshJobs(_renderList.meshJobs);
 
+        if(_screenshotRequested) {
+            int width = cvar_screenshot_width;
+            if(0 > width) width = this->width();
+
+            int height = cvar_screenshot_height;
+            if(0 > height) height = this->height();
+
+            const bool keepAspect = cvar_screenshot_keepAspect;
+            if(keepAspect) {
+                const float aspect = (float)this->width() / this->height();
+                width = aspect * height;
+            }
+
+            printf("taking screenshot: size = %dx%d, keepAspect=%d\n",
+                width, height, keepAspect);
+            printf("... window width = %dx%d\n", this->width(), this->height());
+
+            R::theRenderer.Resize(width, height);
+
+            R::theRenderer.Screenshot();
+            R::theRenderer.BeginFrame();
+            R::theRenderer.Render(_renderList);
+            R::theRenderer.EndFrame(false);
+
+            R::theRenderer.Resize(this->width(), this->height());
+
+            _screenshotRequested = false;
+        }
+
         if(_largeScreenshotRequested) {
-            R::theRenderer.LargeScreenshot(10000, 10000, _renderList);
+            R::theRenderer.LargeScreenshot(cvar_screenshot_largeWidth, cvar_screenshot_largeHeight, _renderList);
             _largeScreenshotRequested = false;
         }
 
