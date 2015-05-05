@@ -13,6 +13,7 @@
 #include <UI\console\console.h>
 #include <UI\renderview\renderview.h>
 #include <UI\rendermetrics\rendermetrics.h>
+#include <UI\renderstats\renderstats.h>
 #include <UI\randompoints\randompoints.h>
 #include <UI\logwidget\logwidget.h>
 #include <UI\outliner\outliner.h>
@@ -120,6 +121,10 @@ namespace UI {
 
     void MainWindow::OnShowRenderConfig(void) {
         _renderConfig->show();
+    }
+
+    void MainWindow::OnShowRenderStats() {
+        RenderStats::Instance()->show();
     }
 
 	void MainWindow::OnLoadOperatorPlugin() {

@@ -20,6 +20,8 @@ private:
     M::Vector3      _lightDir;
     R::Color        _lightCol;
 
+    std::string     _renderContext;
+
     void SetupLights(R::RenderList& renderList);
 protected:
     void initializeGL() override;
@@ -40,6 +42,8 @@ public:
     const R::Color&     GetColor() const { return _lightCol; }
 
     void SetDirection(const M::Vector3& dir);
+
+    void SetRenderContext(const std::string& context);
 
     QSize sizeHint() const override;
 };

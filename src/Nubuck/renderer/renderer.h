@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <sstream>
 
 #include <Nubuck\generic\pointer.h>
 #include <common\config\config.h>
@@ -82,6 +83,10 @@ struct RenderList {
     }
 };
 
+struct LayerStats {
+    int numMeshJobs;
+};
+
 class Renderer {
 public:
     struct Layers {
@@ -124,6 +129,11 @@ private:
 
     Color _clearColor;
 
+    enum { STAT_I };
+
+    std::stringstream _frameStats;
+    std::stringstream& Log(int level) { return _frameStats; }
+
     void Render(
         const RenderList& renderList,
         const M::Matrix4& projection,
@@ -149,6 +159,8 @@ public:
     void Render(RenderList& renderList);
     void RenderPen(const std::vector<PenVertex>& verts);
     void EndFrame(bool present = true);
+
+    std::string GetFrameStats() const;
 
     void Screenshot() { _screenshotRequested = true; }
 

@@ -8,6 +8,7 @@
 #include <UI\outliner\outliner.h>
 #include <UI\penoptions\pen_options.h>
 #include <UI\userinterface.h>
+#include <UI\renderstats\renderstats.h>
 #include <world\world.h>
 #include <operators\operators.h>
 #include <renderer\metrics\metrics.h>
@@ -343,6 +344,9 @@ namespace UI {
         R::theRenderer.Render(_renderList);
         R::theRenderer.RenderPen(_pen);
         R::theRenderer.EndFrame();
+
+        std::string stats = R::theRenderer.GetFrameStats();
+        UI::RenderStats::Instance()->Update("renderview", stats);
 
         _debugText.BeginFrame();
         _debugText.Printf("frame time: %f\n", R::metrics.frame.time);

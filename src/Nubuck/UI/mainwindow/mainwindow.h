@@ -54,6 +54,7 @@ namespace UI {
         void OnShowConsole();
         void OnShowRenderMetrics(void);
         void OnShowRenderConfig(void);
+        void OnShowRenderStats();
         void OnLoadOperatorPlugin();
 
         void OnShowOperator();

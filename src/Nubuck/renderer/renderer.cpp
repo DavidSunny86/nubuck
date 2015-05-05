@@ -851,6 +851,10 @@ static void Clear(GLbitfield mask) {
 }
 
 void Renderer::BeginFrame() {
+    // reset stringstream
+    _frameStats.str("");
+    _frameStats.clear();
+
     float secsPassed = _timer.Stop();
     _time += secsPassed;
     _timer.Start();
@@ -892,10 +896,16 @@ void Renderer::EndFrame(bool present) {
     metrics.frame.time = frame_time.Stop();
     metrics.EndFrame();
 
+    Log(STAT_I) << "frame time = " << metrics.frame.time << std::endl;
+
     if(_screenshotRequested) {
         _screenshotRequested = false;
         colorbuffer->WriteTGA("screenshot.tga");
     }
+}
+
+std::string Renderer::GetFrameStats() const {
+    return _frameStats.str();
 }
 
 void Renderer::Render(
@@ -944,6 +954,7 @@ void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, Re
     M::Matrix4 worldToEye   = renderList.worldMat;
 
     if(!_renderLayers[Layers::GEOMETRY_0_SOLID_0].empty()) {
+        Log(STAT_I) << "rendering layer GEOMETRY_0_SOLID_0" << std::endl;
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_0]);
     }
 
@@ -951,6 +962,7 @@ void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, Re
     fb_spine0.fb->Bind();
     Clear(GL_DEPTH_BUFFER_BIT);
     if(!_renderLayers[Layers::GEOMETRY_0_SPINE_0].empty()) {
+        Log(STAT_I) << "rendering layer GEOMETRY_0_SPINE_0" << std::endl;
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SPINE_0]);
     }
     framebuffer->Bind();

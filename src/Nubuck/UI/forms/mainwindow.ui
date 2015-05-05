@@ -32,6 +32,7 @@
     </property>
     <addaction name="actShowRenderMetrics"/>
     <addaction name="actShowRenderConfig"/>
+    <addaction name="actShowRenderStats"/>
     <addaction name="separator"/>
     <addaction name="actShowPenOptions"/>
     <addaction name="actShowConsole"/>
@@ -104,6 +105,11 @@
   <action name="actShowPenOptions">
    <property name="text">
     <string>Pen Options</string>
+   </property>
+  </action>
+  <action name="actShowRenderStats">
+   <property name="text">
+    <string>Render Stats</string>
    </property>
   </action>
  </widget>
@@ -253,6 +259,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actShowRenderStats</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OnShowRenderStats()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>OnShowRenderMetrics()</slot>
@@ -264,5 +286,6 @@
   <slot>OnShowOutliner()</slot>
   <slot>OnShowLog()</slot>
   <slot>OnShowPenOptions()</slot>
+  <slot>OnShowRenderStats()</slot>
  </slots>
 </ui>

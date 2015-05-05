@@ -9,6 +9,7 @@
 #include <renderer\renderer.h>
 #include <renderer\mesh\sphere\sphere.h>
 #include <renderer\mesh\meshmgr.h>
+#include <UI\renderstats\renderstats.h>
 #include <UI\colorbutton\colorbutton.h>
 #include <UI\dirlight\dirlight.h>
 #include <world\world.h>
@@ -65,6 +66,9 @@ void DirLight::paintGL() {
     R::theRenderer.BeginFrame();
     R::theRenderer.Render(renderList);
     R::theRenderer.EndFrame();
+
+    std::string stats = R::theRenderer.GetFrameStats();
+    UI::RenderStats::Instance()->Update(_renderContext, stats);
 }
 
 void DirLight::mousePressEvent(QMouseEvent* event) {
@@ -111,6 +115,10 @@ void DirLight::SetDirection(const M::Vector3& dir) {
     emit SigDirectionChanged(_lightDir.x, _lightDir.y, _lightDir.z);
 }
 
+void DirLight::SetRenderContext(const std::string& context) {
+    _renderContext = context;
+}
+
 QSize DirLight::sizeHint() const {
     return QSize(100, 100);
 }
@@ -133,8 +141,15 @@ DirLightControls::DirLightControls(const int lightIdx) : _lightIdx(lightIdx) {
 
     QVBoxLayout* vbox = new QVBoxLayout;
 
+    std::string renderContexts[] = {
+        "DirLightControl 0",
+        "DirLightControl 1",
+        "DirLightControl 2"
+    };
+
     _dirLight = new DirLight;
     _dirLight->SetDirection(params.direction);
+    _dirLight->SetRenderContext(renderContexts[_lightIdx]);
 
     connect(_dirLight, SIGNAL(SigDirectionChanged(float, float, float)),
         this, SLOT(OnLightChanged()));
