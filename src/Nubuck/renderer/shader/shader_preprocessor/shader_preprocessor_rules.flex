@@ -34,22 +34,25 @@ INCL_PATH   (<|\").*(>|\")
 <IN_DIRECTIVE>.             { return R::SPP::Tokens::TOK_UNKNOWN; }
 
 "attribute"             { BEGIN(IN_VAR_DECL); return R::SPP::Tokens::TOK_ATTRIB; }
+"material"              { BEGIN(IN_VAR_DECL); return R::SPP::Tokens::TOK_MATERIAL_UFORM; }
+
 <IN_VAR_DECL>{WSPACE}   /* ignore whitespace */
 <IN_VAR_DECL>"("        { return R::SPP::Tokens::TOK_LPAREN; }
 <IN_VAR_DECL>")"        { return R::SPP::Tokens::TOK_RPAREN; }
 <IN_VAR_DECL>{INTEGER}  { return R::SPP::Tokens::TOK_INTEGER; }
 
-<IN_VAR_DECL>"bool"     { return R::SPP::Tokens::TOK_VAR_TYPE; }
-<IN_VAR_DECL>"int"      { return R::SPP::Tokens::TOK_VAR_TYPE; }
-<IN_VAR_DECL>"uint"     { return R::SPP::Tokens::TOK_VAR_TYPE; }
-<IN_VAR_DECL>"float"    { return R::SPP::Tokens::TOK_VAR_TYPE; }
-<IN_VAR_DECL>"double"   { return R::SPP::Tokens::TOK_VAR_TYPE; }
-<IN_VAR_DECL>"vec2"     { return R::SPP::Tokens::TOK_VAR_TYPE; }
-<IN_VAR_DECL>"vec3"     { return R::SPP::Tokens::TOK_VAR_TYPE; }
-<IN_VAR_DECL>"vec4"     { return R::SPP::Tokens::TOK_VAR_TYPE; }
-<IN_VAR_DECL>"mat2"     { return R::SPP::Tokens::TOK_VAR_TYPE; }
-<IN_VAR_DECL>"mat3"     { return R::SPP::Tokens::TOK_VAR_TYPE; }
-<IN_VAR_DECL>"mat4"     { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"bool"         { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"int"          { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"uint"         { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"float"        { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"double"       { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"vec2"         { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"vec3"         { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"vec4"         { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"mat2"         { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"mat3"         { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"mat4"         { return R::SPP::Tokens::TOK_VAR_TYPE; }
+<IN_VAR_DECL>"sampler2D"    { return R::SPP::Tokens::TOK_VAR_TYPE; }   
 
 <IN_VAR_DECL>{IDENT}    { return R::SPP::Tokens::TOK_IDENT; }
 <IN_VAR_DECL>";"        { BEGIN(INITIAL); return R::SPP::Tokens::TOK_SEMICOL; }
@@ -84,10 +87,11 @@ bool YYSPP_PopFile() {
 bool PreprocessShaderSource(
         const std::string& in, 
         std::string& out, 
-        std::vector<AttributeLocation>& attribLocs)
+        std::vector<AttributeLocation>& attribLocs,
+        std::vector<std::string>& materialUniforms)
 {
     yyspp_scan_string(in.c_str());
-    return SPP_StartParsing(out, attribLocs);
+    return SPP_StartParsing(out, attribLocs, materialUniforms);
 }
 
 } // namespace SPP

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include <Nubuck\renderer\color\color.h>
 
 namespace R {
@@ -39,7 +40,11 @@ private:
     UniformBinding  uniformBindings[NUM_UNIFORM_BINDINGS];
     int             _numBindings;
 public:
-    static void Bind(Program& prog, const Material& mat);
+    static void Bind(
+        Program& prog,
+        std::unordered_map<std::string, int>& unorm,
+        int timestamp,
+        const Material& mat);
 
     static Material White;
 

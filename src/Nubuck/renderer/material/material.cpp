@@ -4,13 +4,20 @@
 
 namespace R {
 
-void Material::Bind(Program& prog, const Material& mat) {
+// sets unorm[u] = timestamp, for every material uniform 'u'
+void Material::Bind(Program& prog, std::unordered_map<std::string, int>& unorm, int timestamp, const Material& mat) {
     int texUnit = MATERIAL_BASE_TEXUNIT;
     for(int i = 0; i < NUM_UNIFORM_BINDINGS && mat.uniformBindings[i].IsValid(); ++i) {
         const UniformBinding& ub = mat.uniformBindings[i];
         GLint loc = glGetUniformLocation(prog.GetID(), ub.name);
         if(0 <= loc) {
-            if(UniformType::TEXTURE == ub.type) {
+            std::unordered_map<std::string, int>::iterator unormIt = unorm.find(ub.name);
+            if(unorm.end() == unormIt) {
+                printf("WARNING - material sets non-material uniform '%s'\n", ub.name);
+            } else {
+                unormIt->second = timestamp;
+            }
+            if(UniformType::TEXTURE == ub.type && ub.variant.v_tex) {
                 prog.SetUniform(ub.name, texUnit);
                 ub.variant.v_tex->Bind(texUnit);
                 texUnit++;

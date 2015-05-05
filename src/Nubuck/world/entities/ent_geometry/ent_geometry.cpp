@@ -731,6 +731,12 @@ void ENT_Geometry::BuildRenderList() {
         rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
         if(NB::SM_FAST == _shadingMode) {
             rjob.fx = "FastNodeBillboard";
+
+            R::Material mat = R::Material::White;
+            mat.SetUniformBinding("patternColor", R::Color(0.0f, 0.0f, 0.0f, 0.0f));
+            mat.SetUniformBinding("patternTex", NULL);
+
+            rjob.material = mat;
         }
         if(NB::SM_NICE_BILLBOARDS == _shadingMode) {
             if(R::TransparencyMode::DEPTH_PEELING == transparencyMode) {

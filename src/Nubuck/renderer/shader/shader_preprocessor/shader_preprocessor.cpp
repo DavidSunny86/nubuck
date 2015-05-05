@@ -16,6 +16,7 @@ static const char* TokToString(int tok) {
     TOKTOSTRING_CASE(R::SPP::Tokens::TOK_VAR_TYPE)
     TOKTOSTRING_CASE(R::SPP::Tokens::TOK_INCLUDE)
     TOKTOSTRING_CASE(R::SPP::Tokens::TOK_ATTRIB)
+    TOKTOSTRING_CASE(R::SPP::Tokens::TOK_MATERIAL_UFORM)
     TOKTOSTRING_CASE(R::SPP::Tokens::TOK_STRING)
     TOKTOSTRING_CASE(R::SPP::Tokens::TOK_IDENT)
     TOKTOSTRING_CASE(R::SPP::Tokens::TOK_INTEGER)
@@ -79,11 +80,29 @@ static bool ParseAttributeDecl(std::string& out, R::AttributeLocation& loc) {
     return true;
 }
 
+static bool ParseMaterialUniformDecl(std::string& out, std::string& name) {
+    NextToken();
+    if(!ExpectToken(R::SPP::Tokens::TOK_VAR_TYPE)) return false;
+    std::string type = yyspptext;
+    NextToken();
+    if(!ExpectToken(R::SPP::Tokens::TOK_IDENT)) return false;
+    name = yyspptext;
+    NextToken();
+    if(!ExpectToken(R::SPP::Tokens::TOK_SEMICOL)) return false;
+    out += "uniform " + type + " " + name + ";";
+    return true;
+}
+
 namespace R {
 namespace SPP {
 
-bool SPP_StartParsing(std::string& out, std::vector<AttributeLocation>& attribLocs) {
+bool SPP_StartParsing(
+    std::string& out,
+    std::vector<AttributeLocation>& attribLocs,
+    std::vector<std::string>& materialUniforms)
+{
     attribLocs.clear();
+    materialUniforms.clear();
     bool done = false;
     while(!done) {
         NextToken();
@@ -94,6 +113,10 @@ bool SPP_StartParsing(std::string& out, std::vector<AttributeLocation>& attribLo
             AttributeLocation loc;
             if(!ParseAttributeDecl(out, loc)) return false;
             attribLocs.push_back(loc);
+        } else if(Tokens::TOK_MATERIAL_UFORM == g_nextToken) {
+            std::string name;
+            if(!ParseMaterialUniformDecl(out, name)) return false;
+            materialUniforms.push_back(name);
         } else if(Tokens::TOK_EOF == g_nextToken) {
             if(!YYSPP_PopFile()) break;
         } else {

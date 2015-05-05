@@ -28,7 +28,7 @@ static const char* names[] = {
 
 Shader::Shader(Type type, const GLchar* source) {
     std::string ppsource;
-    if(!SPP::PreprocessShaderSource(source, ppsource, _attribLocs)) {
+    if(!SPP::PreprocessShaderSource(source, ppsource, _attribLocs, _materialUniforms)) {
         common.printf("PreprocessShaderSource failed.\n");
         common.printf("<<<<<<<<<<<<<\n");
         common.printf("%s\n", source);

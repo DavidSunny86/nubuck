@@ -350,11 +350,15 @@ void ENT_TransformGizmo::GetRenderJobs(R::RenderList& renderList) {
     M::Vector3 renderPos = AlignWithCamera(W::world.GetModelView(), GetPosition());
     SetRenderPosition(renderPos);
 
+    R::Material mat = R::Material::White;
+    mat.SetUniformBinding("patternColor", R::Color(0.0f, 0.0f, 0.0f, 0.0f));
+    mat.SetUniformBinding("patternTex", NULL);
+
     R::MeshJob meshJob;
 
     meshJob.fx = "UnlitThickLines";
     meshJob.layer = R::Renderer::Layers::GEOMETRY_1;
-    meshJob.material = R::Material::White;
+    meshJob.material = mat;
     meshJob.primType = 0;
     for(int i = 0; i < 3; ++i) {
         if(_axis & (1 << i)) {
@@ -365,7 +369,7 @@ void ENT_TransformGizmo::GetRenderJobs(R::RenderList& renderList) {
 
     meshJob.fx = "LitDirectional";
     meshJob.layer = R::Renderer::Layers::GEOMETRY_1;
-    meshJob.material = R::Material::White;
+    meshJob.material = mat;
     meshJob.primType = 0;
     for(int i = 0; i < 3; ++i) {
         if(_axis & (1 << i)) {

@@ -128,10 +128,14 @@ MeshJob LineEdges::GetRenderJob() const {
 
 	assert(!_edges.empty());
 
+    R::Material mat = R::Material::White;
+    mat.SetUniformBinding("patternColor", R::Color(0.0f, 0.0f, 0.0f, 0.0f));
+    mat.SetUniformBinding("patternTex", NULL);
+
     MeshJob meshJob;
     meshJob.fx = "EdgeLineBillboard";
     meshJob.tfmesh = _tfmesh;
-    meshJob.material = Material::White;
+    meshJob.material = mat;
     meshJob.primType = 0;
 
     return meshJob;

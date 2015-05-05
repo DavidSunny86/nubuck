@@ -27,8 +27,8 @@ uniform sampler2D depthTex;
 uniform sampler2D solidDepth;
 
 // pattern is enabled if patternColor.a > 0.0
-uniform vec4        patternColor;
-uniform sampler2D   patternTex;
+material vec4        patternColor;
+material sampler2D   patternTex;
 
 #include <Shaders\lighting.glsl>
 

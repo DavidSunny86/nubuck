@@ -16,12 +16,15 @@ namespace R {
 
     class Shader;
     struct Color;
+    class Material;
 
     class Program : GEN::Uncopyable {
     private:
         GLuint  _id;
         bool    _linked;
-        std::unordered_map<std::string, GLint> _uniformLocations;
+        int     _materialTimestamp;
+        std::unordered_map<std::string, GLint>  _uniformLocations;
+        std::unordered_map<std::string, int>    _materialUniformTimestamps;
 
         void BindAttributeLocations(const std::vector<AttributeLocation>& locs);
     public:
@@ -48,6 +51,8 @@ namespace R {
         void SetUniform(const char* name, const M::Matrix3& matrix);
         void SetUniform(const char* name, const M::Matrix4& matrix);
         void SetUniform(const char* name, const R::Color& color);
+
+        void SetMaterial(const Material& mat);
         
         static void UnbindAll(void);
     };

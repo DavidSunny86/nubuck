@@ -373,9 +373,13 @@ void World::Grid_Build() {
 }
 
 void World::Grid_GetRenderJobs(std::vector<R::MeshJob>& rjobs) {
+    R::Material mat = R::Material::White;
+    mat.SetUniformBinding("patternColor", R::Color(0.0f, 0.0f, 0.0f, 0.0f));
+    mat.SetUniformBinding("patternTex", NULL);
+
     R::MeshJob meshJob;
     meshJob.fx = "Unlit";
-    meshJob.material = R::Material::White;
+    meshJob.material = mat;
     meshJob.tfmesh = _gridTFMesh;
     meshJob.primType = 0;
 

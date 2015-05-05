@@ -1,4 +1,4 @@
-uniform sampler2D font;
+material sampler2D font;
 
 varying vec4 vColor;
 varying vec2 vTexCoords;

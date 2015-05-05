@@ -49,10 +49,14 @@ void DirLight::paintGL() {
     renderList.worldMat = M::Mat4::Translate(0.0f, 0.0f, -4.0f);
     renderList.projWeight = 0.0f;
 
+    R::Material mat = R::Material::White;
+    mat.SetUniformBinding("patternColor", R::Color(0.0f, 0.0f, 0.0f, 0.0f));
+    mat.SetUniformBinding("patternTex", NULL);
+
     R::MeshJob rjob;
     rjob.fx         = "LitDirectionalTwosided";
     rjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
-    rjob.material   = R::Material::White;
+    rjob.material   = mat;
     rjob.primType   = 0;
     rjob.tfmesh     = _sphereTFMesh;
     renderList.meshJobs.push_back(rjob);

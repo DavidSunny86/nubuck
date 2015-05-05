@@ -12,6 +12,7 @@
 #include <Nubuck\math\matrix3.h>
 #include <Nubuck\math\matrix4.h>
 #include <renderer\glcall.h>
+#include <renderer\material\material.h>
 #include <renderer\shader\shader.h>
 #include <renderer\program\program.h>
 
@@ -26,7 +27,7 @@ namespace R {
         }
     }
 
-    Program::Program(void) : _id(INVALID_ID), _linked(false) {
+    Program::Program(void) : _id(INVALID_ID), _linked(false), _materialTimestamp(0) {
     }
 
     Program::~Program(void) {
@@ -53,6 +54,15 @@ namespace R {
         _linked = false;
         GL_CALL(glAttachShader(_id, shader.GetID()));
         BindAttributeLocations(shader.GetAttributeLocations());
+
+        // read material variables
+        const std::vector<std::string>& matUnorms = shader.GetMaterialUniforms();
+        for(unsigned i = 0; i < matUnorms.size(); ++i) {
+            _materialUniformTimestamps[matUnorms[i]] = 0;
+#ifdef _DEBUG
+            printf("INFO - reading material variable '%s'\n", matUnorms[i].c_str());
+#endif
+        }
     }
 
     // type must be in Shader::Type
@@ -149,6 +159,19 @@ namespace R {
     void Program::SetUniform(const char* name, const R::Color& color) {
         GLint loc = GetUniformLocation(name);
         if(0 <= loc) glUniform4f(loc, color.r, color.g, color.b, color.a);
+    }
+
+    void Program::SetMaterial(const Material& mat) {
+        _materialTimestamp++;
+        Material::Bind(*this, _materialUniformTimestamps, _materialTimestamp, mat);
+
+        std::unordered_map<std::string, int>::const_iterator it;
+        for(it = _materialUniformTimestamps.begin(); _materialUniformTimestamps.end() != it; ++it) {
+            if(_materialTimestamp != it->second) {
+                printf("WARNING - setting incomplete material, missing binding for '%s'\n",
+                    it->first.c_str());
+            }
+        }
     }
 
     void Program::UnbindAll(void) {

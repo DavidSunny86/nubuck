@@ -16,6 +16,7 @@ class Shader : private GEN::Uncopyable {
 private:
     GLuint                          _id;
     std::vector<AttributeLocation>  _attribLocs;
+    std::vector<std::string>        _materialUniforms;
 public:
     enum Type {
         VERTEX = 0,
@@ -30,7 +31,8 @@ public:
 
     GLuint GetID(void) const { return _id; }
 
-    const std::vector<AttributeLocation>& GetAttributeLocations() const { return _attribLocs; }
+    const std::vector<AttributeLocation>&   GetAttributeLocations() const { return _attribLocs; }
+    const std::vector<std::string>&         GetMaterialUniforms() const { return _materialUniforms; }
 };
 
 } // namespace R

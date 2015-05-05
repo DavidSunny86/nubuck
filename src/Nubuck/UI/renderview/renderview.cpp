@@ -52,11 +52,15 @@ namespace UI {
     }
 
     void RenderView::RenderBackgroundGradient(R::RenderList& renderList) {
+        R::Material mat = R::Material::White;
+        mat.SetUniformBinding("patternColor", R::Color(0.0f, 0.0f, 0.0f, 0.0f));
+        mat.SetUniformBinding("patternTex", NULL);
+
         R::MeshJob mjob;
         mjob.fx         = "UnlitTP";
         mjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
         mjob.tfmesh     = _bgGradient.tfmesh;
-        mjob.material   = R::Material::White;
+        mjob.material   = mat;
         mjob.primType   = 0;
 
         renderList.meshJobs.push_back(mjob);

@@ -766,7 +766,7 @@ static void DrawFrame(
             SetState(desc.state);
 
             BindPipelineTextures(prog);
-            Material::Bind(prog, cur->material);
+            prog.SetMaterial(cur->material);
 
             next = DrawMeshList(prog, desc.state, desc.type, desc.flags, modelView, geomSortMode, cur);
 

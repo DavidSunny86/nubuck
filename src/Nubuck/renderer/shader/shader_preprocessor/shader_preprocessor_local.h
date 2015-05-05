@@ -21,6 +21,7 @@ struct Tokens {
         TOK_VAR_TYPE,
         TOK_INCLUDE,
         TOK_ATTRIB,
+        TOK_MATERIAL_UFORM,
         TOK_STRING,
         TOK_IDENT,
         TOK_INTEGER,
@@ -32,7 +33,10 @@ struct Tokens {
 bool YYSPP_PushFile(const char* filename);
 bool YYSPP_PopFile();
 
-bool SPP_StartParsing(std::string& out, std::vector<AttributeLocation>& attribLocs);
+bool SPP_StartParsing(
+    std::string& out,
+    std::vector<AttributeLocation>& attribLocs,
+    std::vector<std::string>& materialUniforms);
 
 } // namespace SPP
 } // namespace R
