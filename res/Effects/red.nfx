@@ -1,0 +1,7 @@
+// uses renderList.dirLights only
+fx Red {
+  pass Pass0 {
+    vs = "#include <Shaders\mesh.vert>";
+    fs = "#include <Shaders\red.frag>";
+  }
+}
