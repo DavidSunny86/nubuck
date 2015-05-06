@@ -100,4 +100,6 @@ public:
     void R_TouchBuffer();
 };
 
+void GenerateTriangles(const std::vector<Mesh::Index>& indices, const GLenum primType, std::vector<Mesh::TriIndices>& tris);
+
 } // namespace R

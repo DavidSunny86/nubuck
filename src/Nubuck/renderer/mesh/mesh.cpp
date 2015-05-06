@@ -73,7 +73,7 @@ static void GenerateTrianglesFromTriangleFan(const std::vector<Mesh::Index>& ind
     }
 }
 
-static void GenerateTriangles(const std::vector<Mesh::Index>& indices, const GLenum primType, std::vector<Mesh::TriIndices>& tris) {
+void GenerateTriangles(const std::vector<Mesh::Index>& indices, const GLenum primType, std::vector<Mesh::TriIndices>& tris) {
     tris.clear();
     switch(primType) {
     case GL_TRIANGLES: GenerateTrianglesFromTriangles(indices, tris); break;

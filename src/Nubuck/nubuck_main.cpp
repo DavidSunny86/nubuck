@@ -29,6 +29,7 @@
 #include <operators\op_loop\op_loop.h>
 #include <operators\op_gen_randompoints\op_gen_randompoints.h>
 #include <operators\op_gen_platonic_solids\op_gen_platonic_solids.h>
+#include <operators\op_gen_parametric\op_gen_parametric.h>
 #include <operators\op_gen_merge\op_gen_merge.h>
 #include <operators\op_gen_windows\op_gen_windows.h>
 #include <operators\op_loadobj\op_loadobj.h>
@@ -166,6 +167,7 @@ int RunNubuck(
     OP::g_operators.Register(new OP::LoopPanel, new OP::Loop);
     OP::g_operators.Register(new OP::GEN::RandomPointsPanel, new OP::GEN::RandomPoints);
     OP::g_operators.Register(new OP::PlatonicSolidsPanel, new OP::PlatonicSolids);
+    OP::g_operators.Register(new OP::ParametricPanel, new OP::Parametric);
     OP::g_operators.Register(new OP::GEN::MergePanel, new OP::GEN::Merge);
     OP::g_operators.Register(new OP::GEN::WindowsPanel, new OP::GEN::Windows);
 	OP::g_operators.Register(new OP::LoadOBJPanel, new OP::LoadOBJ);
