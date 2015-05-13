@@ -20,7 +20,6 @@ private:
 	Ui::LoadOBJ _ui;
 private slots:
     void OnChooseFilename();
-    void OnLoadScene();
 public:
     LoadOBJPanel();
 
@@ -32,7 +31,6 @@ private:
 	NB::Mesh _mesh;
 
     void Event_Load(const EV::Arg<QString*>& event);
-    void Event_LoadScene(const EV::Event& event);
 public:
 	LoadOBJ();
 
