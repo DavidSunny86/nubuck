@@ -659,6 +659,8 @@ void ENT_Geometry::BuildRenderList() {
         R::MeshJob rjob;
 
         R::Material mat = R::Material::White;
+        mat.SetUniformBinding("patternColor", R::Color(0.0f, 0.0f, 0.0f, 0.0f));
+        mat.SetUniformBinding("patternTex", NULL);
 
         rjob.material   = mat;
         rjob.tfmesh     = _tfmesh;
