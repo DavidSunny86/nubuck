@@ -11,10 +11,13 @@
 #include <Nubuck\math\vector3.h>
 #include <Nubuck\math\matrix3.h>
 #include <Nubuck\math\matrix4.h>
+#include <common\config\config.h>
 #include <renderer\glcall.h>
 #include <renderer\material\material.h>
 #include <renderer\shader\shader.h>
 #include <renderer\program\program.h>
+
+COM::Config::Variable<int> cvar_r_incompleteMaterial_w("r_incompleteMaterial_w", 1);
 
 namespace R {
 
@@ -165,11 +168,13 @@ namespace R {
         _materialTimestamp++;
         Material::Bind(*this, _materialUniformTimestamps, _materialTimestamp, mat);
 
-        std::unordered_map<std::string, int>::const_iterator it;
-        for(it = _materialUniformTimestamps.begin(); _materialUniformTimestamps.end() != it; ++it) {
-            if(_materialTimestamp != it->second) {
-                printf("WARNING - setting incomplete material, missing binding for '%s'\n",
-                    it->first.c_str());
+        if(cvar_r_incompleteMaterial_w) {
+            std::unordered_map<std::string, int>::const_iterator it;
+            for(it = _materialUniformTimestamps.begin(); _materialUniformTimestamps.end() != it; ++it) {
+                if(_materialTimestamp != it->second) {
+                    printf("WARNING - setting incomplete material, missing binding for '%s'\n",
+                        it->first.c_str());
+                }
             }
         }
     }
