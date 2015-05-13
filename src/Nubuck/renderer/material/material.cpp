@@ -4,6 +4,19 @@
 
 namespace R {
 
+Material::UniformBinding& Material::FindBindingSlot(const char* name) {
+    for(int i = 0; i < _numBindings; ++i) {
+        if(!strcmp(uniformBindings[i].name, name)) {
+            return uniformBindings[i];
+        }
+    }
+    if(NUM_UNIFORM_BINDINGS <= _numBindings) {
+        common.printf("ERROR - Material: cannot find a free uniform binding point\n");
+        Crash();
+    }
+    return uniformBindings[_numBindings++];
+}
+
 // sets unorm[u] = timestamp, for every material uniform 'u'
 void Material::Bind(Program& prog, std::unordered_map<std::string, int>& unorm, int timestamp, const Material& mat) {
     int texUnit = MATERIAL_BASE_TEXUNIT;
@@ -39,21 +52,13 @@ Material::Material() : _numBindings(0) { }
 Material Material::White(Color::White);
 
 void Material::SetUniformBinding(const char* name, Texture* val) {
-    if(NUM_UNIFORM_BINDINGS <= _numBindings) {
-        common.printf("ERROR - Material: cannot find a free uniform binding point\n");
-        Crash();
-    }
-    UniformBinding& ub = uniformBindings[_numBindings++];
+    UniformBinding& ub = FindBindingSlot(name);
     ub.name             = name;
     ub.variant.v_tex    = val;
 }
 
 void Material::SetUniformBinding(const char* name, const Color& val) {
-    if(NUM_UNIFORM_BINDINGS <= _numBindings) {
-        common.printf("ERROR - Material: cannot find a free uniform binding point\n");
-        Crash();
-    }
-    UniformBinding& ub = uniformBindings[_numBindings++];
+    UniformBinding& ub = FindBindingSlot(name);
     ub.type                 = UniformType::COLOR;
     ub.name                 = name;
     ub.variant.v_color[0]   = val.r;

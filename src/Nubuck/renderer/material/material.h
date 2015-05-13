@@ -39,6 +39,8 @@ private:
     Color           diffuseColor;
     UniformBinding  uniformBindings[NUM_UNIFORM_BINDINGS];
     int             _numBindings;
+
+    UniformBinding& FindBindingSlot(const char* name);
 public:
     static void Bind(
         Program& prog,
