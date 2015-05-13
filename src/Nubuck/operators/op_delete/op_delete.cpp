@@ -1,15 +1,18 @@
 #include <QMenu>
 #include <Nubuck\nubuck.h>
+#include <Nubuck\UI\menuitem.h>
 #include <Nubuck\operators\operator_invoker.h>
 #include <world\world.h>
 #include "op_delete.h"
 
 namespace OP {
 
+std::string Delete::PreferredShortcut() const {
+    return "D";
+}
+
 void Delete::Register(Invoker& invoker) {
-    QAction* action = NB::ObjectMenu()->addAction("Delete");
-    action->setShortcut(QKeySequence("D"));
-    QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
+    NB::AddMenuItem(NB::ObjectMenu(), "Delete", invoker);
 }
 
 bool Delete::Invoke() {

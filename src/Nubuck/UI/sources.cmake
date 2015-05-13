@@ -8,4 +8,5 @@ add_sources(
     window_events.h
     nb_widgets.h
     nb_widgets.cpp
+    menuitem.cpp
 )

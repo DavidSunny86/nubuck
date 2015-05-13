@@ -104,10 +104,11 @@ void Driver::Event_Fallthrough(const EV::Event& event) {
                 accepted = 0;
                 DispatchSingleEvent(_activeOp, event);
             }
-        } else {
-            // forward event
-            W::world.Send(event);
         }
+    }
+    if(!accepted) {
+        // forward event
+        W::world.Send(event);
     }
     RebuildMeshes();
     SignalCompletion();

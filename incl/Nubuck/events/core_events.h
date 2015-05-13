@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <ostream>
+
 #include <Nubuck\nubuck_api.h>
 #include <Nubuck\events\events.h>
 
@@ -41,16 +44,28 @@ struct KeyEvent : Event {
     int nativeScanCode;
     bool autoRepeat;
     enum Modifier {
-        MODIFIER_SHIFT = 0x02000000 // == Qt::ShiftModifier
+        // MODIFER_* == Qt::*Modifier
+        MODIFIER_SHIFT = 0x02000000,
+        MODIFIER_CTRL = 0x04000000,
+        MODIFIER_ALT = 0x08000000
     };
     int mods;
 };
+
+std::ostream& operator<<(std::ostream& stream, const KeyEvent& keyEvent);
 
 struct Usr_SelectEntity : Event {
     EVENT_TYPE(Usr_SelectEntity)
 
     NB::Entity  entity;
     bool        shiftModifier;
+};
+
+struct ShowQuestionBox : Event {
+    EVENT_TYPE(ShowQuestionBox);
+
+    std::string caption;
+    std::string message;
 };
 
 } // namespace EV
@@ -60,6 +75,10 @@ NUBUCK_API extern EV::ConcreteEventDef<EV::MouseEvent>  ev_mouse;
 NUBUCK_API extern EV::ConcreteEventDef<EV::KeyEvent>    ev_key;
 NUBUCK_API extern EV::ConcreteEventDef<EV::Event>       ev_buttonClicked;
 NUBUCK_API extern EV::ConcreteEventDef<EV::Arg<bool> >  ev_checkBoxToggled;
+
+NUBUCK_API extern EV::ConcreteEventDef<EV::Event>       ev_op_requestFinish; // operator is asked to terminate
+
+NUBUCK_API extern EV::ConcreteEventDef<EV::ShowQuestionBox> ev_ui_showQuestionBox;
 
 NUBUCK_API extern EV::ConcreteEventDef<EV::Usr_SelectEntity>    ev_usr_selectEntity;
 NUBUCK_API extern EV::ConcreteEventDef<EV::Arg<int> >           ev_usr_changeEditMode;

@@ -18,6 +18,10 @@ NUBUCK_API EV::ConcreteEventDef<EV::KeyEvent>    ev_key;
 NUBUCK_API EV::ConcreteEventDef<EV::Event>       ev_buttonClicked;
 NUBUCK_API EV::ConcreteEventDef<EV::Arg<bool> >  ev_checkBoxToggled;
 
+NUBUCK_API EV::ConcreteEventDef<EV::Event>       ev_op_requestFinish;
+
+NUBUCK_API EV::ConcreteEventDef<EV::ShowQuestionBox> ev_ui_showQuestionBox;
+
 NUBUCK_API EV::ConcreteEventDef<EV::Usr_SelectEntity>   ev_usr_selectEntity;
 NUBUCK_API EV::ConcreteEventDef<EV::Arg<int> >          ev_usr_changeEditMode;
 
@@ -52,3 +56,37 @@ EV::ConcreteEventDef<EV::Arg<R::Color> > ev_geom_edgeColorChanged;
 EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_transparencyChanged;
 EV::ConcreteEventDef<RenderModeEvent>    ev_geom_renderModeChanged;
 EV::ConcreteEventDef<EdgeShadingEvent>   ev_geom_edgeShadingChanged;
+
+// output
+
+namespace EV {
+
+std::ostream& operator<<(std::ostream& stream, const KeyEvent& keyEvent) {
+    stream << "KeyEvent {";
+
+    switch(keyEvent.type) {
+    case KeyEvent::KEY_UP:
+        stream << " KEY_UP";
+        break;
+    case KeyEvent::KEY_DOWN:
+        stream << " KEY_DOWN";
+        break;
+    }
+
+    stream << " ";
+    if(KeyEvent::MODIFIER_SHIFT & keyEvent.mods) stream << "SHIFT+";
+    if(KeyEvent::MODIFIER_CTRL & keyEvent.mods) stream << "CTRL+";
+    if(KeyEvent::MODIFIER_ALT & keyEvent.mods) stream << "ALT+";
+
+    if(Qt::Key_Space <= keyEvent.keyCode && keyEvent.keyCode <= Qt::Key_AsciiTilde) {
+        stream << static_cast<char>(keyEvent.keyCode);
+    } else stream << "<keyCode=" << keyEvent.keyCode << ">";
+
+    stream << " autorepeat=" << keyEvent.autoRepeat;
+
+    stream << " }";
+
+    return stream;
+}
+
+} // namespace EV

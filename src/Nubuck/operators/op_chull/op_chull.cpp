@@ -10,10 +10,12 @@
 
 namespace OP {
 
+std::string ConvexHull::PreferredShortcut() const {
+    return "C";
+}
+
 void ConvexHull::Register(Invoker& invoker) {
-    QAction* action = NB::ObjectMenu()->addAction("Convex Hull");
-    action->setShortcut(QKeySequence("C"));
-    QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
+    NB::AddMenuItem(NB::ObjectMenu(), "Convex Hull", invoker);
 }
 
 bool ConvexHull::Invoke() {

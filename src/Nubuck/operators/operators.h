@@ -12,6 +12,12 @@
 #include <system\thread\thread.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 
+namespace EV {
+
+struct ShowQuestionBox;
+
+} // namespace EV
+
 namespace OP {
 
 class Driver;
@@ -27,6 +33,7 @@ private:
         Invoker*    	invoker;
         OperatorPanel*  panel;
         HMODULE         module;
+        QKeySequence    shortcut;
     };
 
     std::vector<OperatorDesc>   _ops; // all registered operators
@@ -42,6 +49,10 @@ private:
     void Event_SetOperator(const EV::Args2<Operator*, bool>& event);
     void Event_ShowConfirmationDialog(const EV::Event& event);
     void Event_ActionFinished(const EV::Event& event);
+
+    void Event_ShowQuestionBox(const EV::ShowQuestionBox& event);
+
+    void Event_Key(const EV::KeyEvent& event);
 
     template<typename T> void Event_ForwardToDriver(const T& event) {
         InvokeAction(event, InvokationMode::ALWAYS);

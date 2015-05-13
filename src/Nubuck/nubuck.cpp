@@ -1,4 +1,5 @@
 #include <Nubuck\nubuck.h>
+#include <Nubuck\UI\menuitem.h>
 #include <Nubuck\operators\operator.h>
 #include <Nubuck\operators\operator_invoker.h>
 
@@ -43,7 +44,12 @@ NUBUCK_API QMenu* VertexMenu() {
 }
 
 NUBUCK_API void AddMenuItem(QMenu* menu, const char* name, OP::Invoker& invoker) {
-    QAction* action = menu->addAction(name);
+    QAction* action = new UI::MenuItem(name);
+    QKeySequence shortcut = invoker.GetShortcut();
+    if(!shortcut.isEmpty()) {
+        action->setShortcut(shortcut);
+    }
+    menu->addAction(action);
     QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
 }
 

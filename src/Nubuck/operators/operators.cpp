@@ -1,6 +1,8 @@
 #include <QMessageBox>
+#include <QDebug>
 
 #include <nubuck_private.h>
+#include <Nubuck\events\core_events.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <Nubuck\operators\operator_invoker.h>
 #include <Nubuck\animation\animator.h>
@@ -52,6 +54,32 @@ void Operators::Event_ActionFinished(const EV::Event& event) {
     _actionsPending--;
 }
 
+void Operators::Event_ShowQuestionBox(const EV::ShowQuestionBox& event) {
+    QMessageBox mb;
+    mb.setText(QString::fromStdString(event.caption));
+    mb.setInformativeText(QString::fromStdString(event.message));
+    mb.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    mb.setIcon(QMessageBox::Question);
+    int retval = mb.exec();
+    if(QMessageBox::Ok == retval) event.SetReturnValue(1);
+    else event.SetReturnValue(0);
+    event.Signal();
+}
+
+
+// key events not handled in the operator, world are passed to the operators manager
+void Operators::Event_Key(const EV::KeyEvent& event) {
+    if(EV::KeyEvent::KEY_DOWN == event.type) {
+        QKeySequence ks(event.mods + event.keyCode);
+        qDebug() << "Operators::Event_Key, sequence = " << ks.toString();
+        for(unsigned i = 0; i < _ops.size(); ++i) {
+            if(!ks.isEmpty() && ks == _ops[i].shortcut) {
+                _ops[i].invoker->OnInvoke();
+            }
+        }
+    }
+}
+
 void Operators::OnInvokeOperator(unsigned id) {
     UI::LogWidget::Instance()->sys_printf("INFO - invoking operator with id = %d\n", id);
 
@@ -76,6 +104,8 @@ void Operators::Init() {
     AddEventHandler(ev_op_setOperator, this, &Operators::Event_SetOperator);
     AddEventHandler(ev_op_showConfirmationDialog, this, &Operators::Event_ShowConfirmationDialog);
     AddEventHandler(ev_op_actionFinished, this, &Operators::Event_ActionFinished);
+    AddEventHandler(ev_ui_showQuestionBox, this, &Operators::Event_ShowQuestionBox);
+    AddEventHandler(ev_key, this, &Operators::Event_Key);
 
     // forward other known events
     AddEventHandler(ev_w_editModeChanged, this, &Operators::Event_ForwardToDriver<EV::Arg<int> >);
@@ -97,7 +127,11 @@ void Operators::FrameUpdate() {
 unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module) {
     unsigned id = _ops.size();
 
-    Invoker* invoker = new Invoker(id);
+    // assign shortcut
+    // TODO: check for duplicates
+    QKeySequence shortcut = QKeySequence(QString::fromStdString(op->PreferredShortcut()));
+
+    Invoker* invoker = new Invoker(id, shortcut);
     connect(invoker, SIGNAL(SigInvokeOperator(unsigned)), this, SLOT(OnInvokeOperator(unsigned)));
 
     if(!panel) panel = new OperatorPanel();
@@ -111,6 +145,7 @@ unsigned Operators::Register(OperatorPanel* panel, Operator* op, HMODULE module)
     desc.invoker = invoker;
 	desc.module = module;
     desc.panel = panel;
+    desc.shortcut = shortcut;
 
     _ops.push_back(desc);
 

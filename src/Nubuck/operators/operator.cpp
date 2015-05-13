@@ -26,7 +26,25 @@ OperatorPanel::OperatorPanel() : _widget(NULL) {
 Operator::Operator() : _panel(NULL) {
     AddEventHandler(ev_mouse, this, &Operator::OnMouse);
     AddEventHandler(ev_key, this, &Operator::OnKey);
+    AddEventHandler(ev_op_requestFinish, this, &Operator::OnRequestFinish);
     AddEventHandler(ev_w_meshChanged, this, &Operator::OnMeshChanged);
+}
+
+// string gets passed to QKeySequence
+std::string Operator::PreferredShortcut() const {
+    return "";
+}
+
+void Operator::OnRequestFinish(const EV::Event& event) {
+    int ret = 0;
+    EV::ShowQuestionBox q;
+    q.SetReturnPointer(&ret);
+    q.caption = "Switch operators.";
+    q.message =
+        "This operation ends the currently active operator.\n"
+        "Do you want to continue?";
+    g_operators.SendAndWait(ev_ui_showQuestionBox.Tag(q));
+    if(ret) event.Accept();
 }
 
 NUBUCK_API void WaitForAnimations() {

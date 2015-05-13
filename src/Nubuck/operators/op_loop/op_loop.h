@@ -50,6 +50,8 @@ private:
 public:
     Loop();
 
+    std::string PreferredShortcut() const override { return "Shift+H"; }
+
     void Register(Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }

@@ -11,10 +11,12 @@
 
 namespace OP {
 
+std::string FlipClip::PreferredShortcut() const {
+    return "Shift+C";
+}
+
 void FlipClip::Register(Invoker& invoker) {
-    QAction* action = NB::ObjectMenu()->addAction("FlipClip Hull");
-    action->setShortcut(QKeySequence("Shift+C"));
-    QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
+    NB::AddMenuItem(NB::ObjectMenu(), "FlipClip Hull", invoker);
 }
 
 bool FlipClip::Invoke() {

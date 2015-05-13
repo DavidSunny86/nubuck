@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include <Nubuck\nubuck.h>
@@ -59,6 +60,8 @@ public:
 
     void SendToPanel(const EV::Event& event);
 
+    virtual std::string PreferredShortcut() const;
+
     virtual void Register(Invoker& invoker) = 0;
     virtual bool Invoke() = 0; // return false to decline invocation
     virtual void Finish() = 0;
@@ -71,6 +74,7 @@ public:
     virtual void OnMouse(const EV::MouseEvent& mouseEvent) { }
     virtual void OnKey(const EV::KeyEvent& keyEvent) { }
     virtual void OnMeshChanged(const EV::Event& event) { }
+    virtual void OnRequestFinish(const EV::Event& event);
 };
 
 NUBUCK_API void SendToOperator(const EV::Event& event);

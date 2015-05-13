@@ -333,13 +333,17 @@ void World::Event_Key(const EV::KeyEvent& event) {
         71, 72, 73
     };
 
+    bool accepted = false;
+
     const float transitionDur = 0.25f;
 
     if('R' == event.keyCode) {
         _camArcball.ResetRotation();
+        accepted = true;
     }
     if('E' == event.keyCode) {
         _camArcball.Reset();
+        accepted = true;
     }
     if(numpad[1] == event.nativeScanCode) {
         if(EV::KeyEvent::MODIFIER_SHIFT & event.mods) {
@@ -347,6 +351,7 @@ void World::Event_Key(const EV::KeyEvent& event) {
         } else {
             _camArcball.RotateTo(M::Quat::Identity(), transitionDur); // front view
         }
+        accepted = true;
     }
     if(numpad[3] == event.nativeScanCode) {
         if(EV::KeyEvent::MODIFIER_SHIFT & event.mods) {
@@ -354,6 +359,7 @@ void World::Event_Key(const EV::KeyEvent& event) {
         } else {
             _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(0.0f, 1.0f, 0.0f), 90.0f), transitionDur); // right view
         }
+        accepted = true;
     }
     if(numpad[7] == event.nativeScanCode) {
         if(EV::KeyEvent::MODIFIER_SHIFT & event.mods) {
@@ -361,8 +367,17 @@ void World::Event_Key(const EV::KeyEvent& event) {
         } else {
             _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(1.0f, 0.0f, 0.0f), -90.0f), transitionDur); // top view
         }
+        accepted = true;
     }
-    if(numpad[5] == event.nativeScanCode) _camArcball.ToggleProjection(transitionDur);
+    if(numpad[5] == event.nativeScanCode) {
+        _camArcball.ToggleProjection(transitionDur);
+        accepted = true;
+    }
+
+    if(!accepted) {
+        // NOTE: event queue overhead. maybe use direct method call?
+        OP::g_operators.Send(event);
+    }
 }
 
 void World::Grid_Build() {

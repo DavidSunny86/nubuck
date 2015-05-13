@@ -16,6 +16,7 @@ class ConvexHull : public Operator {
 private:
     typedef leda::d3_rat_point point3_t;
 public:
+    std::string PreferredShortcut() const override;
     void Register(Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }

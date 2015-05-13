@@ -12,6 +12,7 @@ public:
 
 class Join : public Operator {
 public:
+    std::string PreferredShortcut() const override;
     void Register(Invoker& invoker) override;
     bool Invoke() override;
     void Finish() override { }

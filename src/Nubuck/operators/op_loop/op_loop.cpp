@@ -46,6 +46,8 @@ void Loop::Event_Button0(const EV::Event& event) {
 
 void Loop::Event_Button1(const EV::Event& event) {
     printf("specialized handler for id = 1\n");
+
+    OnRequestFinish(EV::Event());
 }
 
 Loop::Loop() : _geom(NULL) {

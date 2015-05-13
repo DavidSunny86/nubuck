@@ -9,10 +9,12 @@
 
 namespace OP {
 
+std::string Join::PreferredShortcut() const {
+    return "J";
+}
+
 void Join::Register(Invoker& invoker) {
-    QAction* action = NB::ObjectMenu()->addAction("Join");
-    action->setShortcut(QKeySequence("J"));
-    QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
+    NB::AddMenuItem(NB::ObjectMenu(), "Join", invoker);
 }
 
 bool Join::Invoke() {

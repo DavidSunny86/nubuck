@@ -6,10 +6,12 @@
 
 namespace OP {
 
+std::string MergeVertices::PreferredShortcut() const {
+    return "M";
+}
+
 void MergeVertices::Register(Invoker& invoker) {
-    QAction* action = NB::VertexMenu()->addAction("Merge");
-    action->setShortcut(QKeySequence("M"));
-    QObject::connect(action, SIGNAL(triggered()), &invoker, SLOT(OnInvoke()));
+    NB::AddMenuItem(NB::VertexMenu(), "Merge", invoker);
 }
 
 static bool EdgeEx(leda::nb::RatPolyMesh& graph, leda::node v0, leda::node v1) {
