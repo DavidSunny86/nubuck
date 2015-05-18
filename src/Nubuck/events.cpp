@@ -61,6 +61,59 @@ EV::ConcreteEventDef<EdgeShadingEvent>   ev_geom_edgeShadingChanged;
 
 namespace EV {
 
+std::ostream& operator<<(std::ostream& stream, const MouseEvent& mouseEvent) {
+    stream << "MouseEvent {";
+
+    switch(mouseEvent.type) {
+    case MouseEvent::MOUSE_DOWN:
+        stream << " MOUSE_DOWN";
+        break;
+    case MouseEvent::MOUSE_UP:
+        stream << " MOUSE_UP";
+        break;
+    case MouseEvent::MOUSE_MOVE:
+        stream << " MOUSE_MOVE";
+        break;
+    case MouseEvent::MOUSE_WHEEL:
+        stream << " MOUSE_WHEEL";
+        break;
+    default:
+        COM_assert(0 && "unknown mouse event type");
+    }
+
+    switch(mouseEvent.button) {
+    case MouseEvent::BUTTON_NONE:
+        stream << "BUTTON_NONE";
+        break;
+    case MouseEvent::BUTTON_LEFT:
+        stream << " BUTTON_LEFT";
+        break;
+    case MouseEvent::BUTTON_RIGHT:
+        stream << " BUTTON_RIGHT";
+        break;
+    case MouseEvent::BUTTON_MIDDLE:
+        stream << " BUTTON_MIDDLE";
+        break;
+    default:
+        common.printf("unknown mouse event button %d\n", mouseEvent.button);
+        Crash();
+    };
+
+    stream << " mods = (";
+    if(MouseEvent::MODIFIER_CTRL & mouseEvent.mods) stream << " MODIFIER_CTRL";
+    if(MouseEvent::MODIFIER_SHIFT & mouseEvent.mods) stream << " MODIFIER_SHIFT";
+    stream << ")";
+
+    stream
+        << " x = " << mouseEvent.x
+        << ", y = " << mouseEvent.y
+        << ", delta = " << mouseEvent.delta;
+
+    stream << " }";
+
+    return stream;
+}
+
 std::ostream& operator<<(std::ostream& stream, const KeyEvent& keyEvent) {
     stream << "KeyEvent {";
 

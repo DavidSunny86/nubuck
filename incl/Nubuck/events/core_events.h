@@ -23,6 +23,7 @@ struct MouseEvent : Event {
 
     enum Type { MOUSE_DOWN, MOUSE_UP, MOUSE_WHEEL, MOUSE_MOVE };
     enum Button { 
+        BUTTON_NONE     = 0,    // == Qt::NoButton
         BUTTON_LEFT     = 1,    // == Qt::LeftButton
         BUTTON_RIGHT    = 2,    // == Qt::RightButton
         BUTTON_MIDDLE   = 4     // == Qt::MiddleButton
@@ -52,6 +53,7 @@ struct KeyEvent : Event {
     int mods;
 };
 
+std::ostream& operator<<(std::ostream& stream, const MouseEvent& mouseEvent);
 std::ostream& operator<<(std::ostream& stream, const KeyEvent& keyEvent);
 
 struct Usr_SelectEntity : Event {
