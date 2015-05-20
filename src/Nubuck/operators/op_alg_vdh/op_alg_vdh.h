@@ -7,13 +7,15 @@ namespace OP {
 
 enum {
     ID_DELAUNAY,
-    ID_VORONOI
+    ID_VORONOI,
+    ID_CHULL
 };
 
 class VDH_Panel : public OperatorPanel {
 private:
     NB::CheckBox _cbDelaunay;
     NB::CheckBox _cbVoronoi;
+    NB::CheckBox _cbCHull;
 public:
     VDH_Panel();
 

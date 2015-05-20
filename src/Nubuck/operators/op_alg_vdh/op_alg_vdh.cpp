@@ -25,9 +25,11 @@ VDH_Panel::VDH_Panel() {
 
     _cbDelaunay = NB::CreateCheckBox(ID_DELAUNAY, "Show Delaunay");
     _cbVoronoi = NB::CreateCheckBox(ID_VORONOI, "Show Voronoi");
+    _cbCHull = NB::CreateCheckBox(ID_CHULL, "Show Hull");
 
     NB::AddWidgetToBox(boxLayout, NB::CastToWidget(_cbDelaunay));
     NB::AddWidgetToBox(boxLayout, NB::CastToWidget(_cbVoronoi));
+    NB::AddWidgetToBox(boxLayout, NB::CastToWidget(_cbCHull));
 
     SetLayout(boxLayout);
 }
@@ -35,6 +37,7 @@ VDH_Panel::VDH_Panel() {
 void VDH_Panel::Invoke() {
     NB::SetChecked(_cbDelaunay, true, true);
     NB::SetChecked(_cbVoronoi, true, true);
+    NB::SetChecked(_cbCHull, true, true);
 }
 
 /*
@@ -669,12 +672,17 @@ void VDH_Operator::Event_CheckBoxToggled(const EV::Arg<bool>& event) {
         if(isChecked) NB::ShowMesh(_voronoiMesh);
         else NB::HideMesh(_voronoiMesh);
         break;
+    case ID_CHULL:
+        if(isChecked) NB::ShowMesh(_hullMesh);
+        else NB::HideMesh(_hullMesh);
+        break;
     };
 }
 
 VDH_Operator::VDH_Operator()
     : _verticesMesh(NULL)
     , _delaunayMesh(NULL)
+    , _hullMesh(NULL)
 {
     AddEventHandler(ev_checkBoxToggled, this, &VDH_Operator::Event_CheckBoxToggled);
 }
