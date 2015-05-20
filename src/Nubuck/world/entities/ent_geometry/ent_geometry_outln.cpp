@@ -22,9 +22,9 @@ void ENT_GeometryOutln::OnEdgeScaleChanged(leda::rational value) {
     _subject.Send(ev_geom_edgeScaleChanged.Tag(value.to_float()));
 }
 
-void ENT_GeometryOutln::OnEdgeColorChanged(float r, float g, float b) {
-	R::Color edgeColor = R::Color(r, g, b);
-    _subject.Send(ev_geom_edgeColorChanged.Tag(edgeColor));
+void ENT_GeometryOutln::OnEdgeTintChanged(float r, float g, float b) {
+	R::Color edgeTint = R::Color(r, g, b);
+    _subject.Send(ev_geom_edgeTintChanged.Tag(edgeTint));
 }
 
 void ENT_GeometryOutln::OnTransparencyChanged(leda::rational value) {
@@ -72,7 +72,7 @@ ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) 
 
     AddEventHandler(ev_geom_vertexScaleChanged, this, &ENT_GeometryOutln::Event_VertexScaleChanged);
 	AddEventHandler(ev_geom_edgeScaleChanged, this, &ENT_GeometryOutln::Event_EdgeScaleChanged);
-	AddEventHandler(ev_geom_edgeColorChanged, this, &ENT_GeometryOutln::Event_EdgeColorChanged);
+	AddEventHandler(ev_geom_edgeTintChanged, this, &ENT_GeometryOutln::Event_EdgeTintChanged);
 	AddEventHandler(ev_geom_edgeShadingChanged, this, &ENT_GeometryOutln::Event_EdgeShadingChanged);
     AddEventHandler(ev_geom_renderModeChanged, this, &ENT_GeometryOutln::Event_RenderModeChanged);
     AddEventHandler(ev_geom_showVertexLabels, this, &ENT_GeometryOutln::Event_ShowVertexLabels);
@@ -97,10 +97,10 @@ void ENT_GeometryOutln::InitOutline() {
     _sbEdgeScale->setSingleStep(0.1f);
 	_sbEdgeScale->setValue(_subject.GetEdgeScale());
 
-    QLabel* lblEdgeColor = new QLabel("edge color:");
-    _btnEdgeColor = new UI::ColorButton;
-	R::Color edgeColor = _subject.GetEdgeColor();
-	_btnEdgeColor->SetColor(edgeColor.r, edgeColor.g, edgeColor.b);
+    QLabel* lblEdgeTint = new QLabel("edge tint:");
+    _btnEdgeTint = new UI::ColorButton;
+	R::Color edgeTint = _subject.GetEdgeTint();
+	_btnEdgeTint->SetColor(edgeTint.r, edgeTint.g, edgeTint.b);
 
     QLabel* lblEdgeShading = new QLabel("edge shading:");
     _cbEdgeShading = new QComboBox;
@@ -158,8 +158,8 @@ void ENT_GeometryOutln::InitOutline() {
 
     layout->addWidget(_sbEdgeScale, 1, 0, 1, 2);
 
-    layout->addWidget(lblEdgeColor, 2, 0, 1, 1);
-    layout->addWidget(_btnEdgeColor, 2, 1, 1, 1);
+    layout->addWidget(lblEdgeTint, 2, 0, 1, 1);
+    layout->addWidget(_btnEdgeTint, 2, 1, 1, 1);
 
     layout->addWidget(lblEdgeShading, 3, 0, 1, 1);
     layout->addWidget(_cbEdgeShading, 3, 1, 1, 1);
@@ -182,7 +182,7 @@ void ENT_GeometryOutln::InitOutline() {
 
     QObject::connect(_sbVertexScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnVertexScaleChanged(leda::rational)));
     QObject::connect(_sbEdgeScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnEdgeScaleChanged(leda::rational)));
-    QObject::connect(_btnEdgeColor, SIGNAL(SigColorChanged(float, float, float)), this, SLOT(OnEdgeColorChanged(float, float, float)));
+    QObject::connect(_btnEdgeTint, SIGNAL(SigColorChanged(float, float, float)), this, SLOT(OnEdgeTintChanged(float, float, float)));
     QObject::connect(_cbEdgeShading, SIGNAL(currentIndexChanged(int)), this, SLOT(OnEdgeShadingChanged(int)));
     QObject::connect(_cbHiddenLines, SIGNAL(stateChanged(int)), this, SLOT(OnHiddenLinesChanged(int)));
     QObject::connect(_sbHullAlpha, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnTransparencyChanged(leda::rational)));
@@ -220,11 +220,11 @@ void ENT_GeometryOutln::Event_EdgeScaleChanged(const EV::Arg<float>& event) {
 	_sbEdgeScale->blockSignals(false);
 }
 
-void ENT_GeometryOutln::Event_EdgeColorChanged(const EV::Arg<R::Color>& event) {
-    const R::Color& edgeColor = event.value;
-	_btnEdgeColor->blockSignals(true);
-	_btnEdgeColor->SetColor(edgeColor.r, edgeColor.g, edgeColor.b);
-	_btnEdgeColor->blockSignals(false);
+void ENT_GeometryOutln::Event_EdgeTintChanged(const EV::Arg<R::Color>& event) {
+    const R::Color& edgeTint = event.value;
+	_btnEdgeTint->blockSignals(true);
+	_btnEdgeTint->SetColor(edgeTint.r, edgeTint.g, edgeTint.b);
+	_btnEdgeTint->blockSignals(false);
 }
 
 void ENT_GeometryOutln::Event_EdgeShadingChanged(const EdgeShadingEvent& event) {

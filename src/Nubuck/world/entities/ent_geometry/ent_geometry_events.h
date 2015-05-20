@@ -23,7 +23,7 @@ extern EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_setVertexLabelSize;
 extern EV::ConcreteEventDef<EV::Arg<bool> >     ev_geom_xrayVertexLabels;
 extern EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_vertexScaleChanged;
 extern EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_edgeScaleChanged;
-extern EV::ConcreteEventDef<EV::Arg<R::Color> > ev_geom_edgeColorChanged;
+extern EV::ConcreteEventDef<EV::Arg<R::Color> > ev_geom_edgeTintChanged;
 extern EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_transparencyChanged;
 extern EV::ConcreteEventDef<RenderModeEvent>    ev_geom_renderModeChanged;
 extern EV::ConcreteEventDef<EdgeShadingEvent>   ev_geom_edgeShadingChanged;

@@ -213,9 +213,9 @@ void ENT_Geometry::Event_EdgeScaleChanged(const EV::Arg<float>& event) {
     ForceRebuild();
 }
 
-void ENT_Geometry::Event_EdgeColorChanged(const EV::Arg<R::Color>& event) {
+void ENT_Geometry::Event_EdgeTintChanged(const EV::Arg<R::Color>& event) {
 	SYS::ScopedLock lock(_mtx);
-    _edgeColor = event.value;
+    _edgeTint = event.value;
     ForceRebuild();
 }
 
@@ -265,7 +265,7 @@ ENT_Geometry::ENT_Geometry()
 
     _vertexScale    = 1.0f;
     _edgeScale      = 1.0f;
-    _edgeColor      = R::Color(0.3f, 0.3f, 0.3f);
+    _edgeTint      = R::Color(0.3f, 0.3f, 0.3f);
 
     _outlinerItem = g_ui.GetOutliner().AddItem("", this);
 
@@ -276,7 +276,7 @@ ENT_Geometry::ENT_Geometry()
     AddEventHandler(ev_geom_xrayVertexLabels, this, &ENT_Geometry::Event_XrayVertexLabels);
     AddEventHandler(ev_geom_vertexScaleChanged, this, &ENT_Geometry::Event_VertexScaleChanged);
 	AddEventHandler(ev_geom_edgeScaleChanged, this, &ENT_Geometry::Event_EdgeScaleChanged);
-	AddEventHandler(ev_geom_edgeColorChanged, this, &ENT_Geometry::Event_EdgeColorChanged);
+	AddEventHandler(ev_geom_edgeTintChanged, this, &ENT_Geometry::Event_EdgeTintChanged);
     AddEventHandler(ev_geom_transparencyChanged, this, &ENT_Geometry::Event_TransparencyChanged);
     AddEventHandler(ev_geom_renderModeChanged, this, &ENT_Geometry::Event_RenderModeChanged);
     AddEventHandler(ev_geom_edgeShadingChanged, this, &ENT_Geometry::Event_EdgeShadingChanged);
@@ -471,9 +471,9 @@ float ENT_Geometry::GetEdgeScale() const {
     return _edgeScale;
 }
 
-R::Color ENT_Geometry::GetEdgeColor() const {
+R::Color ENT_Geometry::GetEdgeTint() const {
 	SYS::ScopedLock lock(_mtx);
-    return _edgeColor;
+    return _edgeTint;
 }
 
 void ENT_Geometry::SetVertexScale(float vertexScale) {
@@ -494,13 +494,13 @@ void ENT_Geometry::SetEdgeScale(float edgeScale) {
         ev_geom_edgeScaleChanged.Tag(_edgeScale));
 }
 
-void ENT_Geometry::SetEdgeColor(const R::Color& color) {
+void ENT_Geometry::SetEdgeTint(const R::Color& color) {
 	SYS::ScopedLock lock(_mtx);
-    _edgeColor = color;
+    _edgeTint = color;
     RebuildRenderEdges();
 
     g_ui.GetOutliner().SendToView(_outlinerItem,
-        ev_geom_edgeColorChanged.Tag(_edgeColor));
+        ev_geom_edgeTintChanged.Tag(_edgeTint));
 }
 
 M::Vector3 ENT_Geometry::GetPosition() const {

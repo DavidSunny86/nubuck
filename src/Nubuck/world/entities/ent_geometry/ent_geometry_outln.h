@@ -20,7 +20,7 @@ private:
 
     NBW_SpinBox*        _sbVertexScale;
     NBW_SpinBox*        _sbEdgeScale;
-    UI::ColorButton*    _btnEdgeColor;
+    UI::ColorButton*    _btnEdgeTint;
     NBW_SpinBox*        _sbHullAlpha;
 
     QPushButton*        _btnRenderVertices;
@@ -43,7 +43,7 @@ private:
 
     void Event_VertexScaleChanged(const EV::Arg<float>& event);
     void Event_EdgeScaleChanged(const EV::Arg<float>& event);
-    void Event_EdgeColorChanged(const EV::Arg<R::Color>& event);
+    void Event_EdgeTintChanged(const EV::Arg<R::Color>& event);
     void Event_EdgeShadingChanged(const EdgeShadingEvent& event);
     void Event_RenderModeChanged(const RenderModeEvent& event);
     void Event_ShowVertexLabels(const EV::Arg<bool>& event);
@@ -52,7 +52,7 @@ private:
 private slots:
     void OnVertexScaleChanged(leda::rational value);
     void OnEdgeScaleChanged(leda::rational value);
-    void OnEdgeColorChanged(float r, float g, float b);
+    void OnEdgeTintChanged(float r, float g, float b);
     void OnTransparencyChanged(leda::rational value);
     void OnRenderModeChanged(bool checked);
     void OnEdgeShadingChanged(int idx);

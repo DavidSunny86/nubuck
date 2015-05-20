@@ -68,7 +68,7 @@ private:
 
     float       _vertexScale;
     float       _edgeScale;
-    R::Color    _edgeColor;
+    R::Color    _edgeTint;
 
     typedef NB::ShadingMode ShadingMode;
     typedef NB::Pattern     Pattern;
@@ -101,7 +101,7 @@ private:
     void Event_SetVertexLabelSize(const EV::Arg<float>& event);
     void Event_VertexScaleChanged(const EV::Arg<float>& event);
     void Event_EdgeScaleChanged(const EV::Arg<float>& event);
-    void Event_EdgeColorChanged(const EV::Arg<R::Color>& event);
+    void Event_EdgeTintChanged(const EV::Arg<R::Color>& event);
     void Event_TransparencyChanged(const EV::Arg<float>& event);
     void Event_RenderModeChanged(const RenderModeEvent& event);
     void Event_EdgeShadingChanged(const EdgeShadingEvent& event);
@@ -156,11 +156,11 @@ public:
 
     float       GetVertexScale() const;
     float       GetEdgeScale() const;
-    R::Color    GetEdgeColor() const;
+    R::Color    GetEdgeTint() const;
 
     void SetVertexScale(float vertexScale);
     void SetEdgeScale(float edgeScale);
-    void SetEdgeColor(const R::Color& color);
+    void SetEdgeTint(const R::Color& color);
 
     M::Vector3 GetPosition() const;
 
