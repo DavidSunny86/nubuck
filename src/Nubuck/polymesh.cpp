@@ -1,5 +1,7 @@
 #include <Nubuck\polymesh.h>
 #include <Nubuck\face_vertex_mesh.h>
+#include <Nubuck\math\vector3.h>
+#include <Nubuck\math_conv.h>
 
 namespace leda {
 namespace nb {
@@ -161,6 +163,58 @@ NUBUCK_API size_t make_from_obj(const char* filename, RatPolyMesh& mesh) {
 
     fclose(file);
     return 0;
+}
+
+static M::Vector3 ProjectOnParaboloid_F(const M::Vector3& v) {
+    return M::Vector3(v.x, v.y, v.x * v.x + v.y * v.y);
+}
+
+// somehow this doesn't work when using exact arithmetic. oh well...
+NUBUCK_API void make_grid(RatPolyMesh& mesh, const int subdiv, const float size) {
+    const leda::rational zero(0, 1);
+
+    mesh.clear();
+
+    const int N = (1 << subdiv) + 1;
+
+    leda::node* nodes = new leda::node[N * N];
+
+    const float         hsize = 0.5f * size;
+    const M::Vector3    off = M::Vector3(hsize, hsize, 0.0f);
+    const float         ds = size / (N - 1);
+
+    float x = 0.0f, y = 0.0f;
+
+    for(unsigned i = 0; i < N; ++i) {
+        y = 0.0f;
+        for(unsigned j = 0; j < N; ++j) {
+            const leda::node v = mesh.new_node();
+            M::Vector3 pos = M::Vector3(x, y, 0.0f) - off;
+            mesh.set_position(v, ToRatPoint(ProjectOnParaboloid_F(pos)));
+            nodes[N * i + j] = v;
+
+            y += ds;
+        }
+
+        x += ds;
+    }
+
+    for(unsigned i = 0; i < N; ++i) {
+        for(unsigned j = 0; j < N; ++j) {
+            if(i + 1 < N)   mesh.new_edge(nodes[N * i + j], nodes[N * (i + 1) + j]);
+            if(j + 1 < N)   mesh.new_edge(nodes[N * i + j], nodes[N * i + (j + 1)]);
+            if(i > 0)       mesh.new_edge(nodes[N * i + j], nodes[N * (i - 1) + j]);
+            if(j > 0)       mesh.new_edge(nodes[N * i + j], nodes[N * i + (j - 1)]);
+        }
+    }
+
+    delete[] nodes;
+
+    bool isBidirected = mesh.make_map();
+    assert(isBidirected);
+    mesh.compute_faces();
+
+    mesh.set_visible(mesh.face_of(mesh.reversal(mesh.first_edge())), false);
 }
 
 } // namespace nb

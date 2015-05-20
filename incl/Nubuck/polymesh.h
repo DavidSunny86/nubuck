@@ -111,6 +111,7 @@ typedef PolyMesh<d3_rat_point> RatPolyMesh;
 
 NUBUCK_API void     make_leda(RatPolyMesh& mesh);
 NUBUCK_API size_t   make_from_obj(const char* filename, RatPolyMesh& mesh);
+NUBUCK_API void     make_grid(RatPolyMesh& mesh, const int subdiv, const float size);
 
 void D3_HULL(list<d3_rat_point> L, RatPolyMesh& mesh);
 

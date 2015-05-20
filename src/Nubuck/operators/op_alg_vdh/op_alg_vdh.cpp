@@ -26,10 +26,12 @@ VDH_Panel::VDH_Panel() {
     _cbDelaunay = NB::CreateCheckBox(ID_DELAUNAY, "Show Delaunay");
     _cbVoronoi = NB::CreateCheckBox(ID_VORONOI, "Show Voronoi");
     _cbCHull = NB::CreateCheckBox(ID_CHULL, "Show Hull");
+    _cbParaboloid = NB::CreateCheckBox(ID_PARABOLOID, "Show Paraboloid");
 
     NB::AddWidgetToBox(boxLayout, NB::CastToWidget(_cbDelaunay));
     NB::AddWidgetToBox(boxLayout, NB::CastToWidget(_cbVoronoi));
     NB::AddWidgetToBox(boxLayout, NB::CastToWidget(_cbCHull));
+    NB::AddWidgetToBox(boxLayout, NB::CastToWidget(_cbParaboloid));
 
     SetLayout(boxLayout);
 }
@@ -38,6 +40,7 @@ void VDH_Panel::Invoke() {
     NB::SetChecked(_cbDelaunay, true, true);
     NB::SetChecked(_cbVoronoi, true, true);
     NB::SetChecked(_cbCHull, true, true);
+    NB::SetChecked(_cbParaboloid, true, true);
 }
 
 /*
@@ -676,6 +679,10 @@ void VDH_Operator::Event_CheckBoxToggled(const EV::Arg<bool>& event) {
         if(isChecked) NB::ShowMesh(_hullMesh);
         else NB::HideMesh(_hullMesh);
         break;
+    case ID_PARABOLOID:
+        if(isChecked) NB::ShowMesh(_paraboloidMesh);
+        else NB::HideMesh(_paraboloidMesh);
+        break;
     };
 }
 
@@ -683,6 +690,7 @@ VDH_Operator::VDH_Operator()
     : _verticesMesh(NULL)
     , _delaunayMesh(NULL)
     , _hullMesh(NULL)
+    , _paraboloidMesh(NULL)
 {
     AddEventHandler(ev_checkBoxToggled, this, &VDH_Operator::Event_CheckBoxToggled);
 }
@@ -764,6 +772,16 @@ bool VDH_Operator::Invoke() {
     NB::SetMeshName(_hullMesh, "Convex Hull");
     NB::SetMeshRenderMode(_hullMesh, NB::RM_ALL);
     NB::SetMeshPosition(_hullMesh, M::Vector3(0.0f, 0.0f, 2.0f));
+
+    // create mesh for paraboloid
+    _paraboloidMesh = NB::CreateMesh();
+    NB::SetMeshRenderMode(_paraboloidMesh, NB::RM_FACES);
+    NB::SetMeshName(_paraboloidMesh, "Paraboloid");
+    NB::SetMeshPosition(_paraboloidMesh, NB::GetMeshPosition(_paraboloidMesh) + M::Vector3(0.0f, 0.0f, 2.0f));
+    leda::nb::RatPolyMesh& parabMesh = NB::GetGraph(_paraboloidMesh);
+    const float maxSize = 10.0f;
+    leda::nb::make_grid(parabMesh, 6, maxSize);
+    leda::nb::set_color(parabMesh, R::Color::Green);
 
     _vertexEditor.SetAxisFlags(NB::AF_X | NB::AF_Y);
     _vertexEditor.Open(_verticesMesh);

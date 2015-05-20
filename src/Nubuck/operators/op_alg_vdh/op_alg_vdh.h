@@ -8,7 +8,8 @@ namespace OP {
 enum {
     ID_DELAUNAY,
     ID_VORONOI,
-    ID_CHULL
+    ID_CHULL,
+    ID_PARABOLOID
 };
 
 class VDH_Panel : public OperatorPanel {
@@ -16,6 +17,7 @@ private:
     NB::CheckBox _cbDelaunay;
     NB::CheckBox _cbVoronoi;
     NB::CheckBox _cbCHull;
+    NB::CheckBox _cbParaboloid;
 public:
     VDH_Panel();
 
@@ -28,6 +30,7 @@ private:
     NB::Mesh _delaunayMesh;
     NB::Mesh _voronoiMesh;
     NB::Mesh _hullMesh;
+    NB::Mesh _paraboloidMesh;
 
     leda::node_array<R::Color> _vertexColors;
 
