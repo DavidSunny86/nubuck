@@ -125,7 +125,7 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
         int numDispatched = _activeOp->HandleEvents();
         COM_assert(1 == numDispatched);
 
-        W::world.SendAndWait(ev_w_rebuildAll.Tag());
+        RebuildMeshes();
 	}
 
     SignalCompletion();

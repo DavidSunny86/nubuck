@@ -123,4 +123,11 @@ void Transform::OnKey(const EV::KeyEvent& event) {
 
 }
 
+void Transform::OnMeshChanged(const EV::Event& event) {
+    if(W::editMode_t::OBJECTS == _mode) {
+        _entityEditor.CopyGlobalSelection(); // takes care of deletion
+        _entityEditor.UpdateBoundingBoxes();
+    }
+}
+
 } // namespace OP

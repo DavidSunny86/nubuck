@@ -42,6 +42,7 @@ public:
     void OnEditModeChanged(const W::editMode_t::Enum mode) override;
     void OnMouse(const EV::MouseEvent& event) override;
     void OnKey(const EV::KeyEvent& event) override;
+    void OnMeshChanged(const EV::Event& event) override;
 };
 
 } // namespace OP

@@ -723,13 +723,15 @@ static MeshJob* DrawMeshList(
     return meshJob;
 }
 
-static void DrawFrame(
+void Renderer::DrawFrame(
     const M::Matrix4& modelView,
     const M::Matrix4& projectionMat,
     R::Renderer::GeomSortMode::Enum geomSortMode,
     float time, std::vector<MeshJob>& rjobs)
 {
     if(rjobs.empty()) return;
+
+    Log(STAT_I) << "Renderer::DrawFrame {" << std::endl;
 
     MeshJob* meshJob = &rjobs[0];
     while(meshJob) {
@@ -752,6 +754,8 @@ static void DrawFrame(
     MeshJob* next = NULL;
     while(cur) {
         next = NULL;
+
+        Log(STAT_I) << "... fx = " << cur->fx << std::endl;
 
         GEN::Pointer<Effect> fx = effectMgr.GetEffect(cur->fx);
         int numPasses = fx->NumPasses();
@@ -777,6 +781,7 @@ static void DrawFrame(
         }
         cur = next;
     }
+    Log(STAT_I) << "} // Renderer::DrawFrame" << std::endl;
 }
 
 static bool CompareJobs(const R::MeshJob& lhp, const R::MeshJob& rhp) {
@@ -954,7 +959,11 @@ void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, Re
     M::Matrix4 worldToEye   = renderList.worldMat;
 
     if(!_renderLayers[Layers::GEOMETRY_0_SOLID_0].empty()) {
-        Log(STAT_I) << "rendering layer GEOMETRY_0_SOLID_0" << std::endl;
+        Log(STAT_I)
+            << "rendering layer GEOMETRY_0_SOLID_0"
+            << "(" << _renderLayers[Layers::GEOMETRY_0_SOLID_0].size() << " jobs)"
+            << std::endl;
+
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_0]);
     }
 
@@ -962,13 +971,22 @@ void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, Re
     fb_spine0.fb->Bind();
     Clear(GL_DEPTH_BUFFER_BIT);
     if(!_renderLayers[Layers::GEOMETRY_0_SPINE_0].empty()) {
-        Log(STAT_I) << "rendering layer GEOMETRY_0_SPINE_0" << std::endl;
+        Log(STAT_I)
+            << "rendering layer GEOMETRY_0_SPINE_0"
+            << "(" << _renderLayers[Layers::GEOMETRY_0_SPINE_0].size() << " jobs)"
+            << std::endl;
+
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SPINE_0]);
     }
     framebuffer->Bind();
 
     // render use-depth pass
     if(!_renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].empty()) {
+        Log(STAT_I)
+            << "rendering layer GEOMETRY_0_USE_DEPTH_0"
+            << "(" << _renderLayers[Layers::GEOMETRY_0_USE_DEPTH_0].size() << " jobs)"
+            << std::endl;
+
         fb_useDepth.fb->Bind();
         Clear(GL_DEPTH_BUFFER_BIT);
 
@@ -982,8 +1000,12 @@ void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, Re
     }
 
     // use spine
-    /*
     if(!_renderLayers[Layers::GEOMETRY_0_USE_SPINE_0].empty()) {
+        Log(STAT_I)
+            << "rendering layer GEOMETRY_0_USE_SPINE_0"
+            << "(" << _renderLayers[Layers::GEOMETRY_0_USE_SPINE_0].size() << " jobs)"
+            << std::endl;
+
         fb_useDepth.fb->Bind();
         Clear(GL_DEPTH_BUFFER_BIT);
 
@@ -995,10 +1017,14 @@ void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, Re
 
         framebuffer->Bind();
     }
-    */
 
 
     if(!_renderLayers[Layers::GEOMETRY_0_SOLID_1].empty()) {
+        Log(STAT_I)
+            << "rendering layer GEOMETRY_0_SOLID_1"
+            << "(" << _renderLayers[Layers::GEOMETRY_0_SOLID_1].size() << " jobs)"
+            << std::endl;
+
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_1]);
     }
 
@@ -1057,6 +1083,11 @@ void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, Re
 
             // render use-depth pass, with dp enabled
             if(!_renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH].empty()) {
+                Log(STAT_I)
+                    << "rendering layer GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH"
+                    << "(" << _renderLayers[Layers::GEOMETRY_0_TRANSPARENT_DEPTH_PEELING_USE_DEPTH].size() << " jobs)"
+                    << std::endl;
+
                 SetPipelineTextureBinding(0, "depthTex", dp_db[other].Raw());
                 SetPipelineTextureBinding(1, "solidDepth", depthbuffer.Raw());
                 SetPipelineTextureBinding(2, "peelDepth", dp_db[self].Raw());
@@ -1138,6 +1169,11 @@ void Renderer::Render(const M::Matrix4& perspective, const M::Matrix4& ortho, Re
     }
 
     if(!_renderLayers[Layers::GEOMETRY_0_SOLID_2].empty()) {
+        Log(STAT_I)
+            << "rendering layer GEOMETRY_0_SOLID_2"
+            << "(" << _renderLayers[Layers::GEOMETRY_0_SOLID_2].size() << " jobs)"
+            << std::endl;
+
         Render(renderList, projection, worldToEye, GeomSortMode::UNSORTED, _renderLayers[Layers::GEOMETRY_0_SOLID_2]);
     }
 

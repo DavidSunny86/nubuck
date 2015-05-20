@@ -149,13 +149,20 @@ void EntityEditor::BBox::Init() {
     forall_nodes(v, mesh) {
         verts[vidx++] = v;
     }
+
+    leda::edge e;
+    forall_edges(e, mesh) {
+        mesh.set_color(e, R::Color::White);
+    }
 }
 
 void EntityEditor::BBox::Update(W::Entity* ent) {
     const M::Box& mbox = ent->GetBoundingBox();
 
-    const M::Vector3& min = mbox.min;
-    const M::Vector3& max = mbox.max;
+    const M::Vector3 boundary = 0.2f * M::Vector3(1.0f, 1.0f, 1.0f);
+
+    const M::Vector3 min = mbox.min - boundary;
+    const M::Vector3 max = mbox.max + boundary;
 
     leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
     mesh.set_position(verts[0], ToRatPoint(M::Vector3(min.x, min.y, min.z)));
@@ -347,6 +354,22 @@ void EntityEditor::Open() {
 
 void EntityEditor::Close() {
     SetGizmoVisibility(false);
+}
+
+// update
+void EntityEditor::UpdateBoundingBoxes() {
+    W::Entity* it = FirstSelectedEntity();
+    while(it) {
+        if(W::EntityType::ENT_GEOMETRY == it->GetType()) {
+            W::ENT_Geometry* geom = static_cast<W::ENT_Geometry*>(it);
+            if(geom->IsDirty()) {
+                geom->CacheFPos();
+                geom->ComputeBoundingBox();
+                _entData[geom->GetID()].bbox.Update(it);
+            }
+        }
+        it = NextSelectedEntity(it);
+    }
 }
 
 void EntityEditor::CopyGlobalSelection() {

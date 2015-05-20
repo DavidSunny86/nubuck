@@ -62,7 +62,6 @@ private:
 
     void ForceRebuild();
 
-    void CacheFPos();
     void RebuildRenderMesh();
     void UpdateRenderMesh();
     void DestroyRenderMesh();
@@ -89,7 +88,6 @@ private:
     bool                _isTransparent;
 
     void ComputeCenter();
-    void ComputeBoundingBox();
 
     // selection
     std::vector<leda::node> _vertexSelection;
@@ -114,6 +112,9 @@ public:
     DECL_HANDLE_EVENTS(ENT_Geometry);
 
     bool IsDirty() const;
+
+    void CacheFPos();
+    void ComputeBoundingBox();
 
     struct VertexHit {
         leda::node  vert;

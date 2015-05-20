@@ -94,6 +94,8 @@ public:
     void Open();
     void Close();
 
+    void UpdateBoundingBoxes();
+
     void CopyGlobalSelection();
 
     M::Vector3  GlobalCenterOfSelection();

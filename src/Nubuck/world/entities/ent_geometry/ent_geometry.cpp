@@ -668,13 +668,13 @@ void ENT_Geometry::BuildRenderList() {
 
         if(_showWireframe) {
             rjob.fx = "GenericWireframe";
-            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
             _renderList.meshJobs.push_back(rjob);
         }
 
         if(_showNormals) {
             rjob.fx = "GenericNormals";
-            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
             _renderList.meshJobs.push_back(rjob);
         }
 
@@ -730,7 +730,7 @@ void ENT_Geometry::BuildRenderList() {
     if(NB::RM_NODES & _renderMode && !_nodeRenderer->IsEmpty()) {
 	    _nodeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _nodeRenderer->GetRenderJob();
-        rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+        rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
         if(NB::SM_FAST == _shadingMode) {
             rjob.fx = "FastNodeBillboard";
 
@@ -753,7 +753,7 @@ void ENT_Geometry::BuildRenderList() {
             _renderList.meshJobs.push_back(rjob);
 
             rjob.fx = "NodeBillboardGS";
-            rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_DEPTH_0;
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_SPINE_0;
         }
         _renderList.meshJobs.push_back(rjob);
     }
@@ -761,8 +761,13 @@ void ENT_Geometry::BuildRenderList() {
     if(NB::RM_EDGES & _renderMode && !_edgeRenderer->IsEmpty()) {
 		_edgeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _edgeRenderer->GetRenderJob();
-        rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
+        rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
         if(NB::SM_LINES == _shadingMode) {
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
+            _renderList.meshJobs.push_back(rjob);
+
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
+
             if(_stylizedHiddenLines) {
                 rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_2;
                 rjob.fx = "UnlitThickLinesStippled";
@@ -786,7 +791,7 @@ void ENT_Geometry::BuildRenderList() {
                 rjob.fx = "EdgeLineBillboardGSSE";
             }
 
-            rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_DEPTH_0;
+            rjob.layer = R::Renderer::Layers::GEOMETRY_0_USE_SPINE_0;
         }
         _renderList.meshJobs.push_back(rjob);
     }
