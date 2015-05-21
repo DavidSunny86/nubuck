@@ -19,6 +19,13 @@ Material::UniformBinding& Material::FindBindingSlot(const char* name) {
 
 // sets unorm[u] = timestamp, for every material uniform 'u'
 void Material::Bind(Program& prog, std::unordered_map<std::string, int>& unorm, int timestamp, const Material& mat) {
+    const char* mat_diffuseColor = "uDiffuseColor";
+
+    // bind default uniforms
+    prog.SetUniform(mat_diffuseColor, mat.diffuseColor, true);
+    unorm[mat_diffuseColor] = timestamp;
+
+    // bind optional uniforms
     int texUnit = MATERIAL_BASE_TEXUNIT;
     for(int i = 0; i < NUM_UNIFORM_BINDINGS && mat.uniformBindings[i].IsValid(); ++i) {
         const UniformBinding& ub = mat.uniformBindings[i];
@@ -50,6 +57,10 @@ void Material::Bind(Program& prog, std::unordered_map<std::string, int>& unorm, 
 Material::Material() : _numBindings(0) { }
 
 Material Material::White(Color::White);
+
+void Material::SetDiffuseColor(const Color& color) {
+    diffuseColor = color;
+}
 
 void Material::SetUniformBinding(const char* name, Texture* val) {
     UniformBinding& ub = FindBindingSlot(name);

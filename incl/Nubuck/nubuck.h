@@ -194,6 +194,8 @@ NUBUCK_API void SetMeshPattern(Mesh mesh, Pattern pattern);
 NUBUCK_API void SetMeshPatternColor(Mesh mesh, const R::Color& color);
 NUBUCK_API void ShowMeshVertexLabels(Mesh mesh, bool show);
 
+NUBUCK_API void SetMeshEdgeTint(Mesh mesh, const R::Color& color);
+
 NUBUCK_API unsigned GetMeshID(Mesh mesh);
 NUBUCK_API bool     IsMeshDirty(Mesh mesh);
 

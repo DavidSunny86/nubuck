@@ -42,7 +42,7 @@ namespace R {
         void Link(void);
         void Use(void);
 
-        GLint GetUniformLocation(const GLchar* name);
+        GLint GetUniformLocation(const GLchar* name, bool silent = false);
         GLint GetAttributeLocation(const GLchar* name);
 
         void SetUniform(const char* name, int value);
@@ -50,7 +50,7 @@ namespace R {
         void SetUniform(const char* name, const M::Vector3& vector);
         void SetUniform(const char* name, const M::Matrix3& matrix);
         void SetUniform(const char* name, const M::Matrix4& matrix);
-        void SetUniform(const char* name, const R::Color& color);
+        void SetUniform(const char* name, const R::Color& color, bool silent = false);
 
         void SetMaterial(const Material& mat);
         

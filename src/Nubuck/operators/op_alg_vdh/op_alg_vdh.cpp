@@ -761,6 +761,7 @@ bool VDH_Operator::Invoke() {
     _delaunayMesh = NB::CreateMesh();
     NB::SetMeshName(_delaunayMesh, "Delaunay Triangulation");
     NB::SetMeshRenderMode(_delaunayMesh, NB::RM_NODES | NB::RM_EDGES);
+    NB::SetMeshEdgeTint(_delaunayMesh, R::Color::Blue);
 
     // create mesh for projected voronoi diagram
     _voronoiMesh = NB::CreateMesh();

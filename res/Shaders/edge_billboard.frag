@@ -23,6 +23,8 @@ layout(std140) uniform UniformsSkeleton {
 
 #include <Shaders\lighting.glsl>
 
+material vec4 uDiffuseColor;
+
 // in edge's local space
 varying vec4     vColor;
 varying mat4     vObjectToEye;
@@ -47,7 +49,7 @@ void main() {
         vec3 view = -normalize(tp.xyz);
         vec3 normal = normalize(vObjectToEye * vec4(p.x, p.y, 0.0, 0.0)).xyz;
 
-        gl_FragColor = vec4(lighting(normal, view, vColor.rgb), 1.0);
+        gl_FragColor = vec4(lighting(normal, view, uDiffuseColor.rgb * vColor.rgb), 1.0);
 
 		vec4 proj = uProjection * tp;
 		gl_FragDepth = 0.5 * (1.0 + proj.z / proj.w);

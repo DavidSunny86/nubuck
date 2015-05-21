@@ -122,7 +122,7 @@ template<typename VEC3>
 const float PolyMesh<VEC3>::defaultVertexRadius = 0.02f;
 
 template<typename VEC3>
-const R::Color PolyMesh<VEC3>::defaultEdgeColor = R::Color(0.3f, 0.3f, 0.3f);
+const R::Color PolyMesh<VEC3>::defaultEdgeColor = R::Color(1.0f, 1.0f, 1.0f);
 
 template<typename VEC3>
 const float PolyMesh<VEC3>::defaultEdgeRadius = 0.01f;

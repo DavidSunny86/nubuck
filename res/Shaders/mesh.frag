@@ -26,6 +26,7 @@ layout(std140) uniform UniformsRenderTarget {
 uniform sampler2D depthTex;
 uniform sampler2D solidDepth;
 
+material vec4 uDiffuseColor;
 // pattern is enabled if patternColor.a > 0.0
 material vec4        patternColor;
 material sampler2D   patternTex;
@@ -38,7 +39,7 @@ varying vec4 vColor;
 varying vec4 vPatternColor;
 
 void main() {
-    vec4 color = vColor;
+    vec4 color = uDiffuseColor * vColor;
 
     if(PERFORM_DEPTH_TEST || PERFORM_DEPTH_PEEL) {
         vec2 texCoords;

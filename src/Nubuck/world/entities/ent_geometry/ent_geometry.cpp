@@ -761,6 +761,7 @@ void ENT_Geometry::BuildRenderList() {
     if(NB::RM_EDGES & _renderMode && !_edgeRenderer->IsEmpty()) {
 		_edgeRenderer->BuildRenderMesh();
         R::MeshJob rjob = _edgeRenderer->GetRenderJob();
+        rjob.material.SetDiffuseColor(_edgeTint);
         rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
         if(NB::SM_LINES == _shadingMode) {
             rjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;

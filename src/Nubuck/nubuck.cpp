@@ -262,6 +262,10 @@ NUBUCK_API void ShowMeshVertexLabels(Mesh mesh, bool show) {
     mesh->Send(ev_geom_showVertexLabels.Tag(show));
 }
 
+NUBUCK_API void SetMeshEdgeTint(Mesh mesh, const R::Color& color) {
+    mesh->SetEdgeTint(color);
+}
+
 NUBUCK_API unsigned GetMeshID(Mesh mesh) {
     return mesh->GetID();
 }

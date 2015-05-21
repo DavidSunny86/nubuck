@@ -106,12 +106,12 @@ namespace R {
         GL_CALL(glUseProgram(_id));
     }
 
-    GLint Program::GetUniformLocation(const char* name) {
+    GLint Program::GetUniformLocation(const char* name, bool silent) {
         std::unordered_map<std::string, GLint>::const_iterator locIt(_uniformLocations.find(name));
         if(_uniformLocations.end() != locIt) return locIt->second;
         if(!_linked) Link();
         GLint loc = glGetUniformLocation(_id, name);
-        if(0 > loc) {
+        if(0 > loc && !silent) {
             common.printf("uniform %s not found.\n", name);
 #ifdef _WIN32
             std::string msg;
@@ -159,8 +159,8 @@ namespace R {
         if(0 <= loc) glUniformMatrix4fv(loc, 1, GL_FALSE, matrix.mat);
     }
 
-    void Program::SetUniform(const char* name, const R::Color& color) {
-        GLint loc = GetUniformLocation(name);
+    void Program::SetUniform(const char* name, const R::Color& color, bool silent) {
+        GLint loc = GetUniformLocation(name, silent);
         if(0 <= loc) glUniform4f(loc, color.r, color.g, color.b, color.a);
     }
 

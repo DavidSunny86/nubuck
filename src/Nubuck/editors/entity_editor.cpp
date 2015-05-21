@@ -139,6 +139,7 @@ void EntityEditor::BBox::Init() {
     geom->SetShadingMode(NB::SM_LINES);
     geom->SetSolid(false);
     geom->HideOutline();
+    geom->SetEdgeTint(R::Color::White);
 
     leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
 
@@ -148,11 +149,6 @@ void EntityEditor::BBox::Init() {
     leda::node v;
     forall_nodes(v, mesh) {
         verts[vidx++] = v;
-    }
-
-    leda::edge e;
-    forall_edges(e, mesh) {
-        mesh.set_color(e, R::Color::White);
     }
 }
 

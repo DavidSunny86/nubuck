@@ -53,6 +53,8 @@ public:
     Material();
     Material(const Color& diffuseColor) : diffuseColor(diffuseColor) { }
 
+    void SetDiffuseColor(const Color& color);
+
     void SetUniformBinding(const char* name, Texture* val);
     void SetUniformBinding(const char* name, const Color& val);
     void ClearUniformBinding(const char* name);

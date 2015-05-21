@@ -17,6 +17,8 @@ layout(std140) uniform UniformsRenderTarget {
     int uHeight;
 };
 
+material vec4 uDiffuseColor;
+
 uniform sampler2D depthTex;
 uniform sampler2D solidDepth;
 uniform sampler2D peelDepth;
@@ -73,5 +75,5 @@ void main() {
         if(border < dist) alpha = 1.0 - (dist - border) / (1.0 - border);
     }
 
-    gl_FragColor = vec4(inData.color, alpha);
+    gl_FragColor = vec4(uDiffuseColor.rgb * inData.color, alpha);
 }
