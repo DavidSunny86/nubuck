@@ -345,6 +345,9 @@ void World::Event_Key(const EV::KeyEvent& event) {
         _camArcball.Reset();
         accepted = true;
     }
+
+    // NOTE: Shift+Numpad somehow only works with numlock disabled
+
     if(numpad[1] == event.nativeScanCode) {
         if(EV::KeyEvent::MODIFIER_SHIFT & event.mods) {
             _camArcball.RotateTo(M::Quat::RotateAxis(M::Vector3(0.0f, 1.0f, 0.0f), 180.0f), transitionDur); // back view
