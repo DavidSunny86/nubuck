@@ -366,10 +366,22 @@ static leda::edge NextDanglingEdge(const voronoiGraph_t& VD, const leda::edge e,
     return it;
 }
 
-// TODO:
-// -seg-box intersection of segments with no interior endpoints
-// -special cases: interior contains no segments, no interior points
-static leda::edge Voronoi2D_BruteForce(const NB::Graph& in, NB::Graph& out) {
+static leda::node FindVertexByPosition2(const NB::Graph& G, const leda::rat_point& p) {
+    leda::node v;
+    forall_nodes(v, G) {
+        if(p == G[v].project_xy()) return v;
+    }
+    return NULL;
+}
+
+/*
+site[e] is vertex of graph 'in' that lies left of e or NULL, but for each face
+there is at least one edge with site != NULL.
+TODO:
+-seg-box intersection of segments with no interior endpoints
+-special cases: interior contains no segments, no interior points
+*/
+static leda::edge Voronoi2D_BruteForce(const NB::Graph& in, NB::Graph& out, leda::edge_map<leda::node>& site) {
     typedef leda::rat_segment   seg_t;
     typedef leda::rat_ray       ray_t;
     typedef leda::rat_circle    circle_t;
@@ -557,9 +569,13 @@ static leda::edge Voronoi2D_BruteForce(const NB::Graph& in, NB::Graph& out) {
     out.clear();
     FromProjection(VD, out, emap);
 
+    site.init(out, NULL);
+
     forall_edges(e, VD) {
         if(1 == mask[e]) out.set_color(emap[e], R::Color::Red);
         else if(2 == mask[e]) out.set_color(emap[e], R::Color::Blue);
+
+        site[emap[e]] = FindVertexByPosition2(in, VD[e]);
     }
 
     return r;
@@ -594,7 +610,19 @@ static bool IsFrontFace(Graph& G, face f) {
 }
 
 void VDH_Operator::ApplyVoronoiColors() {
-    // ...
+    NB::Graph& G = NB::GetGraph(_voronoiMesh);
+    leda::edge e0, e;
+    leda::face f;
+    forall_faces(f, G) {
+        if(G.is_visible(f)) {
+            e0 = e = G.first_face_edge(f);
+            while(!_site[e]) {
+                e = G.face_cycle_succ(e);
+                COM_assert(e0 != e);
+            }
+            G.set_color(f, _vertexColors[_site[e]]);
+        }
+    }
 }
 
 static void ConvexHull3D(const NB::Graph& verticesGraph, NB::Graph& hullGraph) {
@@ -618,7 +646,7 @@ void VDH_Operator::Update() {
     NB::Graph& voronoiGraph = NB::GetGraph(_voronoiMesh);
 
     // Voronoi2D(verticesGraph, NB::GetGraph(_voronoiMesh));
-    leda::edge r = Voronoi2D_BruteForce(verticesGraph, NB::GetGraph(_voronoiMesh));
+    leda::edge r = Voronoi2D_BruteForce(verticesGraph, NB::GetGraph(_voronoiMesh), _site);
     voronoiGraph.compute_faces();
 
     leda::face f;

@@ -34,6 +34,9 @@ private:
 
     leda::node_array<R::Color> _vertexColors;
 
+    // maps subset of E(voronoiMesh) to V(verticesMesh)
+    leda::edge_map<leda::node> _site;
+
     NB::VertexEditor _vertexEditor;
 
     void ApplyVoronoiColors();
