@@ -22,6 +22,7 @@ void Material::Bind(Program& prog, std::unordered_map<std::string, int>& unorm, 
     const char* mat_diffuseColor = "uDiffuseColor";
 
     // bind default uniforms
+    COM_assert(mat.IsDiffuseColorValid());
     prog.SetUniform(mat_diffuseColor, mat.diffuseColor, true);
     unorm[mat_diffuseColor] = timestamp;
 
@@ -54,11 +55,21 @@ void Material::Bind(Program& prog, std::unordered_map<std::string, int>& unorm, 
     }
 }
 
-Material::Material() : _numBindings(0) { }
+Material::Material()
+    : _numBindings(0)
+    , isDiffuseColorValid(false)
+{ }
+
+Material::Material(const Color& diffuseColor)
+    : _numBindings(0)
+    , isDiffuseColorValid(true)
+    , diffuseColor(diffuseColor)
+{ }
 
 Material Material::White(Color::White);
 
 void Material::SetDiffuseColor(const Color& color) {
+    isDiffuseColorValid = true;
     diffuseColor = color;
 }
 

@@ -692,6 +692,7 @@ static MeshJob* DrawMeshList(
             mesh.R_TouchBuffer();
             Uniforms_UpdateModelView(worldMat * tfmesh.GetTransform());
             BindMeshAttributes();
+            prog.SetMaterial(meshJob->material);
             GL_CALL(glDrawElements(mesh.PrimitiveType(), mesh.NumIndices(), ToGLEnum<Mesh::Index>::ENUM, mesh.OffIndices()));
             metrics.frame.numDrawCalls++;
             UnbindMeshAttributes();
@@ -770,7 +771,6 @@ void Renderer::DrawFrame(
             SetState(desc.state);
 
             BindPipelineTextures(prog);
-            prog.SetMaterial(cur->material);
 
             next = DrawMeshList(prog, desc.state, desc.type, desc.flags, modelView, geomSortMode, cur);
 

@@ -36,6 +36,9 @@ private:
     };
     enum { NUM_UNIFORM_BINDINGS = 3 };
 
+    // TODO: remove this eventually
+    bool            isDiffuseColorValid;
+
     Color           diffuseColor;
     UniformBinding  uniformBindings[NUM_UNIFORM_BINDINGS];
     int             _numBindings;
@@ -51,7 +54,9 @@ public:
     static Material White;
 
     Material();
-    Material(const Color& diffuseColor) : diffuseColor(diffuseColor) { }
+    Material(const Color& diffuseColor);
+
+    bool IsDiffuseColorValid() const { return isDiffuseColorValid; }
 
     void SetDiffuseColor(const Color& color);
 
