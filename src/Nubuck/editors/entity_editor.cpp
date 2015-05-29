@@ -366,6 +366,7 @@ void EntityEditor::UpdateBoundingBoxes() {
         }
         it = NextSelectedEntity(it);
     }
+    UpdateGizmo();
 }
 
 void EntityEditor::CopyGlobalSelection() {
