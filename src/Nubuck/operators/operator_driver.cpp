@@ -37,7 +37,7 @@ void Driver::SetOperator(Operator* op, bool force) {
         if(_activeOp) _activeOp->Finish();
         _activeOp = op;
 
-        W::world.SendAndWait(ev_w_rebuildAll.Tag());
+        RebuildMeshes();
 
         EV::Args2<Operator*, bool> event(op, force);
         g_operators.SendAndWait(ev_op_setOperator.Tag(event));

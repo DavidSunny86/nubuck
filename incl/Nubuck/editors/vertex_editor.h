@@ -62,8 +62,6 @@ private:
     W::ENT_Geometry*    GetSubject() { return _subject; }
     M::Vector3          GetOldVertexPosition(leda::node v) const { return _oldVertPosF[v]; }
     const M::Vector3&   GetCenterOfSelection() const { return _center; }
-    
-    void UpdateGizmo();
 
     bool DoPicking(const EV::MouseEvent& event, bool simulate);
 protected:
@@ -73,6 +71,8 @@ protected:
     bool OnKeyEvent(const EV::KeyEvent& event, bool simulate) override;
 public:
     VertexEditor();
+    
+    void UpdateGizmo();
 
     void SetAllowedModeFlags(int flags);
     void SetMode(int mode);

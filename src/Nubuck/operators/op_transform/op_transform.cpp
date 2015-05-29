@@ -127,6 +127,10 @@ void Transform::OnMeshChanged(const EV::Event& event) {
     if(W::editMode_t::OBJECTS == _mode) {
         _entityEditor.CopyGlobalSelection(); // takes care of deletion
         _entityEditor.UpdateBoundingBoxes();
+    } else {
+        // HACK, should listen to selectionChanged event instead.
+        COM_assert(W::editMode_t::VERTICES == _mode);
+        _vertexEditor.UpdateGizmo();
     }
 }
 
