@@ -322,4 +322,27 @@ void VertexEditor::Close() {
     }
 }
 
+// searches for a selected vertex, in ,,graph order'', starting at v.
+// NOTE that this method returns 'v', if it's selected.
+leda::node VertexEditor::SearchSelectedVertex(leda::node v) {
+    COM_assert(_subject);
+    if(!v) return NULL;
+    if(_selection[v]) return v;
+    return SearchSelectedVertex(_subject->GetRatPolyMesh().next_node(v));
+}
+
+// NOTE: for now, we return selected vertices in ,,graph order'', i.e.,
+// in the order defined by subject.next_node(), not in the order
+// as selected by the user
+
+leda::node VertexEditor::FirstSelectedVertex() {
+    COM_assert(_subject);
+    return SearchSelectedVertex(_subject->GetRatPolyMesh().first_node());
+}
+
+leda::node VertexEditor::NextSelectedVertex(leda::node v) {
+    COM_assert(_subject);
+    return SearchSelectedVertex(_subject->GetRatPolyMesh().next_node(v));
+}
+
 } // namespace NB

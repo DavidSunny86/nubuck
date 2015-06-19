@@ -246,6 +246,7 @@ bool EntityEditor::DoPicking(const EV::MouseEvent& event, bool simulate) {
                 if(!(EV::MouseEvent::MODIFIER_SHIFT & event.mods)) ClearSelection();
                 SelectEntity_Add(ent);
                 UpdateGizmo();
+                _lastAction = Action_PickEntity;
             }
             return true;
         }
@@ -255,10 +256,16 @@ bool EntityEditor::DoPicking(const EV::MouseEvent& event, bool simulate) {
 
 void EntityEditor::OnBeginDragging() {
     _curImpl->OnBeginDragging();
+    _lastAction = Action_BeginDragging;
 }
 
 void EntityEditor::OnDragging() {
     _curImpl->OnDragging();
+    _lastAction = Action_Dragging;
+}
+
+void EntityEditor::OnEndDragging() {
+    _lastAction = Action_EndDragging;
 }
 
 bool EntityEditor::OnMouseEvent(const EV::MouseEvent& event, bool simulate) {
@@ -312,6 +319,7 @@ EntityEditor::EntityEditor()
     , _allowedModeFlags(TMF_ALL)
     , _mode(0)
     , _modifyGlobalSelection(false)
+    , _lastAction(Action_None)
 {
     _impl[0] = GEN::MakePtr(new TranslateImpl(this));
     _impl[1] = GEN::MakePtr(new ScaleImpl(this));
@@ -358,7 +366,12 @@ void EntityEditor::UpdateBoundingBoxes() {
     while(it) {
         if(W::EntityType::ENT_GEOMETRY == it->GetType()) {
             W::ENT_Geometry* geom = static_cast<W::ENT_Geometry*>(it);
-            if(geom->IsDirty()) {
+            M::Vector3 translation = geom->GetPosition() - _entData[geom->GetID()].bbox.geom->GetPosition();
+            bool moved =
+                0.0f != translation.x ||
+                0.0f != translation.y ||
+                0.0f != translation.z;
+            if(geom->IsDirty() || moved) {
                 geom->CacheFPos();
                 geom->ComputeBoundingBox();
                 _entData[geom->GetID()].bbox.Update(it);
@@ -412,6 +425,10 @@ W::Entity* EntityEditor::NextSelectedEntity(const W::Entity* ent) {
     COM_assert(ent);
     COM_assert(IsSelected(ent));
     return _entData[ent->GetID()].nextSelected;
+}
+
+EntityEditor::Mode EntityEditor::GetMode() const {
+    return Mode(_mode);
 }
 
 } // namespace NB

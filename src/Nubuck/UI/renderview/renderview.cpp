@@ -117,6 +117,7 @@ namespace UI {
 		event.ret = NULL;
 
         if(EV::MouseEvent::BUTTON_RIGHT == event.button) {
+            std::cout << "INFO - right mouse button pressed" << std::endl;
             OP::g_operators.InvokeAction(ev_mouse.Tag(event), OP::Operators::InvokationMode::ALWAYS);
         } else {
             if(CAMERA == _inputMode) W::world.HandleMouseEvent(event);

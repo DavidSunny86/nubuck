@@ -116,7 +116,7 @@ bool Editor::HandleMouseEvent(const EV::MouseEvent& event) {
     bool retVal = false;
 
     switch(event.type) {
-    case EV::MouseEvent::MOUSE_DOWN: retVal = OnMouseDown(event); break;
+    case EV::MouseEvent::MOUSE_DOWN:retVal = OnMouseDown(event); break;
     case EV::MouseEvent::MOUSE_UP: retVal = OnMouseUp(event); break;
     case EV::MouseEvent::MOUSE_MOVE: retVal = OnMouseMove(event); break;
     }

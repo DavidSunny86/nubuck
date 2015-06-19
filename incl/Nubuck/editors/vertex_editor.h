@@ -64,6 +64,8 @@ private:
     const M::Vector3&   GetCenterOfSelection() const { return _center; }
 
     bool DoPicking(const EV::MouseEvent& event, bool simulate);
+
+    leda::node SearchSelectedVertex(leda::node v);
 protected:
     void OnBeginDragging() override;
     void OnDragging() override;
@@ -72,15 +74,18 @@ protected:
 public:
     VertexEditor();
     
-    void UpdateGizmo();
+    void        UpdateGizmo();
 
-    void SetAllowedModeFlags(int flags);
-    void SetMode(int mode);
+    void        SetAllowedModeFlags(int flags);
+    void        SetMode(int mode);
 
-    void SetModifyGlobalSelection(bool modify);
+    void        SetModifyGlobalSelection(bool modify);
 
-    void Open(W::ENT_Geometry* geom);
-    void Close();
+    void        Open(W::ENT_Geometry* geom);
+    void        Close();
+
+    leda::node  FirstSelectedVertex();
+    leda::node  NextSelectedVertex(leda::node v);
 };
 
 } // namespace NB

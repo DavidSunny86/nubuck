@@ -152,6 +152,8 @@ bool ENT_TransformGizmo::IsHidden() const {
 }
 
 bool ENT_TransformGizmo::Trace(const M::Ray& ray, int& axis, M::IS::Info* inf) {
+    if(IsHidden()) return false;
+
     for(int i = 0; i < DIM; ++i) {
         if(1 << i & _axis && M::IS::Intersects(ray, _bboxes[i], inf)) {
             axis = i;

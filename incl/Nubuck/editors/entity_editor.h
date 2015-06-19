@@ -12,6 +12,20 @@ TODO:
 */
 
 class EntityEditor : public Editor {
+public:
+    enum Mode {
+        Mode_Translate = 0,
+        Mode_Scale,
+        Mode_Rotate
+    };
+
+    enum Action {
+        Action_None = 0,
+        Action_BeginDragging,
+        Action_Dragging,
+        Action_EndDragging,
+        Action_PickEntity
+    };
 private:
     struct ModeImpl {
         virtual ~ModeImpl() { }
@@ -70,6 +84,8 @@ private:
 
     bool _modifyGlobalSelection;
 
+    int _lastAction;
+
     bool IsSelected(const W::Entity* ent) const;
 
     void ClearSelection();
@@ -81,6 +97,7 @@ private:
 protected:
     void OnBeginDragging() override;
     void OnDragging() override;
+    void OnEndDragging() override;
     bool OnMouseEvent(const EV::MouseEvent& event, bool simulate) override;
     bool OnKeyEvent(const EV::KeyEvent& event, bool simulate) override;
 public:
@@ -101,6 +118,11 @@ public:
     M::Vector3  GlobalCenterOfSelection();
     W::Entity*  FirstSelectedEntity();
     W::Entity*  NextSelectedEntity(const W::Entity* ent);
+
+    Mode        GetMode() const;
+
+    // return last action that caused Handle*Event() to return true
+    Action      GetAction() const;
 };
 
 } // namespace NB
