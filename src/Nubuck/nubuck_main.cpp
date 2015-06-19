@@ -88,18 +88,12 @@ static void InitializeRenderer() {
     delete dummyGL;
 }
 
-void TestPageAlloc();
-
 int RunNubuck(
     int                         argc,
     char*                       argv[],
     createOperatorFunc_t        createOperatorFunc,
     createOperatorPanelFunc_t   createOperatorPanelFunc)
 {
-#ifdef _DEBUG
-    TestPageAlloc();
-#endif
-
     QGLFormat::setDefaultFormat(FmtAlphaMultisampling(0));
     QApplication app(argc, argv);
 
