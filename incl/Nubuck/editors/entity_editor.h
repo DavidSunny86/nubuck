@@ -46,7 +46,6 @@ private:
 
     struct ScaleImpl : ModeImpl {
         EntityEditor*               entityEditor;
-        leda::node_map<M::Vector3>  oldVertPosF;
 
         ScaleImpl(EntityEditor* entityEditor);
 
@@ -73,6 +72,9 @@ private:
         BBox        bbox;
         W::Entity*  nextSelected;
 
+        // used by scale impl
+        leda::node_map<M::Vector3> oldVertPosF;
+
         EntityData() : isSelected(false), nextSelected(NULL) { }
     };
 
@@ -95,6 +97,8 @@ private:
 
     bool DoPicking(const EV::MouseEvent& event, bool simulate);
 protected:
+    EntityData& GetEntityData(W::Entity* ent);
+
     void OnBeginDragging() override;
     void OnDragging() override;
     void OnEndDragging() override;

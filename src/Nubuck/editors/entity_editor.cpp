@@ -70,18 +70,26 @@ ScaleImpl implementation {
 ==================================================
 */
 
+/*
+NOTE: scaling always sets vertex positions and never sets scale of object-to-world matrix.
+this is odd and might get changed in the future.
+*/
+
 EntityEditor::ScaleImpl::ScaleImpl(EntityEditor* entityEditor) : entityEditor(entityEditor) { }
 
 void EntityEditor::ScaleImpl::OnBeginDragging() {
     W::ENT_Geometry* geom = NB::FirstSelectedMesh(); // naming confusion, oh boy
-    if(geom) {
+    while(geom) {
         const leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
-        oldVertPosF.init(mesh);
+        EntityData& entData = entityEditor->GetEntityData(geom);
+        entData.oldVertPosF.init(mesh);
 
         leda::node v;
         forall_nodes(v, mesh) {
-            oldVertPosF[v] = ToVector(mesh.position_of(v));
+            entData.oldVertPosF[v] = ToVector(mesh.position_of(v));
         }
+
+        geom = NB::NextSelectedMesh(geom);
     }
 }
 
@@ -89,16 +97,33 @@ void EntityEditor::ScaleImpl::OnDragging() {
     int dragAxis = entityEditor->GetDragAxis();
     float scale = entityEditor->GetScale();
 
-    // TODO: this is broken, does not work for multiple selected geometry objects
+    M::Vector3 center_ws = entityEditor->GlobalCenterOfSelection();
+
     W::ENT_Geometry* geom = NB::FirstSelectedMesh();
-    if(geom) {
+    while(geom) {
+        EntityData& entData = entityEditor->GetEntityData(geom);
         leda::nb::RatPolyMesh& mesh = geom->GetRatPolyMesh();
         leda::node v;
         forall_nodes(v, mesh) {
-            M::Vector3 pos = oldVertPosF[v];
+            M::Vector3 pos = entData.oldVertPosF[v];
+
+            // scale around center
+
+            M::Matrix4 worldToObject;
+            bool isRegular = M::TryInvert(geom->GetObjectToWorldMatrix(), worldToObject);
+            if(!isRegular) {
+                common.printf("WARNING - object-to-world matrix of geometry with id=%d is not invertable\n", geom->GetID());
+            }
+
+            M::Vector3 center_os = M::Transform(worldToObject, center_ws);
+
+            pos -= center_os;
             pos.vec[dragAxis] *= scale;
+            pos += center_os;
+
             mesh.set_position(v, ToRatPoint(pos));
         }
+        geom = NB::NextSelectedMesh(geom);
     }
 }
 
@@ -252,6 +277,10 @@ bool EntityEditor::DoPicking(const EV::MouseEvent& event, bool simulate) {
         }
     }
     return false;
+}
+
+EntityEditor::EntityData& EntityEditor::GetEntityData(W::Entity* ent) {
+    return _entData[ent->GetID()];
 }
 
 void EntityEditor::OnBeginDragging() {
