@@ -25,6 +25,7 @@ private:
 
     void Event_ShowVectors(const EV::Arg<bool>& event);
     void Event_SetPosition(const EV::Arg<NB::Point3>& event);
+    void Event_SetScale(const EV::Arg<NB::Point3>& event);
 private slots:
     void OnPositionChanged(leda::rational value);
 public:

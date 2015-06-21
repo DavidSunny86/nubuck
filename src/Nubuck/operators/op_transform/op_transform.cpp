@@ -8,6 +8,7 @@
 
 EV::ConcreteEventDef<EV::Arg<bool> >        ev_showVectors;
 EV::ConcreteEventDef<EV::Arg<NB::Point3> >  ev_setPosition;
+EV::ConcreteEventDef<EV::Arg<NB::Point3> >  ev_setScale;
 
 namespace OP {
 
@@ -31,6 +32,19 @@ void TransformPanel::Event_SetPosition(const EV::Arg<NB::Point3>& event) {
         _sbPosition[0]->setValue(event.value.xcoord());
         _sbPosition[1]->setValue(event.value.ycoord());
         _sbPosition[2]->setValue(event.value.zcoord());
+    }
+    event.Accept();
+}
+
+void TransformPanel::Event_SetScale(const EV::Arg<NB::Point3>& event) {
+    {
+        UI::BlockSignals blockSignals(
+            _sbScale[0],
+            _sbScale[1],
+            _sbScale[2]);
+        _sbScale[0]->setValue(event.value.xcoord());
+        _sbScale[1]->setValue(event.value.ycoord());
+        _sbScale[2]->setValue(event.value.zcoord());
     }
     event.Accept();
 }
@@ -98,6 +112,7 @@ TransformPanel::TransformPanel() {
 
     AddEventHandler(ev_showVectors, this, &TransformPanel::Event_ShowVectors);
     AddEventHandler(ev_setPosition, this, &TransformPanel::Event_SetPosition);
+    AddEventHandler(ev_setScale, this, &TransformPanel::Event_SetScale);
 }
 
 /*
@@ -138,12 +153,15 @@ void Transform::UpdatePanelVectorsVisibility() {
 
 void Transform::UpdatePanelVectorsValues() {
     EV::Arg<NB::Point3> event;
-    if(W::editMode_t::OBJECTS == _mode) {
+    if(W::editMode_t::OBJECTS == _mode && _entityEditor.FirstSelectedEntity()) {
         if(NB::EntityEditor::Mode_Translate == _entityEditor.GetMode()) {
             M::Vector3 center = _entityEditor.GlobalCenterOfSelection();
             event.value = ToRatPoint(center);
             SendToPanel(ev_setPosition.Tag(event));
         } else if(NB::EntityEditor::Mode_Scale == _entityEditor.GetMode()) {
+            M::Vector3 scalingVector = _entityEditor.GetScalingVector();
+            event.value = ToRatPoint(scalingVector);
+            SendToPanel(ev_setScale.Tag(event));
         }
     }
 }
@@ -175,6 +193,7 @@ void Transform::OnGeometrySelected() {
     if(W::editMode_t::OBJECTS == _mode) {
         _entityEditor.CopyGlobalSelection();
         UpdatePanelVectorsVisibility();
+        UpdatePanelVectorsValues();
     }
 }
 
@@ -220,6 +239,8 @@ void Transform::Event_SetPosition(const EV::Arg<NB::Point3>& event) {
 void Transform::OnEditModeChanged(const W::editMode_t::Enum mode) {
     _mode = mode;
     OpenEditor();
+    UpdatePanelVectorsVisibility();
+    UpdatePanelVectorsValues();
 }
 
 void Transform::OnMouse(const EV::MouseEvent& event) {
@@ -231,6 +252,9 @@ void Transform::OnMouse(const EV::MouseEvent& event) {
             accept = _entityEditor.SimulateMouseEvent(event);
         } else {
             accept = _entityEditor.HandleMouseEvent(event); 
+            if(accept && NB::EntityEditor::Action_Dragging == _entityEditor.GetAction()) {
+                UpdatePanelVectorsValues();
+            }
         }
     } else if(W::editMode_t::VERTICES == _mode) {
         if(event.fallthrough) {

@@ -75,7 +75,15 @@ NOTE: scaling always sets vertex positions and never sets scale of object-to-wor
 this is odd and might get changed in the future.
 */
 
-EntityEditor::ScaleImpl::ScaleImpl(EntityEditor* entityEditor) : entityEditor(entityEditor) { }
+EntityEditor::ScaleImpl::ScaleImpl(EntityEditor* entityEditor)
+    : entityEditor(entityEditor)
+    , lastScale(1.0f, 1.0f, 1.0f)
+    , scale(1.0f, 1.0f, 1.0f)
+{ }
+
+void EntityEditor::ScaleImpl::OnEnter() {
+    lastScale = scale = M::Vector3(1.0f, 1.0f, 1.0f);
+}
 
 void EntityEditor::ScaleImpl::OnBeginDragging() {
     W::ENT_Geometry* geom = NB::FirstSelectedMesh(); // naming confusion, oh boy
@@ -96,6 +104,9 @@ void EntityEditor::ScaleImpl::OnBeginDragging() {
 void EntityEditor::ScaleImpl::OnDragging() {
     int dragAxis = entityEditor->GetDragAxis();
     float scale = entityEditor->GetScale();
+
+    // update total scaling vector
+    this->scale.vec[dragAxis] = lastScale.vec[dragAxis] * scale;
 
     M::Vector3 center_ws = entityEditor->GlobalCenterOfSelection();
 
@@ -125,6 +136,10 @@ void EntityEditor::ScaleImpl::OnDragging() {
         }
         geom = NB::NextSelectedMesh(geom);
     }
+}
+
+void EntityEditor::ScaleImpl::OnEndDragging() {
+    lastScale = scale;
 }
 
 /*
@@ -294,6 +309,7 @@ void EntityEditor::OnDragging() {
 }
 
 void EntityEditor::OnEndDragging() {
+    _curImpl->OnEndDragging();
     _lastAction = Action_EndDragging;
 }
 
@@ -350,8 +366,9 @@ EntityEditor::EntityEditor()
     , _modifyGlobalSelection(false)
     , _lastAction(Action_None)
 {
+    _scaleImpl = GEN::MakePtr(new ScaleImpl(this));
     _impl[0] = GEN::MakePtr(new TranslateImpl(this));
-    _impl[1] = GEN::MakePtr(new ScaleImpl(this));
+    _impl[1] = _scaleImpl;
     _curImpl = _impl[0].Raw();
 }
 
@@ -360,6 +377,8 @@ void EntityEditor::SetAllowedModeFlags(int flags) {
 }
 
 void EntityEditor::SetMode(int mode) {
+    if(mode == _mode) return;
+
     if(!(_allowedModeFlags & 1 << mode)) {
         COM_printf("WARNING - EntityEditor::SetMode(): required mode not allowed.\n");
         return;
@@ -368,6 +387,7 @@ void EntityEditor::SetMode(int mode) {
     _mode = mode;
     SetGizmoTransformMode(NB::TransformGizmoMode(_mode));
     _curImpl = _impl[_mode].Raw();
+    _curImpl->OnEnter();
 }
 
 void EntityEditor::SetModifyGlobalSelection(bool modify) {
@@ -458,6 +478,14 @@ W::Entity* EntityEditor::NextSelectedEntity(const W::Entity* ent) {
 
 EntityEditor::Mode EntityEditor::GetMode() const {
     return Mode(_mode);
+}
+
+EntityEditor::Action EntityEditor::GetAction() const {
+    return Action(_lastAction);
+}
+
+M::Vector3 EntityEditor::GetScalingVector() const {
+    return _scaleImpl->scale;
 }
 
 } // namespace NB

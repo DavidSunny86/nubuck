@@ -30,8 +30,10 @@ private:
     struct ModeImpl {
         virtual ~ModeImpl() { }
 
+        virtual void OnEnter() { }
         virtual void OnBeginDragging() { }
         virtual void OnDragging() { }
+        virtual void OnEndDragging() { }
     };
 
     struct TranslateImpl : ModeImpl {
@@ -45,13 +47,19 @@ private:
     };
 
     struct ScaleImpl : ModeImpl {
-        EntityEditor*               entityEditor;
+        EntityEditor*   entityEditor;
+        M::Vector3      lastScale;
+        M::Vector3      scale;
 
         ScaleImpl(EntityEditor* entityEditor);
 
+        void OnEnter() override;
         void OnBeginDragging() override;
         void OnDragging() override;
+        void OnEndDragging() override;
     };
+
+    GEN::Pointer<ScaleImpl> _scaleImpl;
 
     GEN::Pointer<ModeImpl>  _impl[2];
     ModeImpl*               _curImpl;
@@ -127,6 +135,8 @@ public:
 
     // return last action that caused Handle*Event() to return true
     Action      GetAction() const;
+
+    M::Vector3  GetScalingVector() const;
 };
 
 } // namespace NB
