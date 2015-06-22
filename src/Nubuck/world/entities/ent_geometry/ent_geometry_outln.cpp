@@ -60,6 +60,15 @@ void ENT_GeometryOutln::OnVertexLabelSizeChanged(leda::rational value) {
     _subject.Send(ev_geom_setVertexLabelSize.Tag(value.to_float()));
 }
 
+void ENT_GeometryOutln::OnPositionChanged() {
+    SetEntityVectorEvent event;
+    event.m_entityID = _subject.GetID();
+    event.m_vector[0] = _sbPosition[0]->value();
+    event.m_vector[1] = _sbPosition[1]->value();
+    event.m_vector[2] = _sbPosition[2]->value();
+    _subject.Send(ev_ent_usr_setPosition.Tag(event));
+}
+
 void ENT_GeometryOutln::OnEdgeShadingChanged(int) {
     SendEdgeShading();
 }
@@ -215,7 +224,7 @@ void ENT_GeometryOutln::InitTransformationTab() {
         _sbPosition[i]->setMinimum(-100);
         _sbPosition[i]->setMaximum( 100);
         _sbPosition[i]->setSingleStep(leda::rational(1, 10));
-        connect(_sbPosition[i], SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnPositionChanged(leda::rational)));
+        connect(_sbPosition[i], SIGNAL(SigValueChanged()), this, SLOT(OnPositionChanged()));
         vbox->addWidget(_sbPosition[i]);
     }
     _grpPosition->setLayout(vbox);

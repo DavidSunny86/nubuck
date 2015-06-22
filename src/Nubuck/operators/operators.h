@@ -12,6 +12,10 @@
 #include <system\thread\thread.h>
 #include <Nubuck\system\locks\scoped_lock.h>
 
+// forward declarations
+
+struct SetOperatorEvent;
+
 namespace EV {
 
 struct ShowQuestionBox;
@@ -46,7 +50,7 @@ private:
 
     void UnloadModules();
 
-    void Event_SetOperator(const EV::Args2<Operator*, bool>& event);
+    void Event_SetOperator(const SetOperatorEvent& event);
     void Event_ShowConfirmationDialog(const EV::Event& event);
     void Event_ActionFinished(const EV::Event& event);
 

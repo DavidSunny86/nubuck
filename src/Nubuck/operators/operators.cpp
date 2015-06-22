@@ -19,13 +19,13 @@ namespace OP {
 
 Operators g_operators;
 
-void Operators::Event_SetOperator(const EV::Args2<Operator*, bool>& event) {
+void Operators::Event_SetOperator(const SetOperatorEvent& event) {
     // find panel of active operator
     OperatorPanel* panel = NULL;
     for(unsigned i = 0; !panel && i < _ops.size(); ++i) {
-        if(_ops[i].op == event.value0) panel = _ops[i].panel;
+        if(_ops[i].op == event.m_op) panel = _ops[i].panel;
     }
-    assert(panel);
+    COM_assert(panel);
 
     panel->Invoke();
     g_ui.GetOperatorPanel().Clear();
@@ -89,7 +89,7 @@ void Operators::OnInvokeOperator(unsigned id) {
 	}
 
     Operator* op = _ops[id].op;
-    EV::Args2<Operator*, bool> event(op, false);
+    SetOperatorEvent event(op, false);
     InvokeAction(ev_op_setOperator.Tag(event));
 }
 

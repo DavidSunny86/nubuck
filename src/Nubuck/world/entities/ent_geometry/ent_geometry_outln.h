@@ -77,6 +77,8 @@ private slots:
     void OnShowVertexLabelsChanged(bool checked);
     void OnXrayVertexLabelsChanged(bool checked);
     void OnVertexLabelSizeChanged(leda::rational value);
+
+    void OnPositionChanged();
 public:
     ENT_GeometryOutln(ENT_Geometry& subject);
 

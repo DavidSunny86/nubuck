@@ -42,9 +42,9 @@ EV::ConcreteEventDef<EV::Args2<outlinerItem_t, QString*> >   ev_outl_setName;
 EV::ConcreteEventDef<EV::Arg<outlinerItem_t> >               ev_outl_delete;
 
 // operator events
-EV::ConcreteEventDef<EV::Event>                         ev_op_actionFinished;
-EV::ConcreteEventDef<EV::Args2<OP::Operator*, bool> >   ev_op_setOperator;
-EV::ConcreteEventDef<EV::Event>                         ev_op_showConfirmationDialog;
+EV::ConcreteEventDef<EV::Event>         ev_op_actionFinished;
+EV::ConcreteEventDef<SetOperatorEvent>  ev_op_setOperator;
+EV::ConcreteEventDef<EV::Event>         ev_op_showConfirmationDialog;
 
 // geometry events
 EV::ConcreteEventDef<EV::Arg<bool> >     ev_geom_showVertexLabels;
@@ -56,6 +56,9 @@ EV::ConcreteEventDef<EV::Arg<R::Color> > ev_geom_edgeTintChanged;
 EV::ConcreteEventDef<EV::Arg<float> >    ev_geom_transparencyChanged;
 EV::ConcreteEventDef<RenderModeEvent>    ev_geom_renderModeChanged;
 EV::ConcreteEventDef<EdgeShadingEvent>   ev_geom_edgeShadingChanged;
+
+EV::ConcreteEventDef<SetEntityVectorEvent>   ev_ent_usr_setPosition;
+EV::ConcreteEventDef<SetEntityVectorEvent>   ev_ent_usr_setScale;
 
 // output
 

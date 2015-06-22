@@ -39,7 +39,7 @@ void Driver::SetOperator(Operator* op, bool force) {
 
         RebuildMeshes();
 
-        EV::Args2<Operator*, bool> event(op, force);
+        SetOperatorEvent event(op, force);
         g_operators.SendAndWait(ev_op_setOperator.Tag(event));
     }
 }
@@ -56,8 +56,8 @@ void Driver::RebuildMeshes() {
     W::world.SendAndWait(ev_w_rebuildAll.Tag());
 }
 
-void Driver::Event_SetOperator(const EV::Args2<Operator*, bool>& event) {
-    SetOperator(event.value0, event.value1);
+void Driver::Event_SetOperator(const SetOperatorEvent& event) {
+    SetOperator(event.m_op, event.m_force);
     SignalCompletion();
 }
 

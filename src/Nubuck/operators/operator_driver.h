@@ -5,6 +5,8 @@
 #include <Nubuck\events\core_events.h>
 #include <renderer\renderer.h>
 
+struct SetOperatorEvent;
+
 namespace OP {
 
 class Operator;
@@ -22,7 +24,7 @@ private:
 
     void RebuildMeshes();
 
-    void Event_SetOperator(const EV::Args2<Operator*, bool>& event);
+    void Event_SetOperator(const SetOperatorEvent& event);
 
     void Event_UsrSelectEntity(const EV::Usr_SelectEntity& event);
     void Event_UsrChangeEditMode(const EV::Arg<int>& event);
