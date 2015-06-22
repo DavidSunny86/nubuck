@@ -156,6 +156,10 @@ source_group("qt_generated\\rcc" REGULAR_EXPRESSION "qrc_.*\\.cxx")
 include_directories("${leda_dir}/incl" "${leda_dir}/src/Nubuck")
 link_directories("${leda_dir}")
 
+# microprofiler
+link_directories("microprofiler")
+add_compile_options(/Gh /GH) # _penter, _pexit hooks
+
 add_compile_options(/W1)
 
 add_definitions(-DLEDA_DLL -DLEDA_MULTI_THREAD)
@@ -164,6 +168,7 @@ add_definitions(-DUNICODE)
 # TARGET nubuck
 add_library(nubuck SHARED ${nubuckSources} ${nubuckHeaders} ${nubuckHeaders_ui} ${nubuckQtRes})
 target_link_libraries(nubuck leda opengl32 glu32 Qt4::QtGui Qt4::QtOpenGL Qt4::QtSvg)
+target_link_libraries(nubuck micro-profiler)
 set_target_properties(nubuck PROPERTIES 
     COMPILE_DEFINITIONS "NUBUCK_LIB;NUBUCK_MT;PARANOID;GLEW_BUILD")
 set_target_properties(nubuck PROPERTIES
