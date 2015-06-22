@@ -20,6 +20,8 @@
 #include <world\editmode\editmode.h>
 #include "entity.h"
 
+struct SetEntityVectorEvent;
+
 namespace EV {
 
 struct Params_Mouse;
@@ -112,6 +114,8 @@ namespace W {
         void Event_Resize(const EV::ResizeEvent& event);
         void Event_Mouse(const EV::MouseEvent& event);
         void Event_Key(const EV::KeyEvent& event);
+
+        void Event_EntUsrSetPosition(const SetEntityVectorEvent& event);
 // region EventHandlers
 #pragma endregion
     public:
@@ -163,6 +167,8 @@ namespace W {
 
         Entity*                     FirstEntity();
         Entity*                     NextEntity(Entity* ent);
+
+        Entity*                     GetEntityByID(int id);
 
         // thread interface
         DWORD Thread_Func(void);

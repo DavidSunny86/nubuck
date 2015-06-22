@@ -60,6 +60,9 @@ EV::ConcreteEventDef<EdgeShadingEvent>   ev_geom_edgeShadingChanged;
 EV::ConcreteEventDef<SetEntityVectorEvent>   ev_ent_usr_setPosition;
 EV::ConcreteEventDef<SetEntityVectorEvent>   ev_ent_usr_setScale;
 
+EV::ConcreteEventDef<SetEntityVectorEvent>   ev_ent_setPosition;
+EV::ConcreteEventDef<SetEntityVectorEvent>   ev_ent_setScale;
+
 // output
 
 namespace EV {

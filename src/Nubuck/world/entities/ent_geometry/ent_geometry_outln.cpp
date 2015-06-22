@@ -10,6 +10,7 @@
 #include <Nubuck\UI\nbw_spinbox.h>
 #include <UI\colorbutton\colorbutton.h>
 #include <UI\block_signals.h>
+#include <operators\operators.h>
 #include "ent_geometry_outln.h"
 #include "ent_geometry.h"
 
@@ -60,13 +61,13 @@ void ENT_GeometryOutln::OnVertexLabelSizeChanged(leda::rational value) {
     _subject.Send(ev_geom_setVertexLabelSize.Tag(value.to_float()));
 }
 
-void ENT_GeometryOutln::OnPositionChanged() {
+void ENT_GeometryOutln::OnPositionChanged(leda::rational) {
     SetEntityVectorEvent event;
     event.m_entityID = _subject.GetID();
     event.m_vector[0] = _sbPosition[0]->value();
     event.m_vector[1] = _sbPosition[1]->value();
     event.m_vector[2] = _sbPosition[2]->value();
-    _subject.Send(ev_ent_usr_setPosition.Tag(event));
+    OP::g_operators.InvokeAction(ev_ent_usr_setPosition.Tag(event));
 }
 
 void ENT_GeometryOutln::OnEdgeShadingChanged(int) {
@@ -88,6 +89,8 @@ ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) 
     AddEventHandler(ev_geom_showVertexLabels, this, &ENT_GeometryOutln::Event_ShowVertexLabels);
     AddEventHandler(ev_geom_xrayVertexLabels, this, &ENT_GeometryOutln::Event_XrayVertexLabels);
     AddEventHandler(ev_geom_setVertexLabelSize, this, &ENT_GeometryOutln::Event_SetVertexLabelSize);
+
+    AddEventHandler(ev_ent_setPosition, this, &ENT_GeometryOutln::Event_SetPosition);
 }
 
 void ENT_GeometryOutln::InitPropertiesTab() {
@@ -224,7 +227,7 @@ void ENT_GeometryOutln::InitTransformationTab() {
         _sbPosition[i]->setMinimum(-100);
         _sbPosition[i]->setMaximum( 100);
         _sbPosition[i]->setSingleStep(leda::rational(1, 10));
-        connect(_sbPosition[i], SIGNAL(SigValueChanged()), this, SLOT(OnPositionChanged()));
+        connect(_sbPosition[i], SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnPositionChanged(leda::rational)));
         vbox->addWidget(_sbPosition[i]);
     }
     _grpPosition->setLayout(vbox);
@@ -333,6 +336,14 @@ void ENT_GeometryOutln::Event_XrayVertexLabels(const EV::Arg<bool>& event) {
 void ENT_GeometryOutln::Event_SetVertexLabelSize(const EV::Arg<float>& event) {
     UI::BlockSignals blockSignals(_sbVertexLabelSize);
     _sbVertexLabelSize->setValue(event.value);
+}
+
+
+void ENT_GeometryOutln::Event_SetPosition(const SetEntityVectorEvent& event) {
+    UI::BlockSignals blockSignals(_sbPosition[0], _sbPosition[1], _sbPosition[2]);
+    _sbPosition[0]->setValue(event.m_vector[0]);
+    _sbPosition[1]->setValue(event.m_vector[1]);
+    _sbPosition[2]->setValue(event.m_vector[2]);
 }
 
 void ENT_GeometryOutln::ExecEvents(const std::vector<EV::Event>& events) {

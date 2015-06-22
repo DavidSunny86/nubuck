@@ -38,3 +38,6 @@ extern EV::ConcreteEventDef<EdgeShadingEvent>   ev_geom_edgeShadingChanged;
 // user sets transformation of entity in outliner
 extern EV::ConcreteEventDef<SetEntityVectorEvent>   ev_ent_usr_setPosition;
 extern EV::ConcreteEventDef<SetEntityVectorEvent>   ev_ent_usr_setScale;
+
+extern EV::ConcreteEventDef<SetEntityVectorEvent>   ev_ent_setPosition;
+extern EV::ConcreteEventDef<SetEntityVectorEvent>   ev_ent_setScale;

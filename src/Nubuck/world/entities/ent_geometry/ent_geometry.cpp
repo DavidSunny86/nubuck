@@ -509,6 +509,16 @@ M::Vector3 ENT_Geometry::GetPosition() const {
 
 void ENT_Geometry::SetPosition(const M::Vector3& position) {
     Entity::SetPosition(position);
+
+    SetEntityVectorEvent event;
+    NB::Point3 ratPos = ToRatPoint(GetPosition());
+    event.m_entityID = GetID();
+    event.m_vector[0] = ratPos.xcoord();
+    event.m_vector[1] = ratPos.ycoord();
+    event.m_vector[2] = ratPos.zcoord();
+
+    g_ui.GetOutliner().SendToView(_outlinerItem,
+        ev_ent_setPosition.Tag(event));
 }
 
 void ENT_Geometry::SetScale(const M::Vector3& scale) {

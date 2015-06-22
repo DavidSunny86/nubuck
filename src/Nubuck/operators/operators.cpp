@@ -118,6 +118,16 @@ unsigned Operators::GetDriverQueueSize() const {
     return _driver->GetEventQueueSize();
 }
 
+/*
+TODO: hacky hack hack
+the operator order is defined by the calls to Register() in nubuck_main.cpp.
+relative order of plugins is generally undefined.
+replace this by name lookup sometimes
+*/
+Operator* Operators::GetOperatorByID(int id) {
+    return _ops[id].op;
+}
+
 void Operators::FrameUpdate() {
     HandleEvents();
 

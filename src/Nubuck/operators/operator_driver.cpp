@@ -3,6 +3,7 @@
 #include <Nubuck\system\locks\scoped_lock.h>
 #include <world\world_events.h>
 #include <world\world.h>
+#include <world\entities\ent_geometry\ent_geometry.h>
 #include <UI\window_events.h>
 #include "operators.h"
 #include "operator_driver.h"
@@ -25,15 +26,17 @@ static int DispatchSingleEvent(Operator* op, const EV::Event& event) {
 void Driver::SetOperator(Operator* op, bool force) {
     if(_activeOp == op) return;
 
+    bool invoke = true;
+
     if(!force && _activeOp && !_activeOp->IsDone()) {
         int retval = 0;
         EV::Event event;
         event.SetReturnPointer(&retval);
         g_operators.SendAndWait(ev_op_showConfirmationDialog.Tag(event));
-        if(!retval) return; // confimration dialog cancelled, abort
+        if(!retval) invoke = false; // confimration dialog cancelled, abort
     }
 
-	if(op->Invoke()) {
+	if(invoke && op->Invoke()) {
         if(_activeOp) _activeOp->Finish();
         _activeOp = op;
 
@@ -41,6 +44,19 @@ void Driver::SetOperator(Operator* op, bool force) {
 
         SetOperatorEvent event(op, force);
         g_operators.SendAndWait(ev_op_setOperator.Tag(event));
+    }
+
+    // TODO hacky hack hack
+    // this forces the outliner widget to update its transformation vectors, which
+    // is necessary when the user changed them and the invokation of op_set_transform
+    // is declined
+    W::Entity* ent = W::world.FirstEntity();
+    while(ent) {
+        if(W::EntityType::ENT_GEOMETRY == ent->GetType()) {
+            W::ENT_Geometry* geom = static_cast<W::ENT_Geometry*>(ent);
+            geom->SetPosition(ent->GetPosition());
+        }
+        ent = W::world.NextEntity(ent);
     }
 }
 
@@ -120,6 +136,8 @@ void Driver::Event_RebuildAll(const EV::Event& event) {
 }
 
 void Driver::Event_Default(const EV::Event& event, const char* className) {
+    int accepted = 0;
+    event.SetReturnPointer(&accepted);
     if(_activeOp) {
         _activeOp->Send(event);
         int numDispatched = _activeOp->HandleEvents();
@@ -127,6 +145,10 @@ void Driver::Event_Default(const EV::Event& event, const char* className) {
 
         RebuildMeshes();
 	}
+
+    if(!accepted) {
+        W::world.Send(event);
+    }
 
     SignalCompletion();
 }

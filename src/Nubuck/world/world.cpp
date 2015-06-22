@@ -19,7 +19,9 @@
 #include <UI\userinterface.h>
 #include <operators\operators.h>
 #include <operators\operator_driver.h>
+#include <operators\operator_events.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
+#include <world\entities\ent_geometry\ent_geometry_events.h>
 #include <world\entities\ent_text\ent_text.h>
 #include <world\entities\ent_transform_gizmo\ent_transform_gizmo.h>
 #include <nubuck_private.h>
@@ -383,6 +385,17 @@ void World::Event_Key(const EV::KeyEvent& event) {
     }
 }
 
+
+void World::Event_EntUsrSetPosition(const SetEntityVectorEvent& event) {
+    SetOperatorEvent setOperatorEvent;
+    setOperatorEvent.m_op = OP::g_operators.GetOperatorByID(1); // set_transform operator
+    setOperatorEvent.m_force = false;
+
+    OP::g_operators.InvokeAction(ev_op_setOperator.Tag(setOperatorEvent));
+
+    std::cout << "World::Event_EntUsrSetPosition()" << std::endl;
+}
+
 void World::Grid_Build() {
     R::Grid grid(4, 20.0f);
     _gridMesh = R::meshMgr.Create(grid.GetDesc());
@@ -455,6 +468,8 @@ void World::Init() {
     AddEventHandler(ev_resize,               this, &World::Event_Resize);
     AddEventHandler(ev_mouse,                this, &World::Event_Mouse);
     AddEventHandler(ev_key,                  this, &World::Event_Key);
+
+    AddEventHandler(ev_ent_usr_setPosition, this, &World::Event_EntUsrSetPosition);
 
     Grid_Build();
 }
@@ -764,6 +779,13 @@ Entity* World::NextEntity(Entity* ent) {
     }
     COM_assert(0 && "World::NextEntity: entity not found");
     return NULL;
+}
+
+Entity* World::GetEntityByID(int id) {
+    if(0 > id || _entities.size() <= id) return NULL;
+    Entity* ent = _entities[id].Raw();
+    COM_assert(ent->GetID() == id);
+    return ent;
 }
 
 DWORD World::Thread_Func(void) {

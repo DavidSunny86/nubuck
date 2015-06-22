@@ -76,6 +76,7 @@ public:
     Driver& GetDriver() { assert(_driver.IsValid()); return *_driver; }
 
     Operator* GetDefaultOperator() { return _ops[0].op; }
+    Operator* GetOperatorByID(int id);
 
     void FrameUpdate();
 

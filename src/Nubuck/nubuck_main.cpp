@@ -38,6 +38,7 @@
 #include <operators\op_fchull\op_fchull.h>
 #include <operators\op_delaunay3d\op_delaunay3d.h>
 #include <operators\op_transform\op_transform.h>
+#include <operators\op_set_transform\op_set_transform.h>
 #include <operators\op_join\op_join.h>
 #include <operators\op_delete\op_delete.h>
 #include <operators\op_savegeom\op_savegeom.h>
@@ -158,6 +159,7 @@ int RunNubuck(
 
     // REMOVEME
 	OP::g_operators.Register(new OP::TransformPanel, new OP::Transform);
+	OP::g_operators.Register(new OP::SetTransformPanel, new OP::SetTransform);
     OP::g_operators.Register(new OP::LoopPanel, new OP::Loop);
     OP::g_operators.Register(new OP::GEN::RandomPointsPanel, new OP::GEN::RandomPoints);
     OP::g_operators.Register(new OP::PlatonicSolidsPanel, new OP::PlatonicSolids);

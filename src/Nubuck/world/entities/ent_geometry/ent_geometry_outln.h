@@ -66,6 +66,8 @@ private:
     void Event_ShowVertexLabels(const EV::Arg<bool>& event);
     void Event_XrayVertexLabels(const EV::Arg<bool>& event);
     void Event_SetVertexLabelSize(const EV::Arg<float>& event);
+
+    void Event_SetPosition(const SetEntityVectorEvent& event);
 private slots:
     void OnVertexScaleChanged(leda::rational value);
     void OnEdgeScaleChanged(leda::rational value);
@@ -78,7 +80,7 @@ private slots:
     void OnXrayVertexLabelsChanged(bool checked);
     void OnVertexLabelSizeChanged(leda::rational value);
 
-    void OnPositionChanged();
+    void OnPositionChanged(leda::rational);
 public:
     ENT_GeometryOutln(ENT_Geometry& subject);
 
