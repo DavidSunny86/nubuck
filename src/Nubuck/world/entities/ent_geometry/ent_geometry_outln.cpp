@@ -5,6 +5,7 @@
 #include <QDoubleSpinBox>
 #include <QSlider>
 #include <QVBoxLayout>
+#include <QTabWidget>
 
 #include <Nubuck\UI\nbw_spinbox.h>
 #include <UI\colorbutton\colorbutton.h>
@@ -80,7 +81,7 @@ ENT_GeometryOutln::ENT_GeometryOutln(ENT_Geometry& subject) : _subject(subject) 
     AddEventHandler(ev_geom_setVertexLabelSize, this, &ENT_GeometryOutln::Event_SetVertexLabelSize);
 }
 
-void ENT_GeometryOutln::InitOutline() {
+void ENT_GeometryOutln::InitPropertiesTab() {
 	QGridLayout* layout = new QGridLayout();
 
     _sbVertexScale = new NBW_SpinBox;
@@ -178,7 +179,8 @@ void ENT_GeometryOutln::InitOutline() {
     layout->addWidget(_sbVertexLabelSize, 9, 0, 1, 2);
     layout->addWidget(_cbXrayVertexLabels, 10, 0, 1, 2);
 
-	setLayout(layout);
+    _tabProperties = new QWidget;
+	_tabProperties->setLayout(layout);
 
     QObject::connect(_sbVertexScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnVertexScaleChanged(leda::rational)));
     QObject::connect(_sbEdgeScale, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnEdgeScaleChanged(leda::rational)));
@@ -197,6 +199,75 @@ void ENT_GeometryOutln::InitOutline() {
     QObject::connect(_cbShowVertexLabels, SIGNAL(toggled(bool)), this, SLOT(OnShowVertexLabelsChanged(bool)));
     QObject::connect(_cbXrayVertexLabels, SIGNAL(toggled(bool)), this, SLOT(OnXrayVertexLabelsChanged(bool)));
     QObject::connect(_sbVertexLabelSize, SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnVertexLabelSizeChanged(leda::rational)));
+}
+
+void ENT_GeometryOutln::InitTransformationTab() {
+    QVBoxLayout* vbox = NULL;
+
+    _grpPosition = new QGroupBox("position");
+    _grpPosition->setObjectName("vectorGroup");
+
+    vbox = new QVBoxLayout;
+    for(int i = 0; i < 3; ++i) {
+        _sbPosition[i] = new NBW_SpinBox;
+        _sbPosition[i]->setText(QString("%1: ").arg(static_cast<char>('x' + i)));
+        // TODO: actually, it's not good that these values are bounded
+        _sbPosition[i]->setMinimum(-100);
+        _sbPosition[i]->setMaximum( 100);
+        _sbPosition[i]->setSingleStep(leda::rational(1, 10));
+        connect(_sbPosition[i], SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnPositionChanged(leda::rational)));
+        vbox->addWidget(_sbPosition[i]);
+    }
+    _grpPosition->setLayout(vbox);
+
+    _grpScale = new QGroupBox("scale");
+    _grpScale->setObjectName("vectorGroup");
+
+    vbox = new QVBoxLayout;
+    for(int i = 0; i < 3; ++i) {
+        _sbScale[i] = new NBW_SpinBox;
+        _sbScale[i]->setText(QString("%1: ").arg(static_cast<char>('x' + i)));
+        // TODO: actually, it's not good that these values are bounded
+        _sbScale[i]->setMinimum(-100);
+        _sbScale[i]->setMaximum( 100);
+        _sbScale[i]->setSingleStep(leda::rational(1, 10));
+        vbox->addWidget(_sbScale[i]);
+    }
+    _grpScale->setLayout(vbox);
+
+    vbox = new QVBoxLayout;
+    vbox->addWidget(_grpPosition);
+    vbox->addWidget(_grpScale);
+    vbox->addStretch();
+
+    _vectors = new QWidget;
+    _vectors->setLayout(vbox);
+
+    vbox = new QVBoxLayout;
+    vbox->addWidget(_vectors);
+
+    _tabTransformation = new QWidget;
+    _tabTransformation->setLayout(vbox);
+}
+
+void ENT_GeometryOutln::InitOutline() {
+    InitPropertiesTab();
+    InitTransformationTab();
+
+    // create tabwidget
+    _tabWidget = new QTabWidget;
+    _tabWidget->setObjectName("outlinerTabs");
+
+    QTabBar* tabBar = _tabWidget->findChild<QTabBar *>(QLatin1String("qt_tabwidget_tabbar"));
+    tabBar->setObjectName("outlinerTabBar");
+
+    _tabWidget->setTabPosition(QTabWidget::North);
+    _tabWidget->addTab(_tabProperties, "Visual");
+    _tabWidget->addTab(_tabTransformation, "Transform");
+
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addWidget(_tabWidget);
+    setLayout(layout);
 }
 
 void ENT_GeometryOutln::SendEdgeShading() {

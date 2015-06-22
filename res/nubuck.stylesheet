@@ -440,6 +440,20 @@ QTabBar::tab {
     border-bottom-right-radius: 6;
 }
 
+QTabWidget#outlinerTabs::pane {
+    border-top:     3px solid #1E1E1E;
+    border-left:    none;
+    border-right:   none;
+    border-bottom:  none;
+}
+
+QTabBar#outlinerTabBar::tab {
+    border-top-left-radius:     6;
+    border-top-right-radius:    6;
+    border-bottom-left-radius:  0;
+    border-bottom-right-radius: 0;
+}
+
 QTabBar::tab:selected {
     background-color: QLinearGradient(
         x1: 0, y1: 0,

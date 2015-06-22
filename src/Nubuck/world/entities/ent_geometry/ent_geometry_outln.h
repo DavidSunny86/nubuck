@@ -2,6 +2,7 @@
 
 #include <QComboBox>
 #include <QCheckBox>
+#include <QGroupBox>
 
 #include <UI\outliner\outliner.h>
 #include <Nubuck\events\events.h>
@@ -17,6 +18,12 @@ class ENT_GeometryOutln : public UI::OutlinerView {
     Q_OBJECT
 private:
     ENT_Geometry& _subject;
+
+    QTabWidget*         _tabWidget;
+    QWidget*            _tabProperties;
+    QWidget*            _tabTransformation;
+
+    // properties tab
 
     NBW_SpinBox*        _sbVertexScale;
     NBW_SpinBox*        _sbEdgeScale;
@@ -37,6 +44,16 @@ private:
     NBW_SpinBox*        _sbVertexLabelSize;
     QCheckBox*          _cbXrayVertexLabels;
 
+    // transformation tab
+
+    QWidget*        _vectors;       // contains _grpPosition, _grpScale
+    QGroupBox*      _grpPosition;
+    QGroupBox*      _grpScale;
+    NBW_SpinBox*    _sbPosition[3]; // xyz
+    NBW_SpinBox* 	_sbScale[3];    // xyz
+
+    void InitPropertiesTab();
+    void InitTransformationTab();
     void InitOutline();
 
     void SendEdgeShading();
