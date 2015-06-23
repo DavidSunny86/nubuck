@@ -15,7 +15,7 @@ void SetTransform::Event_EntUsrSetVector(const SetEntityVectorEvent& event) {
     COM_assert(ent);
 
     if(ev_ent_usr_setPosition.GetEventID() == event.id0) {
-        ent->SetPosition(vec);
+        ent->UpdatePosition(vec);
     } else if(ev_ent_usr_setScale.GetEventID() == event.id0) {
         ent->SetScale(vec);
     } else {
@@ -49,7 +49,7 @@ bool SetTransform::Invoke() {
 
     NB::Point3 ratVec = NB::Point3(args->m_vector[0], args->m_vector[1], args->m_vector[2]);
     if(EntityVector::VectorType_Position == args->m_type) {
-        ent->SetPosition(ToVector(ratVec));
+        ent->UpdatePosition(ToVector(ratVec));
     } else if(EntityVector::VectorType_Scale == args->m_type) {
         ent->SetScale(ToVector(ratVec));
     } else {

@@ -64,6 +64,12 @@ private:
     GEN::Pointer<ModeImpl>  _impl[2];
     ModeImpl*               _curImpl;
 
+    // this is the initial center of the currently selected entities, before
+    // the editor applied any transformations.
+    // the difference vector 'gizmo_position - _initialCenter' is the value
+    // displayed in the op_transform panel.
+    M::Vector3              _initialCenter;
+
     struct BBox {
         W::ENT_Geometry*    geom;
         leda::node          verts[8];
@@ -79,6 +85,7 @@ private:
         bool        isSelected;
         BBox        bbox;
         W::Entity*  nextSelected;
+        M::Vector3  initialPos;
 
         // used by scale impl
         leda::node_map<M::Vector3> oldVertPosF;
@@ -95,6 +102,8 @@ private:
     bool _modifyGlobalSelection;
 
     int _lastAction;
+
+    void ResetTranslation();
 
     bool IsSelected(const W::Entity* ent) const;
 
@@ -123,6 +132,8 @@ public:
     void Open();
     void Close();
 
+    void SetTranslationVector(const M::Vector3& v);
+
     void UpdateBoundingBoxes();
 
     void CopyGlobalSelection();
@@ -136,6 +147,7 @@ public:
     // return last action that caused Handle*Event() to return true
     Action      GetAction() const;
 
+    M::Vector3  GetTranslationVector() const;
     M::Vector3  GetScalingVector() const;
 };
 

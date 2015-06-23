@@ -81,6 +81,10 @@ bool Editor::OnMouseMove(const EV::MouseEvent& event) {
     return false;
 }
 
+M::Vector3 Editor::GetGizmoPosition() const {
+    return _gizmo->GetPosition();
+}
+
 void Editor::SetGizmoPosition(const M::Vector3& pos) {
     _gizmo->SetPosition(pos);
 }

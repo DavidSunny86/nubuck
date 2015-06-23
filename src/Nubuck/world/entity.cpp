@@ -134,6 +134,16 @@ void Entity::SetScale(const M::Vector3& scale) {
     _scale = scale;
 }
 
+/*
+NOTE: UpdatePosition is not virtual and cannot be overriden. It only
+sets the position vector of the entity. In contrast to SetPosition,
+it does not update the outliner widget.
+*/
+void Entity::UpdatePosition(const M::Vector3& position) {
+    SYS::ScopedLock lock(_mtx);
+    _position = position;
+}
+
 void Entity::Destroy() {
     // no lock necessary!
     _tags |= Tags::IS_DEAD;

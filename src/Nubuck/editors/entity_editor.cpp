@@ -227,6 +227,15 @@ void EntityEditor::BBox::Destroy() {
     }
 }
 
+void EntityEditor::ResetTranslation() {
+    W::Entity* ent = FirstSelectedEntity();
+    while(ent) {
+        _entData[ent->GetID()].initialPos = ent->GetPosition();
+        ent = NextSelectedEntity(ent);
+    }
+    _initialCenter = GlobalCenterOfSelection();
+}
+
 bool EntityEditor::IsSelected(const W::Entity* ent) const {
     return _entData.size() > ent->GetID() && _entData[ent->GetID()].isSelected;
 }
@@ -286,6 +295,9 @@ bool EntityEditor::DoPicking(const EV::MouseEvent& event, bool simulate) {
                 if(!(EV::MouseEvent::MODIFIER_SHIFT & event.mods)) ClearSelection();
                 SelectEntity_Add(ent);
                 UpdateGizmo();
+
+                ResetTranslation();
+
                 _lastAction = Action_PickEntity;
             }
             return true;
@@ -329,7 +341,7 @@ bool EntityEditor::OnKeyEvent(const EV::KeyEvent& event, bool simulate) {
         if(!simulate) SetMode(1);
         return true;
     }
-    
+
     if('A' == event.keyCode) {
         if(!simulate && !event.autoRepeat) {
             W::Entity* ent = NULL;
@@ -401,12 +413,33 @@ void EntityEditor::SetModifyGlobalSelection(bool modify) {
     }
 }
 
+// TODO: semantics not clear
 void EntityEditor::Open() {
     UpdateGizmo();
+
+    bool tmp = _modifyGlobalSelection;
+    _modifyGlobalSelection = false;
+    ClearSelection();
+    _modifyGlobalSelection = tmp;
+    if(_modifyGlobalSelection) {
+        CopyGlobalSelection();
+    }
+
+    ResetTranslation();
 }
 
 void EntityEditor::Close() {
     SetGizmoVisibility(false);
+}
+
+void EntityEditor::SetTranslationVector(const M::Vector3& v) {
+    W::Entity* ent = FirstSelectedEntity();
+    while(ent) {
+        ent->SetPosition(_entData[ent->GetID()].initialPos + v);
+        ent = NextSelectedEntity(ent);
+    }
+    UpdateGizmo();
+    UpdateBoundingBoxes();
 }
 
 // update
@@ -450,6 +483,8 @@ void EntityEditor::CopyGlobalSelection() {
     }
     _modifyGlobalSelection = true;
     UpdateGizmo();
+
+    ResetTranslation();
 }
 
 M::Vector3 EntityEditor::GlobalCenterOfSelection() {
@@ -482,6 +517,10 @@ EntityEditor::Mode EntityEditor::GetMode() const {
 
 EntityEditor::Action EntityEditor::GetAction() const {
     return Action(_lastAction);
+}
+
+M::Vector3 EntityEditor::GetTranslationVector() const {
+    return GetGizmoPosition() - _initialCenter;
 }
 
 M::Vector3 EntityEditor::GetScalingVector() const {

@@ -115,6 +115,21 @@ TransformPanel::TransformPanel() {
     AddEventHandler(ev_setScale, this, &TransformPanel::Event_SetScale);
 }
 
+void TransformPanel::Invoke() {
+    {
+        UI::BlockSignals blockSignals(_sbPosition[0], _sbPosition[1], _sbPosition[2]);
+        _sbPosition[0]->setValue(0);
+        _sbPosition[1]->setValue(0);
+        _sbPosition[2]->setValue(0);
+    }
+    {
+        UI::BlockSignals blockSignals(_sbScale[0], _sbScale[1], _sbScale[2]);
+        _sbScale[0]->setValue(1);
+        _sbScale[1]->setValue(1);
+        _sbScale[2]->setValue(1);
+    }
+}
+
 /*
 ==================================================
     Transform Implementation
@@ -155,8 +170,7 @@ void Transform::UpdatePanelVectorsValues() {
     EV::Arg<NB::Point3> event;
     if(W::editMode_t::OBJECTS == _mode && _entityEditor.FirstSelectedEntity()) {
         if(NB::EntityEditor::Mode_Translate == _entityEditor.GetMode()) {
-            M::Vector3 center = _entityEditor.GlobalCenterOfSelection();
-            event.value = ToRatPoint(center);
+            event.value = ToRatPoint(_entityEditor.GetTranslationVector());
             SendToPanel(ev_setPosition.Tag(event));
         } else if(NB::EntityEditor::Mode_Scale == _entityEditor.GetMode()) {
             M::Vector3 scalingVector = _entityEditor.GetScalingVector();
@@ -191,7 +205,7 @@ bool Transform::Invoke() {
 
 void Transform::OnGeometrySelected() {
     if(W::editMode_t::OBJECTS == _mode) {
-        _entityEditor.CopyGlobalSelection();
+        _entityEditor.Open(); // resets selection
         UpdatePanelVectorsVisibility();
         UpdatePanelVectorsValues();
     }
@@ -219,18 +233,7 @@ void Transform::Event_UsrChangeEditMode(const EV::Arg<int>& event) {
 
 void Transform::Event_SetPosition(const EV::Arg<NB::Point3>& event) {
     if(W::editMode_t::OBJECTS == _mode) {
-        // move all selected entities relative to global center of selection
-        M::Vector3 oldCenter = _entityEditor.GlobalCenterOfSelection();
-        M::Vector3 center = ToVector(event.value);
-        M::Vector3 translation = center - oldCenter;
-
-        W::Entity* ent = _entityEditor.FirstSelectedEntity();
-        while(ent) {
-            ent->SetPosition(ent->GetPosition() + translation);
-            ent = _entityEditor.NextSelectedEntity(ent);
-        }
-
-        _entityEditor.UpdateBoundingBoxes();
+        _entityEditor.SetTranslationVector(ToVector(event.value));
     }
 
     event.Accept();
@@ -251,7 +254,7 @@ void Transform::OnMouse(const EV::MouseEvent& event) {
         if(event.fallthrough) {
             accept = _entityEditor.SimulateMouseEvent(event);
         } else {
-            accept = _entityEditor.HandleMouseEvent(event); 
+            accept = _entityEditor.HandleMouseEvent(event);
             if(accept && NB::EntityEditor::Action_Dragging == _entityEditor.GetAction()) {
                 UpdatePanelVectorsValues();
             }
@@ -276,7 +279,7 @@ void Transform::OnKey(const EV::KeyEvent& event) {
         if(event.fallthrough) {
             accept = _entityEditor.SimulateKeyEvent(event);
         } else {
-            accept = _entityEditor.HandleKeyEvent(event); 
+            accept = _entityEditor.HandleKeyEvent(event);
         }
     } else if(W::editMode_t::VERTICES == _mode) {
         if(event.fallthrough) {

@@ -158,7 +158,7 @@ link_directories("${leda_dir}")
 
 # microprofiler
 link_directories("microprofiler")
-add_compile_options(/Gh /GH) # _penter, _pexit hooks
+# add_compile_options(/Gh /GH) # _penter, _pexit hooks
 
 add_compile_options(/W1)
 

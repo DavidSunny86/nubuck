@@ -86,9 +86,11 @@ public:
     M::Vector3          GetLocalCenter() const;
     M::Vector3          GetGlobalCenter() const;
 
-    void                SetPosition(const M::Vector3& position);
+    virtual void        SetPosition(const M::Vector3& position);
     void                SetOrientation(const M::Quaternion& orientation);
     void                SetScale(const M::Vector3& scale);
+
+    void                UpdatePosition(const M::Vector3& position);
 
     void                Destroy();
 	virtual void        OnDestroy() { }

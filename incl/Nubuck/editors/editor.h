@@ -43,7 +43,7 @@ protected:
 
     float GetTranslation() const { return (_dragPlanePick - _dragOrig).vec[_dragAxis]; }
 
-    float GetScale() const { return M::Length(_dragPlanePick - _oldCursorPos) / M::Length(_dragOrig - _oldCursorPos); }              
+    float GetScale() const { return M::Length(_dragPlanePick - _oldCursorPos) / M::Length(_dragOrig - _oldCursorPos); }
 
     virtual void OnBeginDragging() { }
     virtual void OnDragging() { }
@@ -53,6 +53,8 @@ protected:
     virtual bool OnKeyEvent(const EV::KeyEvent& event, bool simulate = false) { return false; }
 
     const W::ENT_TransformGizmo* GetGizmo() const { return _gizmo; }
+
+    M::Vector3 GetGizmoPosition() const;
 
     void SetGizmoPosition(const M::Vector3& pos);
     void SetGizmoTransformMode(const NB::TransformGizmoMode mode);

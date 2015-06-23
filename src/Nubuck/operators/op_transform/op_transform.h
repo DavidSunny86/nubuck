@@ -30,6 +30,8 @@ private slots:
     void OnPositionChanged(leda::rational value);
 public:
     TransformPanel();
+
+    void Invoke() override;
 };
 
 class Transform : public Operator {

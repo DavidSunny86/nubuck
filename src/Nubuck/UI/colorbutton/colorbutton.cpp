@@ -9,7 +9,7 @@ namespace UI {
 void ColorButton::mousePressEvent(QMouseEvent* event) {
     if(Qt::LeftButton == event->button()) {
         QColor oldColor = _color;
-        QColorDialog colorDialog;
+        QColorDialog colorDialog(_color);
         connect(&colorDialog, SIGNAL(currentColorChanged(const QColor&)), this, SLOT(OnColorChanged(const QColor&)));
         if(QDialog::Rejected == colorDialog.exec()) OnColorChanged(oldColor);
     }
