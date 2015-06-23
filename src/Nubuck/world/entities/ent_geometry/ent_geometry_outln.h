@@ -81,6 +81,7 @@ private slots:
     void OnVertexLabelSizeChanged(leda::rational value);
 
     void OnPositionChanged(leda::rational);
+    void OnScaleChanged(leda::rational);
 public:
     ENT_GeometryOutln(ENT_Geometry& subject);
 

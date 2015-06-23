@@ -113,7 +113,7 @@ namespace W {
         void Event_Mouse(const EV::MouseEvent& event);
         void Event_Key(const EV::KeyEvent& event);
 
-        void Event_EntUsrSetPosition(const SetEntityVectorEvent& event);
+        void Event_EntUsrSetVector(const SetEntityVectorEvent& event);
 // region EventHandlers
 #pragma endregion
     public:

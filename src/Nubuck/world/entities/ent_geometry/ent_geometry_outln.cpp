@@ -70,6 +70,15 @@ void ENT_GeometryOutln::OnPositionChanged(leda::rational) {
     OP::g_operators.InvokeAction(ev_ent_usr_setPosition.Tag(event));
 }
 
+void ENT_GeometryOutln::OnScaleChanged(leda::rational) {
+    SetEntityVectorEvent event;
+    event.m_entityID = _subject.GetID();
+    event.m_vector[0] = _sbScale[0]->value();
+    event.m_vector[1] = _sbScale[1]->value();
+    event.m_vector[2] = _sbScale[2]->value();
+    OP::g_operators.InvokeAction(ev_ent_usr_setScale.Tag(event));
+}
+
 void ENT_GeometryOutln::OnEdgeShadingChanged(int) {
     SendEdgeShading();
 }
@@ -227,6 +236,7 @@ void ENT_GeometryOutln::InitTransformationTab() {
         _sbPosition[i]->setMinimum(-100);
         _sbPosition[i]->setMaximum( 100);
         _sbPosition[i]->setSingleStep(leda::rational(1, 10));
+        _sbPosition[i]->setValue(_subject.GetPosition().vec[i]);
         connect(_sbPosition[i], SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnPositionChanged(leda::rational)));
         vbox->addWidget(_sbPosition[i]);
     }
@@ -243,6 +253,8 @@ void ENT_GeometryOutln::InitTransformationTab() {
         _sbScale[i]->setMinimum(-100);
         _sbScale[i]->setMaximum( 100);
         _sbScale[i]->setSingleStep(leda::rational(1, 10));
+        _sbScale[i]->setValue(_subject.GetScale().vec[i]);
+        connect(_sbScale[i], SIGNAL(SigValueChanged(leda::rational)), this, SLOT(OnScaleChanged(leda::rational)));
         vbox->addWidget(_sbScale[i]);
     }
     _grpScale->setLayout(vbox);

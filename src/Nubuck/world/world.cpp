@@ -380,7 +380,7 @@ void World::Event_Key(const EV::KeyEvent& event) {
 }
 
 
-void World::Event_EntUsrSetPosition(const SetEntityVectorEvent& event) {
+void World::Event_EntUsrSetVector(const SetEntityVectorEvent& event) {
     SetOperatorEvent setOperatorEvent;
     setOperatorEvent.m_op = OP::g_operators.GetOperatorByID(1); // set_transform operator
     setOperatorEvent.m_force = false;
@@ -388,10 +388,17 @@ void World::Event_EntUsrSetPosition(const SetEntityVectorEvent& event) {
     EntityVector* args[1] = { new EntityVector };
     args[0]->m_magic = EntityVector::MAGIC_PATTERN;
     args[0]->m_entityID = event.m_entityID;
-    args[0]->m_type = EntityVector::VectorType_Position;
     args[0]->m_vector[0] = event.m_vector[0];
     args[0]->m_vector[1] = event.m_vector[1];
     args[0]->m_vector[2] = event.m_vector[2];
+
+    if(ev_ent_usr_setPosition.GetEventID() == event.id0) {
+        args[0]->m_type = EntityVector::VectorType_Position;
+    } else if(ev_ent_usr_setScale.GetEventID() == event.id0) {
+        args[0]->m_type = EntityVector::VectorType_Scale;
+    } else {
+        COM_assert(0 && "not yet implemented");
+    }
 
     COM_assert(sizeof(EntityVector*) <= SetOperatorEvent::ARGS_BUFFER_SIZE);
     memcpy(setOperatorEvent.m_args, args, sizeof(EntityVector*));
@@ -472,7 +479,8 @@ void World::Init() {
     AddEventHandler(ev_mouse,                this, &World::Event_Mouse);
     AddEventHandler(ev_key,                  this, &World::Event_Key);
 
-    AddEventHandler(ev_ent_usr_setPosition, this, &World::Event_EntUsrSetPosition);
+    AddEventHandler(ev_ent_usr_setPosition, this, &World::Event_EntUsrSetVector);
+    AddEventHandler(ev_ent_usr_setScale, this, &World::Event_EntUsrSetVector);
 
     Grid_Build();
 }
@@ -785,10 +793,10 @@ Entity* World::NextEntity(Entity* ent) {
 }
 
 Entity* World::GetEntityByID(int id) {
-    if(0 > id || _entities.size() <= id) return NULL;
-    Entity* ent = _entities[id].Raw();
-    COM_assert(ent->GetID() == id);
-    return ent;
+    for(unsigned i = 0; i < _entities.size(); ++i) {
+        if(_entities[i]->GetID() == id) return _entities[i].Raw();
+    }
+    return NULL;
 }
 
 DWORD World::Thread_Func(void) {

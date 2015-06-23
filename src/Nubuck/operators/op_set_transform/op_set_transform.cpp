@@ -9,11 +9,18 @@ namespace OP {
 void SetTransform::Register(Invoker& invoker) {
 }
 
-void SetTransform::Event_EntUsrSetPosition(const SetEntityVectorEvent& event) {
+void SetTransform::Event_EntUsrSetVector(const SetEntityVectorEvent& event) {
     W::Entity* ent = W::world.GetEntityByID(event.m_entityID);
-    M::Vector3 position = ToVector(NB::Point3(event.m_vector[0], event.m_vector[1], event.m_vector[2]));
+    M::Vector3 vec = ToVector(NB::Point3(event.m_vector[0], event.m_vector[1], event.m_vector[2]));
     COM_assert(ent);
-    ent->SetPosition(position);
+
+    if(ev_ent_usr_setPosition.GetEventID() == event.id0) {
+        ent->SetPosition(vec);
+    } else if(ev_ent_usr_setScale.GetEventID() == event.id0) {
+        ent->SetScale(vec);
+    } else {
+        COM_assert(0 && "not yet implemented");
+    }
 
     // TODO: why does the application crash if we dont accept this event at this point?
     // worst thing that should happen is that the world tries to invoke this operator again.
@@ -22,7 +29,8 @@ void SetTransform::Event_EntUsrSetPosition(const SetEntityVectorEvent& event) {
 }
 
 SetTransform::SetTransform() {
-    AddEventHandler(ev_ent_usr_setPosition, this, &SetTransform::Event_EntUsrSetPosition);
+    AddEventHandler(ev_ent_usr_setPosition, this, &SetTransform::Event_EntUsrSetVector);
+    AddEventHandler(ev_ent_usr_setScale, this, &SetTransform::Event_EntUsrSetVector);
 }
 
 bool SetTransform::Invoke() {
@@ -39,9 +47,11 @@ bool SetTransform::Invoke() {
     W::Entity* ent = W::world.GetEntityByID(args->m_entityID);
     COM_assert(ent);
 
+    NB::Point3 ratVec = NB::Point3(args->m_vector[0], args->m_vector[1], args->m_vector[2]);
     if(EntityVector::VectorType_Position == args->m_type) {
-        NB::Point3 ratPos = NB::Point3(args->m_vector[0], args->m_vector[1], args->m_vector[2]);
-        ent->SetPosition(ToVector(ratPos));
+        ent->SetPosition(ToVector(ratVec));
+    } else if(EntityVector::VectorType_Scale == args->m_type) {
+        ent->SetScale(ToVector(ratVec));
     } else {
         COM_assert(0 && "not yet implemented");
     }

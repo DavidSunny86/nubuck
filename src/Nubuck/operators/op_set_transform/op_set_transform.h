@@ -10,7 +10,7 @@ class SetTransformPanel : public OperatorPanel {
 
 class SetTransform : public Operator {
 private:
-    void Event_EntUsrSetPosition(const SetEntityVectorEvent& event);
+    void Event_EntUsrSetVector(const SetEntityVectorEvent& event);
 public:
     SetTransform();
 
