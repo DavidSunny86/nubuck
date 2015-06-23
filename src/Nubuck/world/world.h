@@ -92,8 +92,6 @@ namespace W {
 
         ArcballCamera _camArcball;
 
-        GEN::Pointer<Entity> FindByEntityID(unsigned entId);
-
         R::meshPtr_t    _gridMesh;
         R::tfmeshPtr_t  _gridTFMesh;
 

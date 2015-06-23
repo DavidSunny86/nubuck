@@ -1,6 +1,7 @@
 #include <Nubuck\math_conv.h>
 #include <world\world.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
+#include "entity_vector.h"
 #include "op_set_transform.h"
 
 namespace OP {
@@ -26,6 +27,25 @@ SetTransform::SetTransform() {
 
 bool SetTransform::Invoke() {
     NB::SetOperatorName("Set Transformation");
+
+    EntityVector* const * vargs = reinterpret_cast<EntityVector* const *>(GetArgumentData());
+    COM_assert(vargs);
+
+    const EntityVector* args = vargs[0];
+    COM_assert(args);
+
+    COM_assert(EntityVector::MAGIC_PATTERN == args->m_magic);
+
+    W::Entity* ent = W::world.GetEntityByID(args->m_entityID);
+    COM_assert(ent);
+
+    if(EntityVector::VectorType_Position == args->m_type) {
+        NB::Point3 ratPos = NB::Point3(args->m_vector[0], args->m_vector[1], args->m_vector[2]);
+        ent->SetPosition(ToVector(ratPos));
+    } else {
+        COM_assert(0 && "not yet implemented");
+    }
+
     return true;
 }
 

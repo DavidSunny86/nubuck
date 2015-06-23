@@ -20,6 +20,7 @@
 #include <operators\operators.h>
 #include <operators\operator_driver.h>
 #include <operators\operator_events.h>
+#include <operators\op_set_transform\entity_vector.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 #include <world\entities\ent_geometry\ent_geometry_events.h>
 #include <world\entities\ent_text\ent_text.h>
@@ -283,13 +284,6 @@ void World::Event_Mouse(const EV::MouseEvent& event) {
     HandleMouseEvent(event);
 }
 
-GEN::Pointer<Entity> World::FindByEntityID(unsigned entId) {
-    for(unsigned i = 0; i < _entities.size(); ++i) {
-        if(_entities[i]->GetID() == entId) return _entities[i];
-    }
-    return GEN::Pointer<Entity>();
-}
-
 void World::Event_Apocalypse(const EV::Event& event) {
     _entities.clear();
 }
@@ -391,9 +385,18 @@ void World::Event_EntUsrSetPosition(const SetEntityVectorEvent& event) {
     setOperatorEvent.m_op = OP::g_operators.GetOperatorByID(1); // set_transform operator
     setOperatorEvent.m_force = false;
 
-    OP::g_operators.InvokeAction(ev_op_setOperator.Tag(setOperatorEvent));
+    EntityVector* args[1] = { new EntityVector };
+    args[0]->m_magic = EntityVector::MAGIC_PATTERN;
+    args[0]->m_entityID = event.m_entityID;
+    args[0]->m_type = EntityVector::VectorType_Position;
+    args[0]->m_vector[0] = event.m_vector[0];
+    args[0]->m_vector[1] = event.m_vector[1];
+    args[0]->m_vector[2] = event.m_vector[2];
 
-    std::cout << "World::Event_EntUsrSetPosition()" << std::endl;
+    COM_assert(sizeof(EntityVector*) <= SetOperatorEvent::ARGS_BUFFER_SIZE);
+    memcpy(setOperatorEvent.m_args, args, sizeof(EntityVector*));
+
+    OP::g_operators.InvokeAction(ev_op_setOperator.Tag(setOperatorEvent));
 }
 
 void World::Grid_Build() {

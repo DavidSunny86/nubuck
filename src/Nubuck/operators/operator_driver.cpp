@@ -23,7 +23,7 @@ static int DispatchSingleEvent(Operator* op, const EV::Event& event) {
     return *event.ret;
 }
 
-void Driver::SetOperator(Operator* op, bool force) {
+void Driver::SetOperator(Operator* op, bool force, const char* args) {
     if(_activeOp == op) return;
 
     bool invoke = true;
@@ -36,14 +36,17 @@ void Driver::SetOperator(Operator* op, bool force) {
         if(!retval) invoke = false; // confimration dialog cancelled, abort
     }
 
-	if(invoke && op->Invoke()) {
-        if(_activeOp) _activeOp->Finish();
-        _activeOp = op;
+	if(invoke) {
+        op->SetArgumentData(args);
+        if(op->Invoke()) {
+            if(_activeOp) _activeOp->Finish();
+            _activeOp = op;
 
-        RebuildMeshes();
+            RebuildMeshes();
 
-        SetOperatorEvent event(op, force);
-        g_operators.SendAndWait(ev_op_setOperator.Tag(event));
+            SetOperatorEvent event(op, force);
+            g_operators.SendAndWait(ev_op_setOperator.Tag(event));
+        }
     }
 
     // TODO hacky hack hack
@@ -73,7 +76,7 @@ void Driver::RebuildMeshes() {
 }
 
 void Driver::Event_SetOperator(const SetOperatorEvent& event) {
-    SetOperator(event.m_op, event.m_force);
+    SetOperator(event.m_op, event.m_force, event.m_args);
     SignalCompletion();
 }
 
@@ -115,7 +118,7 @@ void Driver::Event_Fallthrough(const EV::Event& event) {
             ftevent->SetFallthrough(true);
             if(DispatchSingleEvent(_defaultOp, *ftevent)) {
                 // default operator becomes active, implicit rebuild
-                SetOperator(_defaultOp, false);
+                SetOperator(_defaultOp, false, NULL);
                 // next, we have to resend the event without fallthrough flag
                 accepted = 0;
                 DispatchSingleEvent(_activeOp, event);

@@ -23,7 +23,23 @@ OperatorPanel::OperatorPanel() : _widget(NULL) {
     _widget = new QWidget;
 }
 
+void Operator::SetArgumentData(const char* args) {
+    if(args) {
+        memcpy(_args, args, GetArgumentDataSize());
+    }
+}
+
+const char* Operator::GetArgumentData() const {
+    return _args;
+}
+
+int Operator::GetArgumentDataSize() const {
+    return sizeof(char) * ARGS_BUFFER_SIZE;
+}
+
 Operator::Operator() : _panel(NULL) {
+    memset(_args, 0, GetArgumentDataSize());
+
     AddEventHandler(ev_mouse, this, &Operator::OnMouse);
     AddEventHandler(ev_key, this, &Operator::OnKey);
     AddEventHandler(ev_op_requestFinish, this, &Operator::OnRequestFinish);

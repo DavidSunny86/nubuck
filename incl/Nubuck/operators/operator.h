@@ -49,6 +49,10 @@ public:
 class NUBUCK_API Operator : public EV::EventHandler<> {
 private:
     OperatorPanel* _panel;
+
+    // TODO must be consistent with buffer size of SetOperatorEvent
+    enum { ARGS_BUFFER_SIZE = 128 };
+    char _args[128];
 public:
     DECL_HANDLE_EVENTS(Operator);
 
@@ -56,9 +60,14 @@ public:
 
     virtual ~Operator() { }
 
-    void SetPanel(OperatorPanel* panel); // called by operators manager only
+    // called by operators manager only
+    void SetPanel(OperatorPanel* panel);
+    void SetArgumentData(const char* args);
 
     void SendToPanel(const EV::Event& event);
+
+    const char* GetArgumentData() const;
+    int         GetArgumentDataSize() const;
 
     virtual std::string PreferredShortcut() const;
 

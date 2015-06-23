@@ -20,7 +20,7 @@ private:
     Operator* _defaultOp;
     Operator* _activeOp;
 
-    void SetOperator(Operator* op, bool force);
+    void SetOperator(Operator* op, bool force, const char* args);
 
     void RebuildMeshes();
 
