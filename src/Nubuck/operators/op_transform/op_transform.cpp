@@ -160,20 +160,17 @@ void Transform::OpenEditor() {
 
 void Transform::CopyEditorSelection() {
     // update global selection
-    if(NB::EntityEditor::Action_SelectEntity == _entityEditor.GetAction()) {
-        if(_entityEditor.FirstSelectedEntity()) {
-            NB::SelectEntity(NB::SM_NEW, _entityEditor.FirstSelectedEntity());
-        } else {
-            NB::ClearSelection();
-        }
-    } else if(NB::EntityEditor::Action_SelectEntity_Add == _entityEditor.GetAction()) {
-        W::Entity *last = NULL, *ent = _entityEditor.FirstSelectedEntity();
+    int lastAction = _entityEditor.GetAction();
+    if( NB::EntityEditor::Action_SelectEntity == lastAction ||
+        NB::EntityEditor::Action_SelectEntity_Add == lastAction)
+    {
+        std::vector<W::Entity*> selection;
+        W::Entity* ent = _entityEditor.FirstSelectedEntity();
         while(ent) {
-            last = ent;
+            selection.push_back(ent);
             ent = _entityEditor.NextSelectedEntity(ent);
         }
-        COM_assert(last);
-        NB::SelectEntity(NB::SM_ADD, last);
+        W::world.Select_InArray(&selection[0], selection.size());
     }
 }
 

@@ -146,6 +146,16 @@ void World::Selection::Set(Entity* ent) {
     SignalChange();
 }
 
+void World::Selection::Set(Entity** entities, int numEntities) {
+    SYS::ScopedLock lock(_mtx);
+    _Clear();
+    for(int i = 0; i < numEntities; ++i) {
+        _Select(entities[i]);
+    }
+    ComputeCenter();
+    SignalChange();
+}
+
 void World::Selection::Add(Entity* ent) {
     if(ent->IsSelected()) return;
 
@@ -737,6 +747,15 @@ void World::ClearSelection() {
 void World::Select_New(Entity* ent) {
     if(!ent->IsSolid()) COM_printf("WARNING - World::Select_New: selecting non-solid entity.\n");
     _selection.Set(ent);
+}
+
+/*
+NOTE: HACKY hack hack. sometimes it's necessary to set the entire selection
+at once, as opposed to selecting entities individiually, so that there is
+a single SelectionChanged() message in response.
+*/
+void World::Select_InArray(Entity** entities, int numEntities) {
+    _selection.Set(entities, numEntities);
 }
 
 void World::Select_Add(Entity* ent) {

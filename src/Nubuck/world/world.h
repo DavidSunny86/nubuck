@@ -68,6 +68,7 @@ namespace W {
 
             void Set(Entity* ent);
             void Add(Entity* ent);
+            void Set(Entity** entities, int numEntities);
             void Clear();
 
             M::Vector3                  GetGlobalCenter();
@@ -154,6 +155,7 @@ namespace W {
         void                        ClearSelection();
         void 						Select_New(Entity* ent);
         void 						Select_Add(Entity* ent);
+        void                        Select_InArray(Entity** entities, int numEntities);
         void 						SelectVertex_New(ENT_Geometry* geom, const leda::node vert);
         void 						SelectVertex_Add(ENT_Geometry* geom, const leda::node vert);
 
