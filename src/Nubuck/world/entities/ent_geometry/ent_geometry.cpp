@@ -160,12 +160,12 @@ void ENT_Geometry::DestroyRenderMesh() {
     }
 }
 
-void ENT_Geometry::ComputeBoundingBox() {
+M::Box ENT_Geometry::GetBoundingBox() const {
     M::Box bbox;
     bbox.min = bbox.max = M::Vector3::Zero;
     leda::node v;
     forall_nodes(v, _ratPolyMesh) {
-        M::Vector3 p = _fpos[v->id()];
+        M::Vector3 p = ToVector(_ratPolyMesh.position_of(v));
         bbox.min.x = M::Min(bbox.min.x, p.x);
         bbox.min.y = M::Min(bbox.min.y, p.y);
         bbox.min.z = M::Min(bbox.min.z, p.z);
@@ -177,7 +177,7 @@ void ENT_Geometry::ComputeBoundingBox() {
         // set empty bbox to some minimum size
         bbox.min = -bbox.max = M::Vector3(0.1f, 0.1f, 0.1f);
     }
-    SetBoundingBox(bbox);
+    return bbox;
 }
 
 void ENT_Geometry::Event_ShowVertexLabels(const EV::Arg<bool>& event) {
@@ -439,8 +439,6 @@ void ENT_Geometry::Rebuild() {
     }
 
     RebuildVertexLabels();
-
-    ComputeBoundingBox();
 }
 
 static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {

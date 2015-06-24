@@ -31,6 +31,8 @@ public:
 
     void GetRenderJobs(R::RenderList& renderList);
 
+    M::Box ENT_Text::GetBoundingBox() const override;
+
     void OnDestroy() override;
 };
 

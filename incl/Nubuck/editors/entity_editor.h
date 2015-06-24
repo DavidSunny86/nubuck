@@ -24,7 +24,8 @@ public:
         Action_BeginDragging,
         Action_Dragging,
         Action_EndDragging,
-        Action_PickEntity
+        Action_SelectEntity,
+        Action_SelectEntity_Add,
     };
 private:
     struct ModeImpl {
@@ -37,8 +38,7 @@ private:
     };
 
     struct TranslateImpl : ModeImpl {
-        EntityEditor*           entityEditor;
-        std::vector<M::Vector3> oldEntPos;
+        EntityEditor* entityEditor;
 
         TranslateImpl(EntityEditor* entityEditor);
 
@@ -59,17 +59,6 @@ private:
         void OnEndDragging() override;
     };
 
-    GEN::Pointer<ScaleImpl> _scaleImpl;
-
-    GEN::Pointer<ModeImpl>  _impl[2];
-    ModeImpl*               _curImpl;
-
-    // this is the initial center of the currently selected entities, before
-    // the editor applied any transformations.
-    // the difference vector 'gizmo_position - _initialCenter' is the value
-    // displayed in the op_transform panel.
-    M::Vector3              _initialCenter;
-
     struct BBox {
         W::ENT_Geometry*    geom;
         leda::node          verts[8];
@@ -85,7 +74,11 @@ private:
         bool        isSelected;
         BBox        bbox;
         W::Entity*  nextSelected;
-        M::Vector3  initialPos;
+
+        M::Vector3  initialPos; // position of entity at time of selection
+
+        // used by translate impl
+        M::Vector3  oldPos;
 
         // used by scale impl
         leda::node_map<M::Vector3> oldVertPosF;
@@ -93,17 +86,18 @@ private:
         EntityData() : isSelected(false), nextSelected(NULL) { }
     };
 
+    GEN::Pointer<ScaleImpl> _scaleImpl;
+
+    GEN::Pointer<ModeImpl>  _impl[2];
+    ModeImpl*               _curImpl;
+
     std::vector<EntityData> _entData; // indexed with entity IDs
     W::Entity*              _selected;
 
-    int _allowedModeFlags;
-    int _mode;
+    int                     _allowedModeFlags;
+    int                     _mode;
 
-    bool _modifyGlobalSelection;
-
-    int _lastAction;
-
-    void ResetTranslation();
+    int                     _lastAction;
 
     bool IsSelected(const W::Entity* ent) const;
 
@@ -127,20 +121,19 @@ public:
     void SetAllowedModeFlags(int flags);
     void SetMode(int mode);
 
-    void SetModifyGlobalSelection(bool modify);
-
     void Open();
     void Close();
+
+    void CopyGlobalSelection();
 
     void SetTranslationVector(const M::Vector3& v);
 
     void UpdateBoundingBoxes();
 
-    void CopyGlobalSelection();
-
-    M::Vector3  GlobalCenterOfSelection();
-    W::Entity*  FirstSelectedEntity();
-    W::Entity*  NextSelectedEntity(const W::Entity* ent);
+    M::Vector3          GlobalCenterOfSelection();
+    W::Entity*          FirstSelectedEntity();
+    const W::Entity*    FirstSelectedEntity() const;
+    W::Entity*          NextSelectedEntity(const W::Entity* ent);
 
     Mode        GetMode() const;
 
@@ -150,5 +143,7 @@ public:
     M::Vector3  GetTranslationVector() const;
     M::Vector3  GetScalingVector() const;
 };
+
+void CopyGlobalSelection(EntityEditor& editor);
 
 } // namespace NB

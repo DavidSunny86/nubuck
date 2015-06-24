@@ -44,6 +44,8 @@ private:
 
     void OpenEditor();
 
+    void CopyEditorSelection();
+
     void UpdatePanelVectorsVisibility();
     void UpdatePanelVectorsValues();
 

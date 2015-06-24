@@ -15,13 +15,13 @@ void ENT_Text::Rebuild() {
     _text.Begin(texFont);
     _text.AddString(texFont, _content, _refChar, _refCharSize);
     _text.End();
+}
 
-    // recompute bbox
+M::Box ENT_Text::GetBoundingBox() const {
     const M::Vector2 contentSize = GetContentSize();
     const M::Vector3 size = M::Vector3(contentSize.x, contentSize.y, 0.1f);
     const M::Vector3 center = 0.5f * M::Vector3(contentSize.x, -contentSize.y, 0.0f);
-    M::Box bbox = M::Box::FromCenterSize(center, size);
-    SetBoundingBox(bbox);
+    return M::Box::FromCenterSize(center, size);
 }
 
 ENT_Text::ENT_Text()

@@ -144,6 +144,7 @@ void Transform::OpenEditor() {
 
     if(W::editMode_t::OBJECTS == _mode) {
         _entityEditor.Open();
+        _entityEditor.CopyGlobalSelection();
         _isEditorOpen = true;
     }
     else if(W::editMode_t::VERTICES == _mode) {
@@ -154,6 +155,25 @@ void Transform::OpenEditor() {
         }
     } else {
         COM_assert(0 && "unkown editmode");
+    }
+}
+
+void Transform::CopyEditorSelection() {
+    // update global selection
+    if(NB::EntityEditor::Action_SelectEntity == _entityEditor.GetAction()) {
+        if(_entityEditor.FirstSelectedEntity()) {
+            NB::SelectEntity(NB::SM_NEW, _entityEditor.FirstSelectedEntity());
+        } else {
+            NB::ClearSelection();
+        }
+    } else if(NB::EntityEditor::Action_SelectEntity_Add == _entityEditor.GetAction()) {
+        W::Entity *last = NULL, *ent = _entityEditor.FirstSelectedEntity();
+        while(ent) {
+            last = ent;
+            ent = _entityEditor.NextSelectedEntity(ent);
+        }
+        COM_assert(last);
+        NB::SelectEntity(NB::SM_ADD, last);
     }
 }
 
@@ -181,7 +201,6 @@ void Transform::UpdatePanelVectorsValues() {
 }
 
 Transform::Transform() : _mode(0), _isEditorOpen(false) {
-    _entityEditor.SetModifyGlobalSelection(true);
     _vertexEditor.SetModifyGlobalSelection(true);
 
     AddEventHandler(ev_usr_selectEntity, this, &Transform::Event_UsrSelectEntity);
@@ -205,7 +224,7 @@ bool Transform::Invoke() {
 
 void Transform::OnGeometrySelected() {
     if(W::editMode_t::OBJECTS == _mode) {
-        _entityEditor.Open(); // resets selection
+        _entityEditor.CopyGlobalSelection();
         UpdatePanelVectorsVisibility();
         UpdatePanelVectorsValues();
     }
@@ -255,7 +274,8 @@ void Transform::OnMouse(const EV::MouseEvent& event) {
             accept = _entityEditor.SimulateMouseEvent(event);
         } else {
             accept = _entityEditor.HandleMouseEvent(event);
-            if(accept && NB::EntityEditor::Action_Dragging == _entityEditor.GetAction()) {
+            if(accept) {
+                CopyEditorSelection();
                 UpdatePanelVectorsValues();
             }
         }
@@ -280,6 +300,10 @@ void Transform::OnKey(const EV::KeyEvent& event) {
             accept = _entityEditor.SimulateKeyEvent(event);
         } else {
             accept = _entityEditor.HandleKeyEvent(event);
+            if(accept) {
+                CopyEditorSelection();
+                UpdatePanelVectorsValues();
+            }
         }
     } else if(W::editMode_t::VERTICES == _mode) {
         if(event.fallthrough) {

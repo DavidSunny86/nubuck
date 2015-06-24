@@ -4,18 +4,6 @@
 #include <world\world.h>
 #include <world\entities\ent_geometry\ent_geometry.h>
 
-static M::Vector3 ToVector(const leda::d3_rat_point& p) { // TODO: duplicate of ent_geometry.cpp:ToVector
-    const leda::d3_point fp = p.to_float();
-    return M::Vector3(fp.xcoord(), fp.ycoord(), fp.zcoord());
-}
-
-static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
-    const leda::rational x = v.x;
-    const leda::rational y = v.y;
-    const leda::rational z = v.z;
-    return leda::d3_rat_point(x, y, z);
-}
-
 namespace NB {
 
 /*
@@ -27,10 +15,9 @@ TranslateImpl implementation {
 EntityEditor::TranslateImpl::TranslateImpl(EntityEditor* entityEditor) : entityEditor(entityEditor) { }
 
 void EntityEditor::TranslateImpl::OnBeginDragging() {
-    oldEntPos.clear();
     W::Entity* ent = entityEditor->FirstSelectedEntity();
     while(ent) {
-        oldEntPos.push_back(ent->GetPosition());
+        entityEditor->_entData[ent->GetID()].oldPos = ent->GetPosition();
         ent = entityEditor->NextSelectedEntity(ent);
     }
 }
@@ -40,19 +27,18 @@ void EntityEditor::TranslateImpl::OnDragging() {
     float translation = entityEditor->GetTranslation();
 
     W::Entity* ent = entityEditor->FirstSelectedEntity();
-    unsigned i = 0;
     while(ent) {
-        M::Vector3 pos = oldEntPos[i];
-        pos.vec[dragAxis] = oldEntPos[i].vec[dragAxis] + translation;
+        EntityData& data = entityEditor->_entData[ent->GetID()];
+
+        M::Vector3 pos = data.oldPos;
+        pos.vec[dragAxis] += translation;
         ent->SetPosition(pos);
 
         // move bbox
-        EntityData& data = entityEditor->_entData[ent->GetID()];
         COM_assert(data.bbox.geom);
         data.bbox.geom->SetPosition(pos);
 
         ent = entityEditor->NextSelectedEntity(ent);
-        i++;
     }
 
     entityEditor->UpdateGizmo();
@@ -193,7 +179,7 @@ void EntityEditor::BBox::Init() {
 }
 
 void EntityEditor::BBox::Update(W::Entity* ent) {
-    const M::Box& mbox = ent->GetBoundingBox();
+    const M::Box mbox = ent->GetBoundingBox();
 
     const M::Vector3 boundary = 0.2f * M::Vector3(1.0f, 1.0f, 1.0f);
 
@@ -227,15 +213,6 @@ void EntityEditor::BBox::Destroy() {
     }
 }
 
-void EntityEditor::ResetTranslation() {
-    W::Entity* ent = FirstSelectedEntity();
-    while(ent) {
-        _entData[ent->GetID()].initialPos = ent->GetPosition();
-        ent = NextSelectedEntity(ent);
-    }
-    _initialCenter = GlobalCenterOfSelection();
-}
-
 bool EntityEditor::IsSelected(const W::Entity* ent) const {
     return _entData.size() > ent->GetID() && _entData[ent->GetID()].isSelected;
 }
@@ -246,12 +223,9 @@ void EntityEditor::ClearSelection() {
     }
     _entData.clear();
     _selected = NULL;
-
-    if(_modifyGlobalSelection) W::world.ClearSelection();
 }
 
 void EntityEditor::SelectEntity_Add(W::Entity* ent) {
-    /* DEBUG */ std::cout << "EntityEditor::SelectEntity_Add(W::Entity* ent)" << std::endl;
     if(!IsSelected(ent)) {
         _entData.resize(M::Max(ent->GetID() + 1, _entData.size()));
 
@@ -269,7 +243,14 @@ void EntityEditor::SelectEntity_Add(W::Entity* ent) {
         }
         *tail = ent;
 
-        if(_modifyGlobalSelection) W::world.Select_Add(ent);
+        // save current position of selected entities
+        // TODO: merge with above loop
+        W::Entity* ent = _selected;
+        while(ent) {
+            EntityData& data = _entData[ent->GetID()];
+            data.oldPos = ent->GetPosition();
+            ent = data.nextSelected;
+        }
     }
 }
 
@@ -292,13 +273,13 @@ bool EntityEditor::DoPicking(const EV::MouseEvent& event, bool simulate) {
         W::Entity* ent = NULL;
         if(W::world.TraceEntity(ray, &ent)) {
             if(!simulate) {
-                if(!(EV::MouseEvent::MODIFIER_SHIFT & event.mods)) ClearSelection();
+                _lastAction = Action_SelectEntity_Add;
+                if(!(EV::MouseEvent::MODIFIER_SHIFT & event.mods)) {
+                    ClearSelection();
+                    _lastAction = Action_SelectEntity;
+                }
                 SelectEntity_Add(ent);
                 UpdateGizmo();
-
-                ResetTranslation();
-
-                _lastAction = Action_PickEntity;
             }
             return true;
         }
@@ -355,12 +336,19 @@ bool EntityEditor::OnKeyEvent(const EV::KeyEvent& event, bool simulate) {
 
             if(isSelectionComplete) ClearSelection();
             else {
+                int numSelected = 0;
                 ent = W::world.FirstEntity();
                 while(ent) {
-                    if(ent->IsSolid()) SelectEntity_Add(ent);
+                    if(ent->IsSolid()) {
+                        SelectEntity_Add(ent);
+                        numSelected++;
+                    }
                     ent = W::world.NextEntity(ent);
                 }
+                std::cout << "EntityEditor: select all, " << numSelected << " selected." << std::endl;
             }
+
+            _lastAction = Action_SelectEntity;
 
             UpdateGizmo();
         }
@@ -375,7 +363,6 @@ EntityEditor::EntityEditor()
     , _selected(NULL)
     , _allowedModeFlags(TMF_ALL)
     , _mode(0)
-    , _modifyGlobalSelection(false)
     , _lastAction(Action_None)
 {
     _scaleImpl = GEN::MakePtr(new ScaleImpl(this));
@@ -402,30 +389,10 @@ void EntityEditor::SetMode(int mode) {
     _curImpl->OnEnter();
 }
 
-void EntityEditor::SetModifyGlobalSelection(bool modify) {
-    if(_modifyGlobalSelection = modify) {
-        W::world.ClearSelection();
-        W::Entity* ent = FirstSelectedEntity();
-        while(ent) {
-            W::world.Select_Add(ent);
-            ent = NextSelectedEntity(ent);
-        }
-    }
-}
-
-// TODO: semantics not clear
+// clears selection
 void EntityEditor::Open() {
-    UpdateGizmo();
-
-    bool tmp = _modifyGlobalSelection;
-    _modifyGlobalSelection = false;
     ClearSelection();
-    _modifyGlobalSelection = tmp;
-    if(_modifyGlobalSelection) {
-        CopyGlobalSelection();
-    }
-
-    ResetTranslation();
+    UpdateGizmo();
 }
 
 void EntityEditor::Close() {
@@ -433,13 +400,6 @@ void EntityEditor::Close() {
 }
 
 void EntityEditor::SetTranslationVector(const M::Vector3& v) {
-    W::Entity* ent = FirstSelectedEntity();
-    while(ent) {
-        ent->SetPosition(_entData[ent->GetID()].initialPos + v);
-        ent = NextSelectedEntity(ent);
-    }
-    UpdateGizmo();
-    UpdateBoundingBoxes();
 }
 
 // update
@@ -455,36 +415,12 @@ void EntityEditor::UpdateBoundingBoxes() {
                 0.0f != translation.z;
             if(geom->IsDirty() || moved) {
                 geom->CacheFPos();
-                geom->ComputeBoundingBox();
                 _entData[geom->GetID()].bbox.Update(it);
             }
         }
         it = NextSelectedEntity(it);
     }
     UpdateGizmo();
-}
-
-void EntityEditor::CopyGlobalSelection() {
-    // check if global selection is equal to editor selection
-    W::Entity *self = FirstSelectedEntity(), *other = W::world.FirstSelectedEntity();
-    while(self == other && self) {
-        self = NextSelectedEntity(self);
-        other = W::world.NextSelectedEntity(other);
-    }
-    if(self == other) return; // nothing to do
-
-    // mirror selection
-    _modifyGlobalSelection = false;
-    ClearSelection();
-    W::Entity* ent = W::world.FirstSelectedEntity();
-    while(ent) {
-        SelectEntity_Add(ent);
-        ent = W::world.NextSelectedEntity(ent);
-    }
-    _modifyGlobalSelection = true;
-    UpdateGizmo();
-
-    ResetTranslation();
 }
 
 M::Vector3 EntityEditor::GlobalCenterOfSelection() {
@@ -505,6 +441,10 @@ W::Entity* EntityEditor::FirstSelectedEntity() {
     return _selected;
 }
 
+const W::Entity* EntityEditor::FirstSelectedEntity() const {
+    return _selected;
+}
+
 W::Entity* EntityEditor::NextSelectedEntity(const W::Entity* ent) {
     COM_assert(ent);
     COM_assert(IsSelected(ent));
@@ -520,11 +460,34 @@ EntityEditor::Action EntityEditor::GetAction() const {
 }
 
 M::Vector3 EntityEditor::GetTranslationVector() const {
-    return GetGizmoPosition() - _initialCenter;
+    const W::Entity* ent = FirstSelectedEntity();
+    if(ent) {
+        // the translation vector is the same for all selected entities
+        return ent->GetPosition() - _entData[ent->GetID()].initialPos;
+    }
+    return M::Vector3::Zero;
 }
 
 M::Vector3 EntityEditor::GetScalingVector() const {
     return _scaleImpl->scale;
+}
+
+void EntityEditor::CopyGlobalSelection() {
+    // test if global selection differs from editor selection
+    W::Entity* self = FirstSelectedEntity();
+    W::Entity* other = NB::FirstSelectedEntity();
+    while(self && self == other) {
+        self = NextSelectedEntity(self);
+        other = NB::NextSelectedEntity(other);
+    }
+    if(self == other) return; // nothing to do
+
+    ClearSelection();
+    W::Entity* ent = NB::FirstSelectedEntity();
+    while(ent) {
+        SelectEntity_Add(ent);
+        ent = NB::NextSelectedEntity(ent);
+    }
 }
 
 } // namespace NB

@@ -114,7 +114,6 @@ public:
     bool IsDirty() const;
 
     void CacheFPos();
-    void ComputeBoundingBox();
 
     struct VertexHit {
         leda::node  vert;
@@ -142,6 +141,8 @@ public:
     const std::string& GetName() const { return Entity::GetName(); }
 
     void SetName(const std::string& name);
+
+    M::Box GetBoundingBox() const override;
 
 	void Destroy() { Entity::Destroy(); }
     void OnDestroy();

@@ -41,10 +41,6 @@ private:
     M::Vector3          _position;
     M::Quaternion       _orientation;
     M::Vector3          _scale;
-
-    M::Box              _bbox;
-protected:
-    void SetBoundingBox(const M::Box& bbox);
 public:
     struct DListLink {
         Entity *prev, *next;
@@ -79,7 +75,7 @@ public:
     M::Quaternion       GetOrientation() const;
     M::Vector3          GetScale() const;
 
-    const M::Box&       GetBoundingBox() const;
+    virtual M::Box      GetBoundingBox() const;
 
     M::Matrix4          GetObjectToWorldMatrix() const;
 

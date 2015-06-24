@@ -6,10 +6,6 @@
 
 namespace W {
 
-void Entity::SetBoundingBox(const M::Box& bbox) {
-    _bbox = bbox;
-}
-
 Entity::Entity()
     : _tags(Tags::IS_SOLID)
     , _position(M::Vector3::Zero)
@@ -96,8 +92,8 @@ M::Vector3 Entity::GetScale() const {
     return _scale;
 }
 
-const M::Box& Entity::GetBoundingBox() const {
-    return _bbox;
+M::Box Entity::GetBoundingBox() const {
+    return M::Box::FromCenterSize(GetPosition(), M::Vector3(1.0f, 1.0f, 1.0f));
 }
 
 M::Matrix4 Entity::GetObjectToWorldMatrix() const {
@@ -110,7 +106,8 @@ M::Matrix4 Entity::GetObjectToWorldMatrix() const {
 
 M::Vector3 Entity::GetLocalCenter() const {
 	SYS::ScopedLock lock(_mtx);
-    return _bbox.min + 0.5f * (_bbox.max - _bbox.min);
+    const M::Box bbox = GetBoundingBox();
+    return bbox.min + 0.5f * (bbox.max - bbox.min);
 }
 
 M::Vector3 Entity::GetGlobalCenter() const {
