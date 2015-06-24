@@ -7,6 +7,8 @@ Globals g;
 R::Color purple = R::Color(1.0f, 0.0f, 1.0f);
 
 void InitPhases() {
+    g = Globals();
+
 	g.phase1_level0P0 = GEN::MakePtr(new Phase1_Level0(g.P0));
 	g.phase1_level0P1 = GEN::MakePtr(new Phase1_Level0(g.P1));
 

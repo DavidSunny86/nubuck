@@ -215,6 +215,7 @@ bool Transform::Invoke() {
     _mode = W::world.GetEditMode().GetMode();
     OpenEditor();
     UpdatePanelVectorsVisibility();
+    UpdatePanelVectorsValues();
 
     return true;
 }

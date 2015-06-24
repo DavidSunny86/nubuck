@@ -248,7 +248,7 @@ void EntityEditor::SelectEntity_Add(W::Entity* ent) {
         W::Entity* ent = _selected;
         while(ent) {
             EntityData& data = _entData[ent->GetID()];
-            data.oldPos = ent->GetPosition();
+            data.initialPos = ent->GetPosition();
             ent = data.nextSelected;
         }
     }
