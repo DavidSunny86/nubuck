@@ -80,35 +80,6 @@ void Driver::Event_SetOperator(const SetOperatorEvent& event) {
     SignalCompletion();
 }
 
-void Driver::Event_UsrSelectEntity(const EV::Usr_SelectEntity& event) {
-    Event_Fallthrough(event);
-}
-
-void Driver::Event_UsrChangeEditMode(const EV::Arg<int>& event) {
-    Event_Fallthrough(event);
-}
-
-void Driver::Event_SelectionChanged(const EV::Event& event) {
-    if(_activeOp) _activeOp->OnGeometrySelected();
-    _defaultOp->OnGeometrySelected();
-    SignalCompletion();
-}
-
-void Driver::Event_EditModeChanged(const EV::Arg<int>& event) {
-    const W::editMode_t::Enum editMode = W::editMode_t::Enum(event.value);
-    if(_activeOp) _activeOp->OnEditModeChanged(editMode);
-    if(_activeOp != _defaultOp) _defaultOp->OnEditModeChanged(editMode);
-    SignalCompletion();
-}
-
-void Driver::Event_Mouse(const EV::MouseEvent& event) {
-    Event_Fallthrough(event);
-}
-
-void Driver::Event_Key(const EV::KeyEvent& event) {
-    Event_Fallthrough(event);
-}
-
 void Driver::Event_Fallthrough(const EV::Event& event) {
     int accepted = 0;
     event.SetReturnPointer(&accepted);
@@ -139,21 +110,7 @@ void Driver::Event_RebuildAll(const EV::Event& event) {
 }
 
 void Driver::Event_Default(const EV::Event& event, const char* className) {
-    int accepted = 0;
-    event.SetReturnPointer(&accepted);
-    if(_activeOp) {
-        _activeOp->Send(event);
-        int numDispatched = _activeOp->HandleEvents();
-        COM_assert(1 == numDispatched);
-
-        RebuildMeshes();
-	}
-
-    if(!accepted) {
-        W::world.Send(event);
-    }
-
-    SignalCompletion();
+    Event_Fallthrough(event);
 }
 
 Driver::Driver(Operator* defaultOp)
@@ -164,12 +121,6 @@ Driver::Driver(Operator* defaultOp)
     assert(_defaultOp);
 
 	AddEventHandler(ev_op_setOperator, this, &Driver::Event_SetOperator);
-    AddEventHandler(ev_usr_selectEntity, this, &Driver::Event_UsrSelectEntity);
-    AddEventHandler(ev_usr_changeEditMode, this, &Driver::Event_UsrChangeEditMode);
-	AddEventHandler(ev_w_selectionChanged, this, &Driver::Event_SelectionChanged);
-    AddEventHandler(ev_w_editModeChanged, this, &Driver::Event_EditModeChanged);
-	AddEventHandler(ev_mouse, this, &Driver::Event_Mouse);
-    AddEventHandler(ev_key, this, &Driver::Event_Key);
     AddEventHandler(ev_w_rebuildAll, this, &Driver::Event_RebuildAll);
 }
 

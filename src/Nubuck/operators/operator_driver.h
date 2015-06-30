@@ -15,23 +15,15 @@ class Driver : public SYS::Thread, public EV::EventHandler<EV::EventHandlerPolic
 private:
     DECL_HANDLE_EVENTS(Driver)
 
-    bool _isBlocked;
-
-    Operator* _defaultOp;
-    Operator* _activeOp;
+    bool        _isBlocked;
+    Operator*   _defaultOp;
+    Operator*   _activeOp;
 
     void SetOperator(Operator* op, bool force, const char* args);
 
     void RebuildMeshes();
 
     void Event_SetOperator(const SetOperatorEvent& event);
-
-    void Event_UsrSelectEntity(const EV::Usr_SelectEntity& event);
-    void Event_UsrChangeEditMode(const EV::Arg<int>& event);
-    void Event_SelectionChanged(const EV::Event& event);
-    void Event_EditModeChanged(const EV::Arg<int>& event);
-    void Event_Mouse(const EV::MouseEvent& event);
-    void Event_Key(const EV::KeyEvent& event);
     void Event_RebuildAll(const EV::Event& event);
 
     void Event_Fallthrough(const EV::Event& event);

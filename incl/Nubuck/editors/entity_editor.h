@@ -101,9 +101,6 @@ private:
 
     bool IsSelected(const W::Entity* ent) const;
 
-    void ClearSelection();
-    void SelectEntity_Add(W::Entity* ent);
-
     void UpdateGizmo();
 
     bool DoPicking(const EV::MouseEvent& event, bool simulate);
@@ -123,6 +120,10 @@ public:
 
     void Open();
     void Close();
+
+    void ClearSelection();
+    void SelectEntity_Add(W::Entity* ent);
+    void SelectEntity_New(W::Entity* ent);
 
     void CopyGlobalSelection();
 

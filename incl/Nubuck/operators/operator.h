@@ -76,10 +76,6 @@ public:
     virtual void Finish() = 0;
     virtual bool IsDone() const { return false; }
 
-    virtual void GetMeshJobs(std::vector<R::MeshJob>& meshJobs) { }
-    virtual void OnGeometrySelected() { }
-    virtual void OnCameraChanged() { }
-    virtual void OnEditModeChanged(const W::editMode_t::Enum mode) { }
     virtual void OnMouse(const EV::MouseEvent& mouseEvent) { }
     virtual void OnKey(const EV::KeyEvent& keyEvent) { }
     virtual void OnMeshChanged(const EV::Event& event) { }

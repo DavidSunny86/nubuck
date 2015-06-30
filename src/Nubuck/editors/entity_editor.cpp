@@ -251,7 +251,14 @@ void EntityEditor::SelectEntity_Add(W::Entity* ent) {
             data.initialPos = ent->GetPosition();
             ent = data.nextSelected;
         }
+
+        UpdateGizmo();
     }
+}
+
+void EntityEditor::SelectEntity_New(W::Entity* ent) {
+    ClearSelection();
+    SelectEntity_Add(ent);
 }
 
 /*
@@ -279,7 +286,6 @@ bool EntityEditor::DoPicking(const EV::MouseEvent& event, bool simulate) {
                     _lastAction = Action_SelectEntity;
                 }
                 SelectEntity_Add(ent);
-                UpdateGizmo();
             }
             return true;
         }
@@ -389,9 +395,7 @@ void EntityEditor::SetMode(int mode) {
     _curImpl->OnEnter();
 }
 
-// clears selection
 void EntityEditor::Open() {
-    ClearSelection();
     UpdateGizmo();
 }
 

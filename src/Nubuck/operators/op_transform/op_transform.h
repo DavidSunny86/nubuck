@@ -42,6 +42,8 @@ private:
     int     _mode;
     bool    _isEditorOpen;
 
+    void SetEditMode(int mode);
+
     void OpenEditor();
 
     void CopyEditorSelection();
@@ -52,9 +54,8 @@ private:
     void Event_UsrSelectEntity(const EV::Usr_SelectEntity& event);
     void Event_UsrChangeEditMode(const EV::Arg<int>& event);
 
-    void Event_SelectionChanged(const EV::Event& event) {
-        OnGeometrySelected();
-	}
+    void Event_SelectionChanged(const EV::Event& event);
+    void Event_EditModeChanged(const EV::Arg<int>& event);
 
     void Event_SetPosition(const EV::Arg<NB::Point3>& event);
 public:
@@ -65,8 +66,6 @@ public:
     void Finish() override { }
     bool IsDone() const override { return true; }
 
-    void OnGeometrySelected() override;
-    void OnEditModeChanged(const W::editMode_t::Enum mode) override;
     void OnMouse(const EV::MouseEvent& event) override;
     void OnKey(const EV::KeyEvent& event) override;
     void OnMeshChanged(const EV::Event& event) override;

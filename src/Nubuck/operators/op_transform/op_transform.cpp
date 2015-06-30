@@ -136,6 +136,15 @@ void TransformPanel::Invoke() {
 ==================================================
 */
 
+void Transform::SetEditMode(int mode) {
+    if(mode != _mode) {
+        _mode = mode;
+        OpenEditor();
+        UpdatePanelVectorsVisibility();
+        UpdatePanelVectorsValues();
+    }
+}
+
 void Transform::OpenEditor() {
     // first, close all editors
     _entityEditor.Close();
@@ -170,7 +179,11 @@ void Transform::CopyEditorSelection() {
             selection.push_back(ent);
             ent = _entityEditor.NextSelectedEntity(ent);
         }
-        W::world.Select_InArray(&selection[0], selection.size());
+        if(selection.empty()) {
+            W::world.ClearSelection();
+        } else {
+            W::world.Select_InArray(&selection[0], selection.size());
+        }
     }
 }
 
@@ -203,6 +216,7 @@ Transform::Transform() : _mode(0), _isEditorOpen(false) {
     AddEventHandler(ev_usr_selectEntity, this, &Transform::Event_UsrSelectEntity);
     AddEventHandler(ev_usr_changeEditMode, this, &Transform::Event_UsrChangeEditMode);
 	AddEventHandler(ev_w_selectionChanged, this, &Transform::Event_SelectionChanged);
+    AddEventHandler(ev_w_editModeChanged, this, &Transform::Event_EditModeChanged);
     AddEventHandler(ev_setPosition, this, &Transform::Event_SetPosition);
 }
 
@@ -220,29 +234,45 @@ bool Transform::Invoke() {
     return true;
 }
 
-void Transform::OnGeometrySelected() {
-    if(W::editMode_t::OBJECTS == _mode) {
-        _entityEditor.CopyGlobalSelection();
-        UpdatePanelVectorsVisibility();
-        UpdatePanelVectorsValues();
-    }
-}
-
-void Transform::Event_UsrSelectEntity(const EV::Usr_SelectEntity& event) {
-    COM_assert(event.entity);
-    if(!event.IsFallthrough()) {
-        if(event.shiftModifier) {
-            W::world.Select_Add(event.entity);
-        } else {
-            W::world.Select_New(event.entity);
+void Transform::Event_SelectionChanged(const EV::Event& event) {
+    /*
+    If this is not a fallthrough event, then we set the selection
+    ourselves and we do not need to update the editor selection
+    */
+    if(event.IsFallthrough()) {
+        if(W::editMode_t::OBJECTS == _mode) {
+            _entityEditor.CopyGlobalSelection();
+            UpdatePanelVectorsVisibility();
+            UpdatePanelVectorsValues();
         }
     }
     event.Accept();
 }
 
-void Transform::Event_UsrChangeEditMode(const EV::Arg<int>& event) {
-    COM_assert(event.value != W::world.GetEditMode().GetMode());
+void Transform::Event_EditModeChanged(const EV::Arg<int>& event) {
+    if(event.IsFallthrough()) {
+        SetEditMode(event.value);
+    }
+    event.Accept();
+}
+
+void Transform::Event_UsrSelectEntity(const EV::Usr_SelectEntity& event) {
+    COM_assert(event.entity);
     if(!event.IsFallthrough()) {
+        SetEditMode(0); // TODO: magic number
+        if(event.shiftModifier) {
+            _entityEditor.SelectEntity_Add(event.entity);
+        } else {
+            _entityEditor.SelectEntity_New(event.entity);
+        }
+        CopyEditorSelection();
+    }
+    event.Accept();
+}
+
+void Transform::Event_UsrChangeEditMode(const EV::Arg<int>& event) {
+    if(!event.IsFallthrough()) {
+        SetEditMode(event.value);
         W::world.GetEditMode().SetMode(W::editMode_t::Enum(event.value));
     }
     event.Accept();
@@ -254,13 +284,6 @@ void Transform::Event_SetPosition(const EV::Arg<NB::Point3>& event) {
     }
 
     event.Accept();
-}
-
-void Transform::OnEditModeChanged(const W::editMode_t::Enum mode) {
-    _mode = mode;
-    OpenEditor();
-    UpdatePanelVectorsVisibility();
-    UpdatePanelVectorsValues();
 }
 
 void Transform::OnMouse(const EV::MouseEvent& event) {
@@ -318,7 +341,18 @@ void Transform::OnKey(const EV::KeyEvent& event) {
 
 void Transform::OnMeshChanged(const EV::Event& event) {
     if(W::editMode_t::OBJECTS == _mode) {
-        _entityEditor.CopyGlobalSelection(); // takes care of deletion
+        // takes care of deletions
+        bool updateSelection = false;
+        W::Entity* ent = _entityEditor.FirstSelectedEntity();
+        while(ent) {
+            if(ent->IsDead()) updateSelection = true;
+            ent = _entityEditor.NextSelectedEntity(ent);
+        }
+        if(updateSelection) {
+            _entityEditor.ClearSelection();
+            _entityEditor.CopyGlobalSelection();
+        }
+
         _entityEditor.UpdateBoundingBoxes();
     } else {
         // HACK, should listen to selectionChanged event instead.
