@@ -16,6 +16,11 @@ void Delete::Register(Invoker& invoker) {
 }
 
 bool Delete::Invoke() {
+    if(W::editMode_t::OBJECTS != W::world.GetEditMode().GetMode()) {
+        NB::LogPrintf("cannot invoke operator 'Delete' when not in OBJECT mode\n");
+        return false;
+    }
+
     NB::SetOperatorName("Delete");
 
     std::vector<NB::Entity> del;

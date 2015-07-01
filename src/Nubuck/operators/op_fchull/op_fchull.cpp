@@ -7,6 +7,7 @@
 
 #include <Nubuck\polymesh.h>
 #include <polymesh\flipclip.h>
+#include <world\world.h>
 #include "op_fchull.h"
 
 namespace OP {
@@ -20,6 +21,11 @@ void FlipClip::Register(Invoker& invoker) {
 }
 
 bool FlipClip::Invoke() {
+    if(W::editMode_t::OBJECTS != W::world.GetEditMode().GetMode()) {
+        NB::LogPrintf("cannot invoke operator 'FlipClip' when not in OBJECT mode\n");
+        return false;
+    }
+
     if(!NB::FirstSelectedMesh()) {
         NB::LogPrintf("no mesh selected.\n");
         return false;

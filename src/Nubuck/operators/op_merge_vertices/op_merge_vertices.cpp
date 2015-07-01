@@ -63,6 +63,11 @@ static leda::node merge_vertices(leda::nb::RatPolyMesh& graph, leda::node v0, le
 }
 
 bool MergeVertices::Invoke() {
+    if(W::editMode_t::VERTICES != W::world.GetEditMode().GetMode()) {
+        NB::LogPrintf("cannot invoke operator 'Merge' when not in VERTEX mode\n");
+        return false;
+    }
+
     if(!NB::FirstSelectedMesh()) {
         std::cout << "MergeVertices: empty selection" << std::endl;
         return false;

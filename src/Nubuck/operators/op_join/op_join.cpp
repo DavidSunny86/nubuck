@@ -18,6 +18,11 @@ void Join::Register(Invoker& invoker) {
 }
 
 bool Join::Invoke() {
+    if(W::editMode_t::OBJECTS != W::world.GetEditMode().GetMode()) {
+        NB::LogPrintf("cannot invoke operator 'Join' when not in OBJECT mode\n");
+        return false;
+    }
+
     NB::SetOperatorName("Join");
 
     NB::Mesh mesh0 = NB::FirstSelectedMesh();

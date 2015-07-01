@@ -6,6 +6,7 @@
 #include <LEDA\geo\d3_hull.h>
 
 #include <Nubuck\polymesh.h>
+#include <world\world.h>
 #include "op_chull.h"
 
 namespace OP {
@@ -19,6 +20,11 @@ void ConvexHull::Register(Invoker& invoker) {
 }
 
 bool ConvexHull::Invoke() {
+    if(W::editMode_t::OBJECTS != W::world.GetEditMode().GetMode()) {
+        NB::LogPrintf("cannot invoke operator 'Convex Hull' when not in OBJECT mode\n");
+        return false;
+    }
+
     if(!NB::FirstSelectedMesh()) {
         NB::LogPrintf("no mesh selected.\n");
         return false;
