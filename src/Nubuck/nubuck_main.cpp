@@ -27,6 +27,7 @@
 #include <Nubuck\operators\operator_invoker.h>
 #include <operators\operators.h>
 #include <operators\op_loop\op_loop.h>
+#include <operators\op_selected_faces\op_selected_faces.h>
 #include <operators\op_gen_randompoints\op_gen_randompoints.h>
 #include <operators\op_gen_platonic_solids\op_gen_platonic_solids.h>
 #include <operators\op_gen_parametric\op_gen_parametric.h>
@@ -161,6 +162,7 @@ int RunNubuck(
 	OP::g_operators.Register(new OP::TransformPanel, new OP::Transform);
 	OP::g_operators.Register(new OP::SetTransformPanel, new OP::SetTransform);
     OP::g_operators.Register(new OP::LoopPanel, new OP::Loop);
+    OP::g_operators.Register(new OP::SelectedFacesPanel, new OP::SelectedFaces);
     OP::g_operators.Register(new OP::GEN::RandomPointsPanel, new OP::GEN::RandomPoints);
     OP::g_operators.Register(new OP::PlatonicSolidsPanel, new OP::PlatonicSolids);
     OP::g_operators.Register(new OP::ParametricPanel, new OP::Parametric);
