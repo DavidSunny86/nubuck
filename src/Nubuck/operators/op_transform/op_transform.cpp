@@ -246,7 +246,6 @@ void Transform::Event_SelectionChanged(const EV::Event& event) {
             UpdatePanelVectorsValues();
         }
     }
-    event.Accept();
 }
 
 void Transform::Event_EditModeChanged(const EV::Arg<int>& event) {
