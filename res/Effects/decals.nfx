@@ -1,5 +1,15 @@
 fx Decals {
     pass Pass0 {
+        state {
+            depth.maskEnabled = GL_FALSE;
+
+            alphaTest {
+                enabled = GL_TRUE;
+                func    = GL_GEQUAL;
+                ref     = 0.5;
+            }
+        }
+
         vs = "#include <Shaders\decals.vert>";
         fs = "#include <Shaders\decals.frag>";
     }

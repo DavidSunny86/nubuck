@@ -98,7 +98,7 @@ void ENT_Geometry::DecalMesh::Render(R::RenderList& renderList) {
     if(!m_vertices.empty()) {
         R::Material mat = R::Material::White;
 
-        R::Texture* tex = R::TextureManager::Instance().Get(common.BaseDir() + "Textures\\circle.tga").Raw();
+        R::Texture* tex = R::TextureManager::Instance().Get(common.BaseDir() + "Textures\\circle_sdf.tga").Raw();
         mat.SetUniformBinding("decalTex", tex);
 
         R::MeshJob mjob;
