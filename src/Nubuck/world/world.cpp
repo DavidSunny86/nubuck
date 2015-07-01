@@ -595,7 +595,7 @@ void World::Update(void) {
             ENT_Geometry& geom = static_cast<ENT_Geometry&>(*entity);
 			geom.HandleEvents();
             geom.CompileMesh();
-            geom.FrameUpdate();
+            geom.FrameUpdate(_secsPassed);
             geom.BuildRenderList();
         }
     }

@@ -6,11 +6,17 @@
 #include <UI\userinterface.h>
 #include <renderer\metrics\metrics.h>
 #include <renderer\texfont\texfont.h>
+#include <renderer\mesh\quad\quad.h>
 #include <world\world_events.h>
 #include <world\world.h>
 #include <operators\operators.h>
 #include "ent_geometry_outln.h"
 #include "ent_geometry.h"
+
+static COM::Config::Variable<float>    cvar_faceCurveSpeed("faceSpeed", 0.2f);
+static COM::Config::Variable<float>    cvar_faceCurveDecalSize("faceDecalSize", 0.2f);
+static COM::Config::Variable<float>    cvar_faceCurveSpacing("faceSpacing", 0.4f);
+static COM::Config::Variable<float>    cvar_faceCurveCurvature("faceCurvature", 0.2f);
 
 namespace {
 
@@ -22,6 +28,89 @@ M::Vector3 ToVector(const leda::d3_rat_point& p) {
 } // unnamed namespace
 
 namespace W {
+
+void ENT_Geometry::DecalMesh::Rebuild(const std::vector<Curve>& curves) {
+    m_vertices.clear();
+    m_indices.clear();
+
+    if(curves.empty()) {
+        return;
+    }
+
+    M::Vector2 texCoords[] = {
+        M::Vector2(-1.0f, -1.0f),
+        M::Vector2( 1.0f, -1.0f),
+        M::Vector2( 1.0f,  1.0f),
+        M::Vector2(-1.0f,  1.0f)
+    };
+
+    R::Mesh::Index indices[] = { 0, 1, 2, 0, 2, 3 };
+
+    for(unsigned i = 0; i < curves.size(); ++i) {
+        for(unsigned j = 0; j < curves[i].curve.decalPos.size(); ++j) {
+            // emit quad indices
+            unsigned baseIdx = m_vertices.size();
+            for(int k = 0; k < 6; ++k) {
+                m_indices.push_back(baseIdx + indices[k]);
+            }
+            m_indices.push_back(R::Mesh::RESTART_INDEX);
+
+            // emit quad vertices
+
+            const M::Vector3& position = curves[i].curve.decalPos[j];
+            const M::Matrix3& localToWorld = curves[i].localToWorld;
+
+            R::Mesh::Vertex vertex;
+            for(int k = 0; k < 4; ++k) {
+                vertex.position = position;
+                vertex.normal.x = cvar_faceCurveDecalSize;
+                vertex.texCoords = texCoords[k];
+                vertex.color = curves[i].color;
+                vertex.A[0] = M::Vector3(localToWorld.m00, localToWorld.m10, localToWorld.m20);
+                vertex.A[1] = M::Vector3(localToWorld.m01, localToWorld.m11, localToWorld.m21);
+                vertex.A[2] = M::Vector3(localToWorld.m02, localToWorld.m12, localToWorld.m22);
+                m_vertices.push_back(vertex);
+            }
+        }
+    }
+
+    bool rebuildMesh = !m_mesh || R::meshMgr.GetMesh(m_mesh).GetVertices().size() < m_vertices.size();
+    if(true || rebuildMesh) { // !!!
+        if(m_mesh) R::meshMgr.Destroy(m_mesh);
+        if(m_tfmesh) R::meshMgr.Destroy(m_tfmesh);
+
+        R::Mesh::Desc meshDesc;
+        meshDesc.indices = &m_indices[0];
+        meshDesc.numIndices = m_indices.size();
+        meshDesc.vertices = &m_vertices[0];
+        meshDesc.numVertices = m_vertices.size();
+        meshDesc.primType = GL_TRIANGLES;
+
+        m_mesh = R::meshMgr.Create(meshDesc);
+        m_tfmesh = R::meshMgr.Create(m_mesh);
+    } else {
+        R::meshMgr.GetMesh(m_mesh).Invalidate(&m_vertices[0], 0, sizeof(R::Mesh::Vertex) * m_vertices.size());
+        R::meshMgr.GetMesh(m_mesh).Invalidate(&m_indices[0], m_indices.size());
+    }
+}
+
+void ENT_Geometry::DecalMesh::Render(R::RenderList& renderList) {
+    if(!m_vertices.empty()) {
+        R::Material mat = R::Material::White;
+
+        R::Texture* tex = R::TextureManager::Instance().Get(common.BaseDir() + "Textures\\circle.tga").Raw();
+        mat.SetUniformBinding("decalTex", tex);
+
+        R::MeshJob mjob;
+        mjob.fx = "Decals";
+        mjob.layer = R::Renderer::Layers::GEOMETRY_0_SOLID_1;
+        mjob.material = mat;
+        mjob.primType = 0;
+        mjob.tfmesh = m_tfmesh;
+
+        renderList.meshJobs.push_back(mjob);
+    }
+}
 
 void ENT_Geometry::ForceRebuild() {
     OP::g_operators.InvokeAction(ev_w_rebuildAll.Tag(), OP::Operators::InvokationMode::ALWAYS);
@@ -439,6 +528,7 @@ void ENT_Geometry::Rebuild() {
     }
 
     RebuildVertexLabels();
+    RebuildCurves();
 }
 
 static leda::d3_rat_point ToRatPoint(const M::Vector3& v) {
@@ -639,7 +729,7 @@ void ENT_Geometry::SetPatternColor(const R::Color& color) {
     _patternColor = color;
 }
 
-void ENT_Geometry::FrameUpdate() {
+void ENT_Geometry::FrameUpdate(float secsPassed) {
     static SYS::Timer timer;
 
 	SYS::ScopedLock lock(_mtx);
@@ -651,6 +741,32 @@ void ENT_Geometry::FrameUpdate() {
     timer.Start();
     _edgeRenderer->SetTransform(tf, world.GetCameraMatrix());
     R::metrics.frame.edgeRendererSetTransformAccu += timer.Stop();
+
+    // rebuild curves, if necessary
+
+    if(cvar_faceCurveCurvature.IsDirty()) {
+        RebuildCurves();
+    }
+
+    bool rebuildDecals = cvar_faceCurveSpacing.IsDirty() || cvar_faceCurveDecalSize.IsDirty();
+
+    // animate curves
+    if(0.0f < cvar_faceCurveSpeed) {
+        rebuildDecals = true;
+        for(unsigned i = 0; i < _curves.size(); ++i) {
+            _curves[i].time += cvar_faceCurveSpeed * secsPassed;
+        }
+    }
+
+    if(rebuildDecals) {
+        for(unsigned i = 0; i < _curves.size(); ++i) {
+            ComputeCurveDecals(_curves[i]);
+        }
+    }
+
+    cvar_faceCurveDecalSize.ClearDirtyFlag();
+    cvar_faceCurveCurvature.ClearDirtyFlag();
+    cvar_faceCurveSpacing.ClearDirtyFlag();
 }
 
 void ENT_Geometry::BuildRenderList() {
@@ -733,6 +849,11 @@ void ENT_Geometry::BuildRenderList() {
             rjob.layer      = R::Renderer::Layers::GEOMETRY_0_SOLID_0;
             _renderList.meshJobs.push_back(rjob);
         }
+
+        // curves
+
+        _decalMesh.Rebuild(_curves);
+        _decalMesh.Render(_renderList);
     }
 
     if(NB::RM_NODES & _renderMode && !_nodeRenderer->IsEmpty()) {
@@ -813,6 +934,100 @@ void ENT_Geometry::BuildRenderList() {
 void ENT_Geometry::AttachAnimation(A::Animation* anim) {
     anim->subjectLink.next = _anims;
     _anims = anim;
+}
+
+static inline M::Vector2 ProjXY(const M::Vector3& v) {
+    return M::Vector2(v.x, v.y);
+}
+
+void ENT_Geometry::ComputeCurveDecals(Curve& cv) {
+    // avoid overlapping decals
+    float w = cvar_faceCurveDecalSize + cvar_faceCurveSpacing;
+    int n = (int)(cv.curve.length / w);
+    float def = cv.curve.length - n * w;
+    w += def / n;
+
+    std::vector<M::Vector2> decalPos2;
+    cv.curve.decalPos.clear();
+    R::SampleEquidistantPoints(cv.curve, cv.time, w, decalPos2);
+    for(unsigned i = 0; i < decalPos2.size(); ++i) {
+        M::Vector3 p = M::Transform(cv.localToWorld, M::Vector3(decalPos2[i].x, decalPos2[i].y, 0.0f)) + cv.origin;
+        const float eps = 0.001f; // resolves z-fighting of faces and hull
+        p += eps * cv.normal;
+        cv.curve.decalPos.push_back(p);
+    }
+}
+
+
+void ENT_Geometry::RebuildCurve(Curve& cv) {
+    COM_assert(cv.faceIdx < _faces.size());
+    const Face& face = _faces[cv.faceIdx];
+
+    // create local copy of shrinked points
+    std::vector<M::Vector3> points;
+    points.reserve(face.sz);
+    M::Vector3 center = M::Vector3::Zero;
+    for(unsigned i = 0; i < face.sz; ++i) {
+        const M::Vector3& p = _vertices[face.idx + i].position;
+        center += p;
+        points.push_back(p);
+    }
+    center /= points.size();
+    const float f = 0.2f;
+    for(unsigned i = 0; i < points.size(); ++i)
+        points[i] = points[i] - f * (points[i] - center);
+
+    const M::Vector3& p0 = points[0];
+    const M::Vector3& p1 = points[1];
+    const M::Vector3& p2 = points[2];
+
+    M::Vector3 v0 = M::Normalize(p1 - p0);
+    M::Vector3 v1 = M::Normalize(p2 - p0);
+    M::Vector3 v2 = M::Normalize(M::Cross(v0, v1));
+
+    M::Matrix3 M(M::Mat3::FromColumns(v0, v1, v2));
+    if(M::AlmostEqual(0.0f, M::Det(M))) common.printf("ERROR - ENT_Geometry::RebuildCurve: matrix M is not invertable.\n");
+    M::Orthonormalize(M);
+    M::Matrix3 invM(M::Inverse(M)); // TODO transpose
+
+    cv.localToWorld = M;
+    cv.origin = p0;
+    cv.normal = v2;
+
+    cv.curve = R::PolyBezier2U();
+    const float s = cvar_faceCurveCurvature;
+    // compute endpoints and transform both control and endpoints to local space.
+    for(unsigned i = 0; i < face.sz; ++i) {
+        const M::Vector3& c0 = points[i];
+        const M::Vector3& c1 = points[(i + 1) % face.sz];
+        cv.curve.points.push_back(ProjXY(M::Transform(invM, (1.0f - s) * c0 + s * c1 - p0))); // must start at first endpoint!
+        cv.curve.points.push_back(ProjXY(M::Transform(invM,  0.5f * c0 + 0.5f * c1 - p0)));
+        cv.curve.points.push_back(ProjXY(M::Transform(invM,  s * c0 + (1.0f - s) * c1 - p0)));
+        cv.curve.points.push_back(ProjXY(M::Transform(invM,  c1 - p0)));
+    }
+    cv.curve.points.push_back(cv.curve.points.front()); // close poly
+
+    R::ComputeTSamples(cv.curve);
+    ComputeCurveDecals(cv);
+}
+
+void ENT_Geometry::RebuildCurves() {
+    for(unsigned i = 0; i < _curves.size(); ++i) {
+        Curve& cv = _curves[i];
+        if(true || cv.dirty) { // NOTE: always rebuild curves on Rebuild()
+            RebuildCurve(cv);
+            cv.dirty = false;
+        }
+    }
+}
+
+void ENT_Geometry::AddCurve(leda::face face, const R::Color& color) {
+    Curve cv;
+    cv.faceIdx = face->id();
+    cv.time = 0.0f;
+    cv.color = color;
+    cv.dirty = true;
+    _curves.push_back(cv);
 }
 
 void SetColorsFromVertexSelection(

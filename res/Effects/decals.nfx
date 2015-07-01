@@ -1,0 +1,6 @@
+fx Decals {
+    pass Pass0 {
+        vs = "#include <Shaders\decals.vert>";
+        fs = "#include <Shaders\decals.frag>";
+    }
+}

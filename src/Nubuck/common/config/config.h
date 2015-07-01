@@ -44,8 +44,9 @@ public:
     private:
         std::string _name;
         TYPE        _val;
+        bool        _isDirty;
     public:
-        Variable(const std::string& name, const TYPE& defaultValue) : _name(name), _val(defaultValue) {
+        Variable(const std::string& name, const TYPE& defaultValue) : _name(name), _val(defaultValue), _isDirty(false) {
             Config::Instance().Add(this);
         }
 
@@ -57,6 +58,7 @@ public:
             TYPE val;
             if(Impl::Parse(str, val)) {
                 _val = val;
+                _isDirty = true;
                 return true;
             } else {
                 common.printf("WARNING - unable to parse string '%s' as value of type '%s'\n",
@@ -73,8 +75,13 @@ public:
 
         Variable& operator=(const TYPE& val) {
             _val = val;
+            _isDirty = true;
             return *this;
         }
+
+        bool IsDirty() const { return _isDirty; }
+
+        void ClearDirtyFlag() { _isDirty = false; }
     };
 private:
     VarInfo* _vars;

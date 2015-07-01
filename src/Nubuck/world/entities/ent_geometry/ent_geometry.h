@@ -9,6 +9,7 @@
 #include <renderer\renderer.h>
 #include <renderer\mesh\mesh.h>
 #include <renderer\mesh\meshmgr.h>
+#include <renderer\mesh\bezier\bezier.h>
 #include <renderer\nodes\r_billboard_nodes.h>
 #include <renderer\nodes\r_point_nodes.h>
 #include <renderer\edges\r_cylinder_edges.h>
@@ -49,9 +50,20 @@ private:
         unsigned idx;
         unsigned sz;
     };
+    struct Curve {
+        unsigned        faceIdx;
+        float           time;
+        R::Color        color;
+        M::Matrix3      localToWorld; // face transformation. face's base vertex is local origin
+        M::Vector3      origin;
+        M::Vector3      normal;
+        R::PolyBezier2U curve;
+        bool            dirty;
+    };
     std::vector<M::Vector3>         _fpos;
     std::vector<leda::node>         _vmap; // maps rendermesh vertex IDs to polymesh vertices
     std::vector<Face>               _faces;
+    std::vector<Curve>              _curves;
     std::vector<R::Mesh::Vertex>    _vertices;
     std::vector<R::Mesh::Index>     _indices;
     R::Mesh::Desc                   _meshDesc;
@@ -59,6 +71,27 @@ private:
     R::tfmeshPtr_t                  _tfmesh;
     bool                            _meshCompiled; // TODO: might be a race cond
     bool                            _forceRebuild;
+
+    void ComputeCurveDecals(Curve& cv);
+    void RebuildCurve(Curve& curve);
+
+    void RebuildCurves();
+
+    // the single mesh that stores all decals of all curves,
+    // updated every frame
+    struct DecalMesh {
+        R::meshPtr_t                    m_mesh;
+        R::tfmeshPtr_t                  m_tfmesh;
+
+        std::vector<R::Mesh::Vertex>    m_vertices;
+        std::vector<R::Mesh::Index>     m_indices;
+
+        DecalMesh() : m_mesh(NULL), m_tfmesh(NULL) { }
+
+        void Rebuild(const std::vector<Curve>& curves);
+        void Render(R::RenderList& renderList);
+
+    } _decalMesh;
 
     void ForceRebuild();
 
@@ -188,11 +221,13 @@ public:
     float   GetVertexLabelSize() const { return _vertexLabelSize; }
     bool    GetXrayVertexLabels() const { return _xrayVertexLabels; }
 
-    void FrameUpdate();
+    void FrameUpdate(float secsPassed);
     void BuildRenderList();
     const R::RenderList& GetRenderList() const { return _renderList; }
 
     void AttachAnimation(A::Animation* animation);
+
+    void AddCurve(leda::face face, const R::Color& color);
 };
 
 void SetColorsFromVertexSelection(
